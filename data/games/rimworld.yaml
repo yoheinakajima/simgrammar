@@ -107,6 +107,8 @@ mechanics:
     Workshop.'
 influenced_by:
 - dwarf-fortress
+store_ids:
+  steam: 294100
 sources:
 - src-wikipedia-rimworld
 status: sourced
@@ -115,3 +117,4 @@ provenance:
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-25-contributor-readiness
+  - 2026-10-25-store-ids-pilot

@@ -100,8 +100,12 @@ mechanics:
   role: supporting
   note: Parts are destroyed individually by impact or overheating, removing their engines, tanks, or controls
     from the craft.
+store_ids:
+  steam: 220200
 sources:
 - src-wikipedia-kerbal-space-program
 status: sourced
 provenance:
   created: 2026-10-24-catalog-gg
+  reviewed:
+  - 2026-10-25-store-ids-pilot

@@ -73,8 +73,12 @@ mechanics:
 - id: blueprints
   role: supporting
   note: The duplicator tool and Advanced Duplicator addon copy and paste multi-prop contraptions.
+store_ids:
+  steam: 4000
 sources:
 - src-wikipedia-garrys-mod
 status: sourced
 provenance:
   created: 2026-10-24-catalog-gg
+  reviewed:
+  - 2026-10-25-store-ids-pilot

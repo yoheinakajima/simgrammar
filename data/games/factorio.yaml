@@ -164,6 +164,8 @@ mechanics:
   role: supporting
 influenced_by:
 - minecraft
+store_ids:
+  steam: 427520
 claims:
 - text: Factorio was publicly purchasable as an alpha from its official site in 2013, after the February
     2013 Indiegogo campaign, three years before Steam early access on 2016-02-25; `year` records the 2013
@@ -199,3 +201,4 @@ provenance:
   created: 2026-10-24-catalog-gh
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-25-store-ids-pilot

@@ -94,8 +94,12 @@ mechanics:
 influenced_by:
 - elite
 - ultima-online
+store_ids:
+  steam: 8500
 sources:
 - src-wikipedia-eve-online
 status: sourced
 provenance:
   created: 2026-10-24-catalog-gi
+  reviewed:
+  - 2026-10-25-store-ids-pilot

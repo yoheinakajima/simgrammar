@@ -101,6 +101,8 @@ mechanics:
   role: supporting
 influenced_by:
 - simcity-4
+store_ids:
+  steam: 255710
 claims:
 - text: 'Cities: Skylines is credited with reviving the SimCity style of city builder after SimCity (2013).'
   sources:
@@ -116,3 +118,4 @@ provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-25-store-ids-pilot

@@ -1,0 +1,43 @@
+id: 2026-10-25-store-ids-pilot
+type: run
+kind: catalog
+date: '2026-10-25'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-sonnet-5-5
+  harness: Claude Code subagent (pilot)
+purpose: Add confirmed Steam, IGDB, and Wikidata ids to 10 PC simulation games (store-ids brief).
+method: >-
+  Read AGENTS.md, CONTRACT.md section 2, tasks/store-ids.md, the game schema, and scripts/check_sources.py to see how
+  store ids are judged (Steam name similarity, Wikidata English label, IGDB format only). Searched the Steam store by
+  game name with WebSearch limited to store.steampowered.com, then opened each store page with WebFetch and compared the
+  page title, developer, and release date with the record. Confirmed and added Steam app ids for dwarf-fortress (975370),
+  banished (242920), cities-skylines (255710), eve-online (8500), factorio (427520), garrys-mod (4000),
+  kerbal-space-program (220200), and rimworld (294100); every page title equals the record name. Added no id for
+  minecraft: the search hit store.steampowered.com/app/3049290 returned the Steam home page when opened, and the Steam
+  developer listing for Mojang Studios shows only Dungeons and Legends titles. Added no id for football-manager: the
+  record covers the whole series since 2004 while Steam sells one app per yearly edition (the search showed Football
+  Manager 26 as app 3551340). No Wikidata or IGDB id was added for any game: wikidata.org and igdb.com pages could not be
+  opened with WebFetch (url_not_found and client_error), PCGamingWiki shows no such ids in the fetched text, and the
+  search listings were not accepted as confirmation because one listing showed a title and an id that disagree. Three
+  URLs I built by hand (Steam storesearch API, Wikipedia pageprops API, Wikidata EntityData) were refused by the fetch
+  permission check and were not retried. Ran make check before and
+  after the edit. Appended this run to provenance.reviewed of the eight games that gained an id; minecraft and football-manager
+  were checked and left unchanged, for the reasons above.
+contract_version: '1.1'
+proposals:
+- kind: other
+  target: tasks/store-ids.md
+  detail: >-
+    The brief says to add ids only for the exact edition the record describes. Dwarf Fortress and Garry's Mod are
+    recorded under their first release year (2006 free build, 2004 free mod) while their only Steam page is the later paid
+    edition (2022 and 2006) and the record's design_notes mention that edition. I added the Steam id for both, treating
+    the paid edition as the same game, not a remaster or sequel. The brief should state this rule, and maintainers can
+    strike either id if it is wrong.
+- kind: other
+  target: data/games/eve-online.yaml
+  detail: >-
+    The Steam page for app 8500 lists the developer as Fenris Creations. Search headlines (not opened) say CCP Games
+    rebranded to Fenris Creations in 2026. The record still says CCP Games. A maintenance run could update developer or
+    add an alias; this run left it unchanged because it is outside the store-ids brief.

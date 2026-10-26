@@ -84,6 +84,8 @@ mechanics:
   role: supporting
 - id: fire-spread
   role: supporting
+store_ids:
+  steam: 242920
 claims:
 - text: Banished is credited with starting the survival city-builder trend.
   sources:
@@ -98,3 +100,4 @@ provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-25-store-ids-pilot
