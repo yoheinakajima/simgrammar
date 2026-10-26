@@ -1,0 +1,15 @@
+id: src-therabidsquirel-2026-fallout-shelter-faq-wasteland
+type: source
+name: 'The Fallout Shelter FAQ, Section 10: The Wasteland'
+kind: encyclopedia
+authors:
+- therabidsquirel
+venue: GitHub wiki
+date: '2026'
+url: 'https://github.com/therabidsquirel/The-Fallout-Shelter-FAQ/wiki/Section-10:-The-Wasteland'
+accessed: '2026-10-25'
+notes: Community FAQ. Explorers find caps (scaling linearly with Luck), junk, weapons, and outfits, auto-equip better
+  finds, return automatically at a 100-item carry limit, consume stimpaks and RadAway on the trip, and can be revived
+  for 100 to 1,000 caps by level; Endurance gives radiation resistance in the wasteland.
+provenance:
+  created: 2026-10-25-catalog-game-pilot

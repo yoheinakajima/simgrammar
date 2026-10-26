@@ -1,0 +1,16 @@
+id: src-kairosoftwiki-2026-gds-consoles
+type: source
+name: Consoles (Game Dev Story)
+kind: encyclopedia
+authors:
+- Kairosoft Wiki contributors
+venue: Kairosoft Wiki (wiki.gg)
+date: '2026'
+url: https://kairosoft.wiki.gg/wiki/Consoles_(Game_Dev_Story)
+accessed: '2026-10-25'
+notes: Stub page. Each console has an availability date and a removal date in in-game years, months, and weeks, with
+  a three-month warning before removal; no new games for a removed console; licenses are bought for every console
+  except PC, at rising prices; custom consoles need a hardware engineer and the level 3 office and combine a chosen
+  type, CPU, and media.
+provenance:
+  created: 2026-10-25-catalog-game-pilot

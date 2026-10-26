@@ -1,0 +1,17 @@
+id: src-wikipedia-fallout-shelter
+type: source
+name: Fallout Shelter
+kind: encyclopedia
+authors:
+- Wikipedia contributors
+venue: Wikipedia
+date: '2026'
+url: https://en.wikipedia.org/wiki/Fallout_Shelter
+accessed: '2026-10-25'
+notes: Bethesda Game Studios with Behaviour Interactive, published by Bethesda Softworks, Unity. iOS 2015-06-14
+  (announced and released at E3), Android 2015-08-13, Windows 2016-07-14, Xbox One 2017-02-07, PS4 and Switch
+  2018-06-10. Overseer meets dwellers' power, food, and water needs; SPECIAL-based room assignment; training rooms;
+  breeding in living quarters; rushing risks incidents; lunchboxes; later updates added crafting, pets, quests, and
+  survival mode. Pete Hines named Little Computer People, Progress Quest, XCOM, SimCity, and FTL as inspirations.
+provenance:
+  created: 2026-10-25-catalog-game-pilot

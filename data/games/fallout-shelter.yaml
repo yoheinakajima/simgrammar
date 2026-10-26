@@ -1,0 +1,225 @@
+id: fallout-shelter
+type: game
+name: Fallout Shelter
+summary: A vault management sim in which the Overseer builds rooms in an underground shelter, assigns dwellers
+  to power, food, and water production by their SPECIAL stats, and grows the population through recruitment,
+  rescue, and breeding.
+year: 2015
+developer: Bethesda Game Studios, Behaviour Interactive
+platforms:
+- mobile
+- pc
+- console
+- handheld
+subgenre: colony-sim
+subgenre_secondary:
+- management-tycoon
+sim_domain:
+- social-interpersonal
+- industrial-logistics
+player_role: overseer
+agency_model:
+- direct-unit
+- zoning-placement
+time_model: real-world-clock
+sim_scale: settlement
+fidelity: stylized
+perspective: top-down-2d
+win_structure: open-sandbox
+failure_model: soft-recoverable
+narrative_mode: hybrid
+multiplayer:
+- single
+modding: none
+production_tier: aa
+agent_count_order: '100'
+emergence: 2
+influence: 2
+core_loop: dig and build rooms in the vault cross-section -> drag dwellers into rooms matching their SPECIAL
+  stats -> rooms produce power, food, and water on timed cycles -> rush a cycle at the risk of an incident
+  -> recruit, rescue, and breed dwellers -> population thresholds unlock rooms and stronger attackers
+design_notes: 'Fallout Shelter is a side-on cross-section of an underground vault built downward from the door,
+  with elevators linking floors. Each production room reads one SPECIAL stat (Strength for power), and dwellers
+  with more of that stat finish its cycle faster; adjacent rooms of the same type and level merge up to three
+  wide, which raises output and cuts the upgrade cost per room. Power is shed by distance: when supply falls short,
+  rooms farthest from the power sources stop first. Rushing a room completes its cycle at once but can trigger an
+  incident; incidents also fire from a background timer whose chance rises until one is guaranteed, spread only
+  from empty rooms to neighbours without revisiting a room, and grow stronger with average dweller level, room
+  level, and room width. Dweller happiness settles at 50 percent, or 75 percent in a room matching the dweller''s
+  best stat, rises with successful rushes and breeding, and falls with injury, radiation, and bodies left in the
+  vault. Wasteland exploration sends one dweller out alone for hours of real time to fight and collect caps, junk,
+  weapons, and outfits, spending the stimpaks and RadAway they carry, until recalled, full, or dead (proposed as
+  timed-expedition). When it loads, the game generates what happened while it was closed from the device clock
+  and the last played time, but incidents only occur while it runs in the foreground.'
+mechanics:
+- id: goods-consumption
+  role: core
+  note: Dwellers draw down vault stocks of food and water; shortages injure and irradiate dwellers and lower their
+    happiness.
+- id: power-grid
+  role: core
+  note: Power generators staffed by high-Strength dwellers supply almost every room; when output falls short, rooms
+    stop working starting with those farthest from the power sources.
+- id: agent-skills
+  role: core
+  note: Each dweller has seven SPECIAL stats that training rooms raise one point at a time to 10; the matching stat
+    sets production speed, and level-ups add health scaled by Endurance.
+- id: romance-family
+  role: core
+  note: An adult man and woman placed in living quarters meet, talk, dance, and mate; related dwellers other than
+    cousins, aunts, uncles, nephews, and nieces cannot mate.
+- id: trait-inheritance
+  role: supporting
+  note: A child has a 50 percent chance of inheriting either parent's highest SPECIAL stat, and parents with maxed
+    stats can produce children with far higher stat totals.
+- id: lifecycle-aging
+  role: supporting
+  note: Pregnant dwellers give birth only when the vault has space, and children wander the vault for three hours
+    before becoming assignable adults.
+- id: unit-commands
+  role: supporting
+  note: The player drags individual dwellers into rooms, out to the wasteland, or into a room with an incident;
+    dwellers do not choose their own jobs.
+- id: free-placement
+  role: supporting
+  note: Rooms are dug into the rock on a grid next to existing rooms and elevators, and matching rooms placed side
+    by side merge into double and triple rooms.
+- id: vertical-layers
+  role: supporting
+  note: The vault is a stack of underground floors connected by elevator shafts, with the vault door at the top.
+- id: milestone-unlocks
+  role: supporting
+  note: Room types unlock as the dweller population passes thresholds, such as the Nuclear Reactor at 60 dwellers.
+- id: random-disasters
+  role: supporting
+  note: Fires, radroaches, mole rats, and radscorpions break out from a background timer or a failed rush and spread
+    from empty rooms to adjacent ones.
+- id: raid-defense
+  role: supporting
+  note: Raiders, feral ghouls, and deathclaws attack from outside through the vault door, and dwellers armed with
+    scavenged weapons fight them in the rooms they reach.
+- id: adaptive-threat-scaling
+  role: supporting
+  note: Incident and attack strength rises with the vault's average dweller level and with the level and width of
+    the room under attack, and each attacker type appears only above a population threshold.
+- id: hand-crafting
+  role: supporting
+  note: A 2016 update added workshop rooms that craft weapons and outfits from scavenged junk using found recipes.
+- id: permadeath
+  role: supporting
+  note: In survival mode dead dwellers cannot be revived; in normal mode they can be revived for caps.
+- id: real-time-clock
+  role: supporting
+  note: On load the game computes everything that happened since the last session from the device clock, so
+    changing the device time breaks room timers.
+influenced_by:
+- little-computer-people
+- simcity-1989
+- ftl
+claims:
+- text: Fallout Shelter was developed by Bethesda Game Studios with help from Behaviour Interactive.
+  sources:
+  - src-wikipedia-fallout-shelter
+  confidence: medium
+  quote: developed by Bethesda Game Studios, with assistance by Behaviour Interactive
+  locator: lead
+- text: Bethesda Softworks announced Fallout Shelter, a free-to-play iOS game, at its E3 2015 press conference.
+  sources:
+  - src-gematsu-2015-fallout-shelter-ios
+  confidence: high
+  quote: Bethesda Softworks announced the free-to-play Fallout Shelter for iOS during its E3 2015 press conference.
+  locator: first paragraph
+- text: The iOS version was released on the day it was announced, 2015-06-14.
+  sources:
+  - src-wikipedia-fallout-shelter
+  confidence: medium
+  quote: would be released for iOS the same day
+  locator: Development
+- text: Pete Hines named Little Computer People, Progress Quest, XCOM, SimCity, and FTL as inspirations.
+  sources:
+  - src-wikipedia-fallout-shelter
+  confidence: medium
+  quote: 'Little Computer People, Progress Quest, XCOM, SimCity and FTL: Faster Than Light'
+  locator: Development
+- text: Pairing a male and a female dweller in living quarters produces children.
+  sources:
+  - src-wikipedia-fallout-shelter
+  confidence: medium
+  quote: by pairing a male and a female dweller in living quarters to produce children
+  locator: Gameplay
+- text: Rushing a room risks triggering an incident.
+  sources:
+  - src-wikipedia-fallout-shelter
+  confidence: medium
+  quote: instead having the option to rush the room at the risk of triggering an incident
+  locator: Gameplay
+- text: When power runs short, rooms stop working starting with those farthest from the power sources.
+  sources:
+  - src-falloutwiki-2026-power-generator
+  confidence: medium
+  quote: other rooms will stop producing resources/working, starting with the rooms furthest from the power sources
+  locator: Fallout Shelter section
+- text: A child has a 50 percent chance of inheriting either parent's highest SPECIAL stat.
+  sources:
+  - src-falloutwiki-2026-vault-dwellers
+  confidence: medium
+  quote: Children have a 50% chance of inheriting the 'proficiency' (highest SPECIAL attribute) of either parent.
+  locator: Breeding
+- text: Children become assignable adults three hours after birth.
+  sources:
+  - src-falloutwiki-2026-vault-dwellers
+  confidence: medium
+  quote: After three hours from a Vault dweller's birth, they will become an adult and thus be assignable.
+  locator: Breeding
+- text: Incidents and attacks grow stronger as the vault's average dweller level rises.
+  sources:
+  - src-therabidsquirel-2026-fallout-shelter-faq-incidents
+  confidence: medium
+  quote: get significantly stronger as your average dweller level increases
+  locator: Difficulty scaling
+- text: Incidents spread only from rooms with no dwellers in them.
+  sources:
+  - src-therabidsquirel-2026-fallout-shelter-faq-incidents
+  confidence: medium
+  quote: Incidents only spread when a room is empty
+  locator: Spreading
+- text: Dweller happiness settles at 50 percent by default.
+  sources:
+  - src-therabidsquirel-2026-fallout-shelter-faq-happiness
+  confidence: medium
+  quote: Dwellers normally stabilize at 50% happiness
+  locator: Section 4, happiness
+- text: Keeping enough food and water in stock prevents dwellers from becoming injured or irradiated.
+  sources:
+  - src-therabidsquirel-2026-fallout-shelter-faq-happiness
+  confidence: low
+  quote: Be sure to have enough food and water to avoid either of those things happening
+  locator: Section 4, happiness
+- text: Elapsed time is computed from the device clock when the game is loaded.
+  sources:
+  - src-therabidsquirel-2026-fallout-shelter-faq-basics
+  confidence: medium
+  quote: The game calculates everything when you load it up based on the current device time
+  locator: '1.1'
+- text: The Steam edition lists Bethesda Game Studios as developer and describes building a vault and keeping
+    dwellers happy.
+  sources:
+  - src-steam-2017-fallout-shelter
+  confidence: high
+  quote: Build the perfect Vault, keep your Dwellers happy, and protect them from the dangers of the Wasteland.
+  locator: About This Game
+store_ids:
+  steam: 588430
+sources:
+- src-wikipedia-fallout-shelter
+- src-steam-2017-fallout-shelter
+- src-gematsu-2015-fallout-shelter-ios
+- src-falloutwiki-2026-vault-dwellers
+- src-falloutwiki-2026-power-generator
+- src-therabidsquirel-2026-fallout-shelter-faq-incidents
+- src-therabidsquirel-2026-fallout-shelter-faq-basics
+- src-therabidsquirel-2026-fallout-shelter-faq-happiness
+- src-therabidsquirel-2026-fallout-shelter-faq-wasteland
+status: sourced
+provenance:
+  created: 2026-10-25-catalog-game-pilot

@@ -1,0 +1,14 @@
+id: src-therabidsquirel-2026-fallout-shelter-faq-basics
+type: source
+name: 'The Fallout Shelter FAQ, Section 1: Important Information'
+kind: encyclopedia
+authors:
+- therabidsquirel
+venue: GitHub wiki
+date: '2026'
+url: 'https://github.com/therabidsquirel/The-Fallout-Shelter-FAQ/wiki/Section-1:-Important-Information'
+accessed: '2026-10-25'
+notes: Community FAQ. The game computes elapsed time on load from the current device time and the last played time,
+  so changing the device clock breaks room timers.
+provenance:
+  created: 2026-10-25-catalog-game-pilot

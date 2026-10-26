@@ -1,0 +1,144 @@
+id: pocket-city
+type: game
+name: Pocket City
+summary: A premium mobile city builder in which the mayor zones residential, commercial, and industrial land
+  along roads that also carry power and water, and earns experience levels that unlock buildings.
+year: 2018
+developer: Codebrew Games
+platforms:
+- mobile
+- pc
+subgenre: city-builder
+sim_domain:
+- urban
+- economic
+player_role: planner-mayor
+agency_model:
+- zoning-placement
+- policy-parameter
+time_model: real-time
+sim_scale: city
+fidelity: stylized
+perspective: isometric
+win_structure: open-sandbox
+failure_model: soft-recoverable
+narrative_mode: hybrid
+multiplayer:
+- single
+modding: none
+production_tier: indie
+agent_count_order: aggregate
+emergence: 2
+influence: 1
+core_loop: zone residential, commercial, and industrial land beside roads -> place power plants and water
+  towers on the road network -> zones develop as demand allows -> taxes fund services and land -> respond
+  to crime, fires, disasters, and quests for experience -> level up to unlock buildings
+design_notes: 'Pocket City cuts the SimCity utility layer down to the road graph: power plants and water towers
+  sit on roads, and any building within two tiles of a road receives power, water, and access, so there are
+  no power lines, pipes, or terrain elevation to manage. A gauge reports which zone type citizens demand.
+  Progression runs on experience rather than population: construction, responding to crime, fires, and disasters,
+  completing quests from residents and an advisor, and hosting events such as block parties, firework shows,
+  and rocket launches add experience, and each city level unlocks buildings or pays out cash. The map grows by
+  buying extra plots from a landlord whose price rises with each purchase (proposed as land-expansion).
+  Difficulty settings change starting cash and whether the city depends on bank loans, and a sandbox mode
+  removes costs, quests, and levels. It was sold as a premium game with no timers or in-app purchases.'
+mechanics:
+- id: zoning
+  role: core
+  note: The player paints residential, commercial, and industrial zones tile by tile or by dragging, and lots
+    develop only when they are within reach of a road with power and water.
+- id: road-network
+  role: core
+  note: Roads are the only utility network; a building within two tiles of a road gets power, water, and access,
+    so the player lays more road than traffic alone would need.
+- id: milestone-unlocks
+  role: core
+  note: Experience from building, quests, hosted events, and handling crime, fires, and disasters raises the city
+    level, and levels unlock building types and grant money.
+- id: rci-demand
+  role: supporting
+  note: A gauge at the top of the screen shows whether citizens want more residential, commercial, or industrial
+    zoning.
+- id: power-grid
+  role: supporting
+  note: Power plants placed on a road supply the buildings served by the road network instead of a separate grid
+    of power lines.
+- id: taxation
+  role: supporting
+  note: Raising taxes increases revenue at the cost of residents leaving, and lowering them attracts residents.
+- id: budget-treasury
+  role: supporting
+  note: City funds pay for construction, services, and land; difficulty sets how much cash the city starts with
+    and how expensive building is.
+- id: loans-debt
+  role: supporting
+  note: On Expert difficulty the city must take bank loans to keep building.
+- id: service-coverage
+  role: supporting
+  note: Safety buildings (police, fire department, hospital) and recreation unlock with level as the city grows.
+- id: crime-policing
+  role: supporting
+  note: Crime rises as the city grows; police stations unlock with level, and stopping crime earns experience.
+- id: random-disasters
+  role: supporting
+  note: Disasters such as tornadoes strike at random or when the player triggers them, can be switched off, and
+    damaged buildings are repaired with a paid rebuild button.
+- id: free-placement
+  role: supporting
+  note: Service buildings, parks, and landmarks are placed on the tile grid next to roads; some rectangular buildings
+    cannot be rotated.
+claims:
+- text: Pocket City was released on 2018-07-31 for Android and iOS by Codebrew Games.
+  sources:
+  - src-destructoid-2018-pocket-city-review
+  confidence: high
+  quote: 'Released: July 31, 2018'
+  locator: review information box
+- text: Power and water reach buildings through roads; the game has no power lines, water pipes, or elevation
+    editing.
+  sources:
+  - src-destructoid-2018-pocket-city-review
+  confidence: medium
+  quote: There is no elevation manipulation, no powerlines to worry about, no pipes for water and sewer.
+  locator: review body
+- text: A gauge on screen tells the player which zone type citizens are demanding.
+  sources:
+  - src-imore-2018-pocket-city-review
+  confidence: medium
+  quote: A small gauge at the top notifies you of what the citizens are demanding more of
+  locator: Gameplay
+- text: City levels pay out money or unlock buildings.
+  sources:
+  - src-indiehive-2019-pocket-city
+  confidence: medium
+  quote: level up and gain monetary rewards or unlock buildings
+  locator: review body, experience section
+- text: Extra areas of the map are bought with in-game currency and become expensive.
+  sources:
+  - src-toucharcade-2018-pocket-city-review
+  confidence: medium
+  quote: with additional areas of the map purchase-able via the in-game currency things can start to get expensive,
+    fast.
+  locator: review body
+- text: A macOS edition is sold on the Mac App Store.
+  sources:
+  - src-apple-2026-pocket-city-mac
+  confidence: high
+  quote: The hit city-building game for iOS is now available for MacOS.
+  locator: app description
+- text: The iOS listing describes zoning residential, commercial, and industrial land.
+  sources:
+  - src-apple-2026-pocket-city-ios
+  confidence: high
+  quote: Create residential, commercial, and industrial zones.
+  locator: app description
+sources:
+- src-destructoid-2018-pocket-city-review
+- src-imore-2018-pocket-city-review
+- src-toucharcade-2018-pocket-city-review
+- src-indiehive-2019-pocket-city
+- src-apple-2026-pocket-city-ios
+- src-apple-2026-pocket-city-mac
+status: sourced
+provenance:
+  created: 2026-10-25-catalog-game-pilot

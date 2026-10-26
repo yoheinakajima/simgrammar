@@ -1,0 +1,15 @@
+id: src-falloutwiki-2026-power-generator
+type: source
+name: Power generator
+kind: encyclopedia
+authors:
+- Fallout Wiki contributors
+venue: Fallout Wiki (Fandom)
+date: '2026'
+url: https://fallout.fandom.com/wiki/Power_generator
+accessed: '2026-10-25'
+notes: The Fallout Shelter power generator uses dwellers' Strength; three upgrade tiers; adjacent matching rooms
+  of the same level merge with a production and upgrade cost bonus (single, double, triple); when power runs short,
+  rooms stop working starting with those farthest from the power sources; the Nuclear Reactor unlocks at 60 dwellers.
+provenance:
+  created: 2026-10-25-catalog-game-pilot

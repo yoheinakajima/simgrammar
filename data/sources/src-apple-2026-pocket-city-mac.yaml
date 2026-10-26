@@ -1,0 +1,14 @@
+id: src-apple-2026-pocket-city-mac
+type: source
+name: Pocket City (Mac)
+kind: store-page
+authors:
+- Codebrew Games Inc.
+venue: Mac App Store
+date: '2026'
+url: https://apps.apple.com/us/app/id1468908135
+accessed: '2026-10-25'
+notes: Mac-only listing by Codebrew Games Inc. (copyright 2020), requiring macOS 10.10 or later; describes the iOS
+  city builder as now available for macOS; zones, parks, crime and disasters, levels that unlock buildings.
+provenance:
+  created: 2026-10-25-catalog-game-pilot

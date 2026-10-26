@@ -1,0 +1,150 @@
+id: game-dev-story
+type: game
+name: Game Dev Story
+aliases:
+- ゲーム発展途上国
+summary: A game-studio management sim in which the player hires and trains staff, licenses consoles, and
+  develops games from genre and type combinations that four critics score across a twenty-year span.
+year: 1997
+developer: Kairosoft
+platforms:
+- pc
+- mobile
+- handheld
+- console
+subgenre: business-economic-sim
+subgenre_secondary:
+- management-tycoon
+sim_domain:
+- economic
+- occupational
+player_role: manager-owner
+agency_model:
+- policy-parameter
+- direct-unit
+time_model: real-time
+sim_scale: facility
+fidelity: stylized
+perspective: top-down-2d
+win_structure: score-ranking
+failure_model: soft-recoverable
+narrative_mode: hybrid
+multiplayer:
+- single
+modding: none
+production_tier: indie
+agent_count_order: '10'
+emergence: 2
+influence: 3
+core_loop: hire staff -> pick a licensed platform, a genre, and a type -> staff build fun, creativity, graphics,
+  and sound points while bugs appear -> debug, release, and four critics score the game -> weekly sales and
+  fans fund training, ads, licenses, and office moves -> tally at year 20
+design_notes: 'Game Dev Story turns a studio into a calendar of releases. Each game takes one genre and one type
+  from lists that grow as staff gain experience, and each pairing is rated from poor to excellent, which strongly
+  moves sales; the platform must be licensed unless it is PC. A development direction trades cost against speed,
+  quality, and research data. Staff in four basic careers (coder, writer, designer, sound engineer) produce Fun,
+  Creativity, Graphics, and Sound points plus bugs; debugging removes bugs and yields research data, and a game
+  released early can be marked down for its bugs. Four critics score each release out of 10, and 32 of 40 enters
+  the Hall of Fame and allows a sequel. Fictional consoles enter and leave the market on set dates with a
+  three-month warning, and a studio with a hardware engineer in its third office can build its own console from
+  a chosen type, CPU, and media. Calendar events recur yearly: a July convention where the studio buys a booth, a
+  December awards show gated on review totals, and a salesman who sells the career change manual. Accomplishments
+  are tallied at the 20-year mark, though play can continue.'
+mechanics:
+- id: product-development
+  role: core
+  note: Each game is a platform, genre, type, and direction choice; staff accumulate four point totals and bugs,
+    and four critics turn the result into scores out of 40 and a weekly sales run.
+- id: staff-hiring
+  role: core
+  note: The player hires staff with differing stats and salaries through recruiting methods unlocked by office size,
+    and assigns them to the proposal, graphics, and sound of each game.
+- id: agent-skills
+  role: core
+  note: Staff stats for program, scenario, graphics, and sound rise through paid training and levels gained in their
+    current career.
+- id: career-ladder
+  role: supporting
+  note: Each of eight careers levels to 5; level 5 in two basic careers opens director or producer, those open
+    hardware engineer, and that opens hacker, applied with a career change manual.
+- id: dated-tech-timeline
+  role: supporting
+  note: Fictional consoles become available and leave the market on fixed in-game dates, after which no new games
+    can be made for them.
+- id: contracts-orders
+  role: supporting
+  note: Between games the studio takes contract jobs with deadlines of several weeks that pay cash and research data,
+    and failing one costs the fee and reputation.
+- id: advertising-awareness
+  role: supporting
+  note: Paid advertising, from magazine ads up to far costlier campaigns unlocked with bigger offices, builds
+    popularity and loses effect when the same type is repeated.
+- id: reputation
+  role: supporting
+  note: Popularity with each age group and gender rises or falls with reviews, fan letters, and convention booths,
+    and a failed contract costs reputation.
+- id: milestone-unlocks
+  role: supporting
+  note: Office upgrades become available after set years and cost large sums, adding seats and new training,
+    advertising, and hiring methods.
+- id: budget-treasury
+  role: supporting
+  note: Salaries, licenses, training, and development costs draw on studio funds, and running out of money during
+    development cancels the game.
+claims:
+- text: Game Dev Story was first released for Windows in April 1997.
+  sources:
+  - src-wikipedia-game-dev-story
+  confidence: medium
+  quote: It was released for Windows in April 1997
+  locator: lead
+- text: The player runs a start-up developer that makes games and consoles to earn money.
+  sources:
+  - src-wikipedia-game-dev-story
+  confidence: medium
+  quote: The player takes control of a start-up video game developer, with the goal of making hit titles and consoles
+    in order to make money.
+  locator: Gameplay
+- text: Four critics review each released game for up to 10 points each.
+  sources:
+  - src-kairosoftwiki-2026-gds-creating-games
+  confidence: medium
+  quote: The critics can give you 10 points each, for a total of 40.
+  locator: Reviews
+- text: A console removed from the market can no longer be targeted by new games.
+  sources:
+  - src-kairosoftwiki-2026-gds-consoles
+  confidence: medium
+  quote: Once a console is removed from the market, you may no longer create games for it.
+  locator: Consoles
+- text: Building a custom console requires at least one hardware engineer.
+  sources:
+  - src-kairosoftwiki-2026-gds-consoles
+  confidence: medium
+  quote: To make a console, you must have at least one Hardware Engineer.
+  locator: Custom consoles
+- text: The game tallies the player's accomplishments at the 20-year mark, and play can continue afterwards.
+  sources:
+  - src-giantbomb-2010-game-dev-story-review
+  confidence: medium
+  quote: The game "stops" at the 20-year marker to tally your accomplishments
+  locator: review body
+- text: The Steam edition describes hiring staff and training their skills.
+  sources:
+  - src-steam-2022-game-dev-story
+  confidence: high
+  quote: Hire talented people and train them to develop their skills.
+  locator: About This Game
+store_ids:
+  steam: 1847240
+sources:
+- src-wikipedia-game-dev-story
+- src-steam-2022-game-dev-story
+- src-kairosoftwiki-2026-gds-creating-games
+- src-kairosoftwiki-2026-gds-careers
+- src-kairosoftwiki-2026-gds-consoles
+- src-kairosoftwiki-2026-game-dev-story
+- src-giantbomb-2010-game-dev-story-review
+status: sourced
+provenance:
+  created: 2026-10-25-catalog-game-pilot

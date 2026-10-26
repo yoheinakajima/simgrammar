@@ -1,0 +1,17 @@
+id: src-therabidsquirel-2026-fallout-shelter-faq-incidents
+type: source
+name: 'The Fallout Shelter FAQ, Section 6: Incidents'
+kind: encyclopedia
+authors:
+- therabidsquirel
+venue: GitHub wiki
+date: '2026'
+url: 'https://github.com/therabidsquirel/The-Fallout-Shelter-FAQ/wiki/Section-6:-Incidents'
+accessed: '2026-10-25'
+notes: Community FAQ. Internal incidents (fires, radroaches, mole rats, radscorpions) and external attacks (raiders,
+  feral ghouls, deathclaws); a background timer raises incident chance until one is guaranteed, and a failed rush
+  resets it; minimum population per incident type; incidents spread only from empty rooms and never revisit a room;
+  strength rises with average dweller level, then room level, then room width; no incidents while the game is not in
+  the foreground.
+provenance:
+  created: 2026-10-25-catalog-game-pilot

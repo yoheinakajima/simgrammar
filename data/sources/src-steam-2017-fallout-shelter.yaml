@@ -1,0 +1,14 @@
+id: src-steam-2017-fallout-shelter
+type: source
+name: Fallout Shelter
+kind: store-page
+authors:
+- Bethesda Game Studios
+venue: Steam
+date: '2017-03-29'
+url: https://store.steampowered.com/app/588430/Fallout_Shelter/
+accessed: '2026-10-25'
+notes: App 588430; Steam release 2017-03-29; developer Bethesda Game Studios, publisher Bethesda Softworks; Windows;
+  description of building a Vault, keeping dwellers happy, and protecting them from the Wasteland.
+provenance:
+  created: 2026-10-25-catalog-game-pilot

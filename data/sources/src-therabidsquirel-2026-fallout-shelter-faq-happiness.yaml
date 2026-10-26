@@ -1,0 +1,16 @@
+id: src-therabidsquirel-2026-fallout-shelter-faq-happiness
+type: source
+name: 'The Fallout Shelter FAQ, Section 4: Dweller Happiness and Health'
+kind: encyclopedia
+authors:
+- therabidsquirel
+venue: GitHub wiki
+date: '2026'
+url: 'https://github.com/therabidsquirel/The-Fallout-Shelter-FAQ/wiki/Section-4:-Dweller-Happiness-and-Health'
+accessed: '2026-10-25'
+notes: Community FAQ. Happiness stabilizes at 50%, or 75% in a room matching the dweller's highest SPECIAL stat;
+  successful and failed rushes shift it by 10%; breeding raises both parents to 100%; radio rooms nudge vault-wide
+  happiness; heavy injury and radiation lower it, and enough food and water avoids both; health gained at level-up
+  depends on Endurance at that moment.
+provenance:
+  created: 2026-10-25-catalog-game-pilot

@@ -1,0 +1,92 @@
+id: 2026-10-25-catalog-game-pilot
+type: run
+kind: catalog
+date: '2026-10-25'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code subagent (pilot)
+purpose: Catalogue three mobile management candidates from tasks/candidates.yaml (Pocket City, Fallout
+  Shelter, Game Dev Story) after applying the game inclusion test.
+method: 'Read CLAUDE.md, AGENTS.md, CONTRACT.md, tasks/README.md, tasks/catalog-game.md, source-claims.md,
+  store-ids.md, archive-sources.md, propose-mechanic.md, ADR-0004, the game, common, source, and run schemas, every
+  vocab file the game schema names, the emergence and influence anchors, data/games/rimworld.yaml and
+  game-dev-tycoon.yaml as exemplars, and the definitions of every mechanic tagged. Ran find.py for each title (no
+  existing records) and find.py --list mechanic; built dist/ locally to read mechanic prevalence for the inclusion
+  test. Searched with WebSearch and opened pages with WebFetch, which returns a model-processed rendering: every
+  quote was requested as an exact excerpt under 125 characters with a check that no footnote marker falls inside
+  it, but none could be compared against raw HTML locally (no shell internet). Pocket City: Destructoid, iMore,
+  TouchArcade, and Indie Hive reviews, the iOS and Mac App Store listings; Pocket Gamer and Android Police were read
+  for the launch date and developer but not cited. Fallout Shelter: Wikipedia, the Steam page (app 588430), Gematsu
+  launch news, two Fallout Wiki pages, and four sections of a community FAQ on GitHub; the Bethesda official game
+  page rendered empty; a Steam forum thread on offline time was read but not cited in favour of the FAQ. Game Dev
+  Story: Wikipedia, the Steam page (app 1847240), the Giant Bomb review, and four Kairosoft Wiki pages; Pocket Tactics
+  and an Inside Games article were read for the 1997 origin and did not confirm it. Blocked without an answer to the
+  permission prompt: archive.org (so no Wayback snapshots and no `archived` fields), Japanese Wikipedia, Wikidata
+  (so no wikidata ids), the Microsoft Store listing of a Windows edition of Pocket City, and the Fallout Wiki main
+  Fallout Shelter page. Fields were filled from vocab terms only and scores by anchor text, taking the lower anchor
+  when between two. Mechanics were chosen from existing ids only; rule-systems with no fitting mechanic are in
+  design_notes and the proposals below. After the games were added, make check failed on one section 5.5 report
+  assertion that depends on the number of games (see the rule proposal). The run first repinned it; after the
+  maintainer keyed the white-space filter to a game count (ADR-0005), the repin was dropped and make check passes
+  with the report unchanged.'
+contract_version: '1.1'
+proposals:
+- kind: new-mechanic
+  target: land-expansion
+  detail: 'Land expansion: the buildable area is a set of owned plots or tiles, and the player buys adjacent plots
+    for money or a gated currency at a price that rises with each purchase. State: owned-plot set and price schedule;
+    update: purchase adds a plot and advances the price. Nameable: pocket-city (plots bought from a landlord at a rising
+    price), cities-skylines and cities-skylines-2 (map tiles bought after milestones); purchasable park land in
+    rollercoaster-tycoon is a candidate from general knowledge, not from its record or a source read here. Atomic: it owns only the plot set and its price, apart from milestone-unlocks, which only gates
+    the right to buy. Tunable: plot size, price curve, gating condition, map edge. Removable: a fixed map works without
+    it. Nearest: milestone-unlocks (Cities: Skylines folds tile purchase into it today), auctions (no bidding here).'
+- kind: new-mechanic
+  target: timed-expedition
+  detail: 'Timed expedition: an agent or team sent off the map resolves a trip on the clock without player control,
+    accruing loot, damage, and events per interval from its stats and supplies, and returns after a travel time or
+    on recall. State: expedition roster, elapsed time, carried supplies and loot; update: per-interval stochastic
+    encounter and loot rolls. Nameable: fallout-shelter (wasteland explorers), jurassic-world-evolution (Expedition
+    Center dig sites, tagged resource-extraction today), captain-of-industry (ship expeditions); Frostpunk scouts are a
+    candidate outside the current tags. Atomic: it owns only off-map trips. Tunable: encounter rate, loot table by
+    duration and stats, return-time rule, supply use. Removable: yes. Nearest: resource-extraction (map nodes, worker
+    rates), contracts-orders (posted jobs with payouts), neither of which models an unattended trip.'
+- kind: rule
+  target: report/src/05-structure.md
+  detail: 'Adding these three games broke E019/E029 on {{assert:rank.whitespace.embodied-skill-control.free-placement
+    <= 10}} in section 5.5. Nothing about the pair changed: embodied-skill-control is tagged by 14 games, and the
+    white-space filter needs a share of at least 0.08 of games, which is 14 of 174 or 175 but more than 14 of 176. Any
+    PR that adds two or more games without that mechanic fails the same way, so the brief''s 3 to 10 games cannot
+    pass as written. This run replaced the assertion with {{assert:cooccur.embodied-skill-control.free-placement <= 1}},
+    which pins what the sentence says (vehicle sims do not use free placement) without the share threshold, and
+    changed no prose. Please review or replace it. Suggest testing every rank.whitespace assertion against adding
+    several games, not one, or keying the filter to a count.'
+- kind: other
+  target: game-dev-tycoon
+  detail: 'Lineage: src-wikipedia-game-dev-tycoon (already cited by game-dev-tycoon) records that Game Dev Tycoon was
+    inspired by Game Dev Story. The influenced_by edge is owned by game-dev-tycoon, a record outside this task, so it
+    was not added here; a follow-up catalog run should add game-dev-story to game-dev-tycoon.influenced_by.'
+scope:
+- data/games/pocket-city.yaml
+- data/games/fallout-shelter.yaml
+- data/games/game-dev-story.yaml
+- data/sources/
+notes: 'Inclusion test. All three pass (a), released commercially. Pocket City passes (b), zones develop from demand,
+  road access, power, and water, with crime and disasters, and passes (c) only narrowly: it adds a mobile use of
+  rci-demand, which only the SimCity line tags, and a road-borne variant of power-grid; its main value is sampling of
+  mobile city builders (report 2.6). Fallout Shelter passes (b), a resource economy with distance-ordered power
+  shedding and an incident system, and (c) with breeding and trait inheritance inside a management game and wall-clock
+  offline progress. Game Dev Story passes (b), a market and review model, and (c) as lineage-defining for Kairosoft
+  management games and the game-studio sim. None was declined. Facts to re-check when verifying: Game Dev Story year
+  1997 rests on English Wikipedia alone, while the Kairosoft Wiki lists a 2008 DoCoMo phone release as the earliest and
+  Pocket Tactics names Bookstore Story as the 1997 debut; its iOS date is 2010-10-09 on Wikipedia and November 2010 on
+  Pocket Tactics. Game Dev Story time_model real-time is a judgment: no source read describes pause or speed controls,
+  and Giant Bomb calls its pacing turn-based. Pocket City time_model real-time and perspective isometric are judgments
+  without a source, and its service-coverage tag rests on safety buildings being named, not on a documented coverage
+  radius. Pocket City platforms include pc for the Mac App Store edition; a Windows edition appears in search results
+  but its store page was not opened. Fallout Shelter production_tier aa is a judgment (Bethesda publisher, small mobile
+  team); influenced_by maps the SimCity that Pete Hines named to simcity-1989. Steam ids were opened and their names
+  match; both are later PC ports of the same game, not remasters. Every claim quote came through a model-processed
+  page rendering, so the sources workflow is the first real check of them. No Proposal issues were opened (no GitHub
+  access in this session).'
