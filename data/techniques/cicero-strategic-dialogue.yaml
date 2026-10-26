@@ -29,6 +29,10 @@ key_results:
   - src-fair-2022-cicero
   - src-meta-2022-cicero-project
   confidence: high
+  quote: Across 40 games of an anonymous online Diplomacy league, Cicero achieved more than double the
+    average score of the human players and ranked in the top 10% of participants who played more than
+    one game
+  locator: Abstract
 - text: Cicero pairs a controllable dialogue model with a planning engine that models other players' likely
     moves from the board and the conversation and predicts what others think Cicero will do.
   sources:
@@ -40,11 +44,16 @@ key_results:
   sources:
   - src-facebookresearch-2022-diplomacy-cicero
   confidence: high
+  quote: 'We are releasing model weights under a separate license: CC-BY-NC (version 4.0)'
+  locator: README, License for Model Weights
 - text: Richelieu (2024) built an LLM Diplomacy agent combining planning with memory and reflection, goal-directed
     negotiation, and self-play memory augmentation without human game data.
   sources:
   - src-guan-2024-richelieu
   confidence: medium
+  quote: strategic planning with memory and reflection; 2) goal-oriented negotiation with social reasoning;
+    and 3) augmenting memory through self-play games for self-evolution without human in the loop
+  locator: Abstract
 maturity: research
 trl: 5
 runtime:
@@ -103,3 +112,4 @@ provenance:
   reviewed:
   - 2026-10-24-technique-links
   - 2026-10-24-review-fixes
+  - 2026-10-25-source-claims-pilot

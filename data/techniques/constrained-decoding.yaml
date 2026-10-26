@@ -28,21 +28,32 @@ key_results:
   sources:
   - src-openai-2024-structured-outputs
   confidence: high
+  quote: our new model gpt-4o-2024-08-06 with Structured Outputs scores a perfect 100%. In comparison,
+    gpt-4-0613 scores less than 40%
+  locator: Introduction, before How to use Structured Outputs
 - text: XGrammar reports up to 100x faster grammar-constrained generation than prior engines and near-zero
     end-to-end overhead when integrated with an inference server.
   sources:
   - src-dong-2024-xgrammar
   confidence: medium
+  quote: XGrammar can achieve up to 100x speedup over existing solutions
+  locator: Abstract
 - text: Outlines showed that regex and CFG guidance can be implemented as finite-state-machine transitions
     with a precomputed vocabulary index and little per-token overhead.
   sources:
   - src-willard-2023-outlines
   confidence: high
+  quote: guiding text generation with regular expressions and context-free grammars by allowing the construction
+    of an index over a language model's vocabulary
+  locator: Abstract
 - text: Strict format restrictions such as JSON or XML significantly reduced LLM reasoning accuracy compared
     with free-form answers, with stricter formats causing larger drops.
   sources:
   - src-tam-2024-let-me-speak-freely
   confidence: medium
+  quote: we find that stricter format constraints generally lead to greater performance degradation in
+    reasoning tasks
+  locator: Abstract
 - text: Concordia's language-model interface includes a sample_choice call that scores a list of candidate
     responses and returns an index, raising an error after repeated invalid attempts, which is how its
     agents pick from closed option sets.
@@ -113,3 +124,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-llm-agents
+  reviewed:
+  - 2026-10-25-source-claims-pilot

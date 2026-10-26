@@ -28,12 +28,20 @@ key_results:
   sources:
   - src-gudmundsson-2018-human-like-playtesting
   confidence: high
+  quote: Compared to Monte Carlo Tree Search (MCTS) we show that this approach increases correlation with
+    average level difficulty, giving more accurate predictions as well as requiring only a fraction of
+    the computation time
+  locator: Abstract
 - text: EA used A* and evolution-strategy agents to balance The Sims Mobile careers during development
     and reported that deep RL needed heavy per-game tuning, so effort grew roughly linearly with the number
     of target games.
   sources:
   - src-zhao-2019-winning-isnt-everything
   confidence: high
+  quote: deep RL models does not seamlessly transfer from the benchmark environments to target ones without
+    heavily tuning their hyperparameters, leading to linear scaling of the engineering efforts and computational
+    cost with the number of target domains
+  locator: Abstract
 - text: EA SEED's RL test agents found a wall missing its collision mesh that scripted navmesh agents
     missed and located all five stuck areas in a test map, and curiosity rewards raised coverage of a
     complex 3D map.
@@ -41,6 +49,8 @@ key_results:
   - src-bergdahl-2020-augmenting-automated-testing-drl
   - src-gordillo-2021-curiosity-playtesting
   confidence: high
+  quote: the RL agent quickly finds a way of exploiting the missing collision mesh
+  locator: Section IV.A, Game exploits and logical bugs
 - text: EA SEED added an experimental RL system to scripted-bot automated testing for AAA titles including
     Battlefield 2042 and Dead Space (2023) and reported that integration, not algorithms, consumed the
     most time.
@@ -52,12 +62,18 @@ key_results:
   sources:
   - src-roohi-2020-difficulty-churn
   confidence: high
+  quote: The AI players predict level difficulty, which is used to drive a player population model with
+    simulated skill, persistence, and boredom
+  locator: Abstract
 - text: SIMA 2 (2025) follows language instructions in commercial 3D games through screen input and virtual
     keyboard and mouse and transfers skills across games, but still struggles with long-horizon tasks,
     memory, and precise low-level control.
   sources:
   - src-deepmind-2025-sima-2-blog
   confidence: medium
+  quote: We find the agents still face challenges with very long-horizon, complex tasks that require extensive,
+    multi-step reasoning and goal verification. SIMA 2 also has a relatively short memory of its interactions
+  locator: 'Looking to the Future: The Journey to General Embodied Intelligence'
 maturity: shipped-niche
 trl: 7
 runtime:
@@ -117,3 +133,4 @@ provenance:
   created: 2026-10-24-techniques-rl-design
   reviewed:
   - 2026-10-24-technique-links
+  - 2026-10-25-source-claims-pilot

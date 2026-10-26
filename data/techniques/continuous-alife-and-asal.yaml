@@ -26,16 +26,26 @@ key_results:
   sources:
   - src-chan-2019-lenia
   confidence: high
+  quote: More than 400 species in 18 families have been identified, many discovered via interactive evolutionary
+    computation
+  locator: Abstract
 - text: Flow-Lenia's mass conservation made localized creatures easier to find, and parameter localization
     let multiple species with different rules coexist and interact in one world.
   sources:
   - src-plantec-2023-flow-lenia
   confidence: high
+  quote: Due to the mass conservative nature of Flow Lenia, most of patterns do not grow indefinitely
+    into spatially global patterns (i.e patterns that diffuse on the entire grid also called Turing-like
+    patterns), therefore SLPs are much more common and easier to find
+  locator: Discussion
 - text: ASAL found previously unseen Lenia and Boids lifeforms and open-ended cellular automata in the
     style of Game of Life, and quantified qualitative phenomena in ways that aligned with human judgment.
   sources:
   - src-kumar-2024-asal
   confidence: medium
+  quote: the discovery of previously unseen Lenia and Boids lifeforms, as well as cellular automata that
+    are open-ended
+  locator: Abstract
 maturity: research
 trl: 3
 runtime:
@@ -77,3 +87,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-sim-math
+  reviewed:
+  - 2026-10-25-source-claims-pilot

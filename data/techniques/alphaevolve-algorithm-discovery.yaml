@@ -25,6 +25,8 @@ key_results:
   sources:
   - src-romeraparedes-2023-funsearch
   confidence: high
+  quote: in dimension n = 8, FunSearch found a larger cap set than what was previously known
+  locator: Extremal combinatorics, Cap sets
 - text: AlphaEvolve found a 4x4 complex matrix multiplication with 48 scalar multiplications, matched
     about 75% and improved about 20% of over 50 open math problems, and produced a Borg scheduling heuristic
     that has recovered about 0.7% of Google's fleet compute in production for over a year.
@@ -32,11 +34,17 @@ key_results:
   - src-deepmind-2025-alphaevolve-blog
   - src-novikov-2025-alphaevolve
   confidence: high
+  quote: This solution, now in production for over a year, continuously recovers, on average, 0.7% of
+    Google’s worldwide compute resources
+  locator: Improving data center scheduling
 - text: Applied by Georgiev, Gomez-Serrano, Tao and Wagner to 67 problems, AlphaEvolve mostly rediscovered
     the best known constructions, improved several, and sometimes generalized finite results into formulas.
   sources:
   - src-georgiev-2025-math-discovery-at-scale
   confidence: high
+  quote: The system rediscovered the best known solutions in most of the cases and discovered improved
+    solutions in several
+  locator: Abstract
 - text: 'Open-source successors lowered the barrier: ShinkaEvolve reported a new state-of-the-art circle
     packing with about 150 samples, and OpenEvolve runs the loop with any OpenAI-compatible or local model
     under Apache-2.0.'
@@ -44,6 +52,8 @@ key_results:
   - src-lange-2025-shinkaevolve
   - src-sharma-2025-openevolve
   confidence: medium
+  quote: ShinkaEvolve discovers a new state-of-the-art circle packing solution using only 150 samples
+  locator: Abstract
 maturity: research
 trl: 3
 runtime:
@@ -99,3 +109,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-sim-math
+  reviewed:
+  - 2026-10-25-source-claims-pilot

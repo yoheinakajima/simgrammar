@@ -28,6 +28,9 @@ key_results:
   sources:
   - src-wurman-2022-gt-sophy
   confidence: high
+  quote: We demonstrate the capabilities of our agent, Gran Turismo Sophy, by winning a head-to-head competition
+    against four of the world’s best Gran Turismo drivers
+  locator: Abstract
 - text: GT Sophy entered Gran Turismo 7 as the time-limited Race Together event in update 1.29 (February
     2023), with four races against GT Sophy cars of different performance at Beginner, Intermediate, and
     Expert levels and a 1vs1 mode.
@@ -50,10 +53,16 @@ key_results:
   sources:
   - src-alonso-2020-drl-navigation-aaa
   confidence: medium
+  quote: notably an order of magnitude larger than maps typically used in the Deep RL literature. One
+    of these maps is directly modeled after a Ubisoft AAA game
+  locator: Abstract
 - text: Unity's open-source ML-Agents Toolkit lets developers train agents inside Unity scenes.
   sources:
   - src-juliani-2018-unity-ml-agents
   confidence: high
+  quote: is an open source project which enables researchers and developers to create simulated environments
+    using the Unity Editor and interact with them via a Python API
+  locator: Section 5, The Unity ML-Agents Toolkit
 maturity: shipped-niche
 trl: 7
 runtime:
@@ -108,3 +117,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-rl-design
+  reviewed:
+  - 2026-10-25-source-claims-pilot

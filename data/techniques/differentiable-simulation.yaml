@@ -28,26 +28,38 @@ key_results:
   sources:
   - src-hu-2020-difftaichi
   confidence: high
+  quote: a differentiable elastic object simulator written in our language is 4.2x shorter than the hand-engineered
+    CUDA version yet runs as fast, and is 188x faster than the TensorFlow implementation
+  locator: Abstract
 - text: Brax exposed gradients through a JAX rigid-body engine running at millions of steps per second
     on one accelerator.
   sources:
   - src-freeman-2021-brax
   confidence: medium
+  quote: For an individual accelerator, Brax reaches millions of simulation steps per second
+  locator: Section 1, Summary of Contributions
 - text: NVIDIA Warp lets developers write differentiable GPU kernels in Python; NVIDIA reports Autodesk
     fluid simulations 8x faster and 5x larger than with traditional frameworks.
   sources:
   - src-nvidia-2024-warp-blog
   confidence: medium
+  quote: Customers such as Autodesk are using NVIDIA Warp to write large-scale fluid simulations up to
+    8x faster and 5x larger than traditional frameworks
+  locator: Article body
 - text: GradABM made a million-agent epidemic agent-based model differentiable, ran it in a few seconds
     on commodity hardware, and calibrated it to COVID-19 and influenza data by gradient descent.
   sources:
   - src-chopra-2023-gradabm
   confidence: high
+  quote: GradABM can quickly simulate million-size populations in few seconds on commodity hardware
+  locator: Abstract
 - text: 'As of 2026, gradient support is uneven across GPU engines: MuJoCo Warp lists differentiability
     via Warp as not yet available.'
   sources:
   - src-deepmind-2026-mujoco-warp
   confidence: medium
+  quote: Differentiability via Warp is not yet available
+  locator: README, MuJoCo API Compatibility
 maturity: research
 trl: 3
 runtime:
@@ -102,3 +114,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-sim-math
+  reviewed:
+  - 2026-10-25-source-claims-pilot

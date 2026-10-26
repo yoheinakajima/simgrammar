@@ -1,0 +1,84 @@
+id: 2026-10-25-source-claims-pilot
+type: run
+kind: maintenance
+date: '2026-10-25'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code subagent (pilot)
+purpose: 'Add verbatim quotes and locators from each claim''s first source to the key results of eight
+  technique records (task issue: Add verbatim quotes to the claims of 8 records).'
+method: 'Opened the first source of each of the 38 key results on the eight records and copied the shortest
+  passage that supports the claim; 32 now carry a quote and locator. Tools: an LLM-processed web fetch
+  that returns at most about 125 verbatim characters per answer, so longer quotes were assembled from
+  overlapping fragments and then confirmed with an exact-match question against the same page (Flow-Lenia,
+  SIMA 2, Richelieu, Ludii, Zhao, Roohi, Outlines, Hu, Gudmundsson, NVIDIA Warp). Pages read: arXiv abstract
+  pages for the arXiv sources; arXiv HTML full text for Bergdahl (IV.A), Plantec (Discussion), Juliani
+  (section 5) and Gillberg; the arXiv PDF for Brax (its HTML page was rate limited twice); the Nature
+  pages for FunSearch (full text) and GT Sophy (abstract); the DeepMind, NVIDIA and Sony AI pages; OpenAI''s
+  post; the GitHub pages of diplomacy_cicero, concordia, mujoco_warp and the llama.cpp grammar README.
+  Three DOI-only papers were read from copies: Cicero (Science) and Gudmundsson (CIG 2018) from published
+  PDFs on gwern.net, and Browne and Maire (TCIAIG 2010) from the abstract on Maastricht University''s
+  CRIS record; their quotes come from the abstract, which the CI fetch of the DOI landing page can show
+  or warn on. Avoided passages with LaTeX or footnote markers, and for Tam et al. quoted the sentence
+  that reads the same on the abstract page and in the HTML (the first abstract sentence differs by an
+  apostrophe between the two). Six key results are left unquoted: ai.meta.com/research/cicero and both
+  gran-turismo.com/us news pages could not be fetched (tool permission prompts timed out); the Concordia
+  repository page does not contain the sample_choice text and the code file could not be fetched; the
+  llama.cpp claim''s core is a statement about absence that no source can quote; and Gillberg et al. do
+  not say that integration rather than algorithms took the most time. No source was changed: the shell
+  has no network, archive.org was unreachable from the fetch tool, so no Wayback snapshots were added.
+  check_sources.py could not be run (no network); validate and build checks pass. Review before merge (maintainer): the cited Sony AI article now returns 404 in a browser, so the quote added to
+  deep-rl-npc-policies key result 3 could not be confirmed and was removed; 31 key results carry quotes.'
+contract_version: '1.1'
+proposals:
+- kind: other
+  target: automated-playtesting
+  detail: 'key_results[3] says EA SEED ''reported that integration, not algorithms, consumed the most
+    time''. The paper (arXiv 2307.11105) promises to ''cover some of the largest time sinks'' and concludes
+    it is ''possible, although difficult, to bring RL into an existing automated and scripted bot system'',
+    but never ranks integration against algorithm work, and section IV.A treats algorithm choice as one
+    of the challenges. Left unquoted. Suggested text: ''...for AAA titles including Battlefield 2042 and
+    Dead Space (2023) and described the largest time sinks of that integration.'' Quote ready for it (Abstract):
+    ''add an experimental reinforcement learning system to an existing automated game testing solution''.
+    The record''s second limitation repeats the same overreach.'
+- kind: other
+  target: constrained-decoding
+  detail: key_results[5] is a statement about the creating run's search ('No source found documents constrained
+    decoding in a specific shipped game'). Its first source, the llama.cpp grammar README, supports only
+    the engine-support premise ('GBNF (GGML BNF) is a format for defining formal grammars to constrain
+    model outputs in llama.cpp', section GBNF Guide), so a quote would look like support for the absence.
+    Left unquoted. Suggest moving the absence statement into limitations and, if wanted, keeping a claim
+    that llama.cpp constrains output with GBNF grammars, quoted with the passage above.
+- kind: other
+  target: src-deepmind-2026-concordia-repo
+  detail: constrained-decoding key_results[4] describes sample_choice in Concordia's language-model interface.
+    The source url is the repository root, whose README never mentions sample_choice, so CI would fail
+    any quote taken from the code. The code file (concordia/language/language_model.py) could not be fetched
+    in this run (GitHub blob and tree pages refused, raw.githubusercontent.com blocked). Suggest a file-level
+    source for this claim (a raw or blob url of that file) so the docstring can be quoted and checked.
+- kind: rule
+  target: tasks/source-claims.md
+  detail: Step 4 asks to add a Wayback snapshot to every first source that lacks one, but (a) the 38 first
+    sources here exceed the 30-source PR cap, (b) archive-sources.md names a maintenance run for that
+    work while this brief runs as verification, (c) sources without a url (DOI or arXiv only) cannot take
+    an archived snapshot without adding a url, which archive-sources.md forbids, and (d) check_sources.py
+    treats an archived page as full text, so archiving an arXiv abstract page turns a body quote whose
+    paper has no arXiv HTML from a warning into a failure. Suggest making step 4 optional, capped by the
+    source limit, and saying which page an arXiv source should archive.
+- kind: rule
+  target: schema/common.schema.json#claim.quote
+  detail: 'A claim holds one quote, but most key results here bundle two to four facts (AlphaEvolve: matrix
+    multiplication, open problems, Borg; FunSearch: cap sets and bin packing). The quote then supports
+    one part and the rest is unchecked. Suggest either allowing a short list of quotes per claim or asking
+    creators to split compound claims, and saying in the brief which part to quote when only one fits.'
+scope:
+- data/techniques/alphaevolve-algorithm-discovery.yaml (key_results quote and locator, provenance.reviewed)
+- data/techniques/automated-playtesting.yaml (key_results quote and locator, provenance.reviewed)
+- data/techniques/automated-rule-generation.yaml (key_results quote and locator, provenance.reviewed)
+- data/techniques/cicero-strategic-dialogue.yaml (key_results quote and locator, provenance.reviewed)
+- data/techniques/constrained-decoding.yaml (key_results quote and locator, provenance.reviewed)
+- data/techniques/continuous-alife-and-asal.yaml (key_results quote and locator, provenance.reviewed)
+- data/techniques/deep-rl-npc-policies.yaml (key_results quote and locator, provenance.reviewed)
+- data/techniques/differentiable-simulation.yaml (key_results quote and locator, provenance.reviewed)

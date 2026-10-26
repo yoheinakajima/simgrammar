@@ -29,22 +29,34 @@ key_results:
   sources:
   - src-browne-2010-evolutionary-game-design
   confidence: medium
+  quote: We examine the concept of game quality, its automated measurement through self-play simulations,
+    and its use in the evolutionary search for new high-quality games
+  locator: Abstract
 - text: Ludii describes games with high-level ludemes and outperformed a propositional-network GDL reasoner
     on all games in the Tiltyard repository.
   sources:
   - src-piette-2019-ludii
   confidence: high
+  quote: Ludii outperforms one of the most efficient Game Description Language (GDL) reasoners, based
+    on a propositional network, in all games available in the Tiltyard GGP repository
+  locator: Abstract
 - text: GAVEL (2024) fine-tuned CodeLlama-13b (about 40 hours on one RTX8000) on 574 Ludii games as a
     MAP-Elites mutation operator and generated playable games in rule-space regions not covered by existing
     Ludii games, scored by MCTS self-play metrics; samples are playable on the Ludii portal.
   sources:
   - src-todd-2024-gavel
   confidence: high
+  quote: including in regions of the potential rules space not covered by existing games in the Ludii
+    dataset
+  locator: Abstract
 - text: An LLM framework built on VGDL generated game rules and levels together, extending LLM generation
     from levels for fixed games to whole games.
   sources:
   - src-hu-2024-llm-game-generation-vgdl
   confidence: medium
+  quote: Based on video game description language, this paper proposes an LLM-based framework to generate
+    game rules and levels simultaneously
+  locator: Abstract
 maturity: prototype
 trl: 5
 runtime:
@@ -99,3 +111,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-rl-design
+  reviewed:
+  - 2026-10-25-source-claims-pilot
