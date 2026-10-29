@@ -72,3 +72,66 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-taxonomy-m3
+  reviewed:
+  - 2026-10-29-shreyko-antim-rate-scores-19
+ratings:
+- field: legibility
+  value: 4
+  run: 2026-10-24-taxonomy-m3
+  rationale: original score
+- field: legibility
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Practice improving competence and higher skills improving output are intuitive. Decay, passion
+    and caps cause occasional surprises, excluding 5; the basic progression and specialization model does
+    not require deliberate investigation (3).
+- field: emergence_potential
+  value: 3
+  run: 2026-10-24-taxonomy-m3
+  rationale: original score
+- field: emergence_potential
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Specialization reinforces assignments, changes economic quality, and makes specialist death
+    a capability crisis. These are cross-system chains beyond isolated interactions (3), but skills alone
+    are not a primary story engine wherever used (5).
+- field: authoring_cost
+  value: 2
+  run: 2026-10-24-taxonomy-m3
+  rationale: original score
+- field: authoring_cost
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Experience curves, task modifiers, gates and level effects are small tables. They require
+    more than content-free rules (1), without bespoke assets for every skill level or progression variant
+    (3).
+- field: compute_cost
+  value: 1
+  run: 2026-10-24-taxonomy-m3
+  rationale: original score
+- field: compute_cost
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Experience accumulation, threshold checks and decay scale linearly over agent skills with
+    modest constants. At colony scale this exceeds negligible one-value bookkeeping (1), but it is not
+    a usual slowdown source (3).
+- field: tuning_difficulty
+  value: 3
+  run: 2026-10-24-taxonomy-m3
+  rationale: original score
+- field: tuning_difficulty
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Small growth or output-curve changes can make grinding optimal, specialists snowball or recruits
+    useless. That dominant-strategy sensitivity exceeds ordinary multi-parameter tuning (3), while caps,
+    decay and soft gates can settle balance below 5.
+- field: ai_leverage
+  value: 2
+  run: 2026-10-24-taxonomy-m3
+  rationale: original score
+- field: ai_leverage
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: AI can assist experience curves, training advice and balance checks, incremental changes
+    above little expected impact (1). It does not materially change the stock-level-task-effect mechanic
+    or its variety enough for 3.

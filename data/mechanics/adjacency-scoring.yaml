@@ -64,3 +64,65 @@ sources: []
 status: asserted
 provenance:
   created: 2026-10-24-taxonomy-m4
+  reviewed:
+  - 2026-10-29-shreyko-antim-rate-scores-19
+ratings:
+- field: legibility
+  value: 4
+  run: 2026-10-24-taxonomy-m4
+  rationale: original score
+- field: legibility
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Local neighbor effects and placement previews are mostly intuitive. Hidden pairs and retroactive
+    changes create occasional surprises, so this falls below fully transparent at a glance (5), without
+    normally needing deliberate investigation (3).
+- field: emergence_potential
+  value: 2
+  run: 2026-10-24-taxonomy-m4
+  rationale: original score
+- field: emergence_potential
+  value: 3
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Space constraints, future pieces and yield unlocks interact to create unplanned layouts.
+    This exceeds merely parametric variation (2), but local sums do not frequently drive long cross-system
+    chains strongly enough for 4.
+- field: authoring_cost
+  value: 2
+  run: 2026-10-24-taxonomy-m4
+  rationale: original score
+- field: authoring_cost
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Signed type-pair effects, radii and caps fit small data tables. This requires more content
+    data than rules alone (1), without moderate bespoke content for each arrangement (3).
+- field: compute_cost
+  value: 1
+  run: 2026-10-24-taxonomy-m4
+  rationale: original score
+- field: compute_cost
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Local neighborhood queries and sums have modest constants at typical placement scale. Recomputing
+    several neighbors exceeds negligible bookkeeping (1), but is not ordinarily a late-game slowdown source
+    (3).
+- field: tuning_difficulty
+  value: 3
+  run: 2026-10-24-taxonomy-m4
+  rationale: original score
+- field: tuning_difficulty
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Small changes to stacking or positive pairs can make one repeating cluster or maximum density
+    dominant. This is more sensitive than ordinary multi-parameter playtesting (3), while caps and penalties
+    can still settle balance below 5.
+- field: ai_leverage
+  value: 2
+  run: 2026-10-24-taxonomy-m4
+  rationale: original score
+- field: ai_leverage
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: AI can help tune effect tables and search for dominant layouts, an incremental improvement.
+    The combinatorial placement rule retains its ceiling, so a notable change in cost or variety (3) is
+    not established; little change (1) understates useful tuning assistance.

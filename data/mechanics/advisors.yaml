@@ -71,3 +71,66 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-taxonomy-m6
+  reviewed:
+  - 2026-10-29-shreyko-antim-rate-scores-19
+ratings:
+- field: legibility
+  value: 4
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: legibility
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Named advisors explicitly diagnose indicators and recommend actions, making their role mostly
+    intuitive. Biased views and conflicting departments produce surprises below 5, without players normally
+    needing deliberate tools to understand the message layer (3).
+- field: emergence_potential
+  value: 1
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: emergence_potential
+  value: 1
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Threshold checks select authored messages without changing simulation state. Player responses
+    can affect other systems, but the advice layer itself supplies no unscripted state variation warranting
+    2.
+- field: authoring_cost
+  value: 3
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: authoring_cost
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Distinct personas, state coverage, recommendations and optional voice require substantial
+    writing and presentation pipelines. This exceeds moderate bespoke variants (3), but systematic triggers
+    and reuse mean content is not necessarily the primary ceiling on depth (5).
+- field: compute_cost
+  value: 1
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: compute_cost
+  value: 1
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Periodic aggregate threshold tests, cooldown checks and ranking a small message set are negligible.
+    The monitored simulations own their own costs, so modest linear runtime overhead (2) is not required
+    at typical scale.
+- field: tuning_difficulty
+  value: 2
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: tuning_difficulty
+  value: 3
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Severity, thresholds, timing, bias and recommendation accuracy interact and need playtesting.
+    This exceeds a few stable parameters (2), but advice selection itself does not routinely create sensitive
+    runaway strategies deserving 4.
+- field: ai_leverage
+  value: 4
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: ai_leverage
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Grounded models can diagnose interacting causes and tailor explanations or council debate,
+    making substantially new advisory forms feasible beyond cheaper writing alone (3). Monitoring and
+    recommending remain the defining role, excluding 5.

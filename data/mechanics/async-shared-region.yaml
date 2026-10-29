@@ -52,7 +52,7 @@ emergence_potential: 3
 authoring_cost: 2
 compute_cost: 2
 tuning_difficulty: 3
-ai_leverage: 3
+ai_leverage: 2
 maturity: established
 open_questions:
 - Can AI-controlled stand-in neighbors, trained on real player cities, keep regions alive when players
@@ -66,3 +66,65 @@ provenance:
   created: 2026-10-24-taxonomy-m7
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-29-shreyko-antim-rate-scores-19
+ratings:
+- field: legibility
+  value: 3
+  run: 2026-10-24-taxonomy-m7
+  rationale: original score
+- field: legibility
+  value: 3
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Players must inspect flows and wait through synchronization delays to understand distant
+    causes and dependencies. This needs deliberate attention and info tools rather than mostly intuitive
+    local feedback (4), while external wikis are not inherently necessary (2).
+- field: emergence_potential
+  value: 3
+  run: 2026-10-24-taxonomy-m7
+  rationale: original score
+- field: emergence_potential
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Specialization, cross-border pollution and service dependencies propagate other players'
+    choices through several systems. These are frequent consequence chains beyond 3, but exported boundary
+    flows do not universally become primary story engines (5).
+- field: authoring_cost
+  value: 2
+  run: 2026-10-24-taxonomy-m7
+  rationale: original score
+- field: authoring_cost
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Export schemas, service/resource types and shared-project definitions are small tables. Networking
+    engineering is not per-variety content, keeping this above rules-only authoring (1) but below moderate
+    bespoke assets for each exchange (3).
+- field: compute_cost
+  value: 2
+  run: 2026-10-24-taxonomy-m7
+  rationale: original score
+- field: compute_cost
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Periodic compact-state publication and boundary-flow imports are modest linear processing
+    at typical region size. Serialization and reconciliation exceed negligible work (1), while server
+    outages and latency do not establish compute slowdown at level 3.
+- field: tuning_difficulty
+  value: 3
+  run: 2026-10-24-taxonomy-m7
+  rationale: original score
+- field: tuning_difficulty
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Rates, export limits and offline fallback can make dependence or specialization dominant
+    and propagate shortages between players. This exceeds routine interacting-parameter tuning (3), but
+    capped flows and robust fallback can stabilize outcomes below 5.
+- field: ai_leverage
+  value: 3
+  run: 2026-10-24-taxonomy-m7
+  rationale: original score
+- field: ai_leverage
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: AI can help tune matching, flow estimates or abandoned-neighbor fallback, incremental improvements
+    above little change (1). Asynchronous export/import remains the design ceiling; notable new variety
+    or content-cost change at 3 is not evident.

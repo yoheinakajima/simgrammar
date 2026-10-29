@@ -33,7 +33,7 @@ The film re-voices these episode scenes so their cross-references name the film'
 
 **Voice.** Dwarf Fortress's stress system scores 3 and 4.{{assert:field.stress-accumulation.legibility == 3}}{{assert:field.stress-accumulation.emergence_potential == 4}} Its simulated history, which can run a world forward thousands of years before you arrive, scores 2 and 5.{{assert:field.history-generation.legibility == 2}}{{assert:field.history-generation.emergence_potential == 5}} The pause button scores 5 and 1.{{assert:field.variable-speed.legibility == 5}}{{assert:field.variable-speed.emergence_potential == 1}}
 
-**Voice.** One model rater assigned every one of these scores, reading each mechanic's record against the anchors, and nobody has rated them independently yet.{{assert:n_ratings == 0}} So the patterns in this chapter are a consistent reading of the design knowledge in the records. They aren't measurements of players.
+**Voice.** One model rater assigned the original scores by reading each mechanic's record against the anchors. Independent second ratings now cover {{stat:n_scores_independently_rated}} scores.{{assert:n_scores_independently_rated > 0}} The patterns in this chapter still rely largely on the original rater's reading of the design knowledge in the records. They aren't measurements of players.
 
 ### Episode 4, scene 10: Choosing a point
 

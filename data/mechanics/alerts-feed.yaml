@@ -65,3 +65,66 @@ sources: []
 status: asserted
 provenance:
   created: 2026-10-24-taxonomy-m6
+  reviewed:
+  - 2026-10-29-shreyko-antim-rate-scores-19
+ratings:
+- field: legibility
+  value: 4
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: legibility
+  value: 5
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: An alert explicitly names a problem or event, marks severity and links its location. These
+    immediate visible functions match glance-level transparency; complex causes behind an alert belong
+    to the reported systems and do not lower this layer to 4.
+- field: emergence_potential
+  value: 1
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: emergence_potential
+  value: 1
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: The feed deterministically reports events and predicates without owning their causes. Aggregation
+    and auto-pause shape attention and pacing, but they do not themselves generate unscripted simulation
+    variation deserving 2.
+- field: authoring_cost
+  value: 2
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: authoring_cost
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Alert types, message templates, severity and lifetimes fit small tables. This is more than
+    rule-only content (1), while rich in-fiction writing is optional rather than required moderate bespoke
+    content for every alert variant (3).
+- field: compute_cost
+  value: 2
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: compute_cost
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Condition checks, active-alert maintenance and deduplication are low-cost linear work at
+    typical entity scale. This exceeds a negligible single-state read (1), but is not ordinarily a late-game
+    slowdown source (3).
+- field: tuning_difficulty
+  value: 2
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: tuning_difficulty
+  value: 3
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Thresholds, persistence, deduplication and auto-pause interact and need playtesting to prevent
+    flicker or fatigue. This exceeds a few stable parameters (2), without normally producing sensitive
+    runaway strategies at level 4.
+- field: ai_leverage
+  value: 3
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: ai_leverage
+  value: 3
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Contextual ranking, causal grouping and generated explanations can notably improve relevance
+    and presentation variety beyond incremental alert tuning (2). Event notification remains the form,
+    so substantially new mechanics at 4 are not required.

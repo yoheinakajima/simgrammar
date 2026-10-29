@@ -58,7 +58,7 @@ player_interface:
 - observation
 legibility: 4
 emergence_potential: 3
-authoring_cost: 2
+authoring_cost: 1
 compute_cost: 3
 tuning_difficulty: 2
 ai_leverage: 2
@@ -76,3 +76,66 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-taxonomy-m3
+  reviewed:
+  - 2026-10-29-shreyko-antim-rate-scores-19
+ratings:
+- field: legibility
+  value: 4
+  run: 2026-10-24-taxonomy-m3
+  rationale: original score
+- field: legibility
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Watching routes teaches the effects of doors, roads and distance, making the cost model mostly
+    intuitive. Permissions, obstacles and detours cause surprises below 5; typical layout decisions need
+    less than deliberate investigation (3).
+- field: emergence_potential
+  value: 3
+  run: 2026-10-24-taxonomy-m3
+  rationale: original score
+- field: emergence_potential
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Routes concentrate traffic, constrain hauling throughput and reshape defense, creating frequent
+    chains across systems. This exceeds occasional unplanned situations (3), but route search is not universally
+    a primary engine of stories (5).
+- field: authoring_cost
+  value: 2
+  run: 2026-10-24-taxonomy-m3
+  rationale: original score
+- field: authoring_cost
+  value: 1
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Traversal and cost rules generate route variety from the existing map. New path outcomes
+    need neither content tables for each route (2) nor bespoke route assets, matching trivial per-variety
+    authoring.
+- field: compute_cost
+  value: 3
+  run: 2026-10-24-taxonomy-m3
+  rationale: original score
+- field: compute_cost
+  value: 3
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Many searches and map-edit repathing storms commonly cause late-game slowdown, above modest
+    linear work (2). Hierarchies, shared fields and budgets often control it, so dominant scale-capping
+    cost (4) is not assumed for every typical use.
+- field: tuning_difficulty
+  value: 2
+  run: 2026-10-24-taxonomy-m3
+  rationale: original score
+- field: tuning_difficulty
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Small cost, permission or avoidance changes can create dominant mazes, crippling congestion
+    or unreasonable detours. This exceeds routine interacting-parameter tuning (3), but known route and
+    avoidance controls allow settling behavior below 5.
+- field: ai_leverage
+  value: 2
+  run: 2026-10-24-taxonomy-m3
+  rationale: original score
+- field: ai_leverage
+  value: 3
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Learned heuristics, crowd policies and adaptive routing can notably improve movement variety
+    or practical scale beyond incremental tuning (2). The goal-to-route role remains intact, and substantially
+    new forms (4) are not established by the packet.
