@@ -1,0 +1,17 @@
+id: src-ryan-2018-curating-simulated-storyworlds
+type: source
+name: Curating Simulated Storyworlds
+kind: tech-report
+authors:
+- James Ryan
+venue: PhD dissertation in Computational Media, University of California, Santa Cruz
+date: '2018-12'
+url: https://viv.sifty.studio/background/curating_simulated_storyworlds.pdf
+accessed: '2026-10-28'
+notes: Curationist emergent narrative, story generation as recounting; overgenerate and curate; chronicler,
+  story sifter, and narrativizer in feedforward and feedback variants; sifting patterns versus heuristics;
+  causal bookkeeping; engines World, Talk of the Town, Hennepin and experiences Diol/Diel/Dial, Bad News,
+  Sheldon County; conclusion names a narrativization bottleneck and proposes curation support frameworks.
+  Also hosted at jamesryan.computer.
+provenance:
+  created: 2026-10-28-story-sifting

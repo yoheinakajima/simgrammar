@@ -1,0 +1,139 @@
+id: story-sifting
+type: technique
+name: Story sifting with causal bookkeeping
+aliases:
+- curationist emergent narrative
+- automatic curation
+- sifting patterns
+- Viv
+summary: A simulation records causal links between character actions as they happen, and authored sifting
+  patterns match causally connected sequences in that record, so the system can find the storylines that
+  emerged without steering the world toward them.
+category: multi-agent-social-sim
+year: 2018
+mechanism: 'Characters perform discrete actions that are written to a chronicle. As each action is performed,
+  the engine records which earlier actions caused it: an action that names a past action in one of its
+  roles, a reaction queued by an earlier action, or a reaction to news of an earlier action relayed by
+  gossip or an inscribed item. The chronicle becomes a forest of causal graphs instead of a flat log.
+  Authors write sifting patterns: a set of action slots, each filled by a query over tags, roles, importance,
+  or salience, plus conditions such as caused, triggered, and preceded that bind the slots into a storyline
+  (offense, vow, scheme, payback). Matching a pattern is a constrained search over the recorded graph,
+  not causal inference over raw state. Patterns compose, so a pattern can match two storylines that share
+  a hinge action. The same patterns can run over one character''s memories, so characters can recognize
+  and retell stories they know, and an action that retells a matched story passes knowledge of every
+  action in it to the listener. Ryan''s 2018 dissertation frames this as curation: the simulation overgenerates,
+  a story sifter extracts material, and a narrativizer recounts it, either in a separate media experience
+  (feedforward) or back inside the world (feedback). Viv, his public engine, implements this as a compiled language
+  with a JavaScript runtime that a host game calls periodically.'
+key_results:
+- text: The dissertation defines curationist emergent narrative, in which simulated material is curated
+    into a narrative artifact, recasting story generation as recounting rather than invention.
+  sources:
+  - src-ryan-2018-curating-simulated-storyworlds
+  confidence: high
+  quote: recounting, rather than invention
+  locator: Abstract, p. xiii
+- text: The dissertation proposes recording contingency relationships between events as they occur, which
+    it calls causal bookkeeping, so that storylines can be identified later.
+  sources:
+  - src-ryan-2018-curating-simulated-storyworlds
+  confidence: high
+  quote: explicitly record contingency relationships between events as they occur
+  locator: p. 163
+- text: Its architecture distinguishes sifting patterns, which match against the chronicle, from sifting
+    heuristics, abstract policies that guide sifting; it delivers patterns and leaves heuristics as an
+    open problem.
+  sources:
+  - src-ryan-2018-curating-simulated-storyworlds
+  confidence: high
+  quote: the former pattern-match against the material recorded in a chronicle
+  locator: p. 237, Story Sifter
+- text: In the feedback variant of the architecture, curated stories are mounted back into the simulated
+    storyworld rather than into a separate media experience.
+  sources:
+  - src-ryan-2018-curating-simulated-storyworlds
+  confidence: high
+  quote: mounted back into the simulated storyworld itself
+  locator: p. 232, Curationist Architecture
+- text: The conclusion names a narrativization bottleneck, turning sifted material into arbitrary stories,
+    that the author could not solve, and proposes curation support tools that leave narrativization to
+    human storytellers.
+  sources:
+  - src-ryan-2018-curating-simulated-storyworlds
+  confidence: high
+  quote: let us call it the narrativization bottleneck
+  locator: Conclusion, p. 692
+- text: Viv's runtime records causal links between actions automatically as they occur, storing direct
+    causes and transitive ancestors for each action.
+  sources:
+  - src-ryan-2026-viv-runtime-model
+  confidence: high
+  quote: Each action records both its direct causes and its transitive ancestors, enabling queries over
+    causal chains of arbitrary depth.
+  locator: Causal bookkeeping
+- text: Viv defines story sifting as automatically detecting the storylines that emerge as a simulation
+    proceeds, and its runtime is fully symbolic.
+  sources:
+  - src-ryan-2026-viv-introduction
+  confidence: high
+  quote: There are no LLMs in the loop at runtime.
+  locator: Design philosophy
+- text: Viv ships a single JavaScript runtime, with a C# runtime for Unity planned.
+  sources:
+  - src-sifty-2026-viv-repository
+  confidence: high
+  quote: A C# runtime tailored for Unity is planned.
+  locator: README, Status
+maturity: prototype
+trl: 5
+runtime:
+- server-realtime
+- client-realtime
+- analytics
+determinism_impact: preserves
+horizon: 1-2y
+risks:
+- labor
+- evaluation
+- legibility
+affects:
+- id: history-chronicle
+  effect: deepens
+  note: The chronicle stores causal links with every event, and sifting patterns retrieve whole storylines
+    from it (a revenge arc, a rise and fall) instead of leaving the player to browse records one at a
+    time.
+- id: memories-thoughts
+  effect: enables-new
+  note: Characters can run sifting patterns over their own memories and act on the storylines they recognize,
+    such as warning a grandchild with a remembered cycle of revenge.
+- id: gossip-propagation
+  effect: deepens
+  note: Relayed knowledge carries the original action, so a character who hears of an old event can react
+    to it years later and the reaction is linked causally to both the event and the telling.
+- id: triggered-event-chains
+  effect: explains
+  note: Reactions and multi-phase plans are recorded with their causes, so any chain can be traced and
+    named after the fact rather than only authored in advance.
+- id: storyteller-director
+  effect: deepens
+  note: Policies that a director would use to steer events toward an arc can instead select and frame
+    storylines that already happened, leaving the simulation unsteered.
+builds_on: []
+deployed_in: []
+limitations:
+- Patterns find only the storylines someone authored a pattern for; the dissertation leaves sifting heuristics
+  that find unanticipated stories as an open problem.
+- 'Turning sifted material into a told story (narrativization) remains authored or human work; the 2018
+  conclusion calls it a bottleneck.'
+- Causal bookkeeping requires the simulation to be built from discrete, recorded actions; it cannot be
+  added cheaply to a sim that changes state directly.
+- Designed for periodic background simulation over long spans, not frame-by-frame behavior; the public
+  runtime targets JavaScript only and commercial use needs a license.
+sources:
+- src-ryan-2018-curating-simulated-storyworlds
+- src-ryan-2026-viv-introduction
+- src-ryan-2026-viv-runtime-model
+- src-sifty-2026-viv-repository
+status: sourced
+provenance:
+  created: 2026-10-28-story-sifting

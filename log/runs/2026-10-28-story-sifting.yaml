@@ -1,0 +1,40 @@
+id: 2026-10-28-story-sifting
+type: run
+kind: technique
+date: '2026-10-28'
+actor: agent
+operator: heypedrolucca
+agent:
+  model: claude-opus-5-5
+  harness: Claude app agent workspace (claude.ai)
+purpose: Add story sifting with causal bookkeeping (Ryan 2018; Viv engine) as a technique and link it to the chronicle,
+  memory, gossip, and event-chain mechanics it changes.
+method: 'Searched with scripts/find.py for story sifting, sifter, Talk of the Town, Bad News, and Kreminski; no
+  technique or game covered it. Read the abstract, Chapter 5 (Refining Emergent Narrative: technical approach and
+  curationist architecture), and the Conclusion of James Ryan''s 2018 dissertation, from the PDF hosted with the
+  Viv documentation (the copy at jamesryan.computer came back as unreadable binary through the web tool); quotes
+  were checked against text extracted from that PDF with pdftotext, with page labels. Read the full Viv documentation
+  from the docs/ source in the public siftystudio/viv repository at commit 469cc46 (overview, tour, history, the
+  language reference chapters on roles, actions, reactions, temporal constraints, bindings, tropes, queries, sifting
+  patterns, plans, selectors, compiler output, runtime model, implementation notes, and glossary, plus the README),
+  and confirmed each Viv quote on the rendered pages at viv.sifty.studio through the web tool. Did not open Kreminski
+  et al.''s Felt (2019) or other follow-on sifting papers, so they are not cited. No game in the catalog deploys
+  the technique, so deployed_in is empty. Category multi-agent-social-sim is the closest existing term; see proposals.'
+contract_version: '1.2'
+proposals:
+- kind: vocab-term
+  target: technique_category
+  detail: 'Add narrative-curation (story sifting, causal bookkeeping, chronicle summarization): techniques that
+    read what a simulation produced and extract or recount storylines without changing the world. story-sifting
+    is filed under multi-agent-social-sim and llm-explanation-of-state under llm-narrative-dialogue, although both
+    do this job; a shared category would let the technique landscape show it.'
+- kind: other
+  target: illustrated-chronicles
+  detail: 'The illustrated-chronicles opportunity lists the risk that summaries invent drama the log does not support.
+    Story sifting addresses it: causal bookkeeping plus sifting patterns hand the narrator a matched causal subgraph
+    rather than a raw log. Consider adding story-sifting to its applies list.'
+- kind: other
+  target: catalog-candidates
+  detail: 'Catalog candidates for the curationist lineage: Bad News (Ryan, Samuel, Summerville, 2016), a performed
+    experience driven by the Talk of the Town simulation, and Talk of the Town itself as a public research engine.
+    Both are described in the 2018 dissertation and would let story-sifting carry deployed_in edges.'

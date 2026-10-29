@@ -1,0 +1,17 @@
+id: src-sifty-2026-viv-repository
+type: source
+name: 'Viv: An Engine for Emergent Narrative (monorepo)'
+kind: repository
+authors:
+- James Ryan
+venue: GitHub (siftystudio/viv)
+date: '2026'
+url: https://github.com/siftystudio/viv
+accessed: '2026-10-28'
+notes: Read at commit 469cc46e6370f8021ca0e5f9b1cc67c05b61bc76, including the docs/ source for the introduction,
+  tour, history, and full language reference. Open beta, components in 0.x, more than 1,000 tests in CI;
+  a single JavaScript runtime ships and a C# runtime for Unity is planned; compiler on PyPI, runtime on
+  npm; history page traces Viv from the Hennepin engine of the 2018 thesis through Esper at Hexagram to
+  the 2025-2026 public rewrite.
+provenance:
+  created: 2026-10-28-story-sifting

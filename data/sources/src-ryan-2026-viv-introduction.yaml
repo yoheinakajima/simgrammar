@@ -1,0 +1,18 @@
+id: src-ryan-2026-viv-introduction
+type: source
+name: Introduction to Viv
+kind: docs
+authors:
+- James Ryan
+venue: Viv documentation (Sifty)
+date: '2026'
+url: https://viv.sifty.studio/introduction/
+accessed: '2026-10-28'
+notes: Viv, an engine for emergent narrative in open beta; a DSL for actions, reactions, tropes, plans,
+  selectors, queries, and sifting patterns compiled into a content bundle for a runtime embedded in a
+  host game; characters form memories of actions they witness and relay knowledge through later actions
+  and inscribed items; causal links between actions are recorded automatically, partitioning the chronicle
+  into causal trees; sifting patterns run over the chronicle or a character's memories; symbolic, with
+  no LLMs at runtime; best at background simulation.
+provenance:
+  created: 2026-10-28-story-sifting

@@ -1,0 +1,17 @@
+id: src-ryan-2026-viv-runtime-model
+type: source
+name: 'Viv Language Reference, 20: Runtime model'
+kind: docs
+authors:
+- James Ryan
+venue: Viv documentation (Sifty)
+date: '2026'
+url: https://viv.sifty.studio/reference/language/20-runtime-model/
+accessed: '2026-10-28'
+notes: Action targeting by role casting with backtracking over shuffled casting pools; knowledge manager
+  forms memories for present characters with per-character salience and associations, relays knowledge
+  of past actions cast in new actions or inscribed in items, and fades memories below a salience threshold;
+  causal links recorded from action roles, reactions, knowledge relaying, inscription, and forced causes,
+  with direct causes and transitive ancestors stored per action.
+provenance:
+  created: 2026-10-28-story-sifting
