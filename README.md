@@ -1,5 +1,9 @@
 # SimGrammar
 
+<!-- BEGIN GENERATED: byline -->
+By Yohei Nakajima, Pedro Lucca, and ShreyKo.
+<!-- END GENERATED: byline -->
+
 An open, machine-readable atlas of simulation game mechanics: which games use which rule-systems, how each mechanic works and fails, which math/AI/ML/LLM results change what those mechanics can be, and where the design opportunities are.
 
 The repository is the research. The report, wiki, tables, graph, and site are projections of the same YAML files, rebuilt and checked on every commit, so they cannot disagree with each other.
@@ -40,7 +44,7 @@ High-value first contributions: verbatim quotes for existing claims (`tasks/sour
 
 ### Contributors
 
-Built from the run log: you appear here when your first pull request merges. What each person's runs created and verified is in [appendix D of the paper](https://sim.yohei.me/#appendix-d-contributors). To be credited by name rather than handle, add yourself to `contributors` in [`report/meta.yaml`](report/meta.yaml).
+Built from the run log: you appear here when your first pull request merges. What each person's runs created, verified, and rated is in [appendix D of the paper](https://sim.yohei.me/#appendix-d-contributors). To be credited by name rather than handle, add yourself to `contributors` in [`report/meta.yaml`](report/meta.yaml).
 
 <!-- BEGIN GENERATED: contributors -->
 | contributor | github | first run |

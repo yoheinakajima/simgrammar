@@ -416,10 +416,12 @@ class Web:
         ]
         nums = "".join(f'<div class="number"><b>{esc(v)}</b><span>{esc(lab)}</span><small>{esc(src)}</small></div>' for v, lab, src in numbers)
         tocs = "".join(f'<a href="#{hid}" data-internal>{esc(t)}</a>' for hid, t in toc)
-        authors = ", ".join(meta["authors"])
-        authors_html = ", ".join(f'<a href="#appendix-d-contributors" data-internal>{esc(a)}</a>' if a == "SimGrammar contributors" else esc(a)
-                                 for a in meta["authors"])
-        bib = (f"@misc{{nakajima{meta['date'][:4]}grammar,\n  title = {{{meta['title']}: {meta['subtitle']}}},\n  author = {{Nakajima, Yohei and {{SimGrammar contributors}}}},\n"
+        authors = ", ".join(self.analysis["byline"])
+        authors_html = self.byline_html("")
+        # BibTeX names: "Last, First" for a personal name, braces for a one-word handle or the group name so they stay whole
+        bib_names = " and ".join(f"{a.rsplit(' ', 1)[1]}, {a.rsplit(' ', 1)[0]}" if " " in a and a != "SimGrammar contributors" else f"{{{a}}}"
+                                 for a in self.analysis["byline"])
+        bib = (f"@misc{{nakajima{meta['date'][:4]}grammar,\n  title = {{{meta['title']}: {meta['subtitle']}}},\n  author = {{{bib_names}}},\n"
                f"  year = {{{meta['date'][:4]}}},\n  version = {{{meta['version']}}},\n  url = {{{self.site['url']}}},\n  note = {{Dataset {self.short}; full sha256 in manifest.json}}\n}}")
         nruns = len(self.ents.get("run", []))
         header = f"""<div class="page-header corners">
@@ -1283,6 +1285,11 @@ class Web:
         return self.page(title=f"{title} · the book · simgrammar", desc=f"{title}, a chapter of The Grammar of Simulation, rendered from the dataset.",
                          body=main, depth=2, nav="book", path=f"book/{stem}/", image=f"og/book/{stem}.png")
 
+    def byline_html(self, base):
+        """The byline's names; "SimGrammar contributors", once there are more contributors than it names, links to the full table."""
+        return ", ".join(f'<a href="{base}#appendix-d-contributors" data-internal>{esc(a)}</a>' if a == "SimGrammar contributors" else esc(a)
+                         for a in self.analysis["byline"])
+
     def book_index(self):
         base = "../"
         words = sum(len(re.sub(r"[#*\[\]()]", " ", self.built[f"book/{st}.md"].split("\n## Sources")[0]).split()) for st in self.chapters if st[:2] not in ("00", "90", "91"))
@@ -1300,7 +1307,8 @@ class Web:
                 f'<div class="page-header"><p class="eyebrow"><span class="id">book</span> <span>{sum(1 for st in self.chapters if re.match(r"(0[1-9]|1[0-9])-", st))} chapters, a preface, and back matter</span> <span>about {words // 1000}k words</span></p>'
                 f'<h1>The Grammar of Simulation, as a book</h1><p class="dek">The paper\'s findings at book length: thirteen chapters in four parts, a glossary of every '
                 f'mechanic, and the catalog of games. Like the paper, every number is rendered from the dataset when the site is built, and every sentence that '
-                f'interprets one is checked against the data.</p></div><div class="register" data-size="wide">{"".join(rows)}</div>')
+                f'interprets one is checked against the data.</p><div class="meta"><span><b>{self.byline_html(base)}</b></span></div></div>'
+                f'<div class="register" data-size="wide">{"".join(rows)}</div>')
         return self.page(title="The book · simgrammar", desc="The Grammar of Simulation as a book, one chapter a page, rendered from the dataset.", body=body,
                          depth=1, nav="book", path="book/", image="og/book.png")
 

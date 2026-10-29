@@ -1,0 +1,21 @@
+id: 2026-10-29-byline
+type: run
+kind: maintenance
+date: '2026-10-29'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: name the first three contributors on the byline of the paper, the
+  book, the site, and the citation, and credit later contributors as SimGrammar contributors.'
+method: 'The byline was a fixed list in report/meta.yaml, "Yohei Nakajima, SimGrammar contributors". It is now built
+  from the contributors table: scripts/analyze.py names the first byline_names contributors (3, set in report/meta.yaml)
+  in order of first run, and once there are more it ends with "SimGrammar contributors", which links to paper appendix D.
+  The same list feeds the paper front matter, the site header and its citation line, the BibTeX entry (personal names as
+  Last, First; one-word names and the group name braced), a byline on the book index page and the book contents, and a
+  new README GENERATED block under the title. A byline_names of 2 was checked locally and rendered the first two
+  names followed by the linked group name in each place; it was set back to 3. The byline now reads Yohei Nakajima,
+  Pedro Lucca, and ShreyKo. No schema field, rule, or contract version changed.'
+contract_version: '1.2'
+proposals: []
