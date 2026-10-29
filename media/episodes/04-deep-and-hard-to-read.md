@@ -46,7 +46,7 @@ Target runtime about 12 minutes: about 1,210 words of narration at 135 words a m
 
 **Picture.** A caption card.
 
-**Frame.** compare a="Who rated these scores" a_items="language-model:Original model rater" b="Rated independently" b_items="person:Second rater on a subset"
+**Frame.** compare a="Who rated these scores" a_items="language-model:Original model rater" b="Rated independently" b_items="language-model:Second model rater on a subset"
 
 **On screen.** Original scores: one model rater, against written anchors. Scores with independent second ratings: {{stat:n_scores_independently_rated}}.
 

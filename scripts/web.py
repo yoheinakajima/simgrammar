@@ -30,7 +30,7 @@ from pathlib import Path
 from markdown_it import MarkdownIt
 
 from lib import ROOT, get_path, narration_digest, read_yaml, vocab_terms
-from report_render import _decl_rows, _fmt, render
+from report_render import GITHUB_HANDLE_RE, _decl_rows, _fmt, render
 
 WEB_SRC = ROOT / "web"
 NAV = [("paper", "Paper", ""), ("book", "Book", "book/"), ("game", "Games", "game/"), ("mechanic", "Mechanics", "mechanic/"), ("technique", "Techniques", "technique/"),
@@ -244,6 +244,8 @@ class Web:
             return self.link(v, base)
         if col in VOCAB_COLUMNS and isinstance(v, str):
             return esc(self.term(VOCAB_COLUMNS[col], v))
+        if col == "github" and isinstance(v, str) and GITHUB_HANDLE_RE.match(v):
+            return f'<a href="https://github.com/{esc(v)}">{esc(v)}</a>'
         return esc(_fmt(v))
 
     def table(self, columns, headers, rows, base, link_cols=(), caption=None, cap=None, name=None):
@@ -415,6 +417,8 @@ class Web:
         nums = "".join(f'<div class="number"><b>{esc(v)}</b><span>{esc(lab)}</span><small>{esc(src)}</small></div>' for v, lab, src in numbers)
         tocs = "".join(f'<a href="#{hid}" data-internal>{esc(t)}</a>' for hid, t in toc)
         authors = ", ".join(meta["authors"])
+        authors_html = ", ".join(f'<a href="#appendix-d-contributors" data-internal>{esc(a)}</a>' if a == "SimGrammar contributors" else esc(a)
+                                 for a in meta["authors"])
         bib = (f"@misc{{nakajima{meta['date'][:4]}grammar,\n  title = {{{meta['title']}: {meta['subtitle']}}},\n  author = {{Nakajima, Yohei and {{SimGrammar contributors}}}},\n"
                f"  year = {{{meta['date'][:4]}}},\n  version = {{{meta['version']}}},\n  url = {{{self.site['url']}}},\n  note = {{Dataset {self.short}; full sha256 in manifest.json}}\n}}")
         nruns = len(self.ents.get("run", []))
@@ -422,7 +426,7 @@ class Web:
   <p class="eyebrow"><span class="id">v{esc(meta['version'])}</span> <span>{esc(meta['date'])}</span> <span>dataset <b>{self.short}</b></span> <span>contract {esc(man['contract_version'])}</span></p>
   <h1>{esc(meta['title'])}</h1>
   <p class="dek">{esc(meta['subtitle'])}.</p>
-  <div class="meta"><span><b>{esc(authors)}</b></span><span>{counts['game']} games</span><span>{counts['mechanic']} mechanics</span><span>{counts['technique']} techniques</span><span>{counts['opportunity']} opportunities</span><span>{counts['source']} sources</span><span>{man['edges']} typed edges</span><span>{nruns} research runs</span></div>
+  <div class="meta"><span><b>{authors_html}</b></span><span>{counts['game']} games</span><span>{counts['mechanic']} mechanics</span><span>{counts['technique']} techniques</span><span>{counts['opportunity']} opportunities</span><span>{counts['source']} sources</span><span>{man['edges']} typed edges</span><span>{nruns} research runs</span></div>
   <div class="actions"><a class="btn" href="#abstract" data-internal>Read the paper</a><a class="btn" data-style="ghost" href="data/" data-internal>Get the data</a><a class="btn" data-style="ghost" href="{esc(self.site['repo'])}">Contribute on GitHub</a></div>
   <div class="twins"><b>this paper as</b><a href="paper.md" data-internal>markdown</a><a href="references.bib" data-internal>bibtex</a><a href="manifest.json" data-internal>manifest json</a><a href="llms.txt" data-internal>llms.txt</a></div>
 </div>

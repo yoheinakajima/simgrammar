@@ -38,6 +38,18 @@ make check       # validate every rule, the report and record assertions, and th
 
 High-value first contributions: verbatim quotes for existing claims (`tasks/source-claims.md`), Wayback snapshots for sources (`tasks/archive-sources.md`), store ids for games (`tasks/store-ids.md`), and independent, calibrated ratings of mechanic scores (`tasks/rate-scores.md`). The [verification queue](https://sim.yohei.me/dist/analysis/verification-queue.csv) lists records still waiting for sources.
 
+### Contributors
+
+Built from the run log: you appear here when your first pull request merges. What each person's runs created and verified is in [appendix D of the paper](https://sim.yohei.me/#appendix-d-contributors). To be credited by name rather than handle, add yourself to `contributors` in [`report/meta.yaml`](report/meta.yaml).
+
+<!-- BEGIN GENERATED: contributors -->
+| contributor | github | first run |
+|---|---|---|
+| Yohei Nakajima | [yoheinakajima](https://github.com/yoheinakajima) | 2026-10-23 |
+| Pedro Lucca | [heypedrolucca](https://github.com/heypedrolucca) | 2026-10-28 |
+| ShreyKo | [shreyko-antim](https://github.com/shreyko-antim) | 2026-10-29 |
+<!-- END GENERATED: contributors -->
+
 ## Layout
 
 ```

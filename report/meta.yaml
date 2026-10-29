@@ -3,6 +3,12 @@ subtitle: "A machine-readable atlas of simulation game mechanics and the mathema
 authors:
   - Yohei Nakajima
   - SimGrammar contributors
+# Display names for run operators, keyed by GitHub handle. The contributors table (paper appendix D, book chapter 13,
+# README) is built from log/runs; an operator missing here is credited by handle. Add your own name in your PR.
+contributors:
+  yoheinakajima: Yohei Nakajima
+  heypedrolucca: Pedro Lucca
+  shreyko-antim: ShreyKo
 date: "2026-10-25"
 version: "0.2"
 # The website projection (scripts/web.py -> dist/web). Changing these changes generated pages.
