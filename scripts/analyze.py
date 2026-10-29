@@ -415,6 +415,31 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         stats["n_runs_verification"] = sum(1 for r in all_runs if r.data.get("kind") == "verification")
         stats["n_runs_agent"] = sum(1 for r in all_runs if r.data.get("actor") == "agent")
         stats["n_run_operators"] = len({str(r.data.get("operator", "")).strip().lower() for r in all_runs})
+        # everyone who has operated a run, credited from the run log; display names come from report/meta.yaml
+        names = {str(k).lower(): v for k, v in ((read_yaml(ROOT / "report" / "meta.yaml") or {}).get("contributors") or {}).items()}
+        by_op: dict[str, list] = {}
+        for r in all_runs:
+            by_op.setdefault(str(r.data.get("operator", "")).strip().lower(), []).append(r)
+        prov = [(t, e.data, e.data.get("provenance") or {}) for t, lst in live.items() for e in lst]
+        crows = []
+        for op, rs in by_op.items():
+            ids = {r.id for r in rs}
+            verif = {r.id for r in rs if r.data.get("kind") == "verification"}
+            crows.append({"contributor": names.get(op, str(rs[0].data.get("operator", "")).strip()),
+                          "github": str(rs[0].data.get("operator", "")).strip(),
+                          "first_run": min(str(r.data.get("date")) for r in rs), "runs": len(rs),
+                          "records_created": sum(1 for t, _, p in prov if t != "source" and p.get("created") in ids),
+                          "sources_added": sum(1 for t, _, p in prov if t == "source" and p.get("created") in ids),
+                          "records_verified": sum(1 for t, d, p in prov if d.get("status") == "verified" and verif & set(p.get("reviewed") or [])),
+                          # a rating from the creating run is the original score kept beside the others, not a second reading
+                          "scores_rated": sum(1 for _, d, p in prov for g in d.get("ratings") or [] if g.get("run") in ids and g.get("run") != p.get("created"))})
+        crows.sort(key=lambda r: (r["first_run"], r["github"].lower()))
+        tables["contributors"] = {"description": "Everyone who has operated a run, from the run log (log/runs). Records are games, mechanics, techniques, "
+                                                 "and opportunities; a verified record counts for the person whose verification run checked it, and a "
+                                                 "rated score for the person whose run added an independent rating of it. "
+                                                 "Names come from report/meta.yaml; anyone not listed there appears by GitHub handle.",
+                                  "columns": ["contributor", "github", "first_run", "runs", "records_created", "sources_added", "records_verified", "scores_rated"],
+                                  "rows": crows}
         stats["n_opportunity_asserted"] = sum(1 for o in opps if o.data.get("status") == "asserted")
         # book chapter 2: feedback polarity of mechanics, the game with the most mechanics, and where each large
         # subgenre spends its mechanic uses (top three families by share)
@@ -802,11 +827,14 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
                     ag["pairs"] += len(ps)
                     ag["exact"] += sum(1 for x, y in ps if x["value"] == y["value"])
                     ag["within_one"] += sum(1 for x, y in ps if abs(x["value"] - y["value"]) <= 1)
-    tables["rater-agreement"] = {"description": "Agreement between ratings from independent runs (different operator, and different model for agent runs), per scored field. Empty until a second rater scores records (tasks/rate-scores.md).",
+    tables["rater-agreement"] = {"description": "Agreement between ratings from independent runs (different operator, and different model for agent runs), per scored field. A field appears once a second rater has scored it (tasks/rate-scores.md).",
                                  "columns": ["field", "scores", "pairs", "exact", "within_one"],
                                  "rows": [{"field": f, "scores": v["scores"], "pairs": v["pairs"], "exact": _r(v["exact"] / v["pairs"], 2), "within_one": _r(v["within_one"] / v["pairs"], 2)} for f, v in sorted(pair_stats.items())]}
     stats["n_ratings"] = n_ratings
     stats["n_scores_independently_rated"] = sum(v["scores"] for v in pair_stats.values())
+    stats["n_mechanic_scores"] = sum(1 for m in mechs for f, s in rub["scales"].items() if s.get("applies_to") == "mechanic" and m.data.get(f) is not None)
+    n_mech_rated = sum(v["scores"] for f, v in pair_stats.items() if (rub["scales"].get(f) or {}).get("applies_to") == "mechanic")
+    stats["pct_mechanic_scores_independently_rated"] = _r(100 * n_mech_rated / max(stats["n_mechanic_scores"], 1), 0)
     cal = load_calibration(load_registry())
     cal_rows = []
     for r in sorted(runs.values(), key=lambda r: r.id):

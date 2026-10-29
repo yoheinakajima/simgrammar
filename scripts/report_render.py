@@ -271,8 +271,13 @@ def table_md(ctx: Context, name: str, mode: str) -> str | None:
     return "\n".join(lines) + f"\n\n*{t['description']}*\n"
 
 
+GITHUB_HANDLE_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$")
+
+
 def _cell_md(ctx, path, v, mode):
     s = _fmt(v)
+    if path == "github" and GITHUB_HANDLE_RE.match(s):
+        return f"[{s}](https://github.com/{s})"
     return s.replace("|", "\\|").replace("\n", " ")
 
 

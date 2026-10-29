@@ -13,3 +13,7 @@
 - **Browse** the wiki at `dist/wiki/index.md` or the explorer at `site/index.html`.
 - **Contribute** by following `AGENTS.md`: open a run, search before creating, fill entities against the schema, run `make check`. The fastest useful contribution is sourcing an entity from `dist/analysis/verification-queue.csv`.
 - **Dispute** a fact by setting `status: contested` with a claim that cites the opposing source; disputes are data, not edits.
+
+## Appendix D. Contributors
+
+{{table:contributors}}

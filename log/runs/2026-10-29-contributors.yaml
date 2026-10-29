@@ -1,0 +1,31 @@
+id: 2026-10-29-contributors
+type: run
+kind: maintenance
+date: '2026-10-29'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: credit contributors in the paper, the book, the site, and the README, starting
+  with the first outside contributors, and tighten the wording that the first independent ratings changed.'
+method: 'Credits are built from the run log so they cannot drift and a contributor appears when a first pull request
+  merges. scripts/analyze.py adds a contributors table: one row per run operator with the first run date, the run count,
+  the records (games, mechanics, techniques, opportunities) and sources their runs created, the verified records
+  their verification runs checked, and the scores their runs rated independently (a rating from a record''s creating
+  run is the original score and does not count). Display names come from a new contributors map in report/meta.yaml,
+  keyed by GitHub handle; an operator missing from it is credited by handle. The names added are the maintainer,
+  heypedrolucca as Pedro Lucca, and shreyko-antim as ShreyKo, each the name on that contributor''s signed-off commits.
+  The table appears as paper appendix D and at the end of book chapter 13, and the site header links "SimGrammar
+  contributors" to the appendix. The README GENERATED block lists names, handles, and first run dates only: with run
+  counts it would change in every pull request and conflict between parallel ones, while names change only in the pull
+  request that credits someone new. GitHub handles render as profile links. After the first independent ratings
+  (run 2026-10-29-shreyko-antim-rate-scores-19) merged, the branch took main and resolved book chapter 13, whose closing
+  paragraph now also names the sentences those ratings failed. Because 60 of 1,194 mechanic scores have a second
+  rating, the abstract again says the score correlations rest on a single model rater and gives the count and share,
+  with an assertion that fails once half the scores have a second rating; new stats n_mechanic_scores and
+  pct_mechanic_scores_independently_rated supply them, and the method section and chapter 13 give the same count. The
+  rater-agreement caption no longer says the table is empty, and episode 4 shows the second rater as a model. No
+  schema field, rule, or contract version changed, so open pull requests written under contract 1.2 are unaffected.'
+contract_version: '1.2'
+proposals: []

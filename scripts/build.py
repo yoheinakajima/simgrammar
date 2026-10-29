@@ -277,6 +277,12 @@ def generated_blocks(ents, analysis, vocabs, registry) -> dict[str, str]:
     for name, s in vocabs["rubrics"]["scales"].items():
         ri.append(f"| `{name}` | {s['applies_to']} | {s['question']} |")
     blocks["rubric-index"] = "\n".join(ri)
+    # names only: run counts would change this committed block in every PR (the paper and book tables carry them)
+    cr = ["| contributor | github | first run |", "|---|---|---|"]
+    for row in analysis["tables"]["contributors"]["rows"]:
+        h = row["github"]
+        cr.append(f"| {row['contributor']} | [{h}](https://github.com/{h}) | {row['first_run']} |")
+    blocks["contributors"] = "\n".join(cr)
     return blocks
 
 
