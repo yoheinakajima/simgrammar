@@ -1,0 +1,124 @@
+id: middle-earth-shadow-of-mordor
+type: game
+name: 'Middle-earth: Shadow of Mordor'
+aliases:
+- Shadow of Mordor
+summary: An open-world action game whose Nemesis system generates orc captains with their own strengths,
+  weaknesses, and personalities, promotes the ones that survive or kill the player, and has them remember
+  earlier fights.
+year: 2014
+developer: Monolith Productions
+platforms:
+- pc
+- console
+subgenre: rpg-sim
+sim_domain:
+- military-conflict
+- social-interpersonal
+player_role: inhabitant
+agency_model:
+- direct-avatar
+time_model: real-time
+sim_scale: region
+fidelity: stylized
+perspective: third-person
+win_structure: campaign
+failure_model: soft-recoverable
+narrative_mode: hybrid
+multiplayer:
+- single
+modding: none
+production_tier: aaa
+agent_count_order: '100'
+emergence: 3
+influence: 2
+boundary_case: true
+core_loop: study Sauron's army on the Nemesis screen -> hunt a captain or warchief, exploiting its
+  strengths and weaknesses -> kill, brand, or flee from it -> survivors and killers of Talion are promoted
+  and remember the encounter -> turn branded captains against their warchiefs to take over the army
+design_notes: 'A boundary case: the core loop is authored third-person combat and stealth, and the record
+  is included for the Nemesis system. Sauron''s army is a ranked hierarchy of warchiefs and the captains
+  under them, each a procedurally generated orc with a name, strengths, weaknesses, and personality.
+  The hierarchy updates from the outcomes of the player''s encounters rather than from a script: an orc
+  that survives a fight or kills Talion is promoted and gains power, and its later taunts refer back to
+  the earlier encounter. Talion cannot die permanently, so each player death feeds the hierarchy instead
+  of ending the run. Infighting between orcs can be triggered, and in the second half branded captains
+  serve Talion, so the player reorganizes the same hierarchy from inside. No mechanic in the vocabulary
+  owns a persistent, ranked roster of rivals whose standing changes with each encounter, so the run files
+  a new-mechanic proposal rather than force-fitting career-ladder. Warner Bros. patented the system, and
+  only the sequel, Shadow of War, has used it.'
+mechanics:
+- id: direct-avatar
+  role: core
+  note: The player controls Talion directly in third-person combat, stealth, and traversal.
+- id: procedural-characters
+  role: core
+  note: Orc captains and warchiefs are generated with names, strengths, weaknesses, and personalities
+    that the player exploits.
+- id: memories-thoughts
+  role: core
+  note: An orc that survives an encounter with Talion remembers it, and its dialogue refers back to the
+    earlier fight when it taunts the player.
+claims:
+- text: The game was developed by Monolith Productions and published by Warner Bros. Interactive Entertainment.
+  sources:
+  - src-wikipedia-middle-earth-shadow-of-mordor
+  confidence: high
+  quote: developed by Monolith Productions and published by Warner Bros. Interactive Entertainment
+  locator: lead
+- text: The first release, for PlayStation 4, Windows, and Xbox One, was in September 2014.
+  sources:
+  - src-wikipedia-middle-earth-shadow-of-mordor
+  confidence: medium
+  quote: in September 2014
+  locator: lead
+- text: Uruks that survive an encounter with Talion remember it when they meet him again.
+  sources:
+  - src-wikipedia-middle-earth-shadow-of-mordor
+  confidence: medium
+  quote: Uruks that survive their encounter with Talion will remember this
+  locator: Nemesis system description
+- text: Leader Uruks carry strengths and weaknesses.
+  sources:
+  - src-wikipedia-middle-earth-shadow-of-mordor
+  confidence: medium
+  quote: The leader Uruk will have a range of strengths and weaknesses
+  locator: Nemesis system description
+- text: The player can brand leaders and convert parts of Sauron's army.
+  sources:
+  - src-wikipedia-middle-earth-shadow-of-mordor
+  confidence: medium
+  quote: they can brand these leaders and convert portions of Sauron's army to their side
+  locator: Nemesis system description
+- text: An orc that kills the player is promoted to captain.
+  sources:
+  - src-kato-2014-opening-up-mordor
+  confidence: medium
+  quote: the scrub who knifed me moved up the chain of command and became a captain
+  locator: paragraph 4
+- text: The Nemesis screen lists the region's warchiefs and the captains under each.
+  sources:
+  - src-kato-2014-opening-up-mordor
+  confidence: medium
+  quote: shows you the warchiefs in the area and which captains are under their command
+  locator: paragraph 3
+- text: An orc that survives an encounter may level up and gain abilities.
+  sources:
+  - src-macdonald-2021-nemesis-patent
+  confidence: medium
+  quote: that orc may level up, become more powerful, and/or acquire new abilities
+  locator: paragraph 2
+- text: The system is covered by U.S. Patent No. 10,926,179, titled Nemesis characters, nemesis forts,
+    social vendettas and followers in computer games.
+  sources:
+  - src-macdonald-2021-nemesis-patent
+  confidence: high
+  quote: Nemesis characters, nemesis forts, social vendettas and followers in computer games
+  locator: paragraph 1
+sources:
+- src-wikipedia-middle-earth-shadow-of-mordor
+- src-kato-2014-opening-up-mordor
+- src-macdonald-2021-nemesis-patent
+status: sourced
+provenance:
+  created: 2026-10-28-character-lineage

@@ -1,0 +1,17 @@
+id: src-petzwiki-2026-dogz
+type: source
+name: Dogz
+kind: encyclopedia
+authors:
+- Petz Wiki contributors
+venue: Petz Wiki (Miraheze)
+date: '2026'
+url: https://petz.miraheze.org/wiki/Dogz
+accessed: '2026-10-29'
+notes: Dogz is the first Petz game, released for Windows 3.x on 1995-11-01 and Mac OS on 1996-03-05,
+  with no integration with Catz, released the following year; one dog at a time; treats as positive and
+  the spray bottle as negative reinforcement to teach tricks; dogs get hungry and howl when neglected but
+  cannot starve or die; toys in a toolbox rather than the toy shelf that first appears in Catz; no variation
+  between individuals of a breed; dogs reach maximum size at 15 days.
+provenance:
+  created: 2026-10-28-character-lineage

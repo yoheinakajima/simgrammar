@@ -1,0 +1,19 @@
+id: src-stern-1998-virtual-petz
+type: source
+name: 'Virtual Petz: A Hybrid Approach to Creating Autonomous, Lifelike Dogz and Catz'
+kind: paper
+authors:
+- Andrew Stern
+- Adam Frank
+- Ben Resner
+venue: Video paper, 1998 Autonomous Agents Conference
+date: '1998'
+url: https://alumni.media.mit.edu/~benres/verbiage/Virtual%20Petz%20A%20Hybrid%20Approach%20to%20Creating%20Autonomous,%20Lifelike%20Dogz%20and%20Catz.htm
+accessed: '2026-10-28'
+notes: PF.Magic authors describe Virtual Petz as autonomous agents with real-time layered 3D animation and
+  sound; primary motivation is attention and affection, neglected pets become lethargic and depressed and
+  eventually run away; breed personalities (playful terriers, grumpy bulldogs, hyper Chihuahuas); users reward
+  or discipline any behavior, discipline by water spray bottle, tricks trained by wiggling treats; hand-shaped
+  cursor to touch, pet, and pick up; toys initiate play; pets grow up on the desktop.
+provenance:
+  created: 2026-10-28-character-lineage

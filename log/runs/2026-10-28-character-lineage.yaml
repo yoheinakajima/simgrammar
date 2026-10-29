@@ -1,0 +1,76 @@
+id: 2026-10-28-character-lineage
+type: run
+kind: catalog
+date: '2026-10-28'
+actor: agent
+operator: heypedrolucca
+agent:
+  model: claude-opus-5-5
+  harness: Claude app agent workspace (claude.ai)
+purpose: 'Catalog two lineage titles for autonomous characters: PF.Magic''s Petz (Dogz and Catz) and Middle-earth:
+  Shadow of Mordor''s Nemesis system; record mechanic and vocabulary proposals for character-raising and audience-participation
+  rule systems.'
+method: 'Searched the catalog with scripts/find.py for Petz, Dogz, nemesis, and rival memory; no existing records.
+  Opened and read through the agent''s web tools: the Stern, Frank, and Resner 1998 Autonomous Agents video paper
+  and the Frank, Stern, and Resner 1997 AAAI symposium paper (both on alumni.media.mit.edu), the Game Developer
+  republication of the Petz multiple-character GDC paper, the Wikipedia articles Dogz and Catz and Middle-earth:
+  Shadow of Mordor, Matthew Kato''s 2014 Game Informer preview, and Riley Macdonald''s 2021 Patent Arcade post on
+  U.S. Patent 10,926,179. Each quote was re-checked against its page in a second fetch; three first-draft quotes
+  that crossed line breaks or differed in case were replaced with shorter exact spans. The workspace shell could
+  not reach these sites (egress proxy refused), so pages were read only through the web tools, and no Wayback snapshots
+  were taken. A Warner Bros. UK article on the Nemesis system redirected to the corporate home page and was not
+  used. Breeding and genetics were added to the series in later Petz releases, but no opened source stated it, so
+  trait-inheritance is not tagged. Petz is not tagged lifecycle-aging because its pets stop aging at adulthood and
+  do not die. Shadow of Mordor is a boundary case included for the Nemesis system; its promotion hierarchy is filed
+  as a new-mechanic proposal instead of being force-fit. After maintainer review, the Petz record was rescoped to
+  its 1995 date: every tagged mechanic is now supported for the first game, Dogz, by Ross Scott Rubin''s August
+  1996 Inside Mac Games review of the Mac release (treats teach tricks) and the Petz Wiki Dogz page (treats and
+  spray bottle as reinforcement, one dog at a time, hunger without death). Both pages refused the agent''s web fetch
+  (robots disallow, client error), so they were read in the operator''s own browser and each quote was confirmed
+  as an exact string in the page text, and for the review in the raw RTF. Features the 1997 and 1998 papers describe
+  for later releases (several pets, individual quirks, the toy shelf, running away) are kept in design_notes and
+  claims but not tagged; agent_count_order is now 1.'
+contract_version: '1.2'
+proposals:
+- kind: new-mechanic
+  target: persistent-rivals
+  detail: 'Persistent rivals: a ranked roster of named enemies whose rank, power, and memory of the player update
+    from the outcome of each encounter; an enemy that survives or kills the player is promoted and grows stronger,
+    refers back to the earlier fight, and vacancies are filled by promotion or rival-on-rival struggles. Levers:
+    promotion rule on survival or player death, number of ranks and slots, how much is remembered and surfaced,
+    whether the player can recruit or turn rivals, and how rivals return after apparent death. Used by middle-earth-shadow-of-mordor
+    (Nemesis system); candidates outside the catalog include Shadow of War and XCOM 2: War of the Chosen. Not covered
+    by procedural-characters (generation only), memories-thoughts (mood and memory, no rank), or career-ladder (jobs).'
+- kind: new-mechanic
+  target: audience-intervention
+  detail: 'Audience intervention: spectators of a running simulation spend a currency or place predictions that
+    trigger events, choose between outcomes, or pay out when a predicted outcome happens, so the simulation is steered
+    or wagered on by people other than the player. Levers: how spectators earn currency, the menu and cost of interventions,
+    cooldowns and caps per viewer, whether predictions pay out and in what, and which state changes viewers may
+    touch. Candidates outside the catalog: Twitch Plays Pokemon (crowd input), community storyteller integrations
+    for RimWorld that let stream viewers buy incidents, and Twitch channel-point Predictions used on simulation
+    streams. Distinct from storyteller-director (an AI chooses events) and content-sharing (players exchange creations).'
+- kind: new-mechanic
+  target: character-initiated-contact
+  detail: 'Character-initiated contact: a simulated character reaches the player outside an active session or unprompted
+    within it, through a beep, a letter, a message, or a call, with content and timing driven by its state, and
+    the player''s response or silence feeds back into that state. Levers: frequency caps, which state changes trigger
+    contact, channel (in-game mail, device alarm, push notification), cost of ignoring it, and quiet hours. Seen
+    in tamagotchi (attention calls), animal-crossing-new-horizons (letters from villagers), and companion apps.
+    Distinct from real-time-clock (time passing) and alerts-feed (system notifications not voiced by a character).'
+- kind: new-mechanic
+  target: proxy-agents
+  detail: 'Proxy agents: a player''s character, or a model of the player, acts autonomously inside other players''
+    sessions while its owner is absent, then returns with changed state, memories, or rewards. Levers: what the
+    proxy learns from its owner, what it may do abroad, how its experiences are reported back, and protection against
+    abuse by hosts. Candidates outside the catalog: Dragon''s Dogma pawns, which other players hire and which return
+    with knowledge, and Forza Drivatars, learned driver models that race in other players'' games. Related to async-shared-region
+    and to the agent-ambassadors-async opportunity, which could list these as precedents.'
+- kind: vocab-term
+  target: subgenre
+  detail: 'Add a raising-sim subgenre (tend-and-befriend): games whose core loop is raising and bonding with one
+    or a few characters through care, training, and attention, where relationship and personality mechanics matter
+    more than the fidelity of the underlying simulation. The catalog currently splits this lineage across virtual-pet
+    (tamagotchi, nintendogs, seaman, petz), life-sim (princess-maker-2), and artificial-life (creatures), which
+    hides it in family and cluster statistics. Suggested by the run''s operator; the Petz papers already describe
+    their pets as autonomous, socially intelligent agents aimed at building a relationship with the user.'

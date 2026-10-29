@@ -1,0 +1,168 @@
+id: petz
+type: game
+name: Petz (Dogz and Catz)
+aliases:
+- Dogz
+- Catz
+- Virtual Petz
+summary: PF.Magic's desktop virtual pet series, begun with Dogz in 1995 and Catz in 1996, in which an
+  autonomous animated pet lives on the PC desktop, wants attention and food, and learns tricks from treats
+  and a water spray bottle.
+year: 1995
+developer: PF.Magic
+platforms:
+- pc
+subgenre: virtual-pet
+sim_domain:
+- biological-ecological
+- social-interpersonal
+player_role: caretaker
+agency_model:
+- caretaking-interaction
+time_model: real-time
+sim_scale: individual
+fidelity: stylized
+perspective: top-down-2d
+win_structure: open-sandbox
+failure_model: soft-recoverable
+narrative_mode: emergent
+multiplayer:
+- single
+modding: none
+production_tier: indie
+agent_count_order: '1'
+emergence: 3
+influence: 3
+core_loop: play with the five breeds in the adoption area and adopt one -> pet, feed, and play with it
+  using the hand cursor and toys -> reward behavior with treats or squirt it with the spray bottle ->
+  it learns tricks and grows to full size -> keep it company or it howls for attention
+design_notes: 'The record covers the series and is dated by its first game. Dogz (1995 for Windows, 1996
+  for Mac) and Catz (1996) began it, and the mechanics tagged here are documented for that first game. In Dogz the player adopts one of five breed pups and keeps one dog at a time. The
+  player acts only through a hand cursor that pets, feeds, calls, and offers toys from a toolbox, so every
+  intervention is a stimulus the pet interprets. Treats reward and a water spray bottle punishes, and
+  consistent feedback trains tricks that differ by breed. The dog gets hungry and howls when neglected
+  but cannot starve or die, and it reaches full size after 15 days. PF.Magic''s 1997 and 1998 papers
+  describe the later releases: several pets on one desktop that form friendships and feuds, individual
+  likes, dislikes, and quirks, a toy shelf pets use on their own, and pets that run away after long neglect.
+  Those features are not tagged on this 1995-dated record. The papers call the pets autonomous, socially
+  intelligent agents. Andrew Stern, one of their authors, later co-created Facade.'
+mechanics:
+- id: creature-care
+  role: core
+  note: The player pets, feeds, waters, and plays with the dog through a hand cursor and a toolbox of
+    toys; a neglected dog howls for attention.
+- id: creature-learning
+  role: core
+  note: Treats are positive reinforcement and the spray bottle negative reinforcement, and consistent
+    feedback teaches tricks such as somersaults, backflips, and headstands, cued by which treat is offered.
+- id: personality-traits
+  role: core
+  note: Each of the five breeds has its own personality, which players test in the adoption area before
+    choosing; later releases add individual likes, dislikes, and quirks.
+- id: needs-decay
+  role: supporting
+  note: The dog gets hungry and wants attention, and food and water dishes empty as it uses them, though
+    it cannot starve.
+claims:
+- text: Dogz is the first game in the Petz series, released for Windows 3.x on 1995-11-01 and for Mac
+    OS on 1996-03-05.
+  sources:
+  - src-petzwiki-2026-dogz
+  confidence: medium
+  quote: Dogz is the first game in the Petz series
+  locator: lead
+- text: In the first game, treats teach the dog tricks, and consistent feedback makes it perform them
+    reliably.
+  sources:
+  - src-rubin-1996-dogz-review
+  - src-petzwiki-2026-dogz
+  confidence: high
+  quote: The treats enable you to teach your dog
+  locator: Tricks and Treats
+- text: Dogz uses treats as positive and the spray bottle as negative reinforcement to teach tricks.
+  sources:
+  - src-petzwiki-2026-dogz
+  confidence: medium
+  quote: Dogz can be taught tricks by using Treatz as positive reinforcement and the Spray Bottle as negative
+    reinforcement.
+  locator: Game Play, Interaction
+- text: Dogz lets the player keep one dog at a time.
+  sources:
+  - src-petzwiki-2026-dogz
+  confidence: medium
+  quote: The player is only allowed to have one Dog at a time
+  locator: Game Play, Adoption
+- text: A Dogz pet gets hungry and howls when neglected but cannot starve or die.
+  sources:
+  - src-petzwiki-2026-dogz
+  confidence: medium
+  quote: Dogz can get hungry and will howl for attention when neglected, but they cannot starve or die.
+  locator: Game Play, Interaction
+- text: The PF.Magic authors describe Virtual Petz as autonomous agents with real-time layered 3D animation
+    and sound.
+  sources:
+  - src-stern-1998-virtual-petz
+  confidence: high
+  quote: These are autonomous agents with real-time layered 3D animation and sound.
+  locator: 1. Abstract
+- text: The 1997 symposium paper calls the Petz socially intelligent agents that live on the desktop and
+    aim to build a relationship with the user.
+  sources:
+  - src-frank-1997-socially-intelligent-petz
+  confidence: high
+  quote: socially intelligent agents live on your PC
+  locator: Abstract
+- text: In the later releases the papers describe, a pet's primary motivation is attention and affection,
+    and a neglected pet becomes lethargic and depressed and eventually runs away.
+  sources:
+  - src-stern-1998-virtual-petz
+  confidence: high
+  quote: to receive attention and affection
+  locator: 3. Developing Relationships
+- text: Users reward or discipline behavior, with discipline delivered by a water spray bottle.
+  sources:
+  - src-stern-1998-virtual-petz
+  confidence: high
+  quote: users can reward or discipline any behavior.
+  locator: 4. Communicating with Petz
+- text: Petz begin as puppies or kittens, age over time, and then stop aging without dying.
+  sources:
+  - src-frank-1997-socially-intelligent-petz
+  confidence: high
+  quote: However at a certain point the Petz stop aging and do not die.
+  locator: Should Virtual Petz Die?
+- text: Pets that help and support each other become friends.
+  sources:
+  - src-gamedeveloper-2015-petz-multiple-characters
+  confidence: medium
+  quote: If two characters help and support each other, they should become friends;
+  locator: Interaction Between Multiple Lifelike Computer Characters
+- text: In the original games, how the user treats an animal changes its mood and, over time, its personality.
+  sources:
+  - src-wikipedia-dogz-and-catz
+  confidence: medium
+  quote: Depending on how the animals are interacted with they will change their mood and over time their personality.
+  locator: body text before Reception
+- text: Dogz was released in 1995 and Catz in 1996, both developed and published by PF.Magic for PC and
+    Mac.
+  sources:
+  - src-wikipedia-dogz-and-catz
+  confidence: medium
+  quote: released in 1995 and 1996 respectively
+  locator: lead
+- text: Dogz sold around 200,000 copies in its first year.
+  sources:
+  - src-wikipedia-dogz-and-catz
+  confidence: medium
+  quote: Dogz was an immediate success on release, with around 200,000 copies selling in the first year.
+  locator: Reception
+sources:
+- src-rubin-1996-dogz-review
+- src-petzwiki-2026-dogz
+- src-stern-1998-virtual-petz
+- src-frank-1997-socially-intelligent-petz
+- src-gamedeveloper-2015-petz-multiple-characters
+- src-wikipedia-dogz-and-catz
+status: sourced
+provenance:
+  created: 2026-10-28-character-lineage
