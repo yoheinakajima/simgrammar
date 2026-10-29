@@ -283,6 +283,8 @@ def generated_blocks(ents, analysis, vocabs, registry) -> dict[str, str]:
         h = row["github"]
         cr.append(f"| {row['contributor']} | [{h}](https://github.com/{h}) | {row['first_run']} |")
     blocks["contributors"] = "\n".join(cr)
+    bl = [f"[{a}](https://sim.yohei.me/#appendix-d-contributors)" if a == "SimGrammar contributors" else a for a in analysis["byline"]]
+    blocks["byline"] = "By " + (", ".join(bl[:-1]) + (", and " if len(bl) > 2 else " and ") + bl[-1] if len(bl) > 1 else "".join(bl)) + "."
     return blocks
 
 
@@ -387,7 +389,7 @@ def build() -> tuple[dict[str, str | bytes], dict[str, str]]:
     for p in sorted((ROOT / "report" / "src").glob("*.md")):
         txt, _ = render(p.read_text(encoding="utf-8"), ctx, "paper")
         parts.append(txt.strip() + "\n")
-    fm = ["---", f"title: \"{meta['title']}\"", f"subtitle: \"{meta.get('subtitle', '')}\"", "author:"] + [f"  - {a}" for a in meta["authors"]] + \
+    fm = ["---", f"title: \"{meta['title']}\"", f"subtitle: \"{meta.get('subtitle', '')}\"", "author:"] + [f"  - {a}" for a in analysis["byline"]] + \
          [f"date: \"{meta['date']}\"", f"version: \"{meta['version']}\"", f"dataset_sha256: \"{{DATASET}}\"", "bibliography: references.bib", "---", ""]
     refs = ["", "## References", ""]
     for i, sid in enumerate(ctx.citations, start=1):

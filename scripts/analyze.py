@@ -881,10 +881,15 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
 
     # ---------------- figures
     figures.update(_figures(mechs, derived, fam_terms, famrows, by_id, games, year))
+    # the byline names the first contributors by first run; everyone after them is credited as "SimGrammar contributors"
+    contrib = [r["contributor"] for r in (tables.get("contributors") or {}).get("rows") or []]
+    k = int((read_yaml(ROOT / "report" / "meta.yaml") or {}).get("byline_names", 3))
+    byline = contrib[:k] + (["SimGrammar contributors"] if len(contrib) > k else [])
+    stats["byline"] = ", ".join(byline[:-1]) + (", and " if len(byline) > 2 else " and ") + byline[-1] if len(byline) > 1 else "".join(byline)
     import viz  # local import: viz renders figures from the structures computed above
     vizzes = viz.build(shared, live, by_id, derived, tables, stats, vocabs, cfg)
     return {"derived": {k: dict(sorted(v.items())) for k, v in sorted(derived.items())}, "stats": dict(sorted(stats.items())),
-            "tables": tables, "figures": figures, "vizzes": vizzes, "cocluster": shared.get("cocluster", {}),
+            "tables": tables, "figures": figures, "vizzes": vizzes, "byline": byline, "cocluster": shared.get("cocluster", {}),
             "pair_count": shared.get("pair_count", {}), "mechanic_ids": {m.id for m in mechs}}
 
 

@@ -1,5 +1,7 @@
 # Contents
 
+*The Grammar of Simulation*, by {{stat:byline}}.
+
 [Preface: how this book is made](00-preface.md)
 
 ## Part I. The grammar

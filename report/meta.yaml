@@ -1,8 +1,8 @@
 title: "The Grammar of Simulation"
 subtitle: "A machine-readable atlas of simulation game mechanics and the mathematical, AI, ML, and LLM results that change them"
-authors:
-  - Yohei Nakajima
-  - SimGrammar contributors
+# The byline (paper, book, site header, citation, README) names the first byline_names contributors in order of first
+# run; once there are more, it ends with "SimGrammar contributors", which links to the full table.
+byline_names: 3
 # Display names for run operators, keyed by GitHub handle. The contributors table (paper appendix D, book chapter 13,
 # README) is built from log/runs; an operator missing here is credited by handle. Add your own name in your PR.
 contributors:
