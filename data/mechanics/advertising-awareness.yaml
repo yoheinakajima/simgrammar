@@ -53,7 +53,7 @@ emergence_potential: 2
 authoring_cost: 1
 compute_cost: 1
 tuning_difficulty: 3
-ai_leverage: 3
+ai_leverage: 2
 maturity: classic
 open_questions:
 - Could simulated customers with stated tastes respond to generated ad copy, making campaign content rather than
@@ -75,3 +75,65 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-taxonomy-triage-a
+  reviewed:
+  - 2026-10-29-shreyko-antim-rate-scores-19
+ratings:
+- field: legibility
+  value: 3
+  run: 2026-10-24-taxonomy-triage-a
+  rationale: original score
+- field: legibility
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Spending raises arrivals and fading campaigns lower them, an intuitive causal loop. Saturation,
+    targeting and quality interactions bring occasional surprises, excluding glance-level transparency
+    (5), while the basic stock does not demand deliberate study (3).
+- field: emergence_potential
+  value: 2
+  run: 2026-10-24-taxonomy-triage-a
+  rationale: original score
+- field: emergence_potential
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Traffic changes revenue, service queues and satisfaction, with revenue funding more campaigns.
+    These are cross-system consequence chains beyond isolated unplanned situations (3), but advertising
+    is not a primary story engine wherever used (5).
+- field: authoring_cost
+  value: 1
+  run: 2026-10-24-taxonomy-triage-a
+  rationale: original score
+- field: authoring_cost
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Campaign costs, durations, segment effects and decay curves fit small tables. They exceed
+    rule-only variety (1), without bespoke authored campaign content being necessary per variant (3).
+- field: compute_cost
+  value: 1
+  run: 2026-10-24-taxonomy-triage-a
+  rationale: original score
+- field: compute_cost
+  value: 1
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Updating a few awareness stocks and demand multipliers is negligible at typical business
+    or product scale. Customer simulation is downstream, so its linear agent cost does not justify charging
+    this mechanic level 2.
+- field: tuning_difficulty
+  value: 3
+  run: 2026-10-24-taxonomy-triage-a
+  rationale: original score
+- field: tuning_difficulty
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Return curves can create self-funding maximum-spend strategies or overpower product quality.
+    That sensitivity exceeds stable playtesting of interacting parameters (3); saturation and decay provide
+    tractable controls rather than permanently chaotic balance (5).
+- field: ai_leverage
+  value: 3
+  run: 2026-10-24-taxonomy-triage-a
+  rationale: original score
+- field: ai_leverage
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: AI can optimize targeting and campaign curves, providing incremental tuning assistance beyond
+    little change (1). The spend-stock-arrivals rule is unchanged, so notable new variety or cost reduction
+    at level 3 is unsupported.

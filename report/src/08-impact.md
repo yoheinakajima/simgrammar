@@ -28,7 +28,7 @@ Current AI research mostly targets what a simulation game shows and says, not th
 
 ### 8.4 Judgment versus evidence
 
-Each mechanic carries a judged `ai_leverage` score. It correlates with technique exposure at ρ = {{stat:rho_ai_leverage_exposure}}.{{assert:rho_ai_leverage_exposure >= 0.3}} This is a consistency check, not independent agreement: the same model rater scored leverage, wrote the technique `affects` edges, and judged technique maturity (§2.6). The leverage-gap table lists where they disagree: mechanics judged highly open to AI that no technique in the set yet addresses.
+Each mechanic carries a judged `ai_leverage` score. It correlates with technique exposure at ρ = {{stat:rho_ai_leverage_exposure}}.{{assert:rho_ai_leverage_exposure >= 0.3}} This is a consistency check, not independent agreement: the original model rater scored leverage, wrote the technique `affects` edges, and judged technique maturity (§2.6). Independent second ratings cover part of the mechanic scores; the technique links and maturity judgments retain their original authorship. The leverage-gap table lists where they disagree: mechanics judged highly open to AI that no technique in the set yet addresses.
 
 {{table:leverage-gap}}
 

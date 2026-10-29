@@ -22,7 +22,7 @@ Each record is scored from 1 to 5 on three anchored scales: impact, feasibility,
 
 {{table:opportunities-ranked}}
 
-The scores are one rater's reading of anchor text, like every rubric score in the dataset, so the table ranks arguments by how they were scored and predicts nothing about sales. It does show the shape of the set. {{stat:n_opportunity_horizon_now}} opportunities are buildable now, {{stat:n_opportunity_horizon_1_2y}} in one to two years, and {{stat:n_opportunity_horizon_3_5y}} in three to five.{{assert:n_opportunity_horizon_now >= 10}}{{assert:n_opportunity_horizon_3_5y < n_opportunity_horizon_now}}
+The opportunity scores remain one rater's reading of anchor text, so the table ranks arguments by how they were scored and predicts nothing about sales. It does show the shape of the set. {{stat:n_opportunity_horizon_now}} opportunities are buildable now, {{stat:n_opportunity_horizon_1_2y}} in one to two years, and {{stat:n_opportunity_horizon_3_5y}} in three to five.{{assert:n_opportunity_horizon_now >= 10}}{{assert:n_opportunity_horizon_3_5y < n_opportunity_horizon_now}}
 
 ## The top of the list
 

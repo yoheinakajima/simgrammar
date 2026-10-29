@@ -106,7 +106,7 @@ Generative content is used by {{derived:generative-content.prevalence}} catalog 
 
 ## Judgment against evidence
 
-Every mechanic also carries a judged score for AI leverage: how much, in the rater's reading, current techniques could change it. AI leverage scores and exposure correlate at ρ = {{stat:rho_ai_leverage_exposure}}.{{assert:rho_ai_leverage_exposure >= 0.3}} That number is a consistency check. The same model rater scored AI leverage, wrote the `affects` edges, and judged each technique's maturity, so a correlation between them shows the rater was consistent with itself. A second, calibrated rater is the remedy, and chapter 13 describes how one is being added.
+Every mechanic also carries a judged score for AI leverage: how much, in the rater's reading, current techniques could change it. AI leverage scores and exposure correlate at ρ = {{stat:rho_ai_leverage_exposure}}.{{assert:rho_ai_leverage_exposure >= 0.3}} That number is a consistency check. The original model rater scored AI leverage, wrote the `affects` edges, and judged each technique's maturity. Independent second ratings now cover {{stat:n_scores_independently_rated}} scores across the mechanic scales, while the technique links and maturity judgments retain their original authorship.{{assert:n_scores_independently_rated > 0}} The correlation still partly reflects shared authorship; chapter 13 describes the calibration and rating procedure.
 
 The places where the two disagree point at specific mechanics. The table below lists mechanics judged highly open to AI that no technique in the set touches, the largest gaps between judged AI leverage and exposure first.
 

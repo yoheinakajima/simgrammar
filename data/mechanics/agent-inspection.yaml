@@ -55,7 +55,7 @@ emergence_potential: 1
 authoring_cost: 2
 compute_cost: 1
 tuning_difficulty: 1
-ai_leverage: 4
+ai_leverage: 3
 maturity: classic
 synergy:
 - id: memories-thoughts
@@ -68,3 +68,66 @@ sources: []
 status: asserted
 provenance:
   created: 2026-10-24-taxonomy-m6
+  reviewed:
+  - 2026-10-29-shreyko-antim-rate-scores-19
+ratings:
+- field: legibility
+  value: 4
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: legibility
+  value: 4
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Clicking an agent to inspect needs, actions and reasons is mostly intuitive. Dense tabs and
+    incomplete decision traces prevent transparency at a glance (5), while understanding the inspection
+    layer generally needs no deliberate study (3).
+- field: emergence_potential
+  value: 1
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: emergence_potential
+  value: 1
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: The panel reads existing state and owns only selection and exposed fields. Revealing histories
+    can support perceived stories, but it does not generate simulation variation above deterministic presentation
+    (1), so 2 is unwarranted.
+- field: authoring_cost
+  value: 2
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: authoring_cost
+  value: 2
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Field labels, reason formatting and panel schemas are mainly small data definitions. This
+    exceeds rules alone (1), but underlying agents, histories and animations belong to other mechanics
+    rather than bespoke inspection content per variant (3).
+- field: compute_cost
+  value: 1
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: compute_cost
+  value: 1
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Reading a selected agent and refreshing a panel is negligible at typical use. Simulating
+    the whole population is separate, so level 2 linear population cost should not be attributed to this
+    view.
+- field: tuning_difficulty
+  value: 1
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: tuning_difficulty
+  value: 1
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Choosing which existing state to reveal is primarily an information-design decision, largely
+    irrelevant to economic or combat balance. Visibility can influence play, but there is no required
+    parameter-balancing loop justifying 2.
+- field: ai_leverage
+  value: 4
+  run: 2026-10-24-taxonomy-m6
+  rationale: original score
+- field: ai_leverage
+  value: 3
+  run: 2026-10-29-shreyko-antim-rate-scores-19
+  rationale: Models can summarize histories and translate decision traces into contextual explanations,
+    notably changing information cost and variety beyond incremental labels (2). An inspectable panel
+    remains the same form, so substantially new mechanics (4) are not assumed.

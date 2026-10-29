@@ -46,11 +46,11 @@ Target runtime about 12 minutes: about 1,210 words of narration at 135 words a m
 
 **Picture.** A caption card.
 
-**Frame.** compare a="Who rated these scores" a_items="language-model:One model rater" b="Rated independently" b_items="person:Nobody yet"
+**Frame.** compare a="Who rated these scores" a_items="language-model:Original model rater" b="Rated independently" b_items="person:Second rater on a subset"
 
-**On screen.** Scores: one model rater, against written anchors. Independent ratings so far: {{stat:n_ratings}}.
+**On screen.** Original scores: one model rater, against written anchors. Scores with independent second ratings: {{stat:n_scores_independently_rated}}.
 
-**Voice.** One model rater assigned every one of these scores, reading each mechanic's record against the anchors, and nobody has rated them independently yet.{{assert:n_ratings == 0}} So the patterns in this episode are a consistent reading of the design knowledge in the records. They aren't measurements of players.
+**Voice.** One model rater assigned the original scores by reading each mechanic's record against the anchors. Independent second ratings now cover {{stat:n_scores_independently_rated}} scores.{{assert:n_scores_independently_rated > 0}} The patterns in this episode still rely largely on the original rater's reading of the design knowledge in the records. They aren't measurements of players.
 
 ## 5. The slope (3:34 to 4:30)
 

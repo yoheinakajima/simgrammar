@@ -1,0 +1,190 @@
+id: 2026-10-29-shreyko-antim-rate-scores-19
+type: run
+kind: verification
+date: '2026-10-29'
+actor: agent
+operator: shreyko-antim
+agent:
+  model: gpt-6.1-sol
+  harness: Codex desktop; fresh-context scoring subagent
+purpose: 'Independently calibrate and rate all six rubric scales for the ten mechanics in issue #19.'
+method: 'Claimed issue #19 as shreyko-antim; read CONTRACT.md section 2, AGENTS.md, tasks/rate-scores.md,
+  CONTRIBUTING.md, the run/mechanic/common schemas and rubric anchors. Baseline make check passed. A fresh-context
+  gpt-6.1-sol scoring subagent read only the generated score-free calibration sheet and froze all 120
+  judgments once before comparison; it did not read reference scores, mechanic files, the website, or
+  prior chat. The orchestrator ran calibrate.py score and recorded that first passing submission unchanged.
+  The same rater then read a score-free packet of the ten issue mechanics and rubric anchors, independently
+  scored all six fields, and supplied anchor-based rationales before the orchestrator compared originals.
+  The packet included definitions, player experience, levers, failure modes and dynamics, but no stored
+  scores, ratings, provenance or cross-record research. Preserved each creator score as its original rating,
+  added the new ratings, stored lower medians and appended this run to reviewed. This is a rubric-rating
+  pass, not factual verification: no claims, sources, evidence statuses, mechanic definitions or calibration
+  reference records changed. The first ratings and new operator invalidate existing zero-rating/operator-count
+  assertions; completed the corresponding book, report and media-script wording updates in the same PR,
+  keeping partial coverage and model-judgment limitations explicit. Added the existing generated rater-agreement
+  table to the book. Checked schema, prose style, assertions, deterministic build, record scope and source-check
+  eligibility; detailed command outcomes are in the PR.'
+contract_version: '1.2'
+proposals: []
+calibration:
+  set: mechanics-v1
+  scores:
+    adaptive-threat-scaling:
+      legibility: 3
+      emergence_potential: 3
+      authoring_cost: 2
+      compute_cost: 1
+      tuning_difficulty: 4
+      ai_leverage: 3
+    causal-tooltips:
+      legibility: 5
+      emergence_potential: 1
+      authoring_cost: 2
+      compute_cost: 1
+      tuning_difficulty: 1
+      ai_leverage: 2
+    collection-goals:
+      legibility: 5
+      emergence_potential: 2
+      authoring_cost: 3
+      compute_cost: 1
+      tuning_difficulty: 2
+      ai_leverage: 3
+    creature-care:
+      legibility: 4
+      emergence_potential: 3
+      authoring_cost: 4
+      compute_cost: 1
+      tuning_difficulty: 3
+      ai_leverage: 4
+    day-night-cycle:
+      legibility: 4
+      emergence_potential: 3
+      authoring_cost: 1
+      compute_cost: 1
+      tuning_difficulty: 2
+      ai_leverage: 1
+    dilemma-cards:
+      legibility: 4
+      emergence_potential: 3
+      authoring_cost: 5
+      compute_cost: 1
+      tuning_difficulty: 3
+      ai_leverage: 4
+    fluid-gas-simulation:
+      legibility: 3
+      emergence_potential: 4
+      authoring_cost: 1
+      compute_cost: 3
+      tuning_difficulty: 4
+      ai_leverage: 3
+    hauling-jobs:
+      legibility: 4
+      emergence_potential: 4
+      authoring_cost: 1
+      compute_cost: 3
+      tuning_difficulty: 3
+      ai_leverage: 2
+    interest-groups:
+      legibility: 3
+      emergence_potential: 4
+      authoring_cost: 3
+      compute_cost: 2
+      tuning_difficulty: 4
+      ai_leverage: 4
+    modding-api:
+      legibility: 2
+      emergence_potential: 4
+      authoring_cost: 3
+      compute_cost: 2
+      tuning_difficulty: 4
+      ai_leverage: 4
+    modular-assembly:
+      legibility: 3
+      emergence_potential: 4
+      authoring_cost: 3
+      compute_cost: 3
+      tuning_difficulty: 4
+      ai_leverage: 3
+    natural-language-interaction:
+      legibility: 3
+      emergence_potential: 4
+      authoring_cost: 4
+      compute_cost: 4
+      tuning_difficulty: 4
+      ai_leverage: 5
+    natural-selection:
+      legibility: 3
+      emergence_potential: 5
+      authoring_cost: 1
+      compute_cost: 3
+      tuning_difficulty: 4
+      ai_leverage: 3
+    procedural-checklists:
+      legibility: 3
+      emergence_potential: 3
+      authoring_cost: 4
+      compute_cost: 2
+      tuning_difficulty: 2
+      ai_leverage: 3
+    procedural-terrain:
+      legibility: 4
+      emergence_potential: 3
+      authoring_cost: 1
+      compute_cost: 2
+      tuning_difficulty: 3
+      ai_leverage: 3
+    raid-defense:
+      legibility: 4
+      emergence_potential: 4
+      authoring_cost: 3
+      compute_cost: 3
+      tuning_difficulty: 4
+      ai_leverage: 3
+    resource-extraction:
+      legibility: 4
+      emergence_potential: 3
+      authoring_cost: 2
+      compute_cost: 2
+      tuning_difficulty: 3
+      ai_leverage: 2
+    smart-objects:
+      legibility: 3
+      emergence_potential: 4
+      authoring_cost: 4
+      compute_cost: 2
+      tuning_difficulty: 4
+      ai_leverage: 4
+    trade-routes:
+      legibility: 3
+      emergence_potential: 4
+      authoring_cost: 2
+      compute_cost: 2
+      tuning_difficulty: 4
+      ai_leverage: 3
+    variable-speed:
+      legibility: 5
+      emergence_potential: 1
+      authoring_cost: 1
+      compute_cost: 1
+      tuning_difficulty: 1
+      ai_leverage: 1
+scope:
+- data/mechanics/adjacency-scoring.yaml
+- data/mechanics/advertising-awareness.yaml
+- data/mechanics/advisors.yaml
+- data/mechanics/agent-inspection.yaml
+- data/mechanics/agent-pathfinding.yaml
+- data/mechanics/agent-skills.yaml
+- data/mechanics/alerts-feed.yaml
+- data/mechanics/animal-husbandry.yaml
+- data/mechanics/aspiration-wants.yaml
+- data/mechanics/async-shared-region.yaml
+- book/src (first-rating wording and generated agreement table)
+- report/src (partial second-rating caveats)
+- media/episodes and media/mega (first-rating wording and assertions)
+notes: 'Rater: gpt-6.1-sol through a fresh Codex desktop scoring subagent; shreyko-antim is the accountable
+  operator, not a human rater. Calibration and target scores were each frozen once without access to originals.
+  Agreement statistics are derived by the build. Original and independent values are retained even when
+  they disagree. Prose updates are necessary to deliver a buildable first-rating contribution; they do
+  not expand the dataset or alter scoring rules.'
