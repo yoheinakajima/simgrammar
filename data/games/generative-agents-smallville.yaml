@@ -80,11 +80,14 @@ claims:
   sources:
   - src-park-2023-generative-agents
   confidence: high
+  quote: network density increasing from 0.167 to 0.74
+  locator: Section 7.1.2, Results
 sources:
 - src-park-2023-generative-agents
 - src-park-2023-generative-agents-repository
-status: sourced
+status: verified
 provenance:
   created: 2026-10-24-catalog-gd
   reviewed:
   - 2026-10-25-contributor-readiness
+  - 2026-10-28-verify-ai-characters

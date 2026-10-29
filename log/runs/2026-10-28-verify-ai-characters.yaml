@@ -1,0 +1,81 @@
+id: 2026-10-28-verify-ai-characters
+type: run
+kind: verification
+date: '2026-10-28'
+actor: agent
+operator: heypedrolucca
+agent:
+  model: claude-sonnet-5-5
+  harness: Claude app agent workspace (claude.ai), subagent
+purpose: Independently verify nine sourced AI-character and social-simulation game records against their non-wiki sources.
+method: 'Model id claude-sonnet-5-5 (independent of the creating runs: operator yoheinakajima, model claude-opus-5-5). The shell has no web access, so each source was found by WebSearch, then fetched. Every quote was re-fetched and checked with a yes/no question on the exact string.
+
+
+  READ: Evans and Short Versu paper; Short''s Introducing Versu and Post Linden posts; IFWiki Versu; Wikipedia (Facade, Little
+  Computer People, inZOI, Cai Haoyu); C64-Wiki; McCoy 2013 (OJS abstract plus the cdn.aaai.org PDF of the same paper); McCoy
+  2010; the official Prom Week blog; Park 2023 (arxiv abs and pdf) and its repository; Project Sid (arxiv html v1) and the
+  altera-al repository; Steam pages for inZOI, Suck Up! and Whispers; playsuckup.com home and terms; the Whispers App Store
+  page. Opened only to cross-check Facade: the Mateas and Stern GDC 2003 paper, Game Developer, proceduralarts.net.
+
+  NOT READ: the Treanor Grand Text Auto archive could not be reached, so it is not counted; its facts (2012, 18 students, 5,000+ considerations) were confirmed on the official Prom Week blog instead.
+
+
+  OUTCOMES. Verified (6): versu, prom-week, generative-agents-smallville, project-sid, inzoi, suck-up; each has a non-wiki
+  cited source I read and its facts and notes matched passages I read, except the wording fixes below. Tags and scores were checked against anchors only; no disagreement. Contested (1): whispers-from-the-star; the App Store
+  lists an iPhone release but platforms lists only pc, so per I13 the field is unchanged and a claim with disputes cites the
+  new source src-apple-2025-whispers-from-the-star. Left sourced and unedited (2): facade (main facts rest on Wikipedia) and
+  little-computer-people (both sources are wikis, E034). See proposals.
+
+
+  WORDING FIXES where text outran its sources (no value changed, nothing contradicted): versu design_notes (stress tester
+  ''supported'' 1,000+ actions) and personality note (character files assign desires); prom-week memory note (see follow-up); inzoi career note (''played on site''); suck-up design_notes (voiced audio, a model told to be suspicious).
+
+
+  QUOTES added to claims on smallville, project-sid, suck-up and whispers (two). Smallville and project-sid quotes come from full-text copies, so CI will warn. The suck-up quote covers only the terms date.
+
+
+  NOT CONFIRMED: Smallville developer lists Google Research, the paper lists one author at Google DeepMind; Suck Up! year
+  2023 rests on the terms date, with no explicit launch statement.
+
+
+  A Claude Sonnet 5.5 subagent did all of the reading and made every decision and edit in this run; the Claude Opus
+  5.5 session that launched it did not edit these records, and only rebased, signed off, and pushed the commits.
+
+
+  PROM WEEK FOLLOW-UP: on review I re-opened src-mccoy-2010-the-prom, rewrote the memories-thoughts note to what its "far
+  spreading effects" passage supports, and added a claim quoting it (exact string re-confirmed). It describes no itemized
+  memory store, and the note claims none.'
+contract_version: '1.2'
+proposals:
+- kind: other
+  target: facade
+  detail: 'To verify, cite a non-wiki source for the main facts. Candidates I opened: the Mateas and Stern GDC 2003 paper
+    (cp.eng.chula.ac.th, ABL, drama manager, beats, discourse acts; it predates release, so it gives no 2005 date) and proceduralarts.net
+    (credits Mateas and Stern, July 2005 launch, Windows). The existing src-mateas-2004-facade-nlu could also be added to
+    the record. I did not add sources because this run may add them only to support a correction.'
+- kind: other
+  target: little-computer-people
+  detail: Both cited sources are wikis (E034). Wikipedia calls Apple Town Story a 1987 Japanese Famicom Disk System port by
+    Square with a female character and a new house layout, so the alias may deserve a note. Neither wiki supports the design_notes
+    sentence that the cassette C64 version dropped memory, letters, and card games, or that Rich Gold conceived the game and
+    David Crane built it (Wikipedia says only that both were designers). Wikipedia says the 256 names are randomly selected;
+    C64-Wiki ties name, shirt color, and personality to the serial number. A manual or developer source would settle these.
+- kind: split
+  target: suck-up
+  detail: 'The release-history claim bundles three facts (publicly playable before the Steam release, terms dated 2023-12-05
+    metering use in tokens, early-access label on the site). The quote covers only the terms date. Suggest splitting into
+    one claim per source, each with its own quote, e.g. from the site: "Suck Up! Early Access" and "Yes, you will be able
+    to to keep on playing on the old launcher while you don''t redeem your Steam Key" (the double "to" is as printed).'
+- kind: other
+  target: whispers-from-the-star
+  detail: If the maintainer accepts the App Store source, add mobile to platforms and clear the dispute. Wikipedia and the
+    Steam page do not state a 2025 iPhone release date, so year stays 2025 on the Steam release (2025-08-14).
+- kind: other
+  target: generative-agents-smallville, project-sid
+  detail: The claim quotes come from the full paper (arxiv.org/pdf and arxiv.org/html v1), while the cited source url is the
+    arXiv abstract page. CI will reach only the abstract and warn. Consider letting a source record carry a full-text url
+    for quote checking.
+- kind: other
+  target: project-sid
+  detail: design_notes says the preprint states no public code release. That holds, but github.com/altera-al/project-sid exists
+    and holds only the technical report, PDF, and a demo video, not PIANO code; a clarifying clause could name it.

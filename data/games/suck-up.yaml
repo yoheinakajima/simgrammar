@@ -38,9 +38,9 @@ core_loop: pick a disguise -> knock on a resident's door -> speak a pitch aloud 
   and weighs trust -> get invited in and feed, or get refused -> next house
 design_notes: 'At runtime a language model plays each resident: the player''s spoken words go to a hosted model
   (the Steam page lists ChatGPT from OpenAI; the December 2023 terms name GPT 3.5 and Llama 2 and meter use in tokens)
-  along with the resident''s authored personality, and its reply, delivered in voiced audio, decides whether the
-  player has earned entry. The challenge is social engineering against a model that has been told to be suspicious,
-  so disguises (knight, superhero, a previous victim) work as context that changes the model''s judgment. Players
+  along with the resident''s authored personality, and its reply decides whether the
+  player has earned entry. The challenge is social engineering against characters whose personalities are meant to challenge
+  players, so disguises (knight, superhero, a previous victim) work as context that changes the model''s judgment. Players
   author new residents'' personalities and whole neighborhoods and share them on Steam Workshop. It is a boundary
   case: the persuasion is judged by the model rather than by a simulated social state.'
 mechanics:
@@ -74,10 +74,14 @@ claims:
   - src-proxima-2026-suck-up-site
   - src-steam-2026-suck-up
   confidence: medium
+  quote: 'Last Updated: December 05, 2023'
+  locator: Page header
 sources:
 - src-steam-2026-suck-up
 - src-proxima-2026-suck-up-site
 - src-proxima-2023-suck-up-terms
-status: sourced
+status: verified
 provenance:
   created: 2026-10-24-catalog-gd
+  reviewed:
+  - 2026-10-28-verify-ai-characters

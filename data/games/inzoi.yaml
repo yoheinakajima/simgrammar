@@ -72,7 +72,7 @@ mechanics:
   role: supporting
 - id: career-ladder
   role: supporting
-  note: Careers include active jobs played on site.
+  note: Careers include active jobs.
 - id: agent-skills
   role: supporting
 - id: lifecycle-aging
@@ -102,8 +102,9 @@ influenced_by:
 sources:
 - src-wikipedia-inzoi
 - src-steam-2025-inzoi
-status: sourced
+status: verified
 provenance:
   created: 2026-10-24-catalog-gc
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-28-verify-ai-characters

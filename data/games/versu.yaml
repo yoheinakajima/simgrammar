@@ -36,8 +36,8 @@ design_notes: 'Richard Evans and Emily Short built Versu around social practices
   without controlling them. Each agent tests a candidate action by applying it to the world state, scoring
   the result against its desires (over 300 in total), and undoing it, which the authors contrast with
   the estimated consequences used in The Sims. World state is a set of exclusion-logic sentences, and
-  the Praxis language with a stress tester that runs hundreds of simulated instances supported over 1,000
-  parameterized actions. Linden Lab cancelled the project in early 2014; social practices have no mechanic
+  the Praxis language defines more than 1,000 parameterized actions, and a stress-test tool runs hundreds
+  of instances of the game at once. Linden Lab cancelled the project in early 2014; social practices have no mechanic
   id and are proposed as social-practices.'
 mechanics:
 - id: utility-action-selection
@@ -57,7 +57,7 @@ mechanics:
   note: Fine-grained emotions on Ekman's typology record their target and cause.
 - id: personality-traits
   role: supporting
-  note: Character files assign each agent desires that weight its action scoring.
+  note: Each agent chooses its next action from its own beliefs and desires, which weight its action scoring.
 - id: storyteller-director
   role: supporting
   note: A drama manager agent can act to push an episode's authored plot.
@@ -65,6 +65,8 @@ sources:
 - src-evans-2014-versu
 - src-short-2013-introducing-versu
 - src-ifwiki-2026-versu
-status: sourced
+status: verified
 provenance:
   created: 2026-10-24-catalog-gc
+  reviewed:
+  - 2026-10-28-verify-ai-characters

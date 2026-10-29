@@ -57,14 +57,28 @@ mechanics:
   note: Traits and interests weight which rules apply to a character.
 - id: memories-thoughts
   role: supporting
-  note: Past exchanges are stored as social history that later rules reference.
+  note: Earlier player exchanges change the social space, which changes which social actions characters
+    can later successfully make; in the 2010 paper's example, a wink raises romance and so improves the
+    odds that a later request to date succeeds.
 - id: scenario-objectives
   role: supporting
   note: Each level sets social goals, such as getting two named characters to date.
+claims:
+- text: Changes made to the social space by earlier player actions modify which social actions characters can
+    later successfully make; in the example, winking raises romance and improves the chance that a later
+    request to date succeeds.
+  sources:
+  - src-mccoy-2010-the-prom
+  confidence: medium
+  quote: Changes to social space brought about by player actions have far spreading effects that modify the possibility
+    space of social actions characters can successfully make
+  locator: Article body, Edward and Lily example
 sources:
 - src-mccoy-2013-prom-week
 - src-mccoy-2010-the-prom
 - src-treanor-2012-prom-week-released
-status: sourced
+status: verified
 provenance:
   created: 2026-10-24-catalog-gc
+  reviewed:
+  - 2026-10-28-verify-ai-characters

@@ -79,8 +79,12 @@ claims:
   sources:
   - src-altera-2024-project-sid
   confidence: high
+  quote: We have also simulated societies with over 1000 agents, but these runs exceeded the computational constraints
+  locator: Section 5.3, Cultural Transmission
 sources:
 - src-altera-2024-project-sid
-status: sourced
+status: verified
 provenance:
   created: 2026-10-24-catalog-gd
+  reviewed:
+  - 2026-10-28-verify-ai-characters
