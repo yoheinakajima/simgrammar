@@ -77,8 +77,9 @@ sources:
 - src-mccoy-2013-prom-week
 - src-mccoy-2010-the-prom
 - src-treanor-2012-prom-week-released
-status: verified
+status: sourced
 provenance:
   created: 2026-10-24-catalog-gc
   reviewed:
   - 2026-10-28-verify-ai-characters
+  - 2026-10-29-first-contributions

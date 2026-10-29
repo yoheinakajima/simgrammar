@@ -7,6 +7,7 @@ year: 2025
 developer: Anuttacon
 platforms:
 - pc
+- mobile
 subgenre: ai-native
 subgenre_secondary:
 - social-sim
@@ -70,15 +71,13 @@ claims:
   confidence: medium
   quote: Requires iOS 16.0 or later
   locator: Compatibility
-  disputes: The record lists platforms as pc only, citing the Steam page, which shows Windows system requirements. The platform
-    vocabulary covers families a game shipped on at any point, and the App Store lists an iPhone release, which would add mobile.
-    The platforms field is left unchanged for a maintainer to decide.
 sources:
 - src-steam-2026-whispers-from-the-star
 - src-wikipedia-cai-haoyu
 - src-apple-2025-whispers-from-the-star
-status: contested
+status: sourced
 provenance:
   created: 2026-10-24-catalog-gd
   reviewed:
   - 2026-10-28-verify-ai-characters
+  - 2026-10-29-first-contributions

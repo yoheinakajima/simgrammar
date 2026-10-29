@@ -1,0 +1,41 @@
+id: 2026-10-29-first-contributions
+type: run
+kind: maintenance
+date: '2026-10-29'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: finish the review of the first outside contributions (PRs 31, 32, and 33, by
+  heypedrolucca) and rewrite the report sentences their data moved.'
+method: 'Reviewed the second push of PRs 31, 32, and 33. CI stopped at report assertions (E029), so it skipped the style,
+  build, determinism, and scope steps; I ran those with the scripts of main on each PR tree, which differs from main
+  only under data/ and log/, and all passed, E039 included with the author now a collaborator. Checked by hand the
+  quotes CI could not fetch: the four Petz Wiki quotes and the Rubin review (read in a browser), the McCoy 2010 quote
+  on prom-week (PDF text through PDFKit), and the five quotes from the Ryan 2018 dissertation, whose 16 MB PDF is past
+  the fetcher limit (text extracted with pdf.js in a browser; each printed-page locator matches the PDF page 17 later).
+  All matched.
+
+
+  EDITS. prom-week goes back to sourced: its memories-thoughts note rests on a passage about exchanges changing the
+  social networks, which relationship-values already covers, and the cited papers describe no memory store. The tag
+  and the verifier''s new claim stay, and the tag question is a proposal. whispers-from-the-star: accepted the App Store
+  source the verifier added, added mobile to platforms, removed the disputes text, and returned the record to sourced,
+  since the verification run contested it rather than verifying it. Considered and dropped: asking for first-game
+  evidence for Petz personality-traits, which the record already has in its Wikipedia claim on the original games.
+
+
+  REPORT. Rewrote the sentences the merged data moved (E029): the rare-mechanics bar in chapter 1 (memories-thoughts
+  is now in 11 games, so the sentence says a dozen or fewer and the five bars move from 10 to 12); Dogz (1995) as the
+  earliest learning creature in chapter 3; the Silent Hunter 3 and Gran Turismo 7 co-clustering in chapter 4 (0.374,
+  now under half); and the verification, operator, and run-kind sentences in chapter 13 and episode 12, with the two
+  passages that predicted those failures. The episode 12 video keeps its rendered narration, and the site marks the
+  changed scenes.'
+contract_version: '1.2'
+proposals:
+- kind: other
+  target: prom-week
+  detail: memories-thoughts is tagged, but the cited Comme il Faut papers show exchanges changing social state, not
+    itemized memories. Later CiF papers describe a social facts database of past exchanges that rules can query; cite
+    one with a quote and re-verify the record, or drop the tag.
