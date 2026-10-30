@@ -28,9 +28,13 @@ The figure stacks the vocabulary year by year, one layer per family. The steepes
 
 A count like that suggests a golden age of invention followed by decades of reuse, and the suggestion can be tested against chance.
 
+Tested that way, the early games cover a little more of the vocabulary than chance would give them, and the difference is too small to rely on. Most of the "set early" figure reflects how widely the parts are shared: a few dozen games of any period already show most of the vocabulary. Two narrower findings survive the test: invention concentrates in a small number of games in every decade, and later games are built mostly from parts that already existed.
+
+<details class="disclosure"><summary>how the test against chance works</summary>
+
 Any catalog game uses about a dozen mechanics, and most mechanics are shared by several games, so any small set of games will show a good part of the vocabulary. The question is whether the games released by 2000 show more of it than another set of the same size would. The build answers it by drawing random sets of {{stat:n_games_by_2000}} catalog games from every era, trimming each drawn game to the size of one of the early games, and counting how many mechanics each set covers. Over two thousand draws, a random set covers {{stat:n_mechanics_seen_null_mean}} mechanics on average, {{stat:pct_mechanics_seen_null_mean}} percent of the vocabulary, against {{stat:n_mechanics_seen_by_2000}} for the real early games. Random sets match or beat the early games in a share of {{stat:p_mechanics_seen_by_2000}} of draws.{{assert:n_mechanics_seen_null_mean <= n_mechanics_seen_by_2000}}{{assert:p_mechanics_seen_by_2000 > 0.05}}
 
-So the early games cover a little more of the vocabulary than chance would give them, and the difference is too small to rely on. Most of the "set early" figure reflects how widely the parts are shared: a few dozen games of any period already show most of the vocabulary. Two narrower findings survive the test: invention concentrates in a small number of games in every decade, and later games are built mostly from parts that already existed.
+</details>
 
 ## The founding games
 

@@ -30,9 +30,15 @@ Packages also show how slowly the vocabulary recombines. A designer who starts a
 
 ## Lots no one has built
 
+Most pairs of mechanics have never shared a game because one of the two is rare. The lots worth looking at, the white space, are pairs of common mechanics, from different families, that almost never meet and have no recorded reason to fight.
+
+<details class="disclosure"><summary>which empty pairs count</summary>
+
 Most possible pairs of mechanics have never shared a game, and most of those empty pairs are uninteresting, because at least one of the two mechanics is rare. The white-space analysis keeps only the pairs where the emptiness means something. Both mechanics must appear in at least {{stat:whitespace_min_games}} catalog games. They must come from different families, since two mechanics from the same family are often alternatives. Neither may be a time-and-pacing control, because a game's time model already decides them. The pair must not be recorded as being in design tension: the dataset holds {{count:edge:tension}} such edges, such as building assistance that favours organic shapes against strict structural rules that punish them. And the two must share at most one game. {{stat:n_whitespace_pairs}} pairs pass.{{assert:n_whitespace_pairs >= 100}}
 
-The tension edges record what designers already know about pairs that fight. Each carries a note. Threat that scales with wealth pulls against milestone unlocks: "One rewards growth, the other punishes it; tuning both sets the game's attitude to expansion." Agents with strong free will resist direct commands, so a game with both has to decide who is in charge. Full-information overlays undercut fog of war. A shared persistent world cannot be paused or sped up by one player. A storyteller's directed randomness makes scores incomparable across players, which sits badly with the global histograms of programming puzzles. Generated content resists the authored preconditions that event chains rely on. A pair in tension can still be built, but the white-space table leaves these out because their emptiness has an explanation on record.
+</details>
+
+The pairs left out for being in tension record what designers already know about pairs that fight. Each carries a note. Threat that scales with wealth pulls against milestone unlocks: "One rewards growth, the other punishes it; tuning both sets the game's attitude to expansion." Agents with strong free will resist direct commands, so a game with both has to decide who is in charge. Full-information overlays undercut fog of war. A shared persistent world cannot be paused or sped up by one player. A storyteller's directed randomness makes scores incomparable across players, which sits badly with the global histograms of programming puzzles. Generated content resists the authored preconditions that event chains rely on. A pair in tension can still be built, but the white-space table leaves these out because their emptiness has an explanation on record.
 
 The figure lays out every pair of common mechanics as a plan of lots. The mechanics' names run down a staircase on the diagonal, and each lot sits where one mechanic's row meets another's column. Built lots are pairs that share games, darker where they share more than chance predicts. Dashed lots are white space, slashed lots are pairs recorded as being in tension, and numbers mark the ten largest gaps.
 
@@ -42,7 +48,13 @@ The ranking uses the gap between how often a pair would share games by chance an
 
 {{table:whitespace}}
 
-Expected co-occurrence treats each mechanic as spread across games independently of how many mechanics each game has. Games with many mechanics make every pair more likely, so a pair whose mechanics sit mostly in small games can look emptier than it is. A null model that preserved each game's size would shorten the list, and the dataset has not built one yet. The threshold is a choice too: {{stat:whitespace_min_games}} games was 8 percent of the catalog when it was fixed, and the analysis file records that it should be revisited as the catalog grows. A lot can also look empty because of where the vocabulary draws its lines; the Factorio blueprints in the next section are an example. Read the table as a list of candidates, ranked by a simple measure.
+Read the table as a list of candidates for a designer to check, ranked by a simple measure.
+
+<details class="disclosure"><summary>the limits of this list</summary>
+
+Expected co-occurrence treats each mechanic as spread across games independently of how many mechanics each game has. Games with many mechanics make every pair more likely, so a pair whose mechanics sit mostly in small games can look emptier than it is. A null model that preserved each game's size would shorten the list, and the dataset has not built one yet. The threshold is a choice too: {{stat:whitespace_min_games}} games was 8 percent of the catalog when it was fixed, and the analysis file records that it should be revisited as the catalog grows. A lot can also look empty because of where the vocabulary draws its lines; the Factorio blueprints in the next section are an example.
+
+</details>
 
 ## Five lots
 

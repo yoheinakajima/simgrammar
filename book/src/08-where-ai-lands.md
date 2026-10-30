@@ -30,13 +30,25 @@ The games show what explanation looks like when it is built by hand. RimWorld li
 
 The techniques in the dataset are recent. {{stat:n_technique_since_2023}} of the {{count:technique}} are dated 2023 or later, and the largest category is generative world models, mostly the frame-predicting systems of chapter 7.{{assert:n_technique_since_2023 > 20}}
 
+The set leans toward fields that publish often and name games in their papers, so it shows where research points as much as where games need help.
+
+<details class="disclosure"><summary>the techniques by category, and how the set was gathered</summary>
+
 {{table:techniques-by-category}}
 
 The set was built by looking for dated results that change a named mechanic, which probably favours fields that publish often and name their applications to games. Language-model agents, world models, and neural rendering publish constantly and point at games directly. Operations research on scheduling, or econometrics on markets, rarely mentions a game, so a method that could balance an economy enters only when someone has applied it to one. The pattern below reflects both the field and the search that built the set.
 
+</details>
+
 ## Counting exposure
 
+*Technique exposure* measures how much of the set of techniques points at a family of mechanics, counting a shipped technique for more than a research result. A family with none is one no published result has named yet, which is different from one AI cannot touch.
+
+<details class="disclosure"><summary>how exposure is counted</summary>
+
 To compare families of mechanics, the dataset sums each mechanic's edges into a *technique exposure*. Each edge counts for more when the technique has shipped than when it is a research result, and for more when it replaces or enables a mechanic than when it only tunes or speeds it up; the weights are written down in the rubrics file. A family's exposure is the sum over its mechanics. The measure says where the set of techniques points, weighted by how close each one is to a game. A mechanic with no edge means only that nobody in the set has published a dated result that names it. General-purpose models can write mod code or romance dialogue today, and the dataset leaves those uses out until someone ships or publishes one for a named mechanic. A single pull request that adds a technique can change it.
+
+</details>
 
 {{viz:technique-flows}}
 

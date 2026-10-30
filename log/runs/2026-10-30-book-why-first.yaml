@@ -1,0 +1,32 @@
+id: 2026-10-30-book-why-first
+type: run
+kind: synthesis
+date: '2026-10-30'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: make the book (and the paper''s abstract) readable for people who came for simulation games,
+  by opening with why it matters and folding the longest method passages into collapsed notes, while keeping
+  how games and predictions were chosen in view.'
+method: 'An audit of the book labelled every passage as subject, dataset method, or project process. Chapters 1 to 11
+  were 83 to 100 percent subject; the method sat in a few long passages and the preface was all process. The preface is
+  now about what the book argues, who it is for, and how its parts run, and it keeps how the games were chosen (the
+  coverage the catalog aims for, the inclusion test from AGENTS.md section 3, and the English-language bias, as in paper
+  section 2.2) and how the text stays true, ending on the rater caveat and a pointer to chapter 13. The contents call it
+  Preface and call Part IV How the book is made. Seven method passages now open with a sentence or two on what the
+  method means for the reader and fold the detail into a collapsed note (a details block, which the site styles as its
+  disclosure and GitHub renders as a fold): the test of early invention against chance (ch 3, with its conclusion moved
+  ahead of the procedure), how the number of families is chosen and the four limits of the families (ch 4), the rater
+  caveat and agreement table (ch 5), the maturity count table that the next paragraph states in words (ch 7, whose
+  section is retitled Four steps of maturity), the technique table, how the set was gathered, and how exposure is counted
+  (ch 8), and which empty pairs count and the limits of the white-space list (ch 9). Chapter 13 opens with why a reader
+  might care how the book checks itself. Chapters 10, 11, and 12 are unchanged: how the bets are scored and how the
+  predictions are resolved stay in view, since they are what a reader of those chapters wants to know. No assertion was
+  removed or changed; every folded passage keeps its tokens and checks. The paper is left as it is apart from its abstract, which
+  now says in its second sentence why naming the vocabulary matters and ends its method sentence on what the reader can
+  rely on (open sources, sentences checked against the data) instead of on the projections the validator keeps
+  consistent.'
+contract_version: '1.2'
+proposals: []

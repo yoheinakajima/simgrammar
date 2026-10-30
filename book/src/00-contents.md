@@ -2,7 +2,7 @@
 
 *The Grammar of Simulation*, by {{stat:byline}}.
 
-[Preface: how this book is made](00-preface.md)
+[Preface](00-preface.md)
 
 ## Part I. The grammar
 
@@ -25,7 +25,7 @@
 11. [What breaks](11-what-breaks.md)
 12. [Keeping score](12-keeping-score.md)
 
-## Part IV. Method
+## Part IV. How the book is made
 
 13. [How the book checks itself](13-how-the-book-checks-itself.md)
 
