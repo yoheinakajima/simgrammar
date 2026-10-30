@@ -1,0 +1,32 @@
+id: 2026-10-30-front-door
+type: run
+kind: maintenance
+date: '2026-10-30'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: make the website lead with simulation games, give it a home page
+  that links to every part, move the paper to its own tab, and put how each record was made behind one
+  collapsed section with a note on why it matters.'
+method: 'An audit of the website, the book, the paper, and the video scripts labelled what a reader sees as subject
+  (games, mechanics, techniques, bets), dataset method, or project process; on the website the process sat where a first
+  visitor looks first (the version and contract line, the build-time source line, record ids and status badges around
+  every title, provenance captions under every video). This run changes the website only (scripts/web.py, og.py,
+  simgrammar.js, web/DESIGN.md). The home page is now a front door: what the atlas is and why it matters, four findings
+  from the paper each linked to its section, every mechanic by family, the games the book and the videos use most, the
+  first episodes and shorts, the most shipped techniques, the highest priority bets, the book by part, and the paper and
+  about pages. The paper moved to paper/ and is one tab of seven; sources, find, and about sit in the utility nav. The
+  data page became about/, which opens with why the atlas is built from open records before its downloads, commands,
+  research log, and vocabularies. A record page opens with what the record is; its status (with a sentence on what the
+  status means), checks against the data, ratings, history, and file links sit in one collapsed block at the end; claims
+  cite sources by author and year instead of id. Video posters lost their provenance captions; the book index lists
+  reading time instead of record counts; the find page folds its source list until opened or matched. web/DESIGN.md gains
+  a Subject first section that makes these the rule outside the paper and the about page. Fixed on the way: technology
+  readiness (1 to 9) was drawn on a 5-point meter; a deprecated bet showed "priority None"; relations said "1 stored
+  edges"; the ceilings figure caption said all scores came from one rater, which second ratings have made untrue, and
+  pointed the paper at a book chapter. Every relative link and image path in dist/web resolves; the home page has no
+  sideways scroll at 375 px.'
+contract_version: '1.2'
+proposals: []

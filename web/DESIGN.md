@@ -27,23 +27,32 @@ This file is the design contract for agents working in this repository. Read it 
 ## Images
 
 - Use `figure.image` with `data-ratio` so nothing shifts on load. Treat images (`data-treatment`) so they sit in the palette.
-- Every image carries a provenance line in its caption: `generated` or `photo` · prompt id · model · date · seed · treatment. No untraced images.
+- Every image carries a provenance line in its caption: `generated` or `photo` · prompt id · model · date · seed · treatment. No untraced images. (Video posters and stills are traced by their video's page instead; see Subject first.)
 - Generate images only with the templates in `prompts/`, with the skin brief pasted in. No text in generated images; the page sets type.
 
 ## Rules (the default skin; a skin may relax the ones marked ◇)
 
-1. Every object shows its identifier in the register column (`.row > .id`), at the same x. Dates, claim ids, case numbers, commits, run ids.
+1. Every object shows its identifier in the register column (`.row > .id`), at the same x. Dates, claim ids, case numbers, commits, run ids. (A record's own id, status, and history may sit in its page's closing disclosure; see Subject first.)
 2. ◇ Hierarchy from hairlines and alignment. No cards, no border-radius, no drop shadows, no gradients, no backdrop blur, no colored edge stripes. Fills are `data-surface`. At most one `deep` or series surface per screen, never two adjacent. `deep` is `--deep`, never `#000`. (A skin may set `--radius` up to 12px and a hard-offset `--shadow`; never a blur.)
 3. ◇ Identifiers, numbers, labels, and metadata are lowercase monospace. Prose and headings are sans. No `text-transform: uppercase` anywhere. Case only for names, symbols, and sentences. (A skin may set `--label-case` and `--label` for spaced caps; identifiers stay mono.)
 4. One accent (`--accent`) for links and current. Three states: `--ok` `--open` `--stop`. Four series `--s1`–`--s4` for charts and labs only. Color never appears without a glyph or a word.
 5. Every component must have a plain-text twin (a table, list, or key/value block). If you cannot write it as text, do not add it. Accents come only from `accents.html`, rationed: one signature accent per page, one texture per page, one stamp per site.
+
+## Subject first (this site)
+
+Readers come for simulation games, not for how the atlas is built. Every page except the paper (`paper/`) and the about page (`about/`) leads with the subject:
+
+- A record page opens with what the record is. Its id, status, checks, ratings, history, and file links go in one `details.disclosure`, collapsed, at the end of the page, opened by a sentence on why they matter.
+- A number strip or chart names the paper section that makes its case, not a file, run, or commit. The paper's own figures keep their source lines.
+- Video posters and stills carry no provenance caption; the video's page and transcript say what is on screen and link each record.
+- The paper and the about page show process in full, and every other page keeps them one click away.
 
 ## Numbers
 
 - Exact results go in `.numbers` (20px mono). The stat-banner tell, and the scorer, start at 22px; nothing in the system sits in a row above that size. Counts (works, claims, runs) go in `.meta`, never in a number strip.
 - Live values go in `.numbers[data-style="readout"]` (18px mono).
 - A filled figure block (`.panel[data-surface="s1"]` with one `.number[data-style="block"]`) is always alone. A row of them is forbidden.
-- Every number strip or chart carries a source line naming the run, claim, or commit.
+- Every number strip or chart carries a source line naming the run, claim, or commit, or, outside the paper, the paper section that makes its case (see Subject first).
 
 ## Copy
 

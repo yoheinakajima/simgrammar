@@ -8,16 +8,16 @@ An open, machine-readable atlas of simulation game mechanics: which games use wh
 
 The repository is the research. The report, wiki, tables, graph, and site are projections of the same YAML files, rebuilt and checked on every commit, so they cannot disagree with each other.
 
-Live counts, downloads, and the research log: **[simgrammar.com/data](https://simgrammar.com/data/)**.
+How it is made, downloads, and the research log: **[simgrammar.com/about](https://simgrammar.com/about/)**.
 
 ## Read it
 
 | You want | Open |
 |---|---|
-| The website: paper with interactive figures, a page per record | **[simgrammar.com](https://simgrammar.com/)** |
+| The website: the games, mechanics, techniques, and bets, the videos, the book, and the paper with interactive figures | **[simgrammar.com](https://simgrammar.com/)** |
 | The report (paper form) | [paper.md](https://simgrammar.com/dist/paper/paper.md) · BibTeX: [references.bib](https://simgrammar.com/dist/paper/references.bib) |
 | Every projection in one download | [simgrammar-dist.zip](https://simgrammar.com/dist/simgrammar-dist.zip): tables, full records, graph, analysis, wiki, paper, manifest |
-| Tables | [games.csv](https://simgrammar.com/dist/tables/games.csv), [mechanics.csv](https://simgrammar.com/dist/tables/mechanics.csv), [edges.csv](https://simgrammar.com/dist/tables/edges.csv), and the rest on the [data page](https://simgrammar.com/data/) |
+| Tables | [games.csv](https://simgrammar.com/dist/tables/games.csv), [mechanics.csv](https://simgrammar.com/dist/tables/mechanics.csv), [edges.csv](https://simgrammar.com/dist/tables/edges.csv), and the rest on the [about page](https://simgrammar.com/about/) |
 | A graph | [nodes.jsonl](https://simgrammar.com/dist/graph/nodes.jsonl), [edges.jsonl](https://simgrammar.com/dist/graph/edges.jsonl), Cytoscape JSON, GraphML for Gephi |
 | The data behind any page | `data/` (one YAML file per record) and `log/runs/` (who added what, how) |
 | Integrity certificate | [manifest.json](https://simgrammar.com/dist/manifest.json): per-record and dataset SHA-256 |
@@ -44,7 +44,7 @@ High-value first contributions: verbatim quotes for existing claims (`tasks/sour
 
 ### Contributors
 
-Built from the run log: you appear here when your first pull request merges. What each person's runs created, verified, and rated is in [appendix D of the paper](https://simgrammar.com/#appendix-d-contributors). To be credited by name rather than handle, add yourself to `contributors` in [`report/meta.yaml`](report/meta.yaml).
+Built from the run log: you appear here when your first pull request merges. What each person's runs created, verified, and rated is in [appendix D of the paper](https://simgrammar.com/paper/#appendix-d-contributors). To be credited by name rather than handle, add yourself to `contributors` in [`report/meta.yaml`](report/meta.yaml).
 
 <!-- BEGIN GENERATED: contributors -->
 | contributor | github | first run | links |

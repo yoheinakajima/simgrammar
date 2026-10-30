@@ -27,8 +27,10 @@
     var m = svg.getScreenCTM();
     return m ? p.matrixTransform(m.inverse()) : { x: 0, y: 0 };
   }
+  // the site root, relative to this page: the brand link points at it ("./" on the home page, "../" one level down)
+  var BASE = (function () { var b = document.querySelector(".brand"); var h = b ? b.getAttribute("href") : ""; return h === "./" ? "" : (h || ""); })();
   function link(type, id, text) {
-    var a = el("a", { href: type + "/" + id + "/", "data-internal": "" }, text);
+    var a = el("a", { href: BASE + type + "/" + id + "/", "data-internal": "" }, text);
     return a;
   }
   // readout: a list of parts; strings become text nodes, nodes are appended as is
@@ -105,6 +107,7 @@
         if (!scope) return;
         $$("[data-q]", scope).forEach(function (n) { n.hidden = !!q && n.getAttribute("data-q").indexOf(q) < 0; });
         $$("[data-group]", scope).forEach(function (g) { g.hidden = !!q && !$("[data-q]:not([hidden])", g); });
+        $$("details[data-filter-open]", scope).forEach(function (d) { if (q) d.open = true; });   // a folded list opens to show its matches
       });
       var start = /[?&]q=([^&]*)/.exec(location.search);   // find/?q=word starts filtered
       if (start) { input.value = decodeURIComponent(start[1].replace(/\+/g, " ")); input.dispatchEvent(new Event("input")); }
