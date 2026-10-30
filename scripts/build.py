@@ -285,7 +285,7 @@ def generated_blocks(ents, analysis, vocabs, registry) -> dict[str, str]:
         cr.append(f"| {row['contributor']} | [{h}](https://github.com/{h}) | {row['first_run']} | {links} |")
     blocks["contributors"] = "\n".join(cr)
     site = (read_yaml(ROOT / "report" / "meta.yaml") or {})["site"]["url"]
-    bl = [f"[{a}]({site}#appendix-d-contributors)" if a == "SimGrammar contributors" else a for a in analysis["byline"]]
+    bl = [f"[{a}]({site}paper/#appendix-d-contributors)" if a == "SimGrammar contributors" else a for a in analysis["byline"]]
     blocks["byline"] = "By " + (", ".join(bl[:-1]) + (", and " if len(bl) > 2 else " and ") + bl[-1] if len(bl) > 1 else "".join(bl)) + "."
     return blocks
 

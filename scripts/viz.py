@@ -934,11 +934,11 @@ def constraint_profile(live, fam):
     body.append("</svg>")
     trows = [{"family": fam[f]["label"], "mechanics": count[f], **{s: round(means[f][s], 2) for s, _, _ in scores}} for f in fams]
     return _plain("Ceiling scores by family", f"{len(fams)} families · {len(mechs)} mechanics", "".join(body),
-                  "Mean rubric score of each family's mechanics on four of the five ceilings; determinism is a property of techniques and has its own figure in chapter 11. "
-                  "Blue marks a family at 3 or above on a cost, or below 3.3 on legibility. Families are ordered by combined compute and authoring cost. All scores come from one model rater.",
+                  "Mean rubric score of each family's mechanics on four of the five ceilings; determinism is a property of techniques and has its own figure. "
+                  "Blue marks a family at 3 or above on a cost, or below 3.3 on legibility. Families are ordered by combined compute and authoring cost.",
                   "mechanic rubric scores · dist/entities/mechanics.json",
                   {"columns": ["family", "mechanics"] + [s for s, _, _ in scores], "rows": trows, "link_columns": [],
-                   "note": "Mean score per family, 1 to 5, from one model rater."}, min_width=720)
+                   "note": "Mean score per family, 1 to 5."}, min_width=720)
 
 
 def technique_landscape(live, vocabs):

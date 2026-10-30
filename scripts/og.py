@@ -1,7 +1,8 @@
 """Link-preview images (og:image) for the website, 1200 x 630 PNG, drawn from the dithered icons (ADR-0006) and the
 vendored IBM Plex fonts (media/fonts). scripts/web.py calls images() and every page names its image in og:image.
 
-  og/site.png                    the paper (home page)
+  og/site.png                    the home page
+  og/paper.png                   the paper
   og/<type>.png                  the game, mechanic, technique, opportunity, and source indexes
   og/watch.png, og/book.png      the watch page and the book's contents
   og/watch/<episode>.png         every episode page
@@ -137,8 +138,9 @@ def images(w) -> dict[str, bytes]:
     top = pngs(e.id for e in mechs)
     counts = {t: len(live(t)) for t in ("game", "mechanic", "technique", "opportunity", "source")}
     meta = w.meta
-    outs = {"web/og/site.png": card("the paper · v" + str(meta["version"]), meta["title"], meta["subtitle"] + ".",
-                                    f'{counts["game"]} games · {counts["mechanic"]} mechanics · {counts["technique"]} techniques', top)}
+    foot = f'{counts["game"]} games · {counts["mechanic"]} mechanics · {counts["technique"]} techniques'
+    outs = {"web/og/site.png": card("simgrammar", meta["title"], meta["subtitle"] + ".", foot, top),
+            "web/og/paper.png": card("the paper · v" + str(meta["version"]), meta["title"], meta["subtitle"] + ".", foot, top)}
     index = {
         "game": ("Every game is a set of parts", "Each catalogued simulation game drawn as the mechanics it is built from.", f'{counts["game"]} games', top),
         "mechanic": ("Mechanics", "Every mechanic as its icon, grouped by family and ordered by how many games use it.", f'{counts["mechanic"]} mechanics in 21 families', top),
@@ -163,7 +165,7 @@ def images(w) -> dict[str, bytes]:
         outs[f"web/og/watch/{ep['key']}.png"] = card(f"episode {ep['n']} · chapter{'s' if len(ep['covers']) > 1 else ''} {chapters}", ep["title"],
                                                      ep["summary"],
                                                      f"{w.mmss(ep['seconds'])} · {len(ep['scenes'])} scenes · {n} records on screen", pngs(ep["shows"][:16]))
-    outs["web/og/book.png"] = card("the book", "The Grammar of Simulation, as a book", "Thirteen chapters on the parts simulation games share, rendered from the dataset.",
+    outs["web/og/book.png"] = card("the book", "The Grammar of Simulation, as a book", "The parts simulation games share, how they trade off, and where AI changes them.",
                                    "13 chapters · glossary · catalog", top)
     for e in mechs:
         der = w.derived.get(e.id, {})
