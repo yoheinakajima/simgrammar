@@ -2,7 +2,7 @@
 
 Target runtime about 12 minutes: about 1,280 words of narration at 135 words a minute, plus a beat of picture-only footage per scene. Covers book chapter 4. Footage: Factorio, Anno 1800, Papers, Please, Princess Maker 2, Job Simulator, Besiege, Farming Simulator 25, iRacing, Black & White, Creatures, inZOI, AI Dungeon, Elite, Elite Dangerous, M.U.L.E., Offworld Trading Company, Frostpunk, Frostpunk 2; publisher video policies are tracked in `media/rights.yaml` and must be checked before release. Every number below is filled in from the dataset when the script is built, and the sentences that interpret numbers carry the same checks as the book.
 
-**Summary.** Group games by their mechanics instead of their genre and families appear: series that stay together, a sequel that moved, and odd couples like Papers, Please and Princess Maker 2. How the families are drawn, how far they match genre, and where they fall apart.
+**Summary.** Group games by their mechanics instead of their genre and families appear: series that stay together, a sequel that moved, and odd couples like Papers, Please and Princess Maker 2. How far the families match genre, and where they fall apart.
 
 ## 1. Cold open (0:00 to 0:45)
 
@@ -184,4 +184,4 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Voice.** RimWorld and Dwarf Fortress share a family in every resampling, and both carry the catalog's top emergence score.{{assert:cocluster.rimworld.dwarf-fortress >= 0.9}}{{assert:field.dwarf-fortress.emergence == 5}} Next episode: why the deepest systems are the hardest to read.
 
-**On screen.** The dataset, the paper, and every source: simgrammar.com
+**On screen.** Every game and the family it falls in: simgrammar.com

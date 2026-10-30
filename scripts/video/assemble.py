@@ -121,7 +121,7 @@ def make(name, segments, vertical=False):
 
 def episode(n, key):
     return [{'type': 'script', 'key': key, 'header': f"Episode {n} · {title_of(key)}"},
-            {'type': 'slate', 'header': f"Episode {n} · {title_of(key)}", 'title': DOMAIN, 'sub': 'Every number in this video is checked against the open dataset each time it is built.', 'dur': 4.0}]
+            {'type': 'slate', 'header': f"Episode {n} · {title_of(key)}", 'title': DOMAIN, 'sub': 'Every game, mechanic, and technique in this video has a page of its own, with its sources.', 'dur': 4.0}]
 
 FILM = 'mega/the-film.md'
 FILM_TITLE = 'Every Simulation Game Is Built From the Same Parts'
@@ -139,7 +139,7 @@ def film(eps):
     for n in range(6, 9): segs += chapter(n)
     segs += [{'type': 'slate', 'header': FILM_TITLE, 'title': 'From gaps to bets', 'dur': 3.0}, {'type': 'script', 'key': FILM, 'header': FILM_TITLE, 'only': [3]}]
     for n in range(9, 13): segs += chapter(n)
-    segs += [{'type': 'slate', 'header': FILM_TITLE, 'title': DOMAIN, 'sub': 'The dataset, the paper, the book, and every source.', 'dur': 5.0}]
+    segs += [{'type': 'slate', 'header': FILM_TITLE, 'title': DOMAIN, 'sub': 'Every game, mechanic, and technique, with its sources.', 'dur': 5.0}]
     return segs
 
 def short(n, key):

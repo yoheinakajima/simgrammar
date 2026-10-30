@@ -174,4 +174,4 @@ Target runtime about 12 minutes: about 1,270 words of narration at 135 words a m
 
 **Voice.** Factorio and Anno 1800 are both built on production chains, and the dataset puts them in different families. Next episode: how those families are drawn, and the games they put side by side.{{assert:cocluster.factorio.anno-1800 < 0.5}}
 
-**On screen.** The dataset, the paper, and every source: simgrammar.com
+**On screen.** Every part and the first game that had it: simgrammar.com
