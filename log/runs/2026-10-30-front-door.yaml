@@ -15,7 +15,8 @@ method: 'An audit of the website, the book, the paper, and the video scripts lab
   visitor looks first (the version and contract line, the build-time source line, record ids and status badges around
   every title, provenance captions under every video). This run changes the website only (scripts/web.py, og.py,
   simgrammar.js, web/DESIGN.md). The home page is now a front door: what the atlas is and why it matters, four findings
-  from the paper each linked to its section, every mechanic by family, the games the book and the videos use most, the
+  from the paper each linked to its section (the first is the reuse share since 2010, the claim the paper says holds,
+  rather than the share of mechanics seen by 2000, which random sets of games nearly match), every mechanic by family, the games the book and the videos use most, the
   first episodes and shorts, the most shipped techniques, the highest priority bets, the book by part, and the paper and
   about pages. The paper moved to paper/ and is one tab of seven; sources, find, and about sit in the utility nav. The
   data page became about/, which opens with why the atlas is built from open records before its downloads, commands,

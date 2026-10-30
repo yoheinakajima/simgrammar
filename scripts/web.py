@@ -485,7 +485,7 @@ class Web:
         base, meta, st = "", self.meta, self.analysis["stats"]
         counts = self.counts()
         findings = [
-            (f'{st["pct_mechanics_seen_by_2000"]:.0f}%', "of the catalog's mechanics were already in a game by 2000", "5.2"),
+            (f'{st["pct_uses_since_2010_on_pre2001"]:.0f}%', "of the parts in games since 2010 were already in a game by 2000", "5.2"),
             (f'{st["rho_legibility_emergence_potential"]}', "the more stories a mechanic makes, the harder it is to read (ρ)", "5.6"),
             (f'{st["pct_uses_on_zero_exposure"]:.0f}%', "of mechanic uses sit where no AI technique reaches yet", "8.2"),
             (f'{st["n_technique_runtime_breaks"]} of {st["n_technique_runtime"]}', "AI techniques that run during play break exact replay", "6.4"),
