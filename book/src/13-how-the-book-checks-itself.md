@@ -1,5 +1,7 @@
 # Chapter 13. How the book checks itself
 
+A book built from a growing dataset can go wrong in a way a printed book cannot: a sentence true on the day it was written can become false when someone adds a game. This chapter is for readers who want to know why the numbers in the earlier chapters can be trusted, and how anyone can check them or add to them.
+
 On 25 October 2026 an AI agent catalogued three mobile management games, Pocket City, Fallout Shelter, and Game Dev Story, and ran the dataset's checks before opening a pull request. The data passed. The paper did not. A sentence in the paper's section on white space, the pairs of common mechanics that almost never meet, had stopped being true, and the build refused to finish.
 
 The sentence named building placement and embodied skill control, real-time motor skill such as hand-flying a plane or driving a car, as one of the most promising empty pairs. Behind it sat an assertion that the pair ranks in the top ten of the white-space table. The new games did not touch either mechanic. The trouble was the table's entry rule: it admitted mechanics used by at least 8 percent of the catalog, and embodied skill control was used by exactly {{derived:embodied-skill-control.prevalence}} games, sitting on the bar.{{assert:derived.embodied-skill-control.prevalence == whitespace_min_games}} Three more games without it pushed it under 8 percent, it dropped out of the table, and the paper's sentence lost its footing even though no finding had changed.

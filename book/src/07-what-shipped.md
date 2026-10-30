@@ -8,7 +8,7 @@ Four years later [[suck-up|Suck Up!]] put a model behind a front door. You play 
 
 The dataset classes both games as boundary cases. In AI Dungeon nothing is simulated outside the model's text, and in Suck Up! the model decides whether your pitch worked, with no social system underneath keeping score. They show what a game looks like when the model is the whole game.
 
-## How the dataset counts maturity
+## Four steps of maturity
 
 A technique enters the dataset only as a dated, citable result that changes at least one mechanic. There are {{count:technique}} of them, from tree search and wave-function collapse to world models that generate a playable scene from a sentence. Each carries a maturity judged for deployment in games, which is a stricter standard than maturity in AI generally. Constrained decoding, which forces a model's output into a fixed format, is routine in software engineering and rare in shipped game runtimes, so it is scored as research here.{{assert:field.constrained-decoding.maturity == research}}
 
@@ -16,7 +16,11 @@ The scale has four steps. *Research* means papers and lab demos. *Prototype* mea
 
 {{viz:technique-landscape}}
 
+<details class="disclosure"><summary>the techniques by maturity, as a table</summary>
+
 {{table:techniques-by-maturity}}
+
+</details>
 
 {{stat:n_technique_shipped_mainstream}} technique is a genre norm, {{stat:n_technique_shipped_niche}} have shipped in at least one commercial game, {{stat:n_technique_prototype}} exist as public prototypes, and {{stat:n_technique_research}} are research only.{{assert:n_technique_shipped_mainstream == 1}}{{assert:n_technique_shipped < n_technique_research}} The shipped ones fall into four groups: rendering and assets, characters that talk, opponents and tools, and a single case of a model writing game rules.
 

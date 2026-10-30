@@ -20,9 +20,15 @@ Every mechanic in the dataset carries six scores on five-point scales, each with
 
 Dwarf Fortress's stress system scores 3 for legibility and 4 for emergence potential.{{assert:field.stress-accumulation.legibility == 3}}{{assert:field.stress-accumulation.emergence_potential == 4}} Its simulated history, which runs a world forward for up to thousands of years before the fortress is founded, scores 2 and 5.{{assert:field.history-generation.legibility == 2}}{{assert:field.history-generation.emergence_potential == 5}} The pause button scores 5 and 1.{{assert:field.variable-speed.legibility == 5}}{{assert:field.variable-speed.emergence_potential == 1}}
 
+Read the scores as one careful reader's judgment against written anchors. A second, independent reading now covers part of them, and nothing here measures how players experience a mechanic.
+
+<details class="disclosure"><summary>who rated the scores, and how often raters agree</summary>
+
 The scores have a limit that applies to everything below. One model rater assigned the original scores by reading each mechanic's record against the anchors. The dataset now holds {{stat:n_ratings}} recorded ratings, including the originals preserved alongside new readings; {{stat:n_scores_independently_rated}} scores have an independent second rating.{{assert:n_ratings > n_scores_independently_rated}}{{assert:n_scores_independently_rated > 0}} Fields with ratings store their lower median. The correlations still draw largely on the original rater's judgments, and the second ratings cover only part of the vocabulary. Neither the scores nor their agreement measure how players experience the mechanics. Further raters first score a calibration set of {{stat:n_calibration_mechanics}} mechanics with published reference scores.
 
 {{table:rater-agreement}}
+
+</details>
 
 ## What the scores show
 
