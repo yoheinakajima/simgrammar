@@ -15,6 +15,7 @@ from collections import Counter, defaultdict
 from datetime import date
 from itertools import combinations
 from pathlib import Path
+from urllib.parse import urlparse
 
 import numpy as np
 from scipy.cluster.hierarchy import fcluster, linkage
@@ -24,6 +25,28 @@ from scipy.stats import spearmanr
 from lib import CALIBRATION_SCALES, ROOT, calibration_agreement, independent, load_calibration, load_registry, read_yaml, vocab_terms
 
 MATURITY_ORDER = ["research", "prototype", "shipped-niche", "shipped-mainstream"]
+# links a contributor profile may carry (report/meta.yaml), in display order, with the hosts each must point at
+PROFILE_LINKS = {"x": ("x.com", "twitter.com"), "linkedin": ("linkedin.com",), "website": ()}
+
+
+def contributor_profiles(meta: dict) -> dict:
+    """Profiles from report/meta.yaml `contributors`, keyed by lowercase GitHub handle; a bare string is a display name.
+    Links must be https, and an x or linkedin link must point at its site, since contributors edit their own."""
+    out = {}
+    for h, p in (meta.get("contributors") or {}).items():
+        p = {"name": p} if isinstance(p, str) else dict(p or {})
+        extra = sorted(set(p) - {"name", *PROFILE_LINKS})
+        if extra:
+            raise ValueError(f"report/meta.yaml: contributors.{h} has unknown keys {extra}; allowed: name, {', '.join(PROFILE_LINKS)}")
+        for k, hosts in PROFILE_LINKS.items():
+            if p.get(k) is None:
+                continue
+            u = urlparse(str(p[k]))
+            host = (u.hostname or "").lower().removeprefix("www.")
+            if u.scheme != "https" or not host or (hosts and not any(host == d or host.endswith("." + d) for d in hosts)):
+                raise ValueError(f"report/meta.yaml: contributors.{h}.{k} must be an https link{' to ' + ' or '.join(hosts) if hosts else ''}: {p[k]}")
+        out[str(h).lower()] = p
+    return out
 
 
 
@@ -415,8 +438,8 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         stats["n_runs_verification"] = sum(1 for r in all_runs if r.data.get("kind") == "verification")
         stats["n_runs_agent"] = sum(1 for r in all_runs if r.data.get("actor") == "agent")
         stats["n_run_operators"] = len({str(r.data.get("operator", "")).strip().lower() for r in all_runs})
-        # everyone who has operated a run, credited from the run log; display names come from report/meta.yaml
-        names = {str(k).lower(): v for k, v in ((read_yaml(ROOT / "report" / "meta.yaml") or {}).get("contributors") or {}).items()}
+        # everyone who has operated a run, credited from the run log; names and links come from report/meta.yaml
+        profiles = contributor_profiles(read_yaml(ROOT / "report" / "meta.yaml") or {})
         by_op: dict[str, list] = {}
         for r in all_runs:
             by_op.setdefault(str(r.data.get("operator", "")).strip().lower(), []).append(r)
@@ -425,20 +448,22 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         for op, rs in by_op.items():
             ids = {r.id for r in rs}
             verif = {r.id for r in rs if r.data.get("kind") == "verification"}
-            crows.append({"contributor": names.get(op, str(rs[0].data.get("operator", "")).strip()),
+            pf = profiles.get(op, {})
+            crows.append({"contributor": pf.get("name") or str(rs[0].data.get("operator", "")).strip(),
                           "github": str(rs[0].data.get("operator", "")).strip(),
                           "first_run": min(str(r.data.get("date")) for r in rs), "runs": len(rs),
                           "records_created": sum(1 for t, _, p in prov if t != "source" and p.get("created") in ids),
                           "sources_added": sum(1 for t, _, p in prov if t == "source" and p.get("created") in ids),
                           "records_verified": sum(1 for t, d, p in prov if d.get("status") == "verified" and verif & set(p.get("reviewed") or [])),
                           # a rating from the creating run is the original score kept beside the others, not a second reading
-                          "scores_rated": sum(1 for _, d, p in prov for g in d.get("ratings") or [] if g.get("run") in ids and g.get("run") != p.get("created"))})
+                          "scores_rated": sum(1 for _, d, p in prov for g in d.get("ratings") or [] if g.get("run") in ids and g.get("run") != p.get("created")),
+                          "links": [pf[k] for k in PROFILE_LINKS if pf.get(k)]})
         crows.sort(key=lambda r: (r["first_run"], r["github"].lower()))
         tables["contributors"] = {"description": "Everyone who has operated a run, from the run log (log/runs). Records are games, mechanics, techniques, "
                                                  "and opportunities; a verified record counts for the person whose verification run checked it, and a "
                                                  "rated score for the person whose run added an independent rating of it. "
-                                                 "Names come from report/meta.yaml; anyone not listed there appears by GitHub handle.",
-                                  "columns": ["contributor", "github", "first_run", "runs", "records_created", "sources_added", "records_verified", "scores_rated"],
+                                                 "Names and links come from each contributor's profile in report/meta.yaml; anyone without one appears by GitHub handle.",
+                                  "columns": ["contributor", "github", "first_run", "runs", "records_created", "sources_added", "records_verified", "scores_rated", "links"],
                                   "rows": crows}
         stats["n_opportunity_asserted"] = sum(1 for o in opps if o.data.get("status") == "asserted")
         # book chapter 2: feedback polarity of mechanics, the game with the most mechanics, and where each large

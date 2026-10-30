@@ -1,7 +1,7 @@
 # SimGrammar
 
 <!-- BEGIN GENERATED: byline -->
-By Yohei Nakajima, Pedro Lucca, and ShreyKo.
+By Yohei Nakajima, Pedro Lucca, and Shrey Kothari.
 <!-- END GENERATED: byline -->
 
 An open, machine-readable atlas of simulation game mechanics: which games use which rule-systems, how each mechanic works and fails, which math/AI/ML/LLM results change what those mechanics can be, and where the design opportunities are.
@@ -47,11 +47,11 @@ High-value first contributions: verbatim quotes for existing claims (`tasks/sour
 Built from the run log: you appear here when your first pull request merges. What each person's runs created, verified, and rated is in [appendix D of the paper](https://sim.yohei.me/#appendix-d-contributors). To be credited by name rather than handle, add yourself to `contributors` in [`report/meta.yaml`](report/meta.yaml).
 
 <!-- BEGIN GENERATED: contributors -->
-| contributor | github | first run |
-|---|---|---|
-| Yohei Nakajima | [yoheinakajima](https://github.com/yoheinakajima) | 2026-10-23 |
-| Pedro Lucca | [heypedrolucca](https://github.com/heypedrolucca) | 2026-10-28 |
-| ShreyKo | [shreyko-antim](https://github.com/shreyko-antim) | 2026-10-29 |
+| contributor | github | first run | links |
+|---|---|---|---|
+| Yohei Nakajima | [yoheinakajima](https://github.com/yoheinakajima) | 2026-10-23 | [x](https://x.com/yoheinakajima) · [linkedin](https://www.linkedin.com/in/yoheinakajima) · [yoheinakajima.com](https://yoheinakajima.com) |
+| Pedro Lucca | [heypedrolucca](https://github.com/heypedrolucca) | 2026-10-28 | [x](https://x.com/pedro_computer) · [linkedin](https://www.linkedin.com/in/pedro-lucca) · [pedrolucca.com](https://www.pedrolucca.com) |
+| Shrey Kothari | [shreyko-antim](https://github.com/shreyko-antim) | 2026-10-29 | [x](https://x.com/shreyko) · [linkedin](https://www.linkedin.com/in/shreyans-kothari) · [antimlabs.com](https://antimlabs.com) |
 <!-- END GENERATED: contributors -->
 
 ## Layout

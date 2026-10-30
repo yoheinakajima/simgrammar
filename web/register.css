@@ -848,6 +848,9 @@ a.chip:hover { border-color: var(--accent); color: var(--accent); text-decoratio
 .panel[data-style="peek"] > h3 { margin: 0; font: 600 var(--fs-md)/1.25 var(--sans); }
 .panel[data-style="peek"] > p:not(.eyebrow) { grid-column: 1 / -1; margin: 10px 0 0; font-size: var(--fs-sm); line-height: 1.45; color: var(--ink-2); }
 .panel[data-style="peek"] > .receipt { grid-column: 1 / -1; margin-top: 10px; padding-top: 8px; border-top: var(--line) solid var(--rule); }
+/* a person's peek (bylines and the contributors table): no icon, and its links take the pointer. Its twin is the contributors table. */
+.panel[data-style="peek"][data-kind="person"] { grid-template-columns: minmax(0, 1fr); width: 300px; pointer-events: auto; }
+.panel[data-style="peek"][data-kind="person"] > .receipt { margin-top: 8px; }
 @media (hover: none) { .panel[data-style="peek"] { display: none; } }
 /* parts: a game as the icons of its mechanics, supporting parts faint */
 .register[data-kind="parts"] .row { grid-template-columns: 44px 200px minmax(0, 1fr) 28px; align-items: center; padding: 8px 0; }

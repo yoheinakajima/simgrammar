@@ -1,0 +1,31 @@
+id: 2026-10-29-profiles
+type: run
+kind: maintenance
+date: '2026-10-29'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: credit Shrey Kothari by name, give each contributor a profile with
+  links, and show it in a card on hover over their name on the site.'
+method: 'report/meta.yaml contributors entries become profiles: a name and any of x, linkedin, and website. A bare
+  string is still read as a name, so a contributor can add one either way. scripts/analyze.py (contributor_profiles)
+  rejects unknown keys and any link that is not https, and an x or linkedin link that does not point at its site,
+  because contributors edit their own entries. shreyko-antim is now Shrey Kothari, at the operator''s word. Each link
+  was confirmed as the person''s own: Yohei Nakajima''s X and website from the yoheinakajima GitHub profile, and the LinkedIn from
+  a search result titled "Yohei Nakajima - Untapped Capital"; Shrey Kothari''s X and website from the shreyko-antim GitHub
+  profile, and the LinkedIn from Shrey''s own Luma profile (Co-founder & CEO, Antim Labs), which links it beside that X
+  account; Pedro Lucca''s X from the operator, the LinkedIn from a search result titled "Pedro Lucca Passarelli - Mutuals
+  Inc.", which the operator named as Pedro''s company, and the website, pedrolucca.com, which says Pedro is building Mutuals
+  Inc. and links to mutuals.inc. The contributors table gains a links column (labelled x, linkedin, or the
+  site''s host), shown in paper appendix D, book chapter 13, and the README block. On the site, each name in a byline
+  (the paper header and the book index) and in the contributors table opens a card on hover with the handle, first run,
+  runs, what their runs created, verified, and rated, and their links. It reuses the mosaic''s peek panel, refactored in
+  web/simgrammar.js into one hover helper, with a person variant in web/register.css whose links take the pointer so the
+  card stays open while the pointer is on it. The card is shown only on screens with a mouse; a name links to the
+  contributors table, the card''s plain-text twin. Checked in the browser on a local build: the cards open on the
+  byline, the table, and the book index; the pointer can reach a card''s links; the card closes on leave; and the
+  mosaic cards still open.'
+contract_version: '1.2'
+proposals: []

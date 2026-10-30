@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import re
 from collections import Counter
+from urllib.parse import urlparse
 
 from lib import ROOT, get_path, read_yaml, vocab_terms
 
@@ -274,7 +275,15 @@ def table_md(ctx: Context, name: str, mode: str) -> str | None:
 GITHUB_HANDLE_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$")
 
 
+def link_label(url: str) -> str:
+    """A profile link's label: x, linkedin, or the site's host."""
+    host = (urlparse(url).hostname or "").lower().removeprefix("www.")
+    return {"x.com": "x", "twitter.com": "x"}.get(host) or ("linkedin" if host == "linkedin.com" or host.endswith(".linkedin.com") else host)
+
+
 def _cell_md(ctx, path, v, mode):
+    if path == "links" and isinstance(v, list):
+        return " · ".join(f"[{link_label(u)}]({u})" for u in v)
     s = _fmt(v)
     if path == "github" and GITHUB_HANDLE_RE.match(s):
         return f"[{s}](https://github.com/{s})"
