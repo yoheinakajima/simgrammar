@@ -94,7 +94,7 @@ Per-turn action points, the budget of moves a tactical game gives each unit, wou
 
 Pick a simulation game you know well. It does not have to be in the catalog.
 
-1. List its mechanics, using the catalog's names where they fit (the mechanic list at sim.yohei.me). Ten to fifteen is typical.
+1. List its mechanics, using the catalog's names where they fit (the mechanic list at simgrammar.com). Ten to fifteen is typical.
 2. Mark the core ones, the mechanics without which it would be a different game. Most games have only a few.
 3. For each core mechanic, guess how many catalog games use it, then look it up. The parts you think of as the game's signature are probably rarer than you guessed, and the parts you never think about are probably among the most common.
 4. Remove one core mechanic and describe the game that is left. Then add one rare mechanic from another game's core and describe that game.

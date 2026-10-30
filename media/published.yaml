@@ -3,59 +3,59 @@
 # Written by scripts/video/publish.py from the renders in video-out; shows lists the records each video puts on screen.
 # An episode's scenes give each scene's start in seconds, the records it shows with when each first appears, and said,
 # a digest of its narration as rendered (lib.narration_digest).
-release: videos-2026-10-27
+release: videos-2026-10-29
 shorts:
   - {key: short-01, script: 001-five-most-common.md, file: short-01.mp4, seconds: 38.1,
-     sha256: e863ee05b12d6cec8a16edccec21fe5ed4c4a5c3bad0c4a24c06c4f762c4d9d9,
+     sha256: a291e81e6230b93e91530201d3496f0595110c3cd64f2e5ef1a6b80dcc810922,
      poster: short-01.jpg, poster_sha256: 508dc5c8a2d090055860e447a2d8e28f81a2a24d1c15ed9dc125801cca08e78b,
      shows: [free-placement, modding-api, scenario-objectives, tech-tree, variable-speed, factorio, injury-body-model, mood-breakdown, storyteller-director, production-chain, rimworld, rollercoaster-tycoon]}
   - {key: short-02, script: 002-stardew-older-parts.md, file: short-02.mp4, seconds: 39.8,
-     sha256: 653417996add79d17c588971291d355be7a70a36241229ec15a503552bb771ea,
+     sha256: b12a3cc18341df5c3f9ff188f9aa49bf648e2575e16d6a0b9ffef5155fab2ef0,
      poster: short-02.jpg, poster_sha256: efad93fdab46cda504068ebffae81e4b1604fd748a707095a6769c32a114bac2,
      shows: [relationship-values, crop-cultivation, daily-action-budget, seasons, stardew-valley, harvest-moon, collection-goals, hamurabi, princess-maker-2, seasonal-world-reset]}
   - {key: short-03, script: 003-border-and-daughter.md, file: short-03.mp4, seconds: 35.6,
-     sha256: 0d0050d9991bc7e4196d7477ad7b3ad89c8588d0a35cd4b3a9abef3ff39c2da3,
+     sha256: 303985b4b6bb2a1bd96b255960416607520aa918b11eb8923d6ad4bd048a0e66,
      poster: short-03.jpg, poster_sha256: 54e0f4e96637c5d23b7fa2ddee52fb521f258d4aff0d7a4a2769ef5dfad46c96,
      shows: [agent-skills, budget-treasury, care-dependent-development, daily-action-budget, lifecycle-aging, needs-decay, princess-maker-2, papers-please, rule-checking-inspection, triggered-event-chains, career-ladder, free-placement]}
   - {key: short-04, script: 004-decorating-makes-raids-bigger.md, file: short-04.mp4, seconds: 36.2,
-     sha256: 3a481d6d8536222c70945c3c0e1ee809d836335777193ff60328612130c548eb,
+     sha256: f922a75e15b8acf916178c25bf1ca22dafc349ae58797f7b905e3dcd0f55643b,
      poster: short-04.jpg, poster_sha256: ebfc1f09a0b34cba5f5e648490f3a85a863df042ac377f263c709a3e2fd288cf,
      shows: [adaptive-threat-scaling, decoration-beauty, raid-defense, rimworld]}
   - {key: short-05, script: 005-the-fridge-knows.md, file: short-05.mp4, seconds: 36.0,
-     sha256: 921868eeca961bacd56339ddea82fe7def26e7290131ce436b25aac077f6ca5a,
+     sha256: 97e8feea4c36df0e2373d5c5a63c391f2066022bae6c4fc72a876540f7c9f512,
      poster: short-05.jpg, poster_sha256: 4fd58b9f00ae98eac36e5f6381424e90d7231a07d0dfb26bc7c04ff07c96fc26,
      shows: [smart-objects, the-sims, needs-decay]}
   - {key: short-06, script: 006-one-normal-technique.md, file: short-06.mp4, seconds: 40.4,
-     sha256: 542437d8761c29705b7762a846b904fdd434c0d43f76c9dcabaaf2e74ab731f2,
+     sha256: ae642f675f96709dbd204262bfa355c4a8b600024c5b156b3a5a3e9f0d6680b7,
      poster: short-06.jpg, poster_sha256: f3374447755aec253e7ecf47d9119cfb8e44d1e5a48590c99044396de006c9fa,
      shows: [neural-rendering-shaders, genie-world-models, microsoft-flight-simulator-2020]}
   - {key: short-07, script: 007-most-used-least-touched.md, file: short-07.mp4, seconds: 35.6,
-     sha256: 71082515a6414bedb65ea68ea803eb3f2c0f41d3eb1e12a3b0ebafa75bc55aec,
+     sha256: f38171bf657f634d805112ab0e7fa6a6d24f9f8ee1857ab1fdce065342e1b75c,
      poster: short-07.jpg, poster_sha256: aa6b770239eecba97714226c9e98d0314c1572ea231e166b125650e3a1304fc0,
      shows: [production-chain, conveyor-transport, factorio]}
   - {key: short-08, script: 008-city-builders-no-stories.md, file: short-08.mp4, seconds: 37.6,
-     sha256: d86c78769a6afd87e6d485d90d2efa2ade89af70146d2f537d43425052a814e1,
+     sha256: 0138fc886dcd820d74159fdd5259b43001592e5639a81833131690a94a2e741d,
      poster: short-08.jpg, poster_sha256: eef7b33a7b586e3f5c625ae6ad07c4bc3f6a6004fe9bdc941d444486ad6965e0,
      shows: [free-placement, triggered-event-chains, cities-skylines, power-grid, surviving-mars, tech-tree]}
   - {key: short-09, script: 009-why-button.md, file: short-09.mp4, seconds: 38.6,
-     sha256: 99396316074d7dc92d58a72118afca683de078e957a28469234676867ae13c21,
+     sha256: 66f40f63c36d7bda9c0d4141d4ab0494764d852e8ed5d3c05f3236fe82d18979,
      poster: short-09.jpg, poster_sha256: d955ee153417e5cff53a3ad03a0be130c720b9f0ecde9b2a08a6cbf3d2811b1e,
      shows: [causal-why-query, content-elastic-events, generated-inspection-shifts, generative-decoration-catalogs, illustrated-chronicles, local-first-ai-sims, parallel-autobalance, sim-instructor-coach, sims-as-agent-benchmarks, branch-preview-forecasts, event-sourced-sim-runtime, language-modding]}
   - {key: short-10, script: 010-desync.md, file: short-10.mp4, seconds: 35.0,
-     sha256: 5457dc3671954f11201bcdb9d8ca7b194936276aefbdea2606f4027b590bd00a,
+     sha256: 157b69e8b21b8f302dabf01a9943082808b6ede3bc02b10c4dd87cc7437c56fa,
      poster: short-10.jpg, poster_sha256: d8eb2e2e57350acbeda4a2028e592257937a66ee63a898bf04389aca84f1941b,
      shows: [monte-carlo-tree-search, llm-game-master]}
   - {key: short-11, script: 011-same-day.md, file: short-11.mp4, seconds: 34.6,
-     sha256: d2782344b297637ea6fd65313f293022538ffb4a3f0a447b2df9a10a25c96446,
+     sha256: db971c11afcf80851c189c890fea3128b415ff35726166daaca20c3555e92bf7,
      poster: short-11.jpg, poster_sha256: 9a4f422933e9f2d92ac29263329371b8ce03824c3801bdefd0d86f9b7a3aa86b,
      shows: [causal-why-query, content-elastic-events, generated-inspection-shifts, generative-decoration-catalogs, illustrated-chronicles, local-first-ai-sims, parallel-autobalance, sim-instructor-coach, sims-as-agent-benchmarks]}
   - {key: short-12, script: 012-skipped-parts.md, file: short-12.mp4, seconds: 33.0,
-     sha256: c27ed3a460ecba278ea9ab1ef16a27d05317bef9c390cb29c7a44470092ff991,
+     sha256: c81c41d456955837b1a566103ef1001306599f18bf3306ab33726f6ad467e1a8,
      poster: short-12.jpg, poster_sha256: ad8b2909b68d3625db9f5421739cc37229ccc864deb26568e8133c1315b82866,
      shows: [variable-speed, free-placement]}
 episodes:
   - {key: episode-01, script: 01-same-parts.md, file: episode-01.mp4, seconds: 325.8, rendered: '2026-10-26',
-     sha256: a55a49d5426a9ee847f990741eda8041b177057b87c0fcb151a22612e2b75a63,
+     sha256: 374f85d829821106cda57e4d3efb3816cbbf5f820d8fbc23db28eccea6fb3e44,
      poster: episode-01.jpg, poster_sha256: 5fbb7e8e4b1531180fdf30d299a5c2e58c50c72800e146147463ac2ec5427494,
      thumb: episode-01-thumb.jpg, thumb_sha256: 498282f031d261320deab91a4763152df401b6af1a771eaf4abf0d599d55130f,
      shows: [mood-breakdown, storyteller-director, needs-decay, adaptive-threat-scaling, injury-body-model, rimworld, production-chain, factorio, oxygen-not-included, zoning, free-placement, land-value],
@@ -72,7 +72,7 @@ episodes:
        {"name": "Close", "start": 298.6, "said": "b6aa60cc4269", "shows": {}},
      ]}
   - {key: episode-02, script: 02-old-parts.md, file: episode-02.mp4, seconds: 484.4, rendered: '2026-10-26',
-     sha256: 69ba0b81f78ae4cbb9f08b34278b3403a6991f5463c4aeb69652bc70d5468c2b,
+     sha256: 3cd465682c26ab10f7d9810766d55004264caf83a42442f05bb466901816f51a,
      poster: episode-02.jpg, poster_sha256: d74c61022e750fcfafc7886c3769644a7e7c15a24cdb3b75c044c0655412952f,
      thumb: episode-02-thumb.jpg, thumb_sha256: e14cbc0b39d913fa2920ffe671bc4f7cc62579c01194c1878c4c894331537781,
      shows: [dynasty-succession, crop-cultivation, tech-tree, culture-religion-conversion, free-placement, variable-speed, pollution-spread, conveyor-transport, power-grid, minecraft, traffic-congestion, survival-meters],
@@ -90,7 +90,7 @@ episodes:
        {"name": "Close", "start": 457.1, "said": "a679eec2e772", "shows": {}},
      ]}
   - {key: episode-03, script: 03-families.md, file: episode-03.mp4, seconds: 466.2, rendered: '2026-10-26',
-     sha256: 98aba07c386b0bf6b33c6011e0cd6f2d62fa9df390d77e76a24d22ffab470eca,
+     sha256: 896e0ef8281fdb83ed4c8f8abef53f6afeafc889baafa540127b00d04e3fd418,
      poster: episode-03.jpg, poster_sha256: db49d1a22ade972f5d96252dccba69bc61e26fd89ab774d068a6ee16a4afa87a,
      thumb: episode-03-thumb.jpg, thumb_sha256: 608f45ea72a6d8076eaa1524ab1b0f11bfcd1a7a5c8e0eb4cacd4eedfb610d3d,
      shows: [free-placement, variable-speed, goods-consumption, resource-extraction, production-chain, needs-decay, tech-tree, trade-routes, crop-cultivation, adaptive-threat-scaling, raid-defense, factorio],
@@ -108,7 +108,7 @@ episodes:
        {"name": "Close", "start": 433.2, "said": "86e5171b749a", "shows": {"adaptive-threat-scaling": 451.3, "agent-skills": 451.3, "crop-cultivation": 451.3, "designation-orders": 451.3, "dwarf-fortress": 451.3, "fire-spread": 451.3, "fluid-gas-simulation": 451.3, "history-chronicle": 451.3, "history-generation": 451.3, "injury-body-model": 451.3, "memories-thoughts": 451.3, "modding-api": 451.3, "mood-breakdown": 451.3, "needs-decay": 451.3, "personality-traits": 451.3, "raid-defense": 451.3, "relationship-values": 451.3, "rimworld": 451.3, "room-recognition": 451.3, "storage-capacity": 451.3, "storyteller-director": 451.3, "stress-accumulation": 451.3, "utility-action-selection": 451.3, "variable-speed": 451.3, "vertical-layers": 451.3, "work-priorities": 451.3}},
      ]}
   - {key: episode-04, script: 04-deep-and-hard-to-read.md, file: episode-04.mp4, seconds: 423.4, rendered: '2026-10-26',
-     sha256: 96077825b1c0a52e7453c9a71eec4584cc877854c01947e0e9d6e79561f8b395,
+     sha256: 2fbf8129d2c86fa1c767836ca76f592c7750c1cf2706068f374d29819849b042,
      poster: episode-04.jpg, poster_sha256: d7d65e05cbd14a531e5869d31bb71ddafc519e2d7e3a0ba93103628af0334caa,
      thumb: episode-04-thumb.jpg, thumb_sha256: 16a2391408c801053957d8f5e09f5b98a405877c6d842d86696e947381dbd267,
      shows: [stress-accumulation, dwarf-fortress, memories-thoughts, oxygen-not-included, mood-breakdown, rimworld, variable-speed, adaptive-threat-scaling, history-generation, fluid-gas-simulation, history-chronicle, cities-skylines],
@@ -126,7 +126,7 @@ episodes:
        {"name": "Close", "start": 387.6, "said": "d0c450d5e14c", "shows": {"the-sims": 418.1}},
      ]}
   - {key: episode-05, script: 05-five-ceilings.md, file: episode-05.mp4, seconds: 449.3, rendered: '2026-10-26',
-     sha256: a385c6eb6902a15ce8613aab878fd71ba04ac8172c5cad3913fec2eec2c0b1d8,
+     sha256: c6d15c3bed77cb2b3c7032559dc68f647636006dab8857300ce1657b95901fb0,
      poster: episode-05.jpg, poster_sha256: 2f1db9ffd337a6d708e642dc4cc6c0ecaaafd07263c8e6caf8cc10e9bbae72c7,
      thumb: episode-05-thumb.jpg, thumb_sha256: da4862f767e151506728658d08e08ba8fd87b506d804c1c06469fce896f98200,
      shows: [the-sims, rimworld, crop-cultivation, dwarf-fortress, factorio, dilemma-cards, creatures, generative-agents-smallville, smart-objects, memories-thoughts, reigns, facade],
@@ -143,7 +143,7 @@ episodes:
        {"name": "Close", "start": 408.7, "said": "cd466cadba57", "shows": {}},
      ]}
   - {key: episode-06, script: 06-what-ai-shipped.md, file: episode-06.mp4, seconds: 486.7, rendered: '2026-10-26',
-     sha256: 26c1a4a51d41fb7f74cccc1463dab4b740ae4c2f30dce0f5fa3d50595567a81a,
+     sha256: 55f486bbd8c1e5bd079004431476791660e2d15988c2541f4bbb6e30b80a20c2,
      poster: episode-06.jpg, poster_sha256: 9d985e91ff66c204848e0c778bb44ab00134901b69e1932cbc791bb8b92104e9,
      thumb: episode-06-thumb.jpg, thumb_sha256: d3b5f0734b75ae4c069bac41f49c1c33b8fc9886244dc144e474e03544825d72,
      shows: [llm-game-master, inzoi, on-device-language-models, realtime-voice-models, neural-rendering-shaders, deep-rl-npc-policies, microsoft-flight-simulator-2020, monte-carlo-tree-search, wave-function-collapse, automated-playtesting, whispers-from-the-star, satellite-world-reconstruction],
@@ -163,7 +163,7 @@ episodes:
        {"name": "Close", "start": 472.5, "said": "e84893b8aaed", "shows": {"automated-playtesting": 472.5, "deep-rl-npc-policies": 472.5, "generative-agents": 472.5, "infinite-craft": 472.5, "learned-motion-synthesis": 472.5, "llm-game-master": 472.5, "llm-rule-adjudication": 472.5, "monte-carlo-tree-search": 472.5, "neural-rendering-shaders": 472.5, "on-device-language-models": 472.5, "realtime-voice-models": 472.5, "satellite-world-reconstruction": 472.5, "text-to-3d-assets": 472.5, "wave-function-collapse": 472.5}},
      ]}
   - {key: episode-07, script: 07-where-ai-lands.md, file: episode-07.mp4, seconds: 451.1, rendered: '2026-10-26',
-     sha256: 8ba410511a559753458da9c4c4b4334a4966fae99fedf7b4db5d23a8445f2098,
+     sha256: 96262444929771ddf5b05233f34defa4f6f29062633be1442385af07cb3c5578,
      poster: episode-07.jpg, poster_sha256: 23e3c5422920c7829d71da65a2b9fac0b1ca49912fc0fb68553f1c7d4ba4eb92,
      thumb: episode-07-thumb.jpg, thumb_sha256: 6fc7ac8d1dbbfa07fa6229c50122981b2fd1f1da269c909c430856a74d662f56,
      shows: [llm-game-master, utility-action-selection, inzoi, monte-carlo-tree-search, deep-rl-npc-policies, genie-world-models, on-device-language-models, crusader-kings-3, production-chain, generative-content, procedural-terrain, blueprints],
@@ -182,7 +182,7 @@ episodes:
        {"name": "Close", "start": 436.3, "said": "b98e272b6213", "shows": {}},
      ]}
   - {key: episode-08, script: 08-vacant-lots.md, file: episode-08.mp4, seconds: 452.8, rendered: '2026-10-26',
-     sha256: e71710e10c996002b91151483bcafafe1c6d544c0af22f2b3b299dd4a295331b,
+     sha256: 54db3b4ed663d58edc9d13ddec1d75d0731677e459ede3466b669131d08b9f92,
      poster: episode-08.jpg, poster_sha256: 51d419cbef495d246a1f39b3782862968db54f74cecf6f5ffd32f6268b1a34bf,
      thumb: episode-08-thumb.jpg, thumb_sha256: 82fed7a4a4c14c6aced7d6ab311e4e2733c6182ff1a081c5a6c2badd692cdd33,
      shows: [land-value, traffic-congestion, production-chain, free-placement, simcity-1989, attribute-match-engine, board-confidence, culture-religion-conversion, needs-decay, negotiation, smart-objects, war-score-peace],
@@ -201,7 +201,7 @@ episodes:
        {"name": "Close", "start": 438.0, "said": "153e64b91b06", "shows": {}},
      ]}
   - {key: episode-09, script: 09-bets.md, file: episode-09.mp4, seconds: 431.1, rendered: '2026-10-26',
-     sha256: 29793e1ba26fc10028787d0c7bf06f33c3a6e416d80c794eeb9d019f2821598b,
+     sha256: c1f7f578f3e15c884c77e2adf33c983a1e37609a356e769931bf4576186a4d45,
      poster: episode-09.jpg, poster_sha256: 8266d62a223a1e1360d5155e789168351fc486628d5c3fdb2d5ff7ea71344ade,
      thumb: episode-09-thumb.jpg, thumb_sha256: 2eb00f3acf4bdb73dd9bd5bb7ed465a54c59c41b3e25eacce7b6254beed7ca23,
      shows: [bottleneck-explainer, llm-game-master, causal-why-query, conveyor-transport, satisfactory, anno-1800, oxygen-not-included, rimworld, factorio, mood-breakdown, production-chain, modding-api],
@@ -220,7 +220,7 @@ episodes:
        {"name": "Close", "start": 411.8, "said": "d06982f9532d", "shows": {}},
      ]}
   - {key: episode-10, script: 10-what-breaks.md, file: episode-10.mp4, seconds: 403.3, rendered: '2026-10-26',
-     sha256: 432d7a040342c29fcae94a81c1cc39d1767a22e7afa6e298fdb15a6085a5967e,
+     sha256: d58a369db514693541dc5dd6e3c41c11938bcf4bbbe47f1181ac5e7d051fa7c6,
      poster: episode-10.jpg, poster_sha256: b2755a77fbe935ca6119f5cba47af824facfa3239f77b93e005cdc4138a47546,
      thumb: episode-10-thumb.jpg, thumb_sha256: 1fd9cccaeb830200bbffe0541a7495760fbc93b9b3c9a99cd90d23ec0cfc942c,
      shows: [factorio, townscaper, wave-function-collapse, genie-world-models, monte-carlo-tree-search, neural-rendering-shaders, causal-tooltips, conveyor-transport, llm-game-master, ai-dungeon, constrained-decoding, event-sourced-sim-runtime],
@@ -238,7 +238,7 @@ episodes:
        {"name": "Close", "start": 373.8, "said": "65f847807ca1", "shows": {"event-sourced-sim-runtime": 374.3}},
      ]}
   - {key: episode-11, script: 11-keeping-score.md, file: episode-11.mp4, seconds: 408.0, rendered: '2026-10-26',
-     sha256: 003bbd01312b18afa73a359c555858cb2360fd0fdd7871c83662a63e04d8f13c,
+     sha256: 6d6d74d7caa7c10d8aaf0a71cc3bd794e59f27925549a1c38b5bf0c757333762,
      poster: episode-11.jpg, poster_sha256: f0f0c5c8fb6fac661395a20ec3bdab3573d734d8854080f652ef7122b76e390f,
      thumb: episode-11-thumb.jpg, thumb_sha256: 58122912a86fd5ac6d71d24d0d311510c89c7a3c7c3814e6346082172bd5b299,
      shows: [causal-why-query, generative-decoration-catalogs, local-first-ai-sims, parallel-autobalance, sim-instructor-coach, llm-game-master, content-elastic-events, generated-inspection-shifts, illustrated-chronicles, sims-as-agent-benchmarks, inzoi, bottleneck-explainer],
@@ -256,7 +256,7 @@ episodes:
        {"name": "Close", "start": 388.5, "said": "139e0d316338", "shows": {"causal-why-query": 388.5, "content-elastic-events": 388.5, "generated-inspection-shifts": 388.5, "generative-decoration-catalogs": 388.5, "illustrated-chronicles": 388.5, "local-first-ai-sims": 388.5, "parallel-autobalance": 388.5, "sim-instructor-coach": 388.5, "sims-as-agent-benchmarks": 388.5}},
      ]}
   - {key: episode-12, script: 12-how-this-was-made.md, file: episode-12.mp4, seconds: 402.5, rendered: '2026-10-26',
-     sha256: 6023f924c25560c3f791765f8472208955c9fdb34017917b2fbb57e92541a5ae,
+     sha256: 3447bd1a319a0a951f4b1fa3821088f6e176a9885f38ee77da197075ee93e077,
      poster: episode-12.jpg, poster_sha256: ce90655e436945e1a6df0c50d698458ab71905df6a5d55c122b3a1662f86e4f4,
      thumb: episode-12-thumb.jpg, thumb_sha256: 944e396b63bb69dfd96520c90ca928fc3e4e3256604f3d194cea947ff8897cd6,
      shows: [utopia, fallout-shelter, game-dev-story, free-placement, pocket-city],

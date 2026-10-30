@@ -24,6 +24,9 @@ AUD = os.environ.get('SIMGRAMMAR_AUDIO', V + '/audio')
 FFMPEG = os.environ.get('SIMGRAMMAR_FFMPEG', 'ffmpeg')
 SR = 44100
 from parse import parse_all, film_wording
+sys.path.insert(0, os.path.join(HERE, '..'))
+from lib import ROOT, read_yaml
+DOMAIN = read_yaml(ROOT / 'report' / 'meta.yaml')['site']['domain']   # the end slates name the site
 from entities import load, grid
 S = parse_all()
 os.makedirs(V, exist_ok=True)
@@ -118,7 +121,7 @@ def make(name, segments, vertical=False):
 
 def episode(n, key):
     return [{'type': 'script', 'key': key, 'header': f"Episode {n} · {title_of(key)}"},
-            {'type': 'slate', 'header': f"Episode {n} · {title_of(key)}", 'title': 'sim.yohei.me', 'sub': 'Every number in this video is checked against the open dataset each time it is built.', 'dur': 4.0}]
+            {'type': 'slate', 'header': f"Episode {n} · {title_of(key)}", 'title': DOMAIN, 'sub': 'Every number in this video is checked against the open dataset each time it is built.', 'dur': 4.0}]
 
 FILM = 'mega/the-film.md'
 FILM_TITLE = 'Every Simulation Game Is Built From the Same Parts'
@@ -136,7 +139,7 @@ def film(eps):
     for n in range(6, 9): segs += chapter(n)
     segs += [{'type': 'slate', 'header': FILM_TITLE, 'title': 'From gaps to bets', 'dur': 3.0}, {'type': 'script', 'key': FILM, 'header': FILM_TITLE, 'only': [3]}]
     for n in range(9, 13): segs += chapter(n)
-    segs += [{'type': 'slate', 'header': FILM_TITLE, 'title': 'sim.yohei.me', 'sub': 'The dataset, the paper, the book, and every source.', 'dur': 5.0}]
+    segs += [{'type': 'slate', 'header': FILM_TITLE, 'title': DOMAIN, 'sub': 'The dataset, the paper, the book, and every source.', 'dur': 5.0}]
     return segs
 
 def short(n, key):

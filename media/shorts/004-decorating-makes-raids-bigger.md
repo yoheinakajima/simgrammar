@@ -38,4 +38,4 @@ Vertical, about 55 seconds, about 100 words of narration. One finding, from RimW
 
 ## 0:52 to 0:57. End card
 
-**On screen.** Episode 4: Why deep systems are hard to read. sim.yohei.me
+**On screen.** Episode 4: Why deep systems are hard to read. simgrammar.com

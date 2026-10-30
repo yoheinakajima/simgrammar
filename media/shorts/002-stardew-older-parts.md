@@ -42,4 +42,4 @@ Vertical, about 50 seconds, about 100 words of narration. One finding, from the 
 
 ## 0:48 to 0:52. End card
 
-**On screen.** Episode 2: Where the parts came from. sim.yohei.me
+**On screen.** Episode 2: Where the parts came from. simgrammar.com

@@ -100,4 +100,4 @@ Target runtime about 11 minutes: about 1,190 words of narration at 135 words a m
 
 **Voice.** The dataset is open, and anyone can extend it under the same rules: catalogue a game, add quotes, verify a record, rate scores, resolve a prediction. The last three need someone other than the person who built it, which is why the guide for invited contributors starts there. If you disagree with a record, there's a form for that too, and the disagreement goes into the record, the way Utopia's release year did. The first outside contributions failed two sentences in this series, the ones saying nothing was verified and every run had one operator, and the script now has their rewrites.{{assert:n_run_operators >= 3}}{{assert:n_verified > 0}} The sentence saying every prediction is open still holds, until someone resolves one.{{assert:n_predictions_open == n_predictions}} The last chapter of the book goes through each of these rules in more detail, with the records behind them.
 
-**On screen.** The dataset, the paper, the book, and how to contribute: sim.yohei.me
+**On screen.** The dataset, the paper, the book, and how to contribute: simgrammar.com

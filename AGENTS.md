@@ -101,7 +101,7 @@ Names at least one mechanic in `involves`, has a `validation_experiment` a small
 
 ## 6. Writing the report
 
-`report/src/*.md` is prose plus tokens. Rendered by `make build` into `dist/paper/paper.md` and the website (`dist/web/`, published at sim.yohei.me).
+`report/src/*.md` is prose plus tokens. Rendered by `make build` into `dist/paper/paper.md` and the website (`dist/web/`, published at simgrammar.com).
 
 | Token | Renders |
 |---|---|

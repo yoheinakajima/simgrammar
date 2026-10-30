@@ -38,4 +38,4 @@ Vertical, about 50 seconds, about 100 words of narration. Scene lengths follow t
 
 ## 0:43 to 0:48. End card
 
-**On screen.** Episode 1: Every simulation game is made of the same parts. sim.yohei.me
+**On screen.** Episode 1: Every simulation game is made of the same parts. simgrammar.com
