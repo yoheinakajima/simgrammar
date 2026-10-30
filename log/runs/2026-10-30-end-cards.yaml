@@ -1,0 +1,29 @@
+id: 2026-10-30-end-cards
+type: run
+kind: maintenance
+date: '2026-10-30'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: re-render the closing frames of the published episodes so they show
+  the end cards and end slate from run 2026-10-30-video-why-first, and stage them for a new release.'
+method: 'The 12 published episodes were changed in their closing frames only, from the frozen renders in video-out/out,
+  which match the files of release videos-2026-10-29 (run 2026-10-29-simgrammar-com moved its stills and states there).
+  For each episode the frozen states were rendered twice, as they were and with the on-screen texts that run 2026-10-30-video-why-first
+  changed swapped in: the end card of episodes 1 to 9, from the episode scripts, and the end slate line of all 12, from
+  scripts/video/assemble.py. Only the stills that differ were taken, and a still counted only when its state, or the state
+  it dissolves from, holds a swapped text. One still in episode 8, a 1/30 s transition step at 198.8 s that differed between
+  the two renders for other reasons, kept the published still, as in the earlier run. Where a still rendered without the
+  swap matched the published still pixel for pixel, the new render was used. In episodes 2, 5, 7, and 8 the end card also
+  shows a figure that has changed since the render, so the published still was kept and only the region the text swap changes
+  was pasted in, which does not overlap the figure. Each episode was encoded with ffmpeg 6.1 and the original narration
+  track as scripts/video/assemble.py does, and compared with the published file: the same length and frame count, the same
+  audio (MD5), and differing frames only in the last 4 to 17 seconds. scripts/video/publish.py staged the files for release
+  videos-2026-10-30. Its render dates were restored to 2026-10-26, since the narration and data are still that render''s,
+  and its posters and thumbs are the published ones, which show frames the swap does not reach. So media/published.yaml
+  changes only the release name and the 12 episode checksums, and the shorts are unchanged. The Japanese subtitles now translate
+  the new end cards of episodes 1 to 9. The film, which the site does not carry, was not re-rendered.'
+contract_version: '1.2'
+proposals: []
