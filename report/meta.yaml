@@ -3,12 +3,26 @@ subtitle: "A machine-readable atlas of simulation game mechanics and the mathema
 # The byline (paper, book, site header, citation, README) names the first byline_names contributors in order of first
 # run; once there are more, it ends with "SimGrammar contributors", which links to the full table.
 byline_names: 3
-# Display names for run operators, keyed by GitHub handle. The contributors table (paper appendix D, book chapter 13,
-# README) is built from log/runs; an operator missing here is credited by handle. Add your own name in your PR.
+# Contributor profiles, keyed by GitHub handle. The contributors table (paper appendix D, book chapter 13, README) and
+# the byline are built from log/runs; a profile adds a display name and links, which the table lists and the site shows
+# in a card on hover. An operator without a profile is credited by handle. Add or edit your own in your PR: `name`, and
+# any of `x`, `linkedin`, and `website`, each an https link (x.com or twitter.com, and linkedin.com, for the first two).
 contributors:
-  yoheinakajima: Yohei Nakajima
-  heypedrolucca: Pedro Lucca
-  shreyko-antim: ShreyKo
+  yoheinakajima:
+    name: Yohei Nakajima
+    x: https://x.com/yoheinakajima
+    linkedin: https://www.linkedin.com/in/yoheinakajima
+    website: https://yoheinakajima.com
+  heypedrolucca:
+    name: Pedro Lucca
+    x: https://x.com/pedro_computer
+    linkedin: https://www.linkedin.com/in/pedro-lucca
+    website: https://www.pedrolucca.com
+  shreyko-antim:
+    name: Shrey Kothari
+    x: https://x.com/shreyko
+    linkedin: https://www.linkedin.com/in/shreyans-kothari
+    website: https://antimlabs.com
 date: "2026-10-25"
 version: "0.2"
 # The website projection (scripts/web.py -> dist/web). Changing these changes generated pages.

@@ -30,7 +30,7 @@ from pathlib import Path
 from markdown_it import MarkdownIt
 
 from lib import ROOT, get_path, narration_digest, read_yaml, vocab_terms
-from report_render import GITHUB_HANDLE_RE, _decl_rows, _fmt, render
+from report_render import GITHUB_HANDLE_RE, _decl_rows, _fmt, link_label, render
 
 WEB_SRC = ROOT / "web"
 NAV = [("paper", "Paper", ""), ("book", "Book", "book/"), ("game", "Games", "game/"), ("mechanic", "Mechanics", "mechanic/"), ("technique", "Techniques", "technique/"),
@@ -191,6 +191,8 @@ class Web:
         navh = "".join(f'<a href="{base}{href}"{" aria-current=" + chr(34) + "page" + chr(34) if key == nav else ""} data-internal>{label}</a>'
                        for key, label, href in NAV)
         url = self.site["url"] + path
+        if 'data-person="' in body:
+            body += f'<script type="application/json" id="people">{self.people_json()}</script>'
         return f"""<!doctype html>
 <html lang="en" data-theme="{esc(self.site.get('theme', 'neutral'))}">
 <head>
@@ -234,6 +236,8 @@ class Web:
 
     # ------------------------------------------------------------------ tables
     def cell(self, col, v, base, link_cols, cap=None):
+        if col == "links" and isinstance(v, list):   # a contributor's profile links
+            return " · ".join(f'<a href="{esc(u)}">{esc(link_label(u))}</a>' for u in v)
         if isinstance(v, list):
             if col in link_cols:
                 shown = v[:cap] if cap else v
@@ -256,6 +260,9 @@ class Web:
             for c in columns:
                 v = r.get(c) if isinstance(r, dict) else None
                 cls = ' class="num"' if self._numeric(rows, c) else ""
+                if name == "contributors" and c == "contributor":   # the name opens the contributor's card
+                    tds.append(f'<td><a href="https://github.com/{esc(r["github"])}" data-person="{esc(r["github"])}">{esc(v)}</a></td>')
+                    continue
                 tds.append(f"<td{cls}>{self.cell(c, v, base, set(link_cols), cap)}</td>")
             trs.append("<tr>" + "".join(tds) + "</tr>")
         t = (f'<div class="table-wrap"><table class="data" data-style="dense" data-sortable{" data-name=" + chr(34) + esc(name) + chr(34) if name else ""}>'
@@ -1256,6 +1263,7 @@ class Web:
         body = mdr.render(self.book_md(stem))
         body = body.replace("<table>", '<div class="table-wrap"><table class="data" data-style="dense">').replace("</table>", "</table></div>")
         body = re.sub(r'<tr>\s*<td><a href="\.\./\.\./(game|mechanic)/([a-z0-9-]+)/">', r'<tr id="\2">\n<td><a href="../../\1/\2/">', body)   # rows of the glossary and the catalog
+        body = self.person_links(body)
         title = re.search(r"^# (.*)$", self.built[f"book/{stem}.md"], re.M).group(1)
         words = self.chapter_words(stem)
         i = self.chapters.index(stem)
@@ -1286,9 +1294,27 @@ class Web:
                          body=main, depth=2, nav="book", path=f"book/{stem}/", image=f"og/book/{stem}.png")
 
     def byline_html(self, base):
-        """The byline's names; "SimGrammar contributors", once there are more contributors than it names, links to the full table."""
-        return ", ".join(f'<a href="{base}#appendix-d-contributors" data-internal>{esc(a)}</a>' if a == "SimGrammar contributors" else esc(a)
+        """The byline's names, each linked to the contributors table (paper appendix D) and opening the contributor's card on
+        hover; "SimGrammar contributors", once there are more contributors than the byline names, links to the table alone."""
+        handle = {r["contributor"]: r["github"] for r in self.analysis["tables"]["contributors"]["rows"]}
+        return ", ".join(f'<a href="{base}#appendix-d-contributors"' + (f' data-person="{esc(handle[a])}"' if a in handle else "") + f' data-internal>{esc(a)}</a>'
                          for a in self.analysis["byline"])
+
+    def people_json(self):
+        """Each contributor's card, keyed by GitHub handle, for simgrammar.js. Its twin is the contributors table."""
+        cards = {r["github"]: {"name": r["contributor"], "since": r["first_run"], "runs": r["runs"], "records": r["records_created"],
+                               "sources": r["sources_added"], "verified": r["records_verified"], "rated": r["scores_rated"],
+                               "links": [["github", f"https://github.com/{r['github']}"]] + [[link_label(u), u] for u in r["links"]]}
+                 for r in self.analysis["tables"]["contributors"]["rows"]}
+        return json.dumps(cards, ensure_ascii=False, sort_keys=True, separators=(",", ":")).replace("</", "<\\/")
+
+    def person_links(self, html):
+        """In markdown-rendered pages, a contributors-table name opens the contributor's card, as it does in the paper."""
+        for r in self.analysis["tables"]["contributors"]["rows"]:
+            h = esc(r["github"])
+            html = re.sub(rf'<td>{re.escape(esc(r["contributor"]))}</td>(\s*<td><a href="https://github\.com/{re.escape(h)}">)',
+                          lambda m: f'<td><a href="https://github.com/{h}" data-person="{h}">{esc(r["contributor"])}</a></td>{m.group(1)}', html)
+        return html
 
     def book_index(self):
         base = "../"

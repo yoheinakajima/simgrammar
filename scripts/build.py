@@ -53,7 +53,7 @@ from lib import (  # noqa: E402
     to_csv,
     vocab_terms,
 )
-from report_render import Context, render  # noqa: E402
+from report_render import Context, link_label, render  # noqa: E402
 from rules import RULES  # noqa: E402
 from web import build_web  # noqa: E402
 
@@ -277,11 +277,12 @@ def generated_blocks(ents, analysis, vocabs, registry) -> dict[str, str]:
     for name, s in vocabs["rubrics"]["scales"].items():
         ri.append(f"| `{name}` | {s['applies_to']} | {s['question']} |")
     blocks["rubric-index"] = "\n".join(ri)
-    # names only: run counts would change this committed block in every PR (the paper and book tables carry them)
-    cr = ["| contributor | github | first run |", "|---|---|---|"]
+    # names and links only: run counts would change this committed block in every PR (the paper and book tables carry them)
+    cr = ["| contributor | github | first run | links |", "|---|---|---|---|"]
     for row in analysis["tables"]["contributors"]["rows"]:
         h = row["github"]
-        cr.append(f"| {row['contributor']} | [{h}](https://github.com/{h}) | {row['first_run']} |")
+        links = " · ".join(f"[{link_label(u)}]({u})" for u in row["links"])
+        cr.append(f"| {row['contributor']} | [{h}](https://github.com/{h}) | {row['first_run']} | {links} |")
     blocks["contributors"] = "\n".join(cr)
     bl = [f"[{a}](https://sim.yohei.me/#appendix-d-contributors)" if a == "SimGrammar contributors" else a for a in analysis["byline"]]
     blocks["byline"] = "By " + (", ".join(bl[:-1]) + (", and " if len(bl) > 2 else " and ") + bl[-1] if len(bl) > 1 else "".join(bl)) + "."
