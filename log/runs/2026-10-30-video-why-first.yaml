@@ -1,0 +1,23 @@
+id: 2026-10-30-video-why-first
+type: run
+kind: synthesis
+date: '2026-10-30'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: make the videos'' end cards, end slates, and website descriptions
+  point viewers at the games and mechanics rather than at how the dataset is built.'
+method: 'An audit of the video scripts measured narration as 88 percent subject in episodes 1 to 10, with the process at
+  the edges: every episode ends on a slate reading "Every number in this video is checked against the open dataset each
+  time it is built", most end cards point at "the dataset, the paper, and every source", and the website reuses each
+  script''s Summary as the episode description, which for episodes 3, 11, and 12 led with method. The end cards of
+  episodes 1 to 9 now name what a viewer will find on the site for that episode''s subject (episodes 10 and 11 already
+  did; episode 12, which is about how the series is made, keeps its card). The end slate (scripts/video/assemble.py) now
+  says every game, mechanic, and technique in the video has a page with its sources, and so does the film''s closing
+  slate. The Summaries of episodes 3, 11, and 12 lead with what the episode is for. No narration changed, so no scene''s
+  narration digest moves and the episode pages flag nothing. The published videos keep their current closing frames until
+  they are next rendered: the end cards and slates are on-screen text, which this run does not re-render.'
+contract_version: '1.2'
+proposals: []

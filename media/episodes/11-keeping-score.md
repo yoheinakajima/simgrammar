@@ -2,7 +2,7 @@
 
 Target runtime about 11 minutes: about 1,180 words of narration at 135 words a minute, plus a beat of picture-only footage per scene. Covers book chapter 12. Footage: screen recordings of the dataset's prediction records, its predictions table, and its resolution brief; store pages and patch notes appear as generic mock-ups with no real title shown. No game footage. Every number below is filled in from the dataset when the script is built, and the sentences that interpret numbers carry the same checks as the book.
 
-**Summary.** How the dataset's predictions are written so they can lose, when they come due, and who is allowed to check them. Once results arrive, the scoreboard also tests whether the rankings behind the bets meant anything.
+**Summary.** Every bet in the series comes with a dated prediction that can lose. Here is how the predictions were written, when they come due, and who is allowed to check them. Once results arrive, the scoreboard also tests whether the rankings behind the bets meant anything.
 
 ## 1. Cold open (0:00 to 0:38)
 

@@ -142,4 +142,4 @@ Target runtime about 12 minutes: about 1,210 words of narration at 135 words a m
 
 **Voice.** Explaining a game from its own logs needs tools that already exist, and explanation is still the rarest thing any AI technique in this dataset does to a mechanic.{{assert:rarest_effect == Explains}} Next episode: the five ceilings that have shaped simulation games, starting with a refrigerator in The Sims.
 
-**On screen.** The dataset, the paper, and every source: simgrammar.com
+**On screen.** Every mechanic and how hard it is to read: simgrammar.com

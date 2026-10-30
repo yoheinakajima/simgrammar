@@ -2,7 +2,7 @@
 
 Target runtime about 11 minutes: about 1,190 words of narration at 135 words a minute, plus a beat of picture-only footage per scene. Covers book chapter 13. Footage: screen recordings of the repository, the build output, run records, and agents working in a terminal; a still of the Intellivision game Utopia. No other game footage. Every number below is filled in from the dataset when the script is built, and the sentences that interpret numbers carry the same checks as the book.
 
-**Summary.** How the dataset behind the series is built and checked: plain-text records, everything rebuilt on every change, rules that came from failures, a record of every run, and what the checks can't see. It ends on how anyone can extend it.
+**Summary.** Why the numbers in this series can be trusted. How the dataset behind it is built and checked: plain-text records, everything rebuilt on every change, rules that came from failures, a record of every run, and what the checks can't see. It ends on how anyone can extend it.
 
 ## 1. Cold open (0:00 to 0:38)
 
