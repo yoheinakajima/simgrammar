@@ -28,4 +28,4 @@ Vertical, about 55 seconds, about 100 words of narration. One finding, from the 
 
 ## 0:50 to 0:55. End card
 
-**On screen.** Episode 12: How this was made. sim.yohei.me
+**On screen.** Episode 12: How this was made. simgrammar.com

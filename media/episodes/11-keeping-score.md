@@ -120,4 +120,4 @@ Target runtime about 11 minutes: about 1,180 words of narration at 135 words a m
 
 **Voice.** Every number in this episode is computed from the dataset, so a version built after the first results will say something different. The last episode shows how that works, and why the sentence saying every prediction is still open will break the build the day one isn't.
 
-**On screen.** Every prediction and its criteria: sim.yohei.me
+**On screen.** Every prediction and its criteria: simgrammar.com

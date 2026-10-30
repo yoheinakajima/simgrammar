@@ -27,8 +27,8 @@ date: "2026-10-25"
 version: "0.2"
 # The website projection (scripts/web.py -> dist/web). Changing these changes generated pages.
 site:
-  url: "https://sim.yohei.me/"
-  domain: "sim.yohei.me"   # written to dist/web/CNAME; must match the DNS record
+  url: "https://simgrammar.com/"
+  domain: "simgrammar.com"   # written to dist/web/CNAME, shown on link previews and video end cards; must match the DNS record
   repo: "https://github.com/yoheinakajima/simgrammar"
   theme: "slate"                  # register.css data-theme on <html>
   family:                         # the "site family" bar: sister sites built on the same stylesheet

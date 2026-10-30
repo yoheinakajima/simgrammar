@@ -38,4 +38,4 @@ Vertical, about 55 seconds, about 100 words of narration. One finding, from tech
 
 ## 0:52 to 0:57. End card
 
-**On screen.** Episode 7: Where AI lands. sim.yohei.me
+**On screen.** Episode 7: Where AI lands. simgrammar.com

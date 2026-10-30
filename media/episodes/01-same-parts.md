@@ -138,6 +138,6 @@ Target runtime about 9 minutes: about 880 words of narration at 135 words a minu
 
 **Voice.** Try it on a game you love. List its parts, mark the ones it couldn't live without, and look up how many other games use each one. The ones that make it special will probably be rare.
 
-**On screen.** The dataset, the paper, and every source: sim.yohei.me.
+**On screen.** The dataset, the paper, and every source: simgrammar.com.
 
 **Voice.** Everything in this video comes from an open dataset, and every number on screen is checked against it each time it's built. Next episode: where these parts came from, and the handful of games that introduced the most of them.

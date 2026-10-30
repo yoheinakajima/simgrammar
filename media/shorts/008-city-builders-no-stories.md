@@ -30,4 +30,4 @@ Vertical, about 55 seconds, about 100 words of narration. One finding, from the 
 
 ## 0:46 to 0:51. End card
 
-**On screen.** Episode 8: Vacant lots. sim.yohei.me
+**On screen.** Episode 8: Vacant lots. simgrammar.com

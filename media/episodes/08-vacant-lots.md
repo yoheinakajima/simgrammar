@@ -122,4 +122,4 @@ Target runtime about 12 minutes: about 1,250 words of narration at 135 words a m
 
 **Voice.** Next episode turns the largest gaps, the missing techniques, and the five ceilings into {{count:opportunity}} bets, each with an experiment and a prediction with a date on it.
 
-**On screen.** The dataset, the sources, and the book: sim.yohei.me
+**On screen.** The dataset, the sources, and the book: simgrammar.com

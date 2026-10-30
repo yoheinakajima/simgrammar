@@ -130,4 +130,4 @@ Target runtime about 11 minutes: about 1,120 words of narration at 135 words a m
 
 **Voice.** The event-log bet carries its own prediction: an engine, a middleware vendor, or an open-source project ships a replay layer built for games with generative parts by the end of 2028.{{assert:field.event-sourced-sim-runtime.falsifiable_signal.resolve_by == 2028-12-31}} Until then, the techniques that leave the simulation reproducible, upscaling, cached rules, deterministic generators, are already shipping.{{assert:field.llm-rule-adjudication.maturity == shipped-niche}}{{assert:field.wave-function-collapse.maturity == shipped-niche}} The next episode is about how predictions like that one get checked, and who's allowed to check them.
 
-**On screen.** Every technique and its risks: sim.yohei.me
+**On screen.** Every technique and its risks: simgrammar.com

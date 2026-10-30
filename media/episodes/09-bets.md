@@ -136,4 +136,4 @@ Target runtime about 12 minutes: about 1,230 words of narration at 135 words a m
 
 **Voice.** Every one of the {{stat:n_predictions}} bets in the dataset carries a date, and the first ones come due on {{stat:first_prediction_resolves_spoken}}. Before that, the next episode is about how these ideas fail: the desync, the contradiction, and the bill.
 
-**On screen.** The dataset and every bet's record: sim.yohei.me
+**On screen.** The dataset and every bet's record: simgrammar.com

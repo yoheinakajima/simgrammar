@@ -19,7 +19,7 @@ import re
 
 from PIL import Image, ImageDraw, ImageFont
 
-from lib import ROOT
+from lib import ROOT, read_yaml
 
 W, H, ART, PAD = 1200, 630, 480, 56
 PAPER, PANEL, INK, MUTED, FAINT, RULE = (250, 250, 247), (238, 238, 233), (23, 23, 23), (85, 85, 79), (140, 140, 134), (200, 200, 194)
@@ -93,9 +93,10 @@ def card(eyebrow: str, title: str, desc: str, foot: str, icons: list[bytes]) -> 
     d.rectangle([0, 0, W - 1, H - 1], outline=INK, width=2)
     x, tw = ART + PAD, W - ART - 2 * PAD
     mark = font("Mono-Medium", 20)
-    d.text((W - PAD, PAD + 2), "sim.yohei.me", font=mark, fill=FAINT, anchor="ra")
+    domain = read_yaml(ROOT / "report" / "meta.yaml")["site"]["domain"]
+    d.text((W - PAD, PAD + 2), domain, font=mark, fill=FAINT, anchor="ra")
     eb = font("Mono-Medium", 22)
-    d.text((x, PAD), wrap(eyebrow, eb, tw - int(mark.getlength("sim.yohei.me")) - 24, 1)[0], font=eb, fill=MUTED)
+    d.text((x, PAD), wrap(eyebrow, eb, tw - int(mark.getlength(domain)) - 24, 1)[0], font=eb, fill=MUTED)
     for size in (64, 54, 46):
         tf = font("Sans-SemiBold", size)
         tl = wrap(title, tf, tw, 3)

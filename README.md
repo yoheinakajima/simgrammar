@@ -8,19 +8,19 @@ An open, machine-readable atlas of simulation game mechanics: which games use wh
 
 The repository is the research. The report, wiki, tables, graph, and site are projections of the same YAML files, rebuilt and checked on every commit, so they cannot disagree with each other.
 
-Live counts, downloads, and the research log: **[sim.yohei.me/data](https://sim.yohei.me/data/)**.
+Live counts, downloads, and the research log: **[simgrammar.com/data](https://simgrammar.com/data/)**.
 
 ## Read it
 
 | You want | Open |
 |---|---|
-| The website: paper with interactive figures, a page per record | **[sim.yohei.me](https://sim.yohei.me/)** |
-| The report (paper form) | [paper.md](https://sim.yohei.me/dist/paper/paper.md) · BibTeX: [references.bib](https://sim.yohei.me/dist/paper/references.bib) |
-| Every projection in one download | [simgrammar-dist.zip](https://sim.yohei.me/dist/simgrammar-dist.zip): tables, full records, graph, analysis, wiki, paper, manifest |
-| Tables | [games.csv](https://sim.yohei.me/dist/tables/games.csv), [mechanics.csv](https://sim.yohei.me/dist/tables/mechanics.csv), [edges.csv](https://sim.yohei.me/dist/tables/edges.csv), and the rest on the [data page](https://sim.yohei.me/data/) |
-| A graph | [nodes.jsonl](https://sim.yohei.me/dist/graph/nodes.jsonl), [edges.jsonl](https://sim.yohei.me/dist/graph/edges.jsonl), Cytoscape JSON, GraphML for Gephi |
+| The website: paper with interactive figures, a page per record | **[simgrammar.com](https://simgrammar.com/)** |
+| The report (paper form) | [paper.md](https://simgrammar.com/dist/paper/paper.md) · BibTeX: [references.bib](https://simgrammar.com/dist/paper/references.bib) |
+| Every projection in one download | [simgrammar-dist.zip](https://simgrammar.com/dist/simgrammar-dist.zip): tables, full records, graph, analysis, wiki, paper, manifest |
+| Tables | [games.csv](https://simgrammar.com/dist/tables/games.csv), [mechanics.csv](https://simgrammar.com/dist/tables/mechanics.csv), [edges.csv](https://simgrammar.com/dist/tables/edges.csv), and the rest on the [data page](https://simgrammar.com/data/) |
+| A graph | [nodes.jsonl](https://simgrammar.com/dist/graph/nodes.jsonl), [edges.jsonl](https://simgrammar.com/dist/graph/edges.jsonl), Cytoscape JSON, GraphML for Gephi |
 | The data behind any page | `data/` (one YAML file per record) and `log/runs/` (who added what, how) |
-| Integrity certificate | [manifest.json](https://sim.yohei.me/dist/manifest.json): per-record and dataset SHA-256 |
+| Integrity certificate | [manifest.json](https://simgrammar.com/dist/manifest.json): per-record and dataset SHA-256 |
 
 `dist/` is not committed. `make build` writes it locally (it also feeds the old explorer at `site/index.html`, served from the repository root, and `make sqlite`). CI builds it on every push, checks the build is deterministic, and publishes it with the site.
 
@@ -40,11 +40,11 @@ make check       # validate every rule, the report and record assertions, and th
 4. Scaffold what your run kind may create, for example `python scripts/new.py game <id> --run <run-id>` in a catalog run. Mechanics are created only in taxonomy runs; elsewhere, record a `new-mechanic` proposal (`tasks/propose-mechanic.md`).
 5. `make build && make check`, commit with `git commit -s`, and open a PR that links the issue. A PR carries one run and at most 10 records.
 
-High-value first contributions: verbatim quotes for existing claims (`tasks/source-claims.md`), Wayback snapshots for sources (`tasks/archive-sources.md`), store ids for games (`tasks/store-ids.md`), and independent, calibrated ratings of mechanic scores (`tasks/rate-scores.md`). The [verification queue](https://sim.yohei.me/dist/analysis/verification-queue.csv) lists records still waiting for sources.
+High-value first contributions: verbatim quotes for existing claims (`tasks/source-claims.md`), Wayback snapshots for sources (`tasks/archive-sources.md`), store ids for games (`tasks/store-ids.md`), and independent, calibrated ratings of mechanic scores (`tasks/rate-scores.md`). The [verification queue](https://simgrammar.com/dist/analysis/verification-queue.csv) lists records still waiting for sources.
 
 ### Contributors
 
-Built from the run log: you appear here when your first pull request merges. What each person's runs created, verified, and rated is in [appendix D of the paper](https://sim.yohei.me/#appendix-d-contributors). To be credited by name rather than handle, add yourself to `contributors` in [`report/meta.yaml`](report/meta.yaml).
+Built from the run log: you appear here when your first pull request merges. What each person's runs created, verified, and rated is in [appendix D of the paper](https://simgrammar.com/#appendix-d-contributors). To be credited by name rather than handle, add yourself to `contributors` in [`report/meta.yaml`](report/meta.yaml).
 
 <!-- BEGIN GENERATED: contributors -->
 | contributor | github | first run | links |

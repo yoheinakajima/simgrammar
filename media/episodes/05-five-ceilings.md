@@ -142,4 +142,4 @@ Target runtime about 12 minutes: about 1,260 words of narration at 135 words a m
 
 **Voice.** Next episode: what AI has shipped in games so far, starting in 2019 with a text adventure that had no rules at all, just a language model continuing the story.
 
-**On screen.** The dataset, the paper, and every source: sim.yohei.me
+**On screen.** The dataset, the paper, and every source: simgrammar.com

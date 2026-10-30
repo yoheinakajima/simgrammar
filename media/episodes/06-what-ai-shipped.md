@@ -138,4 +138,4 @@ Target runtime about 14 minutes: about 1,400 words of narration at 135 words a m
 
 **Voice.** Next episode counts every technique in the set, shipped or not, against every mechanic, and starts with the one shipped game that lets a language model write its rules.
 
-**On screen.** The dataset, the sources, and the book: sim.yohei.me
+**On screen.** The dataset, the sources, and the book: simgrammar.com
