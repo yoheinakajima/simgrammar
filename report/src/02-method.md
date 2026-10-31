@@ -27,7 +27,7 @@ Relations are typed edges with one owner each (`vocab/edge_types.yaml`). Inverse
 
 ### 2.4 Evidence
 
-Each entity carries an epistemic status. `asserted` means written from domain knowledge without a citation; `sourced` means at least one cited source supports its factual fields; `verified` requires a second, independent run. Techniques must always cite. At this version, {{stat:n_sourced_or_verified}} entities are sourced or verified and {{stat:n_asserted}} remain asserted; the asserted ones form a public verification queue (`dist/analysis/verification-queue.csv`).
+Each entity carries an epistemic status. `asserted` means written from domain knowledge without a citation; `sourced` means at least one cited source supports its factual fields; `verified` requires a second, independent run. Techniques must always cite. At this version, {{stat:n_sourced_or_verified}} entities are sourced or verified, {{stat:n_contested}} is contested, with both sides cited,{{assert:n_contested == 1}} and {{stat:n_asserted}} remain asserted; the asserted ones form a public verification queue (`dist/analysis/verification-queue.csv`).
 
 ### 2.5 Production
 
