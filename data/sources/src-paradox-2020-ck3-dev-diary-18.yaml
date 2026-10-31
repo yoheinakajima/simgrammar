@@ -1,0 +1,16 @@
+id: src-paradox-2020-ck3-dev-diary-18
+type: source
+name: 'CK3 Dev Diary #18 - Men-at-Arms, Mercenaries and CBs'
+kind: tech-report
+authors:
+- Voffvoffhunden
+venue: Paradox Interactive forums
+date: '2020-03-17'
+url: https://forum.paradoxplaza.com/forum/developer-diary/ck3-dev-diary-18-men-at-arms-mercenaries-and-cbs.1357939/
+archived: https://web.archive.org/web/20231210020225/https://forum.paradoxplaza.com/forum/developer-diary/ck3-dev-diary-18-men-at-arms-mercenaries-and-cbs.1357939/
+accessed: '2026-10-31'
+notes: 'Pre-release developer diary, read through the archived copy (the forum blocks automated readers). Men-at-arms regiments
+  have a capped number of slots and an upkeep cost that is small while unraised and much larger once raised for war; mercenaries
+  are hired for three years and no longer desert the moment the ruler goes into debt; casus belli costs.'
+provenance:
+  created: 2026-10-31-tag-audit-follow-up

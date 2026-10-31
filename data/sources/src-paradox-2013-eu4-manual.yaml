@@ -1,0 +1,16 @@
+id: src-paradox-2013-eu4-manual
+type: source
+name: Europa Universalis IV manual
+kind: docs
+authors:
+- Paradox Interactive
+venue: Steam (game manual PDF)
+date: '2013'
+url: https://cdn.cloudflare.steamstatic.com/steam/apps/236850/manuals/EuropaUniversalisIV_Manual_English.pdf
+accessed: '2026-10-31'
+notes: 'Official manual. The information bar shows the treasury balance and monthly income (section 3). Section 4.4 Economy
+  (pp. 36 to 38): income sources and expenses, everything from advisors to fleet maintenance costs, maintenance of colonies,
+  missionaries, armies, and navies can be cut, war taxes, inflation; loans are taken automatically when money runs out, debts
+  raise interest, and too much debt collapses into bankruptcy.'
+provenance:
+  created: 2026-10-31-tag-audit-follow-up

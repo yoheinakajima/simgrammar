@@ -12,7 +12,7 @@ Anno 1800では、職人の家が並ぶ通りが
 別の島から届く缶詰のグーラッシュを待っています。
 それを積んだ船は遅れています。
 どちらのゲームも生産チェーンで動いていて、
-データセットは2つを同じファミリーに入れています。
+データセットは2つを隣り合うファミリーに入れています。2つが1つにまとまるのは、およそ半分です。
 
 ## 2
 
@@ -41,9 +41,10 @@ Annoは需要のゲームです。
 珍しい部品の共有は、ポーズボタンの共有よりずっと重く数えます。
 生産チェーンは{{derived:production-chain.prevalence}}本にあるので軽く、
 ベルトコンベアは{{derived:conveyor-transport.prevalence}}本なので重く数えます。
-FactorioとAnno 1800は、Satisfactory、Captain of Industry、
-Manor Lords、Caesar III、Pharaohと同じファミリーに入ります。
-その中では珍しい部品のおかげで、Factorioはほかの工場ゲームのいちばん近くにいます。
+Factorioは、Satisfactory、Captain of Industryと同じファミリーに、
+Anno 1800は、Manor Lords、Caesar III、Pharaohと同じファミリーに入ります。
+珍しい部品のおかげでFactorioはほかの工場ゲームのいちばん近くにいるので、
+2つのファミリーが1つのクラスタになるのは、およそ半分だけです。
 
 ## 5
 
@@ -112,7 +113,7 @@ SimCityとSimCity 4、The SimsとThe Sims 4。
 ライバルの株を買い占めると勝ちです。
 カタログでこのメカニクスを最初に記録しているのは、Railroad Tycoonです。
 こうした古い交易ゲームは、工場ゲームとも弱くつながっています。
-FactorioがRailroad Tycoonと同じクラスタに入るのは、再標本化の約4回に3回。
+FactorioがRailroad Tycoonと同じクラスタに入るのは、再標本化の約5回に2回。
 Satisfactoryとは、すべてで同じです。
 
 ## 8

@@ -109,12 +109,26 @@ mechanics:
   role: supporting
   note: Pawns at research stations progress along a tech tree from tribal technologies to space-age
     ones, including the ship parts needed to leave.
+- id: production-chain
+  role: supporting
+  note: 'Workbench bills chain goods through stages: colonists make wort at the brewer table, leave it in fermenting
+    barrels for a while, and then harvest it as beer.'
 influenced_by:
 - dwarf-fortress
 store_ids:
   steam: 294100
+claims:
+- text: 'Since Alpha 15 (2016), beer takes several stages: wort made at the brewer table ferments in barrels
+    before it is harvested as beer.'
+  sources:
+  - src-ludeon-2016-rimworld-alpha-15
+  confidence: high
+  quote: 'Beer production now takes several stages: Colonists make wort (unfermented beer) at the brewer
+    table, then leave it in fermenting barrels for a while, after which they can harvest it as beer.'
+  locator: change list, Misc
 sources:
 - src-wikipedia-rimworld
+- src-ludeon-2016-rimworld-alpha-15
 status: sourced
 provenance:
   created: 2026-10-23-bootstrap
@@ -123,3 +137,4 @@ provenance:
   - 2026-10-25-contributor-readiness
   - 2026-10-25-store-ids-pilot
   - 2026-10-31-tag-audit
+  - 2026-10-31-tag-audit-follow-up

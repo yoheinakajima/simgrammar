@@ -40,7 +40,7 @@ Target runtime about 11 minutes: about 1,190 words of narration at 135 words a m
 
 **Picture.** A sentence from episode 1 on screen, with its hidden tokens revealed beneath it: a stat, two ranks, an assertion.
 
-**Frame.** record script=episodes/01-same-parts.md find="Four of them simulate nothing"
+**Frame.** record script=episodes/01-same-parts.md find="Five of those six simulate nothing"
 
 **Voice.** Sentences are the hard part, because they interpret numbers. So every number in this series is a token the build fills in, and every sentence that interprets one carries a check. When episode 1 first said the five most common parts don't simulate anything, the build checked all five ranks. Then a check of the catalog's tags found games that keep a treasury without the tag, the treasury moved into the five, and the build failed until the line was rewritten.
 

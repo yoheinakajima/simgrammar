@@ -100,15 +100,20 @@ mechanics:
   role: supporting
   note: Tax rates, fees, and ordinances fund the city, and city funds buy more map tiles as milestones
     are reached.
+- id: terraforming
+  role: supporting
+  note: The Terraforming tools shift, level, soften, and slope the terrain in game.
 influenced_by:
 - cities-skylines
 sources:
 - src-wikipedia-cities-skylines-2
 - src-paradox-2023-cs2-traffic-ai
 - src-paradox-2023-cs2-electricity-water
+- src-paradox-2023-cs2-city-services-1
 status: sourced
 provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-tag-audit
+  - 2026-10-31-tag-audit-follow-up

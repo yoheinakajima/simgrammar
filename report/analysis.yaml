@@ -13,10 +13,11 @@ whitespace:
   top_n: 30
 clustering:
   # k is not tuned. It is the smallest k in [k_min, k_max] whose mean subsample ARI reaches min_mean_ari, selected on
-  # 2026-10-25 (k=24), re-selected by the rule on 2026-10-31 (k=17, run 2026-10-31-tag-audit), and fixed here so a data
-  # PR does not reshuffle every cluster (ADR-0004). W107 warns when the rule would now pick another k; re-select only in
-  # a maintenance run, by the rule, and rewrite the prose it breaks.
-  k: 17
+  # 2026-10-25 (k=24), re-selected by the rule on 2026-10-31 (k=17, run 2026-10-31-tag-audit) and again the same day
+  # after further sourced tags (k=22, run 2026-10-31-tag-audit-follow-up), and fixed here so a data PR does not
+  # reshuffle every cluster (ADR-0004). W107 warns when the rule would now pick another k; re-select only in a
+  # maintenance run, by the rule, and rewrite the prose it breaks.
+  k: 22
   stability:
     k_min: 2
     k_max: 30

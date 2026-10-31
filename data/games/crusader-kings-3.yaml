@@ -122,13 +122,29 @@ mechanics:
   role: supporting
   note: 'Event, trigger, and effect scripts and game data files are moddable; total conversions replace the
     setting.'
+- id: budget-treasury
+  role: supporting
+  note: Vassals pay taxes in gold, and men-at-arms draw upkeep that rises sharply when they are raised for
+    war; a ruler can fall into debt.
+claims:
+- text: Men-at-arms regiments have capped slots and an upkeep cost that is small while unraised and much
+    larger once raised for war.
+  sources:
+  - src-paradox-2020-ck3-dev-diary-18
+  confidence: high
+  quote: 'You have a maximum number of Men-at-Arms regiment slots for your army, and in addition they have an
+    upkeep cost.'
+  locator: Men-at-Arms
 sources:
 - src-wikipedia-crusader-kings-3
 - src-paradoxwikis-2026-ck3-event-modding
 - src-pcgamesn-2022-victoria-3-nested-tooltips
+- src-paradox-2020-ck3-dev-diary-18
+- src-paradox-2020-ck3-dev-diary-17
 status: sourced
 provenance:
   created: 2026-10-24-catalog-gi
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-25-contributor-readiness
+  - 2026-10-31-tag-audit-follow-up

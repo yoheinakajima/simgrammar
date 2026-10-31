@@ -88,9 +88,20 @@ mechanics:
   role: supporting
   note: Workers mine iron, quarry rock, and cut forests on land set aside for them, so extraction
     competes with housing for space.
+- id: production-chain
+  role: supporting
+  note: Mines yield iron ore and coal, and blacksmiths turn them into iron tools or longer-lasting steel
+    tools; each chain is a single workshop step after extraction.
 store_ids:
   steam: 242920
 claims:
+- text: Mines yield coal as well as iron ore, and blacksmiths use the coal to make steel tools that last
+    longer than iron tools.
+  sources:
+  - src-shiningrock-2013-this-week-in-review
+  confidence: high
+  quote: 'Coal can also be used in by blacksmiths to make steel tools which last longer than iron tools.'
+  locator: second paragraph
 - text: Banished is credited with starting the survival city-builder trend.
   sources:
   - src-wikipedia-city-building-game
@@ -99,6 +110,7 @@ sources:
 - src-wikipedia-banished
 - src-steam-2026-banished
 - src-wikipedia-city-building-game
+- src-shiningrock-2013-this-week-in-review
 status: sourced
 provenance:
   created: 2026-10-24-catalog-ga
@@ -106,3 +118,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-25-store-ids-pilot
   - 2026-10-31-tag-audit
+  - 2026-10-31-tag-audit-follow-up

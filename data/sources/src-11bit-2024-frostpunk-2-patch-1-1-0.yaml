@@ -1,0 +1,17 @@
+id: src-11bit-2024-frostpunk-2-patch-1-1-0
+type: source
+name: Frostpunk 2 | PATCH 1.1.0 - 21/10/2024
+kind: docs
+authors:
+- 11 bit studios
+venue: Steam (Frostpunk 2 announcements)
+date: '2024-10-21'
+url: https://store.steampowered.com/news/app/1601580/view/6212244583190849562
+accessed: '2026-10-31'
+notes: 'Developer patch notes, read through the Steam news API (the store page renders the text with JavaScript). Under
+  Gameplay, new Consequence Arcs await the Steward when conditions occur, such as keeping the generator off too long while
+  fuel is available, promoting a faction only to raise funds afterwards, repeatedly failing promise quests for a hostile
+  faction, or quelling a protest after negotiating and making a promise; Story Arcs and other events now unlock properly
+  after a Civil War in Utopia Builder.'
+provenance:
+  created: 2026-10-31-tag-audit-follow-up
