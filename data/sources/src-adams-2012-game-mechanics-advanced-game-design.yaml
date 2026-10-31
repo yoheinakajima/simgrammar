@@ -1,0 +1,18 @@
+id: src-adams-2012-game-mechanics-advanced-game-design
+type: source
+name: 'Game Mechanics: Advanced Game Design'
+kind: book
+authors:
+- Ernest Adams
+- Joris Dormans
+venue: New Riders (Voices That Matter)
+date: '2012-06-15'
+url: https://www.peachpit.com/store/game-mechanics-advanced-game-design-9780321820273
+isbn: 978-0-321-82027-3
+accessed: '2026-10-31'
+notes: 'Publisher page with description and table of contents; the book itself was not read. Covers designing
+  mechanics for balanced gameplay, visualizing a game''s internal economy, and simulating mechanics before
+  implementation with Dormans'' Machinations framework (chapter 5 on diagram elements and node types, a quick-reference
+  appendix, a Machinations design pattern language) and simulated playtests for balancing (chapter 8).'
+provenance:
+  created: 2026-10-31-paper-related-work

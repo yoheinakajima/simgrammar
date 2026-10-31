@@ -1,0 +1,17 @@
+id: src-frasca-2003-simulation-versus-narrative
+type: source
+name: 'Simulation versus Narrative: Introduction to Ludology'
+kind: book
+authors:
+- Gonzalo Frasca
+venue: The Video Game Theory Reader, ed. Mark J. P. Wolf and Bernard Perron, Routledge
+date: '2003'
+url: https://www.cs.oswego.edu/~alex/teaching/csc430/readings/VGT_final.pdf
+isbn: '0415965799'
+accessed: '2026-10-31'
+notes: 'Chapter. Read the author''s final manuscript (header: completed and in press) in a course copy, because
+  the author''s site (ludology.org) no longer serves it; book details from Open Library. Defines simulating
+  as modelling a source system through a different system which maintains to somebody some of the behaviors
+  of the original system, and argues that the storytelling model of games is inaccurate and limits analysis.'
+provenance:
+  created: 2026-10-31-paper-related-work

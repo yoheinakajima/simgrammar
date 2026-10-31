@@ -9,7 +9,9 @@ A **mechanic** here is a rule-system that passes four admission tests (CONTRACT.
 - **Tunable.** It has at least two levers.
 - **Removable.** A game could drop it and keep running.
 
-The tests exclude two common confusions. Dynamics such as "cascading failure" or "death spiral" are outcomes of coupled mechanics, so they appear in mechanics' `dynamics` fields rather than as entities. Genre-level patterns such as "colony management" are combinations, so they appear as game decompositions or opportunities. The result sits between the MDA framework's *mechanics* layer and a designer's pattern language: concrete enough to implement, general enough to recur.
+Interface mechanics pass the atomic test on presentation state. An inspector owns its selected agent and the fields it exposes ([[agent-inspection]]), an alert feed owns its list of active alerts with their severities and lifetimes ([[alerts-feed]]), and an overlay owns which map mode is shown and the color ramp it draws through ([[data-overlays]]); each updates that state from simulation state that other mechanics own, which is the sense in which §4.1 says they own no simulation state of their own.{{assert:field.agent-inspection.family == information-legibility}}{{assert:field.alerts-feed.family == information-legibility}}{{assert:field.data-overlays.family == information-legibility}}
+
+The tests exclude two common confusions. Dynamics such as "cascading failure" or "death spiral" are outcomes of coupled mechanics, so they appear in mechanics' `dynamics` fields rather than as entities. Genre-level patterns such as "colony management" are combinations, so they appear as game decompositions or opportunities. The result sits between the MDA framework's *mechanics* layer and a designer's pattern language: concrete enough to implement, general enough to recur (§1.1).
 
 Each mechanic belongs to one of {{stat:n_families}} families, assigned by the state it owns rather than the genre it appears in: [[weather]] is environment, [[labor-market]] is economy, [[agent-inspection]] is information.
 
@@ -25,7 +27,7 @@ Relations are typed edges with one owner each (`vocab/edge_types.yaml`). Inverse
 
 ### 2.4 Evidence
 
-Each entity carries an epistemic status. `asserted` means written from domain knowledge without a citation; `sourced` means at least one cited source supports its factual fields; `verified` requires a second, independent run. Techniques must always cite. At this version, {{stat:n_sourced_or_verified}} entities are sourced or verified and {{stat:n_asserted}} remain asserted; the asserted ones form a public verification queue (`dist/analysis/verification-queue.csv`).
+Each entity carries an epistemic status. `asserted` means written from domain knowledge without a citation; `sourced` means at least one cited source supports its factual fields; `verified` requires a second, independent run. Techniques must always cite. At this version, {{stat:n_sourced_or_verified}} entities are sourced or verified, {{stat:n_contested}} is contested, with both sides cited,{{assert:n_contested == 1}} and {{stat:n_asserted}} remain asserted; the asserted ones form a public verification queue (`dist/analysis/verification-queue.csv`).
 
 ### 2.5 Production
 

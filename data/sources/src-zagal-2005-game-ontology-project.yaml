@@ -1,0 +1,22 @@
+id: src-zagal-2005-game-ontology-project
+type: source
+name: Towards an Ontological Language for Game Analysis
+kind: paper
+authors:
+- José P. Zagal
+- Michael Mateas
+- Clara Fernández-Vara
+- Brian Hochhalter
+- Nolan Lichti
+venue: 'Proceedings of DiGRA 2005 Conference: Changing Views: Worlds in Play'
+date: '2005'
+url: https://dl.digra.org/index.php/dl/article/view/136
+doi: 10.26503/dl.v2005i1.136
+accessed: '2026-10-31'
+notes: 'Read the DiGRA landing page and the full-text PDF. Introduces the Game Ontology Project, a hierarchy
+  of game concepts abstracted from black-box analysis of many games with methods from prototype theory and
+  grounded theory, grown middle-out. Top level: interface, rules, goals, entities, entity manipulation. Each
+  entry has a name, a description, strong and weak example games, a parent, children, and part-of elements.
+  Organizes design elements, not games, and gives no design advice.'
+provenance:
+  created: 2026-10-31-paper-related-work

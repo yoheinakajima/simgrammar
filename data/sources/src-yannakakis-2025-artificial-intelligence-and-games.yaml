@@ -1,0 +1,18 @@
+id: src-yannakakis-2025-artificial-intelligence-and-games
+type: source
+name: Artificial Intelligence and Games (second edition)
+kind: book
+authors:
+- Georgios N. Yannakakis
+- Julian Togelius
+venue: Springer
+date: '2025'
+url: https://gameaibook.org/
+doi: 10.1007/978-3-031-83347-2
+accessed: '2026-10-31'
+notes: 'Read the authors'' companion site and its table of contents (gameaibook.org/toc); the book itself was
+  not read. The textbook is organized around AI that plays games, generates their content, and models their
+  players, with background, frontier, and ethics parts. The first edition is Springer 2018 (Open Library, ISBN
+  9783319635187); Springer''s pages require a login cookie and were not read.'
+provenance:
+  created: 2026-10-31-paper-related-work

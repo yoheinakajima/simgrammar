@@ -1,0 +1,21 @@
+id: src-perez-liebana-2018-gvgai
+type: source
+name: 'General Video Game AI: a Multi-Track Framework for Evaluating Agents, Games and Content Generation Algorithms'
+kind: preprint
+authors:
+- Diego Perez-Liebana
+- Jialin Liu
+- Ahmed Khalifa
+- Raluca D. Gaina
+- Julian Togelius
+- Simon M. Lucas
+venue: arXiv (accepted by IEEE Transactions on Games)
+date: '2018-02-28'
+arxiv: '1802.10363'
+accessed: '2026-10-31'
+notes: 'Read the arXiv abstract page (v4, revised 22 February 2019). Reviews the GVGAI framework, released in
+  2014: an open-source platform whose games are written in VGDL, with tracks for agents that play unknown games
+  with or without a forward model and for agents that generate levels or rules, and its use in research, education
+  and competitions.'
+provenance:
+  created: 2026-10-31-paper-related-work

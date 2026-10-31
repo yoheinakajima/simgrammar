@@ -1,0 +1,19 @@
+id: src-bjork-2003-game-design-patterns
+type: source
+name: Game Design Patterns
+kind: paper
+authors:
+- Staffan Björk
+- Sus Lundgren
+- Jussi Holopainen
+venue: 'Proceedings of DiGRA 2003 Conference: Level Up'
+date: '2003'
+url: https://dl.digra.org/index.php/dl/article/view/60
+doi: 10.26503/dl.v2003i1.60
+accessed: '2026-10-31'
+notes: 'Read the DiGRA landing page and the full-text PDF. Game design patterns describe recurring interaction
+  relevant to gameplay, beside a structural framework of game components. A pattern has a name, a description,
+  consequences, notes on using it, and relations to superior patterns, subpatterns, and potentially conflicting
+  patterns; the collection forms a network with several base nodes. The authors report over 200 patterns identified.'
+provenance:
+  created: 2026-10-31-paper-related-work

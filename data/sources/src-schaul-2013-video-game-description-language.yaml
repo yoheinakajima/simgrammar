@@ -1,0 +1,16 @@
+id: src-schaul-2013-video-game-description-language
+type: source
+name: A Video Game Description Language for Model-based or Interactive Learning
+kind: paper
+authors:
+- Tom Schaul
+venue: IEEE Conference on Computational Intelligence in Games (CIG 2013)
+date: '2013'
+url: https://schaul.site44.com/publications/pyvgdl.pdf
+accessed: '2026-10-31'
+notes: 'Author''s PDF. PyVGDL describes a 2D arcade-style game by a sprite set, a level mapping, an interaction
+  set (the effect when two sprite types collide) and a termination set, drawing on an ontology of building
+  blocks; its library parses and instantly plays a description and gives learning and planning agents visual
+  or abstract observations. The venue is from the py-vgdl README (github.com/schaul/py-vgdl).'
+provenance:
+  created: 2026-10-31-paper-related-work
