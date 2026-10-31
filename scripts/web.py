@@ -29,15 +29,20 @@ from pathlib import Path
 
 from markdown_it import MarkdownIt
 
-from lib import ROOT, get_path, narration_digest, read_yaml, vocab_terms
-from report_render import GITHUB_HANDLE_RE, _decl_rows, _fmt, link_label, render
+from lib import ROOT, counted, get_path, narration_digest, read_yaml, vocab_terms
+from report_render import GITHUB_HANDLE_RE, VOCAB_COLUMNS, _decl_rows, _fmt, link_label, render, table_value
 
 WEB_SRC = ROOT / "web"
 # The primary nav leads with the subject; the paper is one tab among them. Sources, find, and how the atlas is made sit in the utility nav.
-NAV = [("game", "Games", "game/"), ("mechanic", "Mechanics", "mechanic/"), ("technique", "Techniques", "technique/"), ("opportunity", "Opportunities", "opportunity/"),
+# Readers meet opportunity records as bets (the home page and the book call them that); the URLs and the paper keep the record type's name.
+READER_NAME = {"opportunity": ("bet", "bets")}
+NAV = [("game", "Games", "game/"), ("mechanic", "Mechanics", "mechanic/"), ("technique", "Techniques", "technique/"), ("opportunity", "Bets", "opportunity/"),
        ("watch", "Watch", "watch/"), ("book", "Book", "book/"), ("paper", "Paper", "paper/")]
 UTILITY = [("find", "find", "find/"), ("source", "sources", "source/"), ("about", "about", "about/")]
 FAVICON = "free-placement"   # the icon the browser tab shows
+# The front page's lead, also its link-preview description: what the atlas is for a reader, where the paper's subtitle says it for a scholar.
+LEAD = ("Every simulation game is assembled from a shared set of parts: production chains, needs, markets, weather, raids. Naming the parts shows "
+        "why games feel alike, which combinations no one has built yet, and where AI can change how a game plays.")
 STATE = {"asserted": "optional", "sourced": "waiting", "verified": "done", "contested": "blocked"}
 SKIP_FACTS = {"id", "type", "name", "aliases", "summary", "status", "provenance", "sources", "claims", "deprecated", "key_results", "falsifiable_signal",
               "assertions", "ratings", "store_ids", "archived"}
@@ -46,9 +51,6 @@ STORE_URL = {"steam": "https://store.steampowered.com/app/{}/", "igdb": "https:/
 LONG = {"game": ["core_loop", "design_notes"], "mechanic": ["definition", "player_experience"], "technique": ["mechanism"],
         "opportunity": ["thesis", "design_sketch", "validation_experiment"], "source": ["notes"]}
 LISTS = {"mechanic": ["design_levers", "failure_modes", "dynamics", "open_questions"], "technique": ["limitations"], "opportunity": ["key_risks"]}
-VOCAB_COLUMNS = {"family": "mechanic_family", "family_a": "mechanic_family", "family_b": "mechanic_family", "subgenre": "subgenre",
-                 "maturity": "technique_maturity", "category": "technique_category", "effect": "effect", "opportunity_type": "opportunity_type",
-                 "horizon": "horizon", "kind": "source_kind"}
 
 
 def esc(s) -> str:
@@ -103,7 +105,8 @@ class Web:
                 if said[sc["name"]]:   # the title card has no narration and is not a scene to jump to
                     scenes.append({**sc, "end": ep["scenes"][k + 1]["start"] if k + 1 < len(ep["scenes"]) else ep["seconds"], "voice": said[sc["name"]],
                                    "changed": narration_digest(" ".join(said[sc["name"]])) != sc["said"]})
-            ep = {**ep, "n": int(ep["key"].rsplit("-", 1)[1]), "title": title.group(1), "summary": summary.group(1).strip(), "covers": [int(x) for x in re.findall(r"\d+", covers.group(1))], "scenes": scenes}
+            ep = {**ep, "n": int(ep["key"].rsplit("-", 1)[1]), "title": title.group(1), "summary": summary.group(1).strip(), "covers": [int(x) for x in re.findall(r"\d+", covers.group(1))], "scenes": scenes,
+                  "tracks": self.subtitle_tracks(ep, md, scenes)}
             self.episodes.append(ep)
             for sc in scenes:
                 for i, t in sorted(sc["shows"].items(), key=lambda kv: (kv[1], kv[0])):
@@ -136,6 +139,27 @@ class Web:
             self.edges_in[ed.target].append(ed)
         self.vt = {}
         self.runs = {e.id: e for e in ents.get("run", [])}
+
+    SUBTITLE_LABELS = {"ja": "日本語"}   # the languages media/subtitles/ holds, by the label a player's menu shows
+
+    def subtitle_tracks(self, ep, md, voiced):
+        """An episode's subtitle tracks, [(lang, label, path under the site root, WebVTT)], timed from its render as
+        media/published.yaml records it (subtitles.vtt). A track is left out, with a note on the build's output, when its
+        cues do not fit the render, or when a scene's narration has changed since the render (its cues carry the new wording)."""
+        import sys
+        import subtitles
+        out = []
+        for lang, label in self.SUBTITLE_LABELS.items():
+            src = self.built.get(f"media/subtitles/{lang}/{ep['script']}")
+            if not src:
+                continue
+            text, problems = subtitles.vtt(ep["scenes"], ep["seconds"], subtitles.scene_numbers(md), src)
+            problems += [f"scene '{sc['name']}' is worded differently from the render" for sc in voiced if sc["changed"]]
+            if problems:
+                print(f"web: {ep['key']} {lang} subtitles not offered: {'; '.join(problems)}", file=sys.stderr)
+                continue
+            out.append((lang, label, f"media/subtitles/{lang}/{ep['key']}.vtt", text))
+        return out
 
     # ------------------------------------------------------------------ helpers
     def term(self, vname, t):
@@ -315,7 +339,9 @@ class Web:
         t = self.analysis["tables"].get(name)
         if t is None:
             return None
-        return self.table(t["columns"], [c.replace("_", " ") for c in t["columns"]], t["rows"], base, link_cols=t.get("link_columns", []),
+        links = set(t.get("link_columns", []))
+        rows = [{c: v if c in links else table_value(ctx, name, c, v) for c, v in r.items()} for r in t["rows"]]
+        return self.table(t["columns"], [c.replace("_", " ") for c in t["columns"]], rows, base, link_cols=t.get("link_columns", []),
                           caption=t["description"], cap=t.get("max_links"), name=name)
 
     # ------------------------------------------------------------------ figures
@@ -361,7 +387,7 @@ class Web:
                 f'<div class="chart-body">{self.scroller(v)}</div>{v.get("legend", "")}'
                 f'<p class="live" data-readout aria-live="polite" hidden></p>'
                 f'<p class="chart-caption" id="cap-{name}">{esc(v["caption"])} <span class="run">source · {esc(v["source"])} · dataset {self.short}</span></p>'
-                f'<details class="disclosure"><summary>plain-text twin · {nrows} rows</summary><p class="small muted">{esc(tw["note"])}</p>{twin}</details>'
+                f'<details class="disclosure"><summary>plain-text twin · {counted(nrows, "row")}</summary><p class="small muted">{esc(tw["note"])}</p>{twin}</details>'
                 f'{v["data"]}</figure>')
 
     # ------------------------------------------------------------------ paper
@@ -431,7 +457,7 @@ class Web:
   <p class="eyebrow"><span class="id">v{esc(meta['version'])}</span> <span>{esc(meta['date'])}</span> <span>dataset <b>{self.short}</b></span> <span>contract {esc(man['contract_version'])}</span></p>
   <h1>{esc(meta['title'])}</h1>
   <p class="dek">{esc(meta['subtitle'])}.</p>
-  <div class="meta"><span><b>{authors_html}</b></span><span>{counts['game']} games</span><span>{counts['mechanic']} mechanics</span><span>{counts['technique']} techniques</span><span>{counts['opportunity']} opportunities</span><span>{counts['source']} sources</span><span>{man['edges']} typed edges</span><span>{nruns} research runs</span></div>
+  <div class="meta"><span><b>{authors_html}</b></span>{"".join(f"<span>{counted(counts[t], t)}</span>" for t in ("game", "mechanic", "technique", "opportunity", "source"))}<span>{counted(man['edges'], "typed edge")}</span><span>{counted(nruns, "research run")}</span></div>
   <div class="actions"><a class="btn" href="#abstract" data-internal>Read the paper</a><a class="btn" data-style="ghost" href="../about/" data-internal>How it is made</a><a class="btn" data-style="ghost" href="{esc(self.site['repo'])}">Contribute on GitHub</a></div>
   <div class="twins"><b>this paper as</b><a href="../paper.md" data-internal>markdown</a><a href="../references.bib" data-internal>bibtex</a><a href="../manifest.json" data-internal>manifest json</a><a href="../llms.txt" data-internal>llms.txt</a></div>
 </div>"""
@@ -440,7 +466,7 @@ class Web:
 <article class="prose" style="min-width:0">
 <details class="disclosure show-md" data-toc-mobile><summary>contents · {len(toc)} sections</summary><nav class="toc" aria-label="Contents">{tocs}</nav></details>
 {body}
-<section class="section" id="references"><div class="section-line"><h2>references <span>· {len(refs)} cited in the text</span></h2><a href="../source/" data-internal>all {counts['source']} sources</a></div>
+<section class="section" id="references"><div class="section-line"><h2>references <span>· {len(refs)} cited in the text</span></h2><a href="../source/" data-internal>all {counted(counts['source'], "source")}</a></div>
 <div class="register" data-kind="refs">{''.join(refs)}</div></section>
 <section class="section cite" id="cite"><div class="section-line"><h2>cite</h2><span>bibtex</span></div>
 <div class="cite-line"><span class="chip">{esc(authors)}</span><span class="chip">{esc(meta['date'][:4])}</span><span class="chip">v{esc(meta['version'])}</span><span class="chip">dataset {self.short}</span></div>
@@ -486,10 +512,14 @@ class Web:
         counts = self.counts()
         findings = [
             (f'{st["pct_uses_since_2010_on_pre2001"]:.0f}%', "of the parts in games since 2010 were already in a game by 2000", "5.2"),
-            (f'{st["rho_legibility_emergence_potential"]}', "the more stories a mechanic makes, the harder it is to read (ρ)", "5.6"),
-            (f'{st["pct_uses_on_zero_exposure"]:.0f}%', "of mechanic uses sit where no AI technique reaches yet", "8.2"),
+            # the paper's wording: legibility falls as emergence potential, the unscripted variety a mechanic generates, rises
+            (f'{st["rho_legibility_emergence_potential"]}', "mechanics that generate more unscripted variety are rated harder to read (ρ)", "5.6"),
+            # exposure is zero exactly when no technique record has an affects edge to the mechanic
+            (f'{st["pct_uses_on_zero_exposure"]:.0f}%', "of mechanic uses fall on mechanics that no technique in this dataset is linked to", "8.2"),
             (f'{st["n_technique_runtime_breaks"]} of {st["n_technique_runtime"]}', "AI techniques that run during play break exact replay", "6.4"),
         ]
+        # register.css pads every number but the first on its left, so when the strip wraps to two rows on a phone the second
+        # row starts indented. A hidden empty number in front makes every finding a following number: all four pad alike.
         nums = "".join(f'<div class="number"><b>{esc(v)}</b><span>{esc(lab)}</span><small><a href="paper/#{self.paper_anchor(sec)}" data-internal>§{sec}</a></small></div>'
                        for v, lab, sec in findings)
         live = lambda t: [e for e in self.ents.get(t, []) if not e.data.get("deprecated")]
@@ -507,7 +537,7 @@ class Web:
         game_sec = self.section_link("start with a game you know", '<p class="small muted">Each game drawn as the parts it is built from, core parts first. '
                                      'Open one to see how it does each part, and which other games share them.</p>'
                                      f'<div class="register" data-kind="parts">{"".join(game_row(self.by_id[i]) for i in games)}</div>',
-                                     "game/", f"all {counts['game']} games")
+                                     "game/", f"all {counted(counts['game'], 'game')}")
         watch = ""
         if self.episodes or self.shorts:
             eps = "".join(f'<div class="row">{self.episode_figure(ep, base, 480, self.ep_url(ep, base))}<p class="eyebrow"><span class="id">episode {ep["n"]}</span> '
@@ -516,16 +546,16 @@ class Web:
             shorts = "".join(self.short_tile(sh, base) for sh in self.shorts[:4])
             watch = self.section_link("watch", (f'<div class="register" data-kind="episodes">{eps}</div>' if eps else "")
                                       + (f'<div class="register" data-kind="watch">{shorts}</div>' if shorts else ""),
-                                      "watch/", f"{len(self.episodes)} episodes and {len(self.shorts)} shorts")
+                                      "watch/", f"{counted(len(self.episodes), 'episode')} and {counted(len(self.shorts), 'short')}")
         mat = {t: i for i, t in enumerate(["shipped-mainstream", "shipped-niche", "prototype", "research"])}
         techs = sorted(live("technique"), key=lambda e: (mat.get(e.data.get("maturity"), 9), -self.derived.get(e.id, {}).get("affects_count", 0), e.data["name"]))[:6]
         tech_sec = self.section_link("ai that already reaches games", '<p class="small muted">The techniques furthest along in shipped games, and the mechanics each one changes.</p>'
-                                     + self.board([e.id for e in techs], base), "technique/", f"all {counts['technique']} techniques")
+                                     + self.board([e.id for e in techs], base), "technique/", f"all {counted(counts['technique'], 'technique')}")
         ops = sorted(live("opportunity"), key=lambda e: (-(self.derived.get(e.id, {}).get("priority") or 0), e.data["name"]))[:4]
         op_sec = self.section_link("what could be built next", '<p class="small muted">Design bets ranked by impact, feasibility, and novelty. Each one names a test a small team '
                                    'could run and a dated prediction anyone can check.</p>'
                                    + self.board([e.id for e in ops], base, lambda e: f'{self.term("horizon", e.data.get("horizon")).lower()} · resolves by {e.data.get("falsifiable_signal", {}).get("resolve_by", "")}'),
-                                   "opportunity/", f"all {counts['opportunity']} bets")
+                                   "opportunity/", f"all {counted(counts['opportunity'], 'bet')}")
         parts, cur = [], None
         for line in self.built.get("book/00-contents.md", "").splitlines():
             if line.startswith("## "):
@@ -547,15 +577,15 @@ class Web:
         header = f"""<div class="page-header corners">
   <p class="eyebrow"><span class="id">atlas</span> <span>simulation games, part by part</span></p>
   <h1>{esc(meta['title'])}</h1>
-  <p class="dek">Every simulation game is assembled from a shared set of parts: production chains, needs, markets, weather, raids. Naming the parts shows why games feel alike, which combinations no one has built yet, and where AI can change how a game plays.</p>
-  <div class="meta"><span><b>{self.byline_html(base)}</b></span><span>{counts['game']} games</span><span>{counts['mechanic']} mechanics</span><span>{counts['technique']} techniques</span><span>{counts['opportunity']} bets</span></div>
+  <p class="dek">{esc(LEAD)}</p>
+  <div class="meta"><span><b>{self.byline_html(base)}</b></span><span>{counted(counts['game'], 'game')}</span><span>{counted(counts['mechanic'], 'mechanic')}</span><span>{counted(counts['technique'], 'technique')}</span><span>{counted(counts['opportunity'], 'bet')}</span></div>
   <div class="actions"><a class="btn" href="game/" data-internal>Browse the games</a><a class="btn" data-style="ghost" href="watch/" data-internal>Watch the series</a><a class="btn" data-style="ghost" href="book/" data-internal>Read the book</a><a class="btn" data-style="ghost" href="paper/" data-internal>Read the paper</a></div>
 </div>
-<div class="numbers">{nums}</div>
+<div class="numbers"><div class="number" hidden></div>{nums}</div>
 <p class="small faint">four findings from the paper; each links to the section that makes the case</p>
 {self.mosaic(base)}"""
         body = header + game_sec + watch + tech_sec + op_sec + book_sec + paper_sec
-        return self.page(title=f"{meta['title']} · simgrammar", desc=f"{meta['subtitle']}.", body=body, depth=0, nav="", path="")
+        return self.page(title=f"{meta['title']} · simgrammar", desc=LEAD, body=body, depth=0, nav="", path="")
 
     # ------------------------------------------------------------------ shorts and the book
     @staticmethod
@@ -572,9 +602,11 @@ class Web:
         return t.replace("**", "").replace("*", "")
 
     def short_figure(self, sh, base, width=270):
+        """A short's poster, which plays in place. Its opening frame states the finding in its lower lines, so the play
+        label sits under the picture instead of on it, and the tile's eyebrow gives the length as well."""
         return (f'<figure class="image" data-ratio="9/16"><a class="frame" href="{base}media/shorts/{esc(sh["file"])}" data-play>'
                 f'<img src="{base}media/shorts/{esc(sh["poster"])}" width="{width}" height="{round(width * 16 / 9)}" alt="Short {sh["n"]}: {esc(sh["title"])}, opening frame" loading="lazy">'
-                f'<span class="plate" data-size="sm">play · {self.mmss(sh["seconds"])}</span></a></figure>')
+                f'</a><figcaption><span>play · {self.mmss(sh["seconds"])}</span></figcaption></figure>')
 
     def watch_section(self, e, base):
         ss = self.shorts_of.get(e.id, [])
@@ -585,7 +617,7 @@ class Web:
             f'<h3>{esc(sh["title"])}</h3><details class="disclosure" open><summary>transcript</summary>{"".join(f"<p>{self.voice_html(v, base)}</p>" for v in sh["voice"])}</details>'
             + (f'<p class="small faint">also on the pages for</p>{self.chips([i for i in sh["shows"] if i != e.id], base)}' if len(sh["shows"]) > 1 else "")
             + "</div></div>" for sh in ss)
-        return self.section("watch", blocks, f'{len(ss)} short{"s" if len(ss) > 1 else ""} with this record on screen')
+        return self.section("watch", blocks, f'{counted(len(ss), "short")} with this record on screen')
 
     # ------------------------------------------------------------------ episodes
     @staticmethod
@@ -621,13 +653,17 @@ class Web:
         """An episode at 16:9. On its own page, the title card, which becomes the video; elsewhere, the frame with the most
         records on screen, linking the episode page."""
         h = round(width * 9 / 16)
-        if link:
+        if link:   # the frame carries the episode's caption along its foot, so no plate sits on it; the eyebrow beside it gives the length
             return (f'<figure class="image" data-ratio="16/9"><a class="frame" href="{link}" data-internal>'
                     f'<img src="{base}media/episodes/{esc(ep["thumb"])}" width="{width}" height="{h}" alt="Episode {ep["n"]}: {esc(ep["title"])}, a frame from the episode" loading="lazy">'
-                    f'<span class="plate" data-size="sm">{self.mmss(ep["seconds"])}</span></a></figure>')
+                    f'</a></figure>')
+        # the subtitle tracks wait in a template, which simgrammar.js moves into the video it makes; without script each file is a link
+        tracks = "".join(f'<track kind="subtitles" srclang="{lang}" label="{esc(label)}" src="{base}{path}">' for lang, label, path, _ in ep["tracks"])
+        subs = " ".join(f'<a href="{base}{path}" hreflang="{lang}" lang="{lang}">{esc(label)}</a>' for lang, label, path, _ in ep["tracks"])
         return (f'<figure class="image" data-ratio="16/9"><a class="frame" href="{base}media/episodes/{esc(ep["file"])}" data-play="episode" data-internal>'
                 f'<img src="{base}media/episodes/{esc(ep["poster"])}" width="{width}" height="{h}" alt="Episode {ep["n"]}: {esc(ep["title"])}, title card">'
-                f'<span class="plate">play · {self.mmss(ep["seconds"])}</span></a><figcaption><span class="provenance">captions in the picture</span></figcaption></figure>')
+                f'<span class="plate">play · {self.mmss(ep["seconds"])}</span></a>' + (f'<template data-tracks>{tracks}</template>' if tracks else "")
+                + f'<figcaption><span class="provenance">captions in the picture</span>' + (f'<span>subtitles · {subs}</span>' if subs else "") + '</figcaption></figure>')
 
     CARD_TYPES = ("game", "mechanic", "technique", "opportunity")
 
@@ -695,7 +731,7 @@ class Web:
             rest = [i for i in ids if i not in cards]
             plural = self.registry["types"][t]["plural"]
             inner = (f'<div class="register" data-kind="board" data-size="sm">{"".join(card(i) for i in cards)}</div>' if cards else "") + (
-                f'<p class="small faint">{"also on screen" if cards else "on screen"} · {len(rest)} {plural if len(rest) != 1 else self.registry["types"][t]["label"].lower()}</p>'
+                f'<p class="small faint">{"also on screen" if cards else "on screen"} · {counted(len(rest), self.registry["types"][t]["label"].lower(), plural)}</p>'
                 + (self.chips(rest, base) if t in ("game", "opportunity") else self.icon_links(rest, base)) if rest else "")
             right = f"{len(cards)} named in the narration, {len(rest)} more on screen" if rest and cards else f"{len(ids)} on screen, in order of appearance"
             sections.append(self.section(f"{plural} in this episode", inner, right))
@@ -706,14 +742,14 @@ class Web:
                         + (f'<p class="small">The video, rendered {esc(ep["rendered"])}, words this scene differently: the dataset has changed since.</p>' if sc["changed"] else "")
                         + "</div></div>")
         changed = sum(1 for sc in scenes if sc["changed"])
-        transcript = (f'<details class="disclosure" data-style="transcript"><summary>read the transcript, scene by scene · {len(scenes)} scenes'
+        transcript = (f'<details class="disclosure" data-style="transcript"><summary>read the transcript, scene by scene · {counted(len(scenes), "scene")}'
                       + (f' · {changed} worded differently in the video' if changed else "") + f'</summary><div class="register" data-kind="script">{"".join(rows)}</div></details>')
         chapters = " and ".join(str(c) for c in ep["covers"])
         shorts = [sh for sh in self.shorts if sh["episode"] == ep["n"]]
         body = (f'<div data-episode><nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="{base}" data-internal>simgrammar</a></li><li><a href="../" data-internal>watch</a></li>'
                 f'<li>episode {ep["n"]}</li></ol></nav>'
                 f'<div class="page-header"><p class="eyebrow"><span class="id">episode {ep["n"]} of {len(self.episodes)}</span> <span>{self.mmss(ep["seconds"])}</span> '
-                f'<span>{len(scenes)} scenes</span> <span>book chapter{"s" if len(ep["covers"]) > 1 else ""} {chapters}</span></p><h1>{esc(ep["title"])}</h1>'
+                f'<span>{counted(len(scenes), "scene")}</span> <span>book chapter{"s" if len(ep["covers"]) > 1 else ""} {chapters}</span></p><h1>{esc(ep["title"])}</h1>'
                 f'<p class="dek">{esc(ep["summary"])}</p></div>'
                 f'<div class="split" data-style="episode">{self.episode_figure(ep, base, 960)}{side}</div>'
                 + self.section("in the book", '<div class="grid" data-gap="board">' + "".join(self.chapter_block(self.chapter_of[c], base) for c in ep["covers"] if c in self.chapter_of) + "</div>",
@@ -721,7 +757,7 @@ class Web:
                 + "".join(sections)
                 + (self.section("shorts from this episode", f'<div class="register" data-kind="watch">{"".join(self.short_tile(sh, base) for sh in shorts)}</div>',
                                 f"{len(shorts)} · under a minute each") if shorts else "")
-                + self.section("transcript", transcript, f"{len(scenes)} scenes")
+                + self.section("transcript", transcript, counted(len(scenes), "scene"))
                 + "</div>")
         return self.page(title=f"Episode {ep['n']}: {ep['title']} · simgrammar", desc=ep["summary"],
                          body=body, depth=2, nav="watch", path=f"watch/{ep['key']}/", image=f"og/watch/{ep['key']}.png")
@@ -751,8 +787,8 @@ class Web:
         heads = [re.sub(r"[*`]", "", h) for h in re.findall(r"^## (.+)$", body, re.M)]
         words = self.chapter_words(stem)
         n = len([i for i, rs in self.book_refs.items() if any(r[0] == stem for r in rs) and self.by_id[i].type != "source"])
-        return (f'<div class="panel" data-style="chapter"><p class="eyebrow"><span class="id">chapter {int(stem[:2])}</span> <span>{words:,} words</span> '
-                f'<span>about {max(1, round(words / 230))} min</span>{f" <span>{n} records</span>" if n else ""}</p>'
+        return (f'<div class="panel" data-style="chapter"><p class="eyebrow"><span class="id">chapter {int(stem[:2])}</span> <span>{counted(f"{words:,}", "word")}</span> '
+                f'<span>about {max(1, round(words / 230))} min</span>{f" <span>{counted(n, 'record')}</span>" if n else ""}</p>'
                 f'<h3><a href="{base}book/{stem}/" data-internal>{esc(self.chapter_name(stem))}</a></h3>'
                 + (f'<p>In this chapter: {" · ".join(esc(h) for h in heads)}.</p>' if heads else "")
                 + f'<p class="small"><a href="{base}book/{stem}/" data-internal>read the chapter →</a></p></div>')
@@ -764,7 +800,7 @@ class Web:
         if not ep:
             return ""
         return (f'<div class="panel" data-style="watch">{self.episode_figure(ep, base, 480, self.ep_url(ep, base))}<div>'
-                f'<p class="eyebrow"><span class="id">episode {ep["n"]}</span> <span>{self.mmss(ep["seconds"])}</span> <span>{len(ep["scenes"])} scenes</span></p>'
+                f'<p class="eyebrow"><span class="id">episode {ep["n"]}</span> <span>{self.mmss(ep["seconds"])}</span> <span>{counted(len(ep["scenes"]), "scene")}</span></p>'
                 f'<h3><a href="{self.ep_url(ep, base)}" data-internal>{esc(ep["title"])}</a></h3><p>{esc(ep["summary"])}</p>'
                 f'<p class="small"><a href="{self.ep_url(ep, base)}" data-internal>watch the episode →</a></p></div></div>')
 
@@ -825,8 +861,8 @@ class Web:
         if not rows:
             return ""
         npp, nb, ne, ns = len(self.paper_refs.get(e.id, [])), len(self.book_refs.get(e.id, [])), len(by_ep), len((self.short_cites if src else self.shorts_of).get(e.id, []))
-        right = " · ".join(x for x in (f'the paper, {npp} section{"s" if npp != 1 else ""}' if npp else "", f'{nb} chapter{"s" if nb != 1 else ""}' if nb else "", f'{ne} episode{"s" if ne != 1 else ""}' if ne else "",
-                                       f'{ns} short{"s" if ns != 1 else ""}' if ns else "") if x)
+        right = " · ".join(x for x in (f'the paper, {counted(npp, "section")}' if npp else "", counted(nb, "chapter") if nb else "", counted(ne, "episode") if ne else "",
+                                       counted(ns, "short") if ns else "") if x)
         return self.section("appears in", f'<div class="register">{"".join(rows)}</div>', right)
 
     def families(self):
@@ -845,7 +881,7 @@ class Web:
         n = sum(len(v) for _, v in fams)
         rows = "".join(
             f'<div class="row"><div class="id">{esc(self.term("mechanic_family", f).lower())} <b>{len(ms)}</b></div><div>'
-            + "".join(f'<a href="{base}mechanic/{e.id}/" title="{esc(e.data["name"])} · {self.derived.get(e.id, {}).get("prevalence", 0)} games" data-card="{e.id}" data-internal>'
+            + "".join(f'<a href="{base}mechanic/{e.id}/" title="{esc(e.data["name"])} · {counted(self.derived.get(e.id, {}).get("prevalence", 0), "game")}" data-card="{e.id}" data-internal>'
                       f'{self.icon(e.id, base, 24, e.data["name"])}</a>' for e in ms)
             + "</div></div>" for f, ms in fams)
         twin = "".join(f'<div class="row"><div class="id">{esc(self.term("mechanic_family", f).lower())}</div><div><p>'
@@ -857,11 +893,11 @@ class Web:
             return [e.data["name"], self.term("mechanic_family", f).lower(), e.data.get("summary", ""), der.get("prevalence", 0), der.get("core_count", 0),
                     der.get("earliest_year"), first.data.get("name") if first else None, der.get("technique_count", 0)]
         cards = json.dumps({e.id: card(f, e) for f, ms in fams for e in ms}, ensure_ascii=False, sort_keys=True, separators=(",", ":")).replace("</", "<\\/")
-        return (f'<figure class="chart" id="grammar"><div class="chart-head"><span><b>every mechanic</b> · {n} in {len(fams)} families, most used first</span>'
-                f'<a href="{base}mechanic/" data-internal>all {n} mechanics</a></div><div class="chart-body"><div class="register" data-kind="mosaic" data-cards="mosaic-cards">{rows}</div></div>'
+        return (f'<figure class="chart" id="grammar"><div class="chart-head"><span><b>every mechanic</b> · {n} in {counted(len(fams), "family")}, most used first</span>'
+                f'<a href="{base}mechanic/" data-internal>all {counted(n, "mechanic")}</a></div><div class="chart-body"><div class="register" data-kind="mosaic" data-cards="mosaic-cards">{rows}</div></div>'
                 f'<script type="application/json" id="mosaic-cards">{cards}</script>'
                 f'<p class="chart-caption">Each icon is one mechanic, a rule-system a designer would recognize across games. Point at one to see what it is, or open it.</p>'
-                f'<details class="disclosure"><summary>plain-text twin · {len(fams)} families</summary><div class="register" data-size="wide">{twin}</div></details></figure>')
+                f'<details class="disclosure"><summary>plain-text twin · {counted(len(fams), "family")}</summary><div class="register" data-size="wide">{twin}</div></details></figure>')
 
     # ------------------------------------------------------------------ entity pages
     def meter(self, v, scale_max=5):
@@ -884,7 +920,7 @@ class Web:
         twins = (f'<p class="small"><b>this record as</b> <a href="{esc(self.gh(self.registry["types"][t]["dir"] + "/" + e.id + ".yaml"))}">yaml source</a>'
                  f' · <a href="{esc(self.dl("wiki/" + t + "/" + e.id + ".md", base))}">markdown</a> · <a href="{esc(self.dl("entities/" + plural + ".json", base))}">json</a></p>')
         icon = self.icon(e.id, base, 96)
-        head = (f'<nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="{base}" data-internal>simgrammar</a></li><li><a href="../" data-internal>{esc(plural)}</a></li><li>{esc(d.get("name", e.id))}</li></ol></nav>'
+        head = (f'<nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="{base}" data-internal>simgrammar</a></li><li><a href="../" data-internal>{esc(READER_NAME.get(t, ("", plural))[1])}</a></li><li>{esc(d.get("name", e.id))}</li></ol></nav>'
                 f'<div class="page-header"{" data-style=" + chr(34) + "icon" + chr(34) if icon else ""}>{icon}<p class="eyebrow">{" ".join(eyebrow)}</p><h1>{esc(d.get("name", e.id))}</h1>'
                 + (f'<p class="dek">{esc(d["summary"])}</p>' if d.get("summary") else "") + meta + "</div>")
         if d.get("deprecated"):
@@ -935,7 +971,7 @@ class Web:
         if t == "source":
             loc = d.get("url") or (f"https://doi.org/{d['doi']}" if d.get("doi") else None) or (f"https://arxiv.org/abs/{d['arxiv']}" if d.get("arxiv") else None)
             cited = der.get("incoming", {}).get("cited_by", [])
-            main.append(self.section("cited by", self.list_links(cited, base) if cited else '<p class="muted">Cited in the report text.</p>', f"{len(cited)} records"))
+            main.append(self.section("cited by", self.list_links(cited, base) if cited else '<p class="muted">Cited in the report text.</p>', counted(len(cited), "record")))
             if loc:
                 arch = f'<p class="scope">archived · <a href="{esc(d["archived"])}">wayback snapshot</a></p>' if d.get("archived") else ""
                 main.insert(0, self.section("locator", f'<p><a href="{esc(loc)}">{esc(loc)}</a></p>{arch}'))
@@ -957,7 +993,9 @@ class Web:
             head += ('<nav class="cluster" data-gap="chips" data-style="jump" aria-label="On this page"><span>on this page</span>'
                      + "".join(f'<a class="chip" data-style="name" href="#{hid}" data-internal>{re.sub(r"<[^>]+>", "", h)}</a>' for hid, h in jump) + "</nav>")
         body = head + f'<div class="split"><div style="min-width:0">{"".join(m for m in main if m)}</div><aside class="aside" style="min-width:0">{aside}</aside></div>'
-        title = f"{d.get('name', e.id)} · {self.registry['types'][t]['label'].lower()} · simgrammar"
+        # a source's title names where it is published, since a store page and a wiki article often share a game's name
+        where = (d.get("venue") or self.term("source_kind", d.get("kind")).lower()) if t == "source" else ""
+        title = " · ".join(x for x in (d.get("name", e.id), where if where != d.get("name") else "", self.registry["types"][t]["label"].lower(), "simgrammar") if x)
         desc = d.get("summary") or d.get("notes") or d.get("name", e.id)
         return self.page(title=title, desc=desc, body=body, depth=2, nav=t, path=f"{t}/{e.id}/", image=f"og/{t}/{e.id}.png" if t != "source" else "og/site.png")
 
@@ -970,11 +1008,27 @@ class Web:
         """The last section of a record page, collapsed: why the record can be trusted, then its status, checks, ratings,
         history, and files. A reader who only wants the game, mechanic, or technique never has to open it."""
         st = e.data.get("status")
-        head = (f'<p>Every fact on this page comes from the record below and the sources it cites, so any of it can be traced, checked, and '
-                f'corrected. <a href="../../about/" data-internal>How the atlas is made</a>.</p>')
-        status = (f'<p><span class="status" data-state="{STATE.get(st, "optional")}">{esc(st)}</span> {esc(self.STATUS_WHY.get(st, ""))}</p>' if st else "")
+        if e.type == "source":
+            why = ("Every fact on this page comes from the record below, which says what the source is and where to read it, so any of it can be "
+                   "checked against the source itself and corrected.")
+        elif self.cites(e):
+            why = "Every fact on this page comes from the record below and the sources it cites, so any of it can be traced, checked, and corrected."
+        else:
+            why = ("Every fact on this page comes from the record below, which cites no source yet: its facts are its author's reading until "
+                   "someone adds a source. Any of it can be checked and corrected.")
+        head = f'<p>{esc(why)} <a href="../../about/" data-internal>How the atlas is made</a>.</p>'
+        say = self.STATUS_WHY.get(st, "")
+        if st == "asserted" and self.cites(e):   # it lists sources, but they do not yet back its facts
+            say = "Its sources do not yet back all of its facts. It is in the queue for someone to source."
+        status = (f'<p><span class="status" data-state="{STATE.get(st, "optional")}">{esc(st)}</span> {esc(say)}</p>' if st else "")
         inner = head + status + "".join(f'<h3>{esc(h)}</h3>{html}' for h, html in parts if html) + twins
         return self.section("about this record", f'<details class="disclosure"><summary>status, checks, and history{f" · {esc(st)}" if st else ""}</summary>{inner}</details>')
+
+    @staticmethod
+    def cites(e):
+        """Whether a record cites a source, in its sources or in a claim's."""
+        d = e.data
+        return bool(d.get("sources") or any(c.get("sources") for c in (d.get("claims") or []) + (d.get("key_results") or [])))
 
     def cite_label(self, sid):
         """A short citation for a source: first author's surname and year, else the work's name."""
@@ -996,13 +1050,13 @@ class Web:
         d, der, t = e.data, self.derived.get(e.id, {}), e.type
         items = []
         if t == "game":
-            items = [str(d.get("year", "")), d.get("developer", ""), self.term("subgenre", d.get("subgenre")), f"{der.get('mechanic_count', 0)} mechanics"]
+            items = [str(d.get("year", "")), d.get("developer", ""), self.term("subgenre", d.get("subgenre")), counted(der.get('mechanic_count', 0), "mechanic")]
         elif t == "mechanic":
-            items = [self.term("mechanic_family", d.get("family")), self.term("maturity", d.get("maturity")), f"used by {der.get('prevalence', 0)} games",
+            items = [self.term("mechanic_family", d.get("family")), self.term("maturity", d.get("maturity")), f"used by {counted(der.get('prevalence', 0), 'game')}",
                      f"first seen {der.get('earliest_year')}" if der.get("earliest_year") else ""]
         elif t == "technique":
             items = [self.term("technique_category", d.get("category")), str(d.get("year", "")), self.term("technique_maturity", d.get("maturity")),
-                     f"determinism {self.term('determinism_impact', d.get('determinism_impact'))}", f"{der.get('affects_count', 0)} mechanics affected"]
+                     f"determinism {self.term('determinism_impact', d.get('determinism_impact'))}", f"{counted(der.get('affects_count', 0), 'mechanic')} affected"]
         elif t == "opportunity":
             items = [self.term("opportunity_type", d.get("opportunity_type")), f"horizon {self.term('horizon', d.get('horizon'))}", f"impact {d['impact']} of 5" if d.get("impact") is not None else "",
                      f"resolves by {d.get('falsifiable_signal', {}).get('resolve_by', '')}"]
@@ -1068,7 +1122,7 @@ class Web:
         out = []
         if rows:
             rows.sort(key=lambda r: (r[0], r[1]))
-            out.append(self.section("relations", f'<div class="register">{"".join(r[2] for r in rows)}</div>', f'{len(rows)} link{"s" if len(rows) != 1 else ""}'))
+            out.append(self.section("relations", f'<div class="register">{"".join(r[2] for r in rows)}</div>', counted(len(rows), "link")))
         inc = dict(self.derived.get(e.id, {}).get("incoming", {}))
         for ed in self.edges_in.get(e.id, []):   # the inverses the analysis does not list: synergy, requires, influenced, and the rest
             inv = et[ed.type].get("inverse", ed.type)
@@ -1108,7 +1162,7 @@ class Web:
             inner += f'<p class="small faint">core · {len(core)}</p><div class="register" data-kind="board">{"".join(tile(i, a, 96) for _, i, a in core)}</div>'
         if rest:
             inner += f'<p class="small faint">supporting · {len(rest)}</p><div class="register" data-kind="board" data-size="sm">{"".join(tile(i, a, 48) for _, i, a in rest)}</div>'
-        return self.section("parts", inner, f'{len(parts)} mechanics, as {e.data.get("name", e.id)} does them')
+        return self.section("parts", inner, f'{counted(len(parts), "mechanic")}, as {e.data.get("name", e.id)} does them')
 
     def provenance(self, prov):
         rows = []
@@ -1163,36 +1217,43 @@ class Web:
             tds = "".join(f'<td{" class=" + chr(34) + "num" + chr(34) if self._numeric(rows, c) else ""}>{self.link(row[c], base) if c == "name" else esc(_fmt(row[c]))}</td>' for c in cols)
             trs.append(f"<tr>{tds}</tr>")
         plural = self.registry["types"][t]["plural"]
-        label = self.registry["types"][t]["label"]
+        one, many = READER_NAME.get(t, (self.registry["types"][t]["label"].lower(), plural))   # what the index calls its records
         intro = {
             "game": "Each catalogued game drawn as the mechanics it is built from, core parts first. Each page holds the decomposition, design notes, claims, and sources.",
             "mechanic": "Every mechanic as its icon, grouped by family and ordered by how many games use it. The table below holds every score: rubric anchors from 1 to 5, "
                         "and exposure, the maturity-weighted reach of the technique set.",
             "technique": "Every mathematical, AI, ML, and LLM technique in the set, with its maturity in games and what it does to reproducibility.",
-            "opportunity": "Every design opportunity on a board by horizon, highest impact first, with the mechanics it builds on, the techniques it uses, and the risks "
-                           "those techniques carry. Each carries a dated, falsifiable prediction; the table orders them by priority.",
+            "opportunity": "Every design bet on a board by horizon, highest impact first, with the mechanics it builds on, the techniques it uses, and the risks "
+                           "those techniques carry. Each bet is an opportunity record with a dated, falsifiable prediction; the table orders them by priority.",
             "source": "Every source cited by a record or by the paper, newest first.",
         }[t]
         h1 = {"game": "Every game is a set of parts", "opportunity": "What could be built, and when"}.get(t, plural.capitalize())
-        placeholder = {"game": "filter by game or by a part it has"}.get(t, f"type to filter {plural}")
+        placeholder = {"game": "filter by game or by a part it has"}.get(t, f"type to filter {many}")
         table = f'<div class="table-wrap"><table class="data" data-style="dense" data-sortable data-filterable><thead><tr>{th}</tr></thead><tbody>{"".join(trs)}</tbody></table></div>'
         visual = {"mechanic": self.mechanic_tiles, "game": self.game_parts, "opportunity": self.opportunity_board}.get(t)
         if visual:
-            table = visual(lst, base) + f'<details class="disclosure"><summary>plain-text twin · {len(rows)} rows, sortable</summary>{table}</details>'
-        body = (f'<nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../" data-internal>simgrammar</a></li><li>{esc(plural)}</li></ol></nav>'
-                f'<div class="page-header"><p class="eyebrow"><span class="id">{esc(plural)}</span> <span>{len(rows)} records</span></p><h1>{esc(h1)}</h1>'
+            table = visual(lst, base) + f'<details class="disclosure"><summary>plain-text twin · {counted(len(rows), "row")}, sortable</summary>{table}</details>'
+        body = (f'<nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../" data-internal>simgrammar</a></li><li>{esc(many)}</li></ol></nav>'
+                f'<div class="page-header"><p class="eyebrow"><span class="id">{esc(many)}</span> <span>{counted(len(rows), "record")}</span></p><h1>{esc(h1)}</h1>'
                 f'<p class="dek">{esc(intro)}</p><div class="twins"><b>this list as</b><a href="{esc(self.dl("tables/" + plural + ".csv", "../"))}">csv</a>'
                 f'<a href="{esc(self.dl("entities/" + plural + ".json", "../"))}">json</a><a href="{esc(self.gh(self.registry["types"][t]["dir"]))}">yaml sources</a></div></div>'
                 f'<div class="controls" data-filter-controls hidden><label class="field"><span>filter</span><input type="search" data-filter placeholder="{esc(placeholder)}"></label>'
                 + (self.segmented("group", "Group games", [("subgenre", "by subgenre"), ("decade", "by decade")]) if t == "game" else "")
-                + f'</div>{table}')
-        return self.page(title=f"{plural.capitalize()} · simgrammar", desc=intro, body=body, depth=1, nav=t, path=f"{t}/", image=f"og/{t}.png")
+                + f'</div>{self.no_match(f"No {one} matches that filter.")}{table}')
+        return self.page(title=f"{many.capitalize()} · simgrammar", desc=intro, body=body, depth=1, nav=t, path=f"{t}/", image=f"og/{t}.png")
 
     @staticmethod
     def segmented(name, label, options):
         """A view switch for simgrammar.js; without script the first view shows and the switch stays hidden."""
         bs = "".join(f'<button type="button" data-value="{v}" aria-pressed="{"true" if i == 0 else "false"}">{esc(t)}</button>' for i, (v, t) in enumerate(options))
         return f'<div class="segmented" role="group" aria-label="{esc(label)}" data-views="{name}">{bs}</div>'
+
+    @staticmethod
+    def no_match(sentence):
+        """What a filtered list says when nothing in it matches; simgrammar.js shows it, and without script it stays hidden
+        because the list is never filtered."""
+        return (f'<p class="muted" data-filter-empty role="status" hidden>{esc(sentence)} Try fewer words or part of a name, '
+                'or clear the filter to see the whole list.</p>')
 
     def group(self, head, inner, right=""):
         """A filterable group on an index page: a section the filter hides when nothing in it matches."""
@@ -1207,12 +1268,12 @@ class Web:
             n = der.get("prevalence", 0)
             q = " ".join([e.data["name"], e.id, *e.data.get("aliases", [])]).lower()
             return (f'<a class="row" href="{base}mechanic/{e.id}/" data-q="{esc(q)}" data-internal>{self.icon(e.id, base, 48)}<h3>{esc(e.data["name"])}</h3>'
-                    f'<span class="end"><span>{n} games</span><span>{der.get("earliest_year") or ""}</span></span>'
+                    f'<span class="end"><span>{counted(n, "game")}</span><span>{der.get("earliest_year") or ""}</span></span>'
                     f'<span class="pbar"><i style="--p:{100 * n / top:.1f}%"></i></span></a>')
         groups = "".join(
-            self.group(f'{self.icon(f, base, 24)}{esc(self.term("mechanic_family", f))} <span>· {len(ms)} mechanics</span>',
+            self.group(f'{self.icon(f, base, 24)}{esc(self.term("mechanic_family", f))} <span data-count>· {counted(len(ms), "mechanic")}</span>',
                        f'<div class="register" data-kind="tiles">{"".join(tile(e) for e in ms)}</div>',
-                       f'{sum(self.derived.get(e.id, {}).get("prevalence", 0) for e in ms)} uses across the catalog')
+                       f'{counted(sum(self.derived.get(e.id, {}).get("prevalence", 0) for e in ms), "use")} across the catalog')
             for f, ms in self.families())
         return f'<div data-filter-scope>{groups}</div>'
 
@@ -1233,10 +1294,10 @@ class Web:
             by_sub[e.data.get("subgenre")].append(e)
             by_dec[e.data.get("year", 0) // 10 * 10].append(e)
         order = lambda e: (e.data.get("year", 0), e.data["name"])
-        subs = "".join(self.group(f'{self.icon(s, base, 24)}{esc(self.term("subgenre", s))} <span>· {len(gs)} games</span>',
+        subs = "".join(self.group(f'{self.icon(s, base, 24)}{esc(self.term("subgenre", s))} <span data-count>· {counted(len(gs), "game")}</span>',
                                   f'<div class="register" data-kind="parts">{"".join(row(e, False) for e in sorted(gs, key=order))}</div>')
                        for s, gs in sorted(by_sub.items(), key=lambda kv: (-len(kv[1]), str(kv[0]))))
-        decs = "".join(self.group(f'{d}s <span>· {len(gs)} games</span>',
+        decs = "".join(self.group(f'{d}s <span data-count>· {counted(len(gs), "game")}</span>',
                                   f'<div class="register" data-kind="parts">{"".join(row(e, True) for e in sorted(gs, key=order))}</div>',
                                   f'{sum(len(e.data.get("mechanics", [])) for e in gs) / len(gs):.1f} parts a game')
                        for d, gs in sorted(by_dec.items()))
@@ -1269,7 +1330,7 @@ class Web:
         for h in ("now", "1-2y", "3-5y", "5y-plus"):
             ops = sorted((e for e in lst if e.data.get("horizon") == h), key=lambda e: (-(e.data.get("impact") or 0), -(e.data.get("feasibility") or 0), e.data["name"]))
             inner = "".join(card(e) for e in ops) or '<div class="row"><p>none yet</p></div>'
-            cols.append(f'<section data-group><div class="section-line"><h2>{self.icon("horizon-" + h, base, 48)}{esc(self.term("horizon", h))} <span>· {len(ops)}</span></h2></div>'
+            cols.append(f'<section data-group><div class="section-line"><h2>{self.icon("horizon-" + h, base, 48)}{esc(self.term("horizon", h))} <span data-count>· {len(ops)}</span></h2></div>'
                         f'<div class="register" data-kind="cards">{inner}</div></section>')
         legend = '<div class="legend">' + "".join(f'<span>{self.icon("risk-" + r, base, 24)}{esc(lbl)}</span>' for r, lbl in risk_labels.items()) + "</div>"
         return f'{legend}<div class="grid" data-cols="4" data-gap="board" data-filter-scope>{"".join(cols)}</div>'
@@ -1304,12 +1365,11 @@ class Web:
         rrows = "".join(f'<div class="row" data-state="done"><div class="id">{esc(r.data.get("date"))}</div><span class="dot"></span><span class="kind">{esc(r.data.get("kind"))}</span>'
                         f'<span class="what"><a href="{esc(self.gh("log/runs/" + r.id + ".yaml"))}">{esc(r.id)}</a> · {esc(r.data.get("purpose", "")[:140])}</span>'
                         f'<span class="src">{esc(r.data.get("actor", ""))}</span></div>' for r in runs)
-        vrows = "".join(f'<div class="row"><div class="id">{esc(n)}</div><div><p>{esc((v.get("description") or "").strip())}</p></div><div class="end">{len(v.get("terms", []))} terms</div></div>'
+        vrows = "".join(f'<div class="row"><div class="id">{esc(n)}</div><div><p>{esc((v.get("description") or "").strip())}</p></div><div class="end">{counted(len(v.get("terms", [])), "term")}</div></div>'
                         for n, v in sorted(self.vocabs.items()) if n not in ("rubrics",))
         why = [("one set of records", "Every game, mechanic, technique, bet, and source is one plain-text record. The paper, the book, the videos, and this site "
                                       "are all built from those records, so they cannot drift apart: change a record and every page that uses it changes with it."),
-               ("sources you can open", "Each fact cites where it came from, with a short quote from the source. A record is marked sourced when its facts have "
-                                        "sources, and verified when someone other than its author has checked them."),
+               ("sources you can open", self.sources_line()),
                ("sentences that fail loudly", "When a sentence in the paper or the book interprets the data, a check sits beside it. If new data makes the sentence "
                                               "false, the build stops until someone rewrites it, so the text stays true as the catalog grows."),
                ("open to anyone", "People and AI agents add games, sources, and checks through pull requests, under written rules. Every change is logged as a run, "
@@ -1324,10 +1384,25 @@ class Web:
                 + self.section("why it is built this way", f'<div class="register" data-size="wide">{wrows}</div>')
                 + self.section("downloads", f'<div class="register" data-size="wide">{frows}</div>', "generated projections, published beside this site")
                 + self.section("commands", f'<div class="register" data-kind="cmds">{crows}</div>', "from the repository root")
-                + self.section("research log", f'<div class="register" data-kind="log" data-style="timeline">{rrows}</div>', f"{len(runs)} runs, newest first")
+                + self.section("research log", f'<div class="register" data-kind="log" data-style="timeline">{rrows}</div>', f"{counted(len(runs), 'run')}, newest first")
                 + self.section("vocabularies", f'<div class="register" data-size="wide">{vrows}</div>', "closed; add terms through an ADR"))
         return self.page(title="About · simgrammar", desc="How the SimGrammar atlas is made and why it can be checked: open records, downloads, commands, research log, and vocabularies.",
                          body=body, depth=1, nav="about", path="about/")
+
+    def sources_line(self):
+        """How far the records' evidence goes, in counts the build takes from the data: records that cite a source, claims
+        that quote one, sources with an archived snapshot."""
+        recs = [e for t in self.CARD_TYPES for e in self.ents.get(t, []) if not e.data.get("deprecated")]
+        claims = [c for e in recs for c in (e.data.get("claims") or []) + (e.data.get("key_results") or [])]
+        quoted = [e for e in recs if any(c.get("quote") for c in (e.data.get("claims") or []) + (e.data.get("key_results") or []))]
+        srcs = [e for e in self.ents.get("source", []) if not e.data.get("deprecated")]
+        nq, na = sum(1 for c in claims if c.get("quote")), sum(1 for s in srcs if s.data.get("archived"))
+        archived = (f"{na} of the {counted(len(srcs), 'source')} {'has' if na == 1 else 'have'} an archived snapshot so far" if na
+                    else f"none of the {counted(len(srcs), 'source')} has an archived snapshot yet")
+        return (f"{sum(1 for e in recs if self.cites(e))} of the {counted(len(recs), 'record')} cite the sources their facts come from; the rest are "
+                f"marked asserted until someone sources them. {nq} of the {counted(len(claims), 'claim')}, on {counted(len(quoted), 'record')}, also "
+                f"quote the passage that supports them, and {archived}. A record is marked sourced when its facts have sources, and verified when "
+                "someone other than its author has checked them.")
 
     # ------------------------------------------------------------------ watch and book pages
     def watch_page(self):
@@ -1341,7 +1416,7 @@ class Web:
                          f'<span>{self.mmss(ep["seconds"])}</span> <span>chapter{"s" if len(ep["covers"]) > 1 else ""} {chlinks}</span></p>'
                          f'<h3><a href="{url}" data-internal>{esc(ep["title"])}</a></h3><p>{esc(ep["summary"])}</p>{self.icon_links([i for i in ep["shows"] if self.by_id[i].type != "game"][:8], base)}</div>')
             twin.append(f'<div class="row"><div class="id">episode {ep["n"]}</div><div><h3><a href="{url}" data-internal>{esc(ep["title"])}</a></h3>'
-                        f'<p>{esc(ep["summary"])}</p><p>{self.mmss(ep["seconds"])} · {len(ep["scenes"])} scenes · follows {self.covers(ep, base)}</p></div></div>')
+                        f'<p>{esc(ep["summary"])}</p><p>{self.mmss(ep["seconds"])} · {counted(len(ep["scenes"]), "scene")} · follows {self.covers(ep, base)}</p></div></div>')
         stiles, stwin = [], []
         for sh in self.shorts:
             stiles.append(self.short_tile(sh, base, anchor=True))
@@ -1350,19 +1425,19 @@ class Web:
         ne, ns = len(self.episodes), len(self.shorts)
         minutes = round(sum(ep["seconds"] for ep in self.episodes) / 60)
         episodes = self.section("episodes", f'<div class="register" data-kind="episodes">{"".join(tiles)}</div>'
-                                f'<details class="disclosure"><summary>plain-text twin · {ne} episodes</summary><div class="register">{"".join(twin)}</div></details>',
+                                f'<details class="disclosure"><summary>plain-text twin · {counted(ne, "episode")}</summary><div class="register">{"".join(twin)}</div></details>',
                                 f"{ne} · {minutes} min in all") if ne else ""
         shorts = self.section("shorts", f'<div class="register" data-kind="watch">{"".join(stiles)}</div>'
-                              f'<details class="disclosure"><summary>plain-text twin · {ns} transcripts</summary><div class="register">{"".join(stwin)}</div></details>',
+                              f'<details class="disclosure"><summary>plain-text twin · {counted(ns, "transcript")}</summary><div class="register">{"".join(stwin)}</div></details>',
                               f"{ns} · under a minute each") if ns else ""
-        h1 = (f"The book in {ne} episodes, and {ns} findings under a minute each" if ne and ns else
-              f"The book in {ne} episodes" if ne else f"{ns} findings, under a minute each")
+        h1 = (f"The book in {counted(ne, 'episode')}, and {counted(ns, 'finding')} under a minute each" if ne and ns else
+              f"The book in {counted(ne, 'episode')}" if ne else f"{counted(ns, 'finding')}, under a minute each")
         body = (f'<nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../" data-internal>simgrammar</a></li><li>watch</li></ol></nav>'
-                f'<div class="page-header"><p class="eyebrow"><span class="id">watch</span> <span>{ne} episodes · {minutes} min</span> <span>{ns} shorts</span></p><h1>{h1}</h1>'
+                f'<div class="page-header"><p class="eyebrow"><span class="id">watch</span> <span>{counted(ne, "episode")} · {minutes} min</span> <span>{counted(ns, "short")}</span></p><h1>{h1}</h1>'
                 f'<p class="dek">The episodes follow the book chapter by chapter. The shorts each state one finding in their first sentence. '
                 f'Every game, mechanic, and technique on screen links to its page, and its page links back to the moment it appears.</p></div>'
                 + (episodes + shorts if ne or ns else '<p class="muted">No videos are published yet.</p>'))
-        return self.page(title="Watch · simgrammar", desc=f"The SimGrammar series: {ne} episodes that follow the book, and {ns} short videos, each stating one finding from the dataset.",
+        return self.page(title="Watch · simgrammar", desc=f"The SimGrammar series: {counted(ne, 'episode')} that follow the book, and {counted(ns, 'short video')}, each stating one finding from the dataset.",
                          body=body, depth=1, nav="watch", path="watch/", image="og/watch.png")
 
     def book_md(self, stem):
@@ -1507,11 +1582,12 @@ class Web:
             groups.append((self.registry["types"][t]["plural"], rows))
         n = sum(len(r) for _, r in groups)
         body = (f'<nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../" data-internal>simgrammar</a></li><li>find</li></ol></nav>'
-                f'<div class="page-header"><p class="eyebrow"><span class="id">find</span> <span>{n} pages</span></p><h1>Find anything on this site</h1>'
+                f'<div class="page-header"><p class="eyebrow"><span class="id">find</span> <span>{counted(n, "page")}</span></p><h1>Find anything on this site</h1>'
                 f'<p class="dek">Every chapter, episode, short, game, mechanic, technique, opportunity, and source, each linked to its page. '
                 f'Type to filter by name, alias, or summary; each page links on to everything related to it.</p></div>'
                 f'<div class="controls" data-filter-controls hidden><label class="field"><span>filter</span><input type="search" data-filter placeholder="type a name, an id, or a word"></label></div>'
-                f'<div data-filter-scope>' + "".join(self.group(f'{esc(title)} <span>· {len(rows)}</span>', self.find_list(title, rows)) for title, rows in groups if rows) + "</div>")
+                + self.no_match("No page matches that filter.")
+                + f'<div data-filter-scope>' + "".join(self.group(f'{esc(title)} <span data-count>· {len(rows)}</span>', self.find_list(title, rows)) for title, rows in groups if rows) + "</div>")
         return self.page(title="Find · simgrammar", desc=f"Every page of the SimGrammar site in one filterable list: {n} chapters, videos, records, and sources.",
                          body=body, depth=1, nav="find", path="find/")
 
@@ -1564,6 +1640,8 @@ def build_web(ents, edges, analysis, vocabs, registry, schemas, ctx, manifest, m
     outs["web/watch/index.html"] = w.watch_page()
     for ep in w.episodes:
         outs[f"web/watch/{ep['key']}/index.html"] = w.episode_page(ep)
+        for _, _, path, vtt in ep["tracks"]:   # built with the site, so the Pages deploy serves them beside the fetched videos
+            outs[f"web/{path}"] = vtt
     if w.chapters:
         outs["web/book/index.html"] = w.book_index()
         for stem in w.chapters:

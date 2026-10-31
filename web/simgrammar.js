@@ -47,6 +47,8 @@
     r.appendChild(line);
   }
   function bold(s) { return el("b", null, s); }
+  // a count and its noun in the right number, as scripts/lib.py counted() writes them: "1 game", "2 games"
+  function counted(k, one, many) { return k + " " + (k === 1 ? one : many); }
   function pressed(group, value) {
     $$("button", group).forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-value") === value ? "true" : "false"); });
   }
@@ -100,14 +102,28 @@
       var input = $("[data-filter]", c);
       var table = $("table[data-filterable]");
       var scope = $("[data-filter-scope]");
+      var empty = $("[data-filter-empty]");   // the sentence that says nothing matches; hidden until a filter empties the list
       if (!input || (!table && !scope)) return;
+      // a group's count reads "· 3 of 199" while a filter is on, and its total again when it is cleared
+      if (scope) $$("[data-group] span[data-count]", scope).forEach(function (s) { s.setAttribute("data-total", s.textContent); });
       input.addEventListener("input", function () {
         var q = input.value.trim().toLowerCase();
-        if (table) Array.prototype.forEach.call(table.tBodies[0].rows, function (r) { r.hidden = q && r.textContent.toLowerCase().indexOf(q) < 0; });
-        if (!scope) return;
-        $$("[data-q]", scope).forEach(function (n) { n.hidden = !!q && n.getAttribute("data-q").indexOf(q) < 0; });
-        $$("[data-group]", scope).forEach(function (g) { g.hidden = !!q && !$("[data-q]:not([hidden])", g); });
-        $$("details[data-filter-open]", scope).forEach(function (d) { if (q) d.open = true; });   // a folded list opens to show its matches
+        var shown = 0;
+        if (table) Array.prototype.forEach.call(table.tBodies[0].rows, function (r) { r.hidden = !!q && r.textContent.toLowerCase().indexOf(q) < 0; if (!r.hidden) shown++; });
+        if (scope) {
+          $$("[data-q]", scope).forEach(function (n) { n.hidden = !!q && n.getAttribute("data-q").indexOf(q) < 0; });
+          $$("[data-group]", scope).forEach(function (g) {
+            var k = $$("[data-q]:not([hidden])", g).length;
+            g.hidden = !!q && !k;
+            $$("span[data-count]", g).forEach(function (s) {
+              var total = s.getAttribute("data-total");
+              s.textContent = q ? total.replace(/\d[\d,]*/, function (t) { return k + " of " + t; }) : total;
+            });
+          });
+          $$("details[data-filter-open]", scope).forEach(function (d) { if (q) d.open = true; });   // a folded list opens to show its matches
+          shown = $$("[data-q]:not([hidden])", scope).length;
+        }
+        if (empty) empty.hidden = !q || shown > 0;
       });
       var start = /[?&]q=([^&]*)/.exec(location.search);   // find/?q=word starts filtered
       if (start) { input.value = decodeURIComponent(start[1].replace(/\+/g, " ")); input.dispatchEvent(new Event("input")); }
@@ -150,12 +166,19 @@
     var img = $("img", a);
     var v = el("video", { "class": a.className, src: a.getAttribute("href"), poster: img ? img.getAttribute("src") : "", controls: "", playsinline: "", preload: "auto" });
     if (img) { v.setAttribute("width", img.getAttribute("width")); v.setAttribute("height", img.getAttribute("height")); }
+    var tracks = $("template[data-tracks]", a.parentNode);   // subtitle tracks the page offers for this video
+    if (tracks) v.appendChild(document.importNode(tracks.content, true));
     a.parentNode.replaceChild(v, a);
     return v;
   }
   function shorts() {
     $$('a[data-play]:not([data-play="episode"])').forEach(function (a) {
-      a.addEventListener("click", function (e) { e.preventDefault(); video(a).play(); });
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        var cap = $("figcaption", a.parentNode);   // the play label under the poster; the video's own controls take over
+        video(a).play();
+        if (cap) cap.parentNode.removeChild(cap);   // removed, not hidden: register.css gives figcaption its own display
+      });
     });
   }
 
@@ -268,7 +291,7 @@
         card.appendChild(eb);
         card.appendChild(el("h3", null, c[0]));
         if (c[2]) card.appendChild(el("p", null, c[2]));
-        [["used by", c[3] ? c[3] + (c[3] === 1 ? " game" : " games") + (c[4] ? " · core in " + c[4] : "") : "no catalogued game yet"],
+        [["used by", c[3] ? counted(c[3], "game", "games") + (c[4] ? " · core in " + c[4] : "") : "no catalogued game yet"],
          ["first seen", c[5] ? c[5] + (c[6] ? " · " + c[6] : "") : null],
          ["techniques", c[7] ? c[7] + (c[7] === 1 ? " affects it" : " affect it") : null]].forEach(function (r) {
           if (r[1] == null) return;
@@ -285,7 +308,7 @@
   function people() {
     var cards = json("people");
     if (!cards || !canHover()) return;
-    function n(k, one, many) { return k + " " + (k === 1 ? one : many); }
+    var n = counted;
     hovercard(document.body, cards, "peek-people", "data-person", function (card, a, c) {
       var eb = el("p", { "class": "eyebrow" }), dl = el("dl", { "class": "receipt", "data-style": "bare" }), dd = el("dd");
       eb.appendChild(el("span", { "class": "id" }, a.getAttribute("data-person")));
@@ -379,8 +402,8 @@
       if (range) range.value = y;
       var total = data.total[data.years.indexOf(y)];
       var added = data.added[String(y)] || [];
-      var parts = [bold(String(y)), total + " mechanics seen"];
-      if (activeLayer) parts.unshift(activeLayer.getAttribute("data-label").toLowerCase() + ": " + activeLayer.getAttribute("data-count") + " mechanics, first in " + activeLayer.getAttribute("data-first"));
+      var parts = [bold(String(y)), counted(total, "mechanic", "mechanics") + " seen"];
+      if (activeLayer) parts.unshift(activeLayer.getAttribute("data-label").toLowerCase() + ": " + counted(+activeLayer.getAttribute("data-count"), "mechanic", "mechanics") + ", first in " + activeLayer.getAttribute("data-first"));
       if (added.length) {
         var games = {};
         added.forEach(function (a) { games[a[3]] = a[4]; });
@@ -456,7 +479,7 @@
       if (!selected) { readout(fig, ["hover or tap a game to see its nearest neighbours"]); return; }
       var ks = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a] || (a < b ? -1 : 1); });
       var total = ks.reduce(function (s, k) { return s + counts[k]; }, 0);
-      readout(fig, [bold((subLabel[selected] || selected).toLowerCase()), total + " games across " + ks.length + (ks.length === 1 ? " island" : " islands"),
+      readout(fig, [bold((subLabel[selected] || selected).toLowerCase()), counted(total, "game", "games") + " across " + counted(ks.length, "island", "islands"),
         ks.map(function (k) { return k.toLowerCase() + " " + counts[k]; }).join(", ")]);
     });
     $$("[data-key]", fig).forEach(function (g) {
@@ -523,8 +546,8 @@
     function nodeReadout(key) {
       var kv = key.split(":"), k = kv[0], v = kv.slice(1).join(":"), info = data[k][v];
       var i = mode === "edges" ? 0 : 1;
-      if (k === "t") readout(fig, [link("technique", v, info[0]), info[1].toLowerCase(), mode === "edges" ? info[2] + " affects edges" : "exposure " + info[3]]);
-      else readout(fig, [bold(info[0].toLowerCase()), mode === "edges" ? info[1] + " affects edges" : "exposure " + info[2]]);
+      if (k === "t") readout(fig, [link("technique", v, info[0]), info[1].toLowerCase(), mode === "edges" ? counted(+info[2], "affects edge", "affects edges") : "exposure " + info[3]]);
+      else readout(fig, [bold(info[0].toLowerCase()), mode === "edges" ? counted(+info[1], "affects edge", "affects edges") : "exposure " + info[2]]);
     }
     svg.addEventListener("pointerover", function (e) {
       var n = e.target.closest ? e.target.closest("[data-node]") : null;
@@ -534,7 +557,7 @@
         highlight(null, r);
         var t = r.getAttribute("data-t"), ef = r.getAttribute("data-e"), f = r.getAttribute("data-f");
         readout(fig, [link("technique", t, data.t[t][0]), data.e[ef][0].toLowerCase(), data.f[f][0].toLowerCase(),
-          mode === "edges" ? r.getAttribute("data-v") + " edges" : "exposure " + r.getAttribute("data-v2")]);
+          mode === "edges" ? counted(+r.getAttribute("data-v"), "edge", "edges") : "exposure " + r.getAttribute("data-v2")]);
       }
     });
     svg.addEventListener("pointerleave", function () { highlight(null); readout(fig, ["hover or tap a technique, an effect, or a family"]); });
