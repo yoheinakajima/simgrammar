@@ -140,4 +140,4 @@ Target runtime about 9 minutes: about 880 words of narration at 135 words a minu
 
 **On screen.** Every game, taken apart into its parts: simgrammar.com.
 
-**Voice.** Everything in this video comes from an open dataset, and every number on screen is checked against it each time it's built. Next episode: where these parts came from, and the handful of games that introduced the most of them.
+**Voice.** Next episode: where these parts came from, and the handful of games that introduced the most of them.

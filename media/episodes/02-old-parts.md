@@ -36,13 +36,11 @@ Target runtime about 12 minutes: about 1,270 words of narration at 135 words a m
 
 **Frame.** timeline ids=variable-speed,free-placement,tech-tree,dynasty-succession,culture-religion-conversion
 
-**Voice.** The dataset dates a mechanic by the first game in the catalog that uses it. That is a floor. Hamurabi itself was written from a description of an older program, The Sumerian Game, from 1964, which the catalog does not hold.
+**Voice.** Each date is the first game in this catalog with that part, so it is a floor: Hamurabi itself was written from a description of an older program, The Sumerian Game, from 1964.
 
 **Voice.** Plenty of the rest came from outside games altogether. SimCity took its model of urban growth from Jay Forrester's book Urban Dynamics. Civilization took its technology tree from a board game, and Railroad Tycoon started from another board game, 1830. The Sims borrowed its idea of a house from an architecture book, A Pattern Language. Factorio grew out of two Minecraft mods that added pipes and machines.
 
-**Voice.** The edges of the catalog produce odd firsts. The earliest catalog game with a pause button, and with free placement, is Conway's Game of Life, from 1970, because seeding cells and choosing how fast generations run are those two mechanics at their barest.{{assert:derived.variable-speed.earliest_game == game-of-life}}{{assert:derived.free-placement.earliest_game == game-of-life}} Europa Universalis IV gets the credit for dynasties and religious conversion, and the catalog holds no earlier Europa Universalis game.{{assert:derived.dynasty-succession.earliest_game == europa-universalis-4}}
-
-**On screen.** "First appears" means first appears in a game this catalog holds.
+**Voice.** The catalog's edges make odd firsts. Its earliest pause button and its earliest free placement belong to Conway's Game of Life, from 1970, where seeding cells and choosing how fast generations run are those two mechanics at their barest.{{assert:derived.variable-speed.earliest_game == game-of-life}}{{assert:derived.free-placement.earliest_game == game-of-life}} Europa Universalis IV gets the credit for dynasties and religious conversion, and the catalog holds no earlier Europa Universalis game.{{assert:derived.dynasty-succession.earliest_game == europa-universalis-4}}
 
 ## 5. Most of it by 2000 (2:52 to 3:36)
 
@@ -58,11 +56,7 @@ Target runtime about 12 minutes: about 1,270 words of narration at 135 words a m
 
 **Picture.** Thirty-seven cards shuffle out of the full catalog at random, then shrink to the sizes of the early games. A counter tallies the mechanics they cover. The shuffle repeats, fast, and a histogram of counts builds up. A marker shows where the real early games land.
 
-**Voice.** It looks like a golden age. Chance can produce something similar. Draw {{stat:n_games_by_2000}} games at random from every era, trim each one to the size of an early game, and count the mechanics they cover. Do it two thousand times.
-
-**Voice.** A random set covers {{stat:n_mechanics_seen_null_mean}} mechanics on average. The real early games cover {{stat:n_mechanics_seen_by_2000}}. Random sets match or beat them in about one draw in nine.{{assert:n_mechanics_seen_null_mean <= n_mechanics_seen_by_2000}}{{assert:p_mechanics_seen_by_2000 > 0.05}}{{assert:p_mechanics_seen_by_2000 < 0.2}}
-
-**Voice.** So most of that headline number comes from how widely the parts are shared. A few dozen games from any period show most of the vocabulary. What survives the test is narrower: new parts come from a handful of games in every decade, and later games are built mostly from parts that already existed.
+**Voice.** It looks like a golden age, and chance comes close to it. {{stat:n_games_by_2000}} games drawn at random from every era cover {{stat:n_mechanics_seen_null_mean}} mechanics on average, against {{stat:n_mechanics_seen_by_2000}} for the real early games.{{assert:n_mechanics_seen_null_mean <= n_mechanics_seen_by_2000}}{{assert:p_mechanics_seen_by_2000 > 0.05}}{{assert:p_mechanics_seen_by_2000 < 0.2}} A few dozen games from any period show most of the vocabulary. What holds up is narrower: new parts come from a handful of games in every decade, and later games are built mostly from parts that already existed.
 
 ## 7. The founding games (4:44 to 7:03)
 

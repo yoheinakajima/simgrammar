@@ -26,7 +26,7 @@ Target runtime about 12 minutes: about 1,230 words of narration at 135 words a m
 
 **Frame.** count at="That's one of the bets in the dataset" kind=bars ids=production-chain
 
-**Voice.** The dataset's record for production chains lists this as one of the mechanic's failure modes: when starvation happens far upstream, players blame the wrong building. It also lists why the hunt never ends: the slowest stage sets the pace, so the bottleneck moves every time you fix one.
+**Voice.** When starvation happens far upstream, players blame the wrong building. And the hunt never ends: the slowest stage sets the pace, so the bottleneck moves every time you fix one.
 
 **Voice.** A tool that answered the question directly wouldn't need new AI. Add a little capacity to each machine and belt in turn, and measure how much the output rises. The one that raises it most is the constraint. Then a short generated sentence names it: circuits are limited by copper cable, which is starved because the smelters share a belt with iron.
 
@@ -42,17 +42,13 @@ Target runtime about 12 minutes: about 1,230 words of narration at 135 words a m
 
 **Frame.** record at="Two more fields make it a bet" bet=bottleneck-explainer fields=validation_experiment,falsifiable_signal
 
-**Voice.** The dataset holds {{count:opportunity}} bets like this one, and every one fills in the same fields. It names the mechanics it reworks and the techniques it depends on. It names games that already do part of it: for this one, Factorio, Satisfactory, Anno 1800, and Oxygen Not Included.
+**Voice.** Like every one of the {{count:opportunity}} bets, it names the mechanics it reworks, the techniques it depends on, and the games that already do part of it: for this one, Factorio, Satisfactory, Anno 1800, and Oxygen Not Included.
 
 **Voice.** Two more fields make it a bet. An experiment a small team could run, with a number that counts as success: inject a bottleneck into a factory prototype, and see whether players fix it at least fifty percent faster with the view on. And a prediction with a date: a factory or city game ships a feature that finds the binding constraint by testing the simulation, by the middle of 2028.{{assert:field.bottleneck-explainer.falsifiable_signal.resolve_by == 2028-06-30}}
 
-**Picture.** Three dials, impact, feasibility, novelty, combine into one priority number. The ranked table builds.
+**Frame.** count kind=tally of=opportunity field=horizon
 
-**Frame.** formula result="dataset-record:Priority" terms="score-impact:Impact,×score-feasibility:Feasibility,×score-novelty:Novelty" rule=opportunity_priority
-
-**Frame.** count at="What the table does show is how near" kind=tally of=opportunity field=horizon
-
-**Voice.** Each bet is scored for impact, feasibility, and novelty, and the three combine into a priority that punishes a low score on any one of them. The scores are one model's reading of written anchors, so treat the ranking as an ordering of arguments. What the table does show is how near the bets are: {{stat:n_opportunity_horizon_now}} are buildable now, {{stat:n_opportunity_horizon_1_2y}} in one to two years, and {{stat:n_opportunity_horizon_3_5y}} in three to five.{{assert:n_opportunity_horizon_3_5y < n_opportunity_horizon_now}}
+**Voice.** Of the {{count:opportunity}} bets, {{stat:n_opportunity_horizon_now}} are buildable now, {{stat:n_opportunity_horizon_1_2y}} in one to two years, and {{stat:n_opportunity_horizon_3_5y}} in three to five.{{assert:n_opportunity_horizon_3_5y < n_opportunity_horizon_now}}
 
 ## 5. The why button (3:50 to 5:40)
 

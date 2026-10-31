@@ -40,17 +40,11 @@ Target runtime about 12 minutes: about 1,210 words of narration at 135 words a m
 
 **Frame.** scale ids=stress-accumulation,history-generation,variable-speed fields=legibility,emergence_potential
 
-**Voice.** The dataset behind this series scores every mechanic on six scales. Two matter here. Legibility asks how easily a player builds an accurate picture of the mechanic from play. A 2 means you need a wiki. A 5 means it's clear at a glance. Emergence potential asks how much unscripted variety the mechanic produces when it's connected to others. A 4 means it often sets off chains of consequences across systems.
+**Voice.** Two scores matter here. Legibility asks how easily a player builds an accurate picture of the mechanic from play: a 2 means you need a wiki, and a 5 means it's clear at a glance. Emergence potential asks how much unscripted variety the mechanic produces when it's connected to others: a 4 means it often sets off chains of consequences across systems.
 
 **Voice.** Dwarf Fortress's stress system scores 3 and 4.{{assert:field.stress-accumulation.legibility == 3}}{{assert:field.stress-accumulation.emergence_potential == 4}} Its simulated history, which can run a world forward thousands of years before you arrive, scores 2 and 5.{{assert:field.history-generation.legibility == 2}}{{assert:field.history-generation.emergence_potential == 5}} The pause button scores 5 and 1.{{assert:field.variable-speed.legibility == 5}}{{assert:field.variable-speed.emergence_potential == 1}}
 
-**Picture.** A caption card.
-
-**Frame.** compare a="Who rated these scores" a_items="language-model:Original model rater" b="Rated independently" b_items="language-model:Second model rater on a subset"
-
-**On screen.** Original scores: one model rater, against written anchors. Scores with independent second ratings: {{stat:n_scores_independently_rated}}.
-
-**Voice.** One model rater assigned the original scores by reading each mechanic's record against the anchors. Independent second ratings now cover {{stat:n_scores_independently_rated}} scores.{{assert:n_scores_independently_rated > 0}} The patterns in this episode still rely largely on the original rater's reading of the design knowledge in the records. They aren't measurements of players.
+**Voice.** A language model assigned these scores against written anchors, and independent second ratings now cover {{stat:n_scores_independently_rated}} of them.{{assert:n_scores_independently_rated > 0}} They are judgments about design, read from what developers and players have written about each mechanic, and they aren't measurements of players.
 
 ## 5. The slope (3:34 to 4:30)
 
@@ -58,11 +52,9 @@ Target runtime about 12 minutes: about 1,210 words of narration at 135 words a m
 
 **Voice.** Plot all {{stat:n_mechanic}} mechanics and the cloud leans. The more variety a mechanic produces, the harder it's rated to read. The {{stat:n_mechanics_emergence_1}} mechanics at the bottom of the emergence scale average {{stat:mean_legibility_emergence_1}} for legibility. The {{stat:n_mechanics_emergence_4plus}} at 4 or 5 average {{stat:mean_legibility_emergence_4plus}}.{{assert:mean_legibility_emergence_1 > mean_legibility_emergence_4plus}}{{assert:rho_legibility_emergence_potential < -0.2}}
 
-**On screen.** Spearman ρ = {{stat:rho_legibility_emergence_potential}}.
-
 **Picture.** The interface mechanics, overlays, tooltips, speed controls, light up in the bottom right corner, then fade out of the plot. The cloud still leans.
 
-**Voice.** Part of that lean is built in. Overlays and pause buttons generate nothing by themselves, so they sit at the bottom of the emergence scale, and they're easy to read because reading them is their job. Take those two families out and the relationship weakens, but it keeps its direction.{{assert:rho_legibility_emergence_potential_excl_interface < 0}}
+**Voice.** Part of that lean is built in: overlays and pause buttons generate nothing, and they're easy to read because reading them is their job. Take them out and the lean weakens but keeps its direction.{{assert:rho_legibility_emergence_potential_excl_interface < 0}}
 
 ## 6. Rules you can read (4:30 to 5:34)
 

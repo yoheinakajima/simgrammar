@@ -46,11 +46,11 @@ Target runtime about 12 minutes: about 1,250 words of narration at 135 words a m
 
 **Picture.** The vacant-lots figure builds: mechanic names down a staircase, lots filling in where rows meet columns. Dark lots, dashed lots, a few slashed ones.
 
-**Voice.** The dataset looks for the opposite on purpose. It takes mechanics that each appear in at least {{stat:whitespace_min_games}} games, pairs them across different families, leaves out time controls, and leaves out pairs already recorded as being in tension. Then it keeps the pairs that share one game or none. {{stat:n_whitespace_pairs}} pairs pass.{{assert:n_whitespace_pairs >= 100}} The bar of {{stat:whitespace_min_games}} games was 8 percent of the catalog when it was set, and it's written down to be revisited as the catalog grows.
+**Voice.** Now look for the opposite. Take mechanics that each appear in at least {{stat:whitespace_min_games}} games, pair them across different families, and keep the pairs that share one game or none. {{stat:n_whitespace_pairs}} pairs pass.{{assert:n_whitespace_pairs >= 100}}
 
 **Voice.** The tension list is what designers already know about pairs that fight. Threat that grows with your wealth pulls against unlocks that reward growth. Characters with strong free will resist direct orders. Full-information overlays undercut fog of war. A shared online world can't be paused by one player. Generated content resists the authored conditions that event chains depend on. Those pairs are left out on purpose. What's left is emptiness without an explanation on record.
 
-**Voice.** The chance baseline has a known weakness. It treats each mechanic as spread across games regardless of how many mechanics a game has, so pairs whose mechanics live in small games can look emptier than they are. A stricter baseline would shorten the list. Treat it as a list of candidates.
+**Voice.** Treat the list as candidates for a designer to check. Some pairs look emptier than they are, because their mechanics live in small games.
 
 ## 6. Workers who grow old (5:13 to 6:21)
 
@@ -106,13 +106,11 @@ Target runtime about 12 minutes: about 1,250 words of narration at 135 words a m
 
 ## 11. How a lot closes (10:40 to 11:43)
 
-**Picture.** A pull request on screen adding one game record. The build reruns; a sentence in the book turns red; it's rewritten. <!-- tells-ok: signpost -->
-
-**Frame.** mockup kind=terminal label=mock-up title="A pull request" lines="+ one game record, with its sources|$ make check|a sentence that depended on the gap fails its check"
+**Picture.** SimCity's traffic and land value, each one changing the other in a loop.
 
 **Frame.** chain at="And a lot is worth building when" nodes="traffic-congestion:Traffic,land-value:Land value" verbs="changes,changes back" loops=R from=simcity-1989
 
-**Voice.** The catalog is a sample. It leans toward games well documented in English, and a game outside it may already combine any of these pairs. That's the cheapest way to close a lot: add the game, with its sources. The table recomputes, and any sentence in this series that depended on the gap fails its check until someone rewrites it.
+**Voice.** The catalog leans toward games well documented in English, so a game outside it may already combine any of these pairs.
 
 **Voice.** And a lot is worth building when the two mechanics change each other. Traffic and land value do, in SimCity. Placement and events would, if the events changed what you build next. Aging and production would, if the age of the workforce set the factory's output years later. 
 

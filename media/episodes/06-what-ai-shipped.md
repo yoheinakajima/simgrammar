@@ -26,7 +26,7 @@ Target runtime about 14 minutes: about 1,400 words of narration at 135 words a m
 
 **Voice.** The catalog's earliest game of this kind is AI Dungeon, from 2019. You type what you do, and a language model writes what happens next: GPT-2 at launch, GPT-3 for the premium model a year later [@src-wikipedia-ai-dungeon]. There's no inventory behind the text, and no world state at all. A fact lasts as long as it stays in the model's context window. Pick up a key, play for an hour, and the story forgets you have it. The fix the game gives you is a memory box where you write the key down yourself.
 
-**Voice.** The dataset counts both games as boundary cases. Nothing in either is simulated outside the model's text. They show what a game looks like when the model is the whole game. Most games have a simulation to protect, and AI has been allowed into them in a few specific places.
+**Voice.** Both games are boundary cases. Nothing in either is simulated outside the model's text. They show what a game looks like when the model is the whole game. Most games have a simulation to protect, and AI has been allowed into them in a few specific places.
 
 ## 4. How shipped is shipped (2:05 to 3:05)
 
@@ -36,7 +36,7 @@ Target runtime about 14 minutes: about 1,400 words of narration at 135 words a m
 
 **On screen.** {{stat:n_technique_shipped_mainstream}} norm. {{stat:n_technique_shipped_niche}} in at least one game. {{stat:n_technique_prototype}} prototypes. {{stat:n_technique_research}} research.
 
-**Voice.** The dataset holds {{count:technique}} AI and math techniques, each a dated result that changes at least one game mechanic, and it judges each one by how far it has got in games, which is a harder test than how far it has got in AI. Constrained decoding, which forces a model's answer into a fixed format, is everywhere in software. No source in the dataset documents a shipped game using it, so here it counts as research.{{assert:field.constrained-decoding.maturity == research}} By that test, {{stat:n_technique_shipped_mainstream}} technique has become normal in games, {{stat:n_technique_shipped_niche}} have shipped in at least one game, and the rest are prototypes and papers.{{assert:n_technique_shipped_mainstream == 1}}{{assert:n_technique_shipped < n_technique_research}}
+**Voice.** These {{count:technique}} AI and math techniques are judged by how far they have got in games, which is a harder test than how far they have got in AI. Constrained decoding, which forces a model's answer into a fixed format, is everywhere in software, and no shipped game is documented using it, so here it counts as research.{{assert:field.constrained-decoding.maturity == research}} By that test, {{stat:n_technique_shipped_mainstream}} technique has become normal in games, {{stat:n_technique_shipped_niche}} have shipped in at least one game, and the rest are prototypes and papers.{{assert:n_technique_shipped_mainstream == 1}}{{assert:n_technique_shipped < n_technique_research}}
 
 ## 5. The one that's normal (3:05 to 4:07)
 
