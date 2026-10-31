@@ -28,7 +28,7 @@ The figure stacks the vocabulary year by year, one layer per family. The steepes
 
 A count like that suggests a golden age of invention followed by decades of reuse, and the suggestion can be tested against chance.
 
-Tested that way, the early games cover a little more of the vocabulary than chance would give them, and the difference is too small to rely on. Most of the "set early" figure reflects how widely the parts are shared: a few dozen games of any period already show most of the vocabulary. Two narrower findings survive the test: invention concentrates in a small number of games in every decade, and later games are built mostly from parts that already existed.
+Tested that way, the early games cover a little more of the vocabulary than chance would give them, and the difference is too small to rely on. Most of the "set early" figure reflects how widely the parts are shared: a few dozen games of any period already show most of the vocabulary. Two narrower findings rest on direct counts that the test does not check: invention concentrates in a small number of games in every decade, and later games are built mostly from parts that already existed.{{assert:pct_uses_since_2010_on_pre2001 >= 75}}
 
 <details class="disclosure"><summary>how the test against chance works</summary>
 
@@ -91,7 +91,7 @@ Part of the reuse figure is arithmetic. Old mechanics have had decades to spread
 
 ## Named influences
 
-The records also name influences where a source states one, which gives a second, smaller view of the lineage. {{stat:n_games_naming_influence}} games name at least one other catalog game, for {{stat:n_influence_links}} links in all.{{assert:n_games_naming_influence < 100}} A game that names none may still have borrowed; its sources do not say so.
+The records also name influences where a source states one, which gives a second, smaller view of the lineage: {{stat:n_games_naming_influence}} games name at least one other catalog game, for {{stat:n_influence_links}} links in all.{{assert:n_games_naming_influence < 100}} A game that names none may still have borrowed; its sources do not say so.
 
 Three games are named most often, {{stat:max_named_as_influence}} times each: SimCity, The Sims, and Dwarf Fortress.{{assert:derived.simcity-1989.named_as_influence == max_named_as_influence}}{{assert:derived.the-sims.named_as_influence == max_named_as_influence}}{{assert:derived.dwarf-fortress.named_as_influence == max_named_as_influence}} SimCity is named by its sequel SimCity 2000, by Railroad Tycoon and Civilization, by Caesar III, and by [[fallout-shelter|Fallout Shelter]]. Civilization's record adds that an early prototype had a SimCity-style zoning layer, which was dropped [@src-wikipedia-civilization]. The Sims is named by The Sims 2, by [[paralives|Paralives]] and inZOI, by Oxygen Not Included, and by the Generative Agents research town. Dwarf Fortress is named by [[minecraft|Minecraft]], [[prison-architect|Prison Architect]], RimWorld, Oxygen Not Included, and [[space-haven|Space Haven]], whose developer describes it as RimWorld-style storytelling combined with a tile-based gas simulation [@src-bugbyte-2026-space-haven]. [[populous|Populous]] is named three times, by Black & White, by Civilization, and by [[from-dust|From Dust]], which was presented as its spiritual successor [@src-wikipedia-from-dust].{{assert:derived.populous.named_as_influence == 3}}
 

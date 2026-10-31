@@ -10,7 +10,7 @@
 2. [Six layers](02-six-layers.md)
 3. [Old parts](03-old-parts.md)
 4. [Families](04-families.md)
-5. [Depth costs legibility](05-depth-costs-legibility.md)
+5. [Rated deep, rated hard to read](05-depth-costs-legibility.md)
 6. [Five ceilings](06-five-ceilings.md)
 
 ## Part II. The machines arrive

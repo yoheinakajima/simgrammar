@@ -18,7 +18,7 @@ Vertical, about 50 seconds, about 100 words of narration. One finding, from the 
 
 **Frame.** timeline ids=crop-cultivation,daily-action-budget,seasons,relationship-values
 
-**Voice.** Crops first appear in Hamurabi, a text game from 1968. A daily action budget first appears in Princess Maker 2, in 1993. Seasons and friendships with villagers first appear in Harvest Moon, in 1996, the game Stardew was built in response to.{{assert:derived.crop-cultivation.earliest_game == hamurabi}}{{assert:derived.daily-action-budget.earliest_game == princess-maker-2}}{{assert:derived.seasons.earliest_game == harvest-moon}}{{assert:derived.relationship-values.earliest_game == harvest-moon}}
+**Voice.** Crops first appear in Hamurabi, a text game from 1968. A fixed budget of time slots first appears in Princess Maker 2, in 1993, three to a month. Seasons and friendships with villagers first appear in Harvest Moon, in 1996, the game Stardew was built in response to.{{assert:derived.crop-cultivation.earliest_game == hamurabi}}{{assert:derived.daily-action-budget.earliest_game == princess-maker-2}}{{assert:derived.seasons.earliest_game == harvest-moon}}{{assert:derived.relationship-values.earliest_game == harvest-moon}}
 
 ## 0:24 to 0:36. The rule
 

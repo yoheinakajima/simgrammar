@@ -60,7 +60,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Frame.** compare games=papers-please,princess-maker-2 show=shared
 
-**Voice.** Papers, Please is about checking passports at a border. Princess Maker 2, from 1993, is about raising a daughter from ten to eighteen. They share a family.{{assert:derived.princess-maker-2.cluster == derived.papers-please.cluster}} In both, time comes in fixed slots, money is tight, and authored events keep arriving. At the border you are paid per correct decision, mistakes arrive as citations by fax, and the wages go to rent, food, and heat for your family. A shift at the border and a month of your daughter's life are the same kind of budget.
+**Voice.** Papers, Please is about checking passports at a border. Princess Maker 2, from 1993, is about raising a daughter from ten to eighteen. They share a family.{{assert:derived.princess-maker-2.cluster == derived.papers-please.cluster}} In both, time comes in fixed slots, money is tight, and authored events keep arriving. At the border you are paid per correct decision, mistakes print out as citation slips, and the wages go to rent, food, and heat for your family. A shift at the border and a month of your daughter's life are the same kind of budget.
 
 **Picture.** Job Simulator in VR: a hand throws a stapler across an office cubicle. Cut to Besiege: a wooden siege engine flips itself over.
 
@@ -154,7 +154,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Picture.** The design map with each game coloured by its store genre. Most islands are mostly one colour; many have a second and third.
 
-**Voice.** Knowing a game's family tells you a good deal about its genre, far more than chance would.{{assert:cluster_subgenre_nmi > cluster_subgenre_null_nmi}}{{assert:p_cluster_subgenre_nmi <= 0.01}} And {{stat:n_clusters_cross_subgenre}} of the {{stat:n_clusters}} families still mix genres.{{assert:n_clusters_cross_subgenre >= 10}}
+**Voice.** Knowing a game's family tells you a good deal about its genre, far more than chance would.{{assert:cluster_subgenre_nmi > cluster_subgenre_null_nmi}}{{assert:cluster_subgenre_ami > 0.2}}{{assert:p_cluster_subgenre_nmi <= 0.01}} And {{stat:n_clusters_cross_subgenre}} of the {{stat:n_clusters}} families still mix genres.{{assert:n_clusters_cross_subgenre >= 10}}
 
 **Voice.** A game's family says what it is built from, and that is the part a designer can borrow.
 

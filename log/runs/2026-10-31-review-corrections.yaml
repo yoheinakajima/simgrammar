@@ -1,0 +1,64 @@
+id: 2026-10-31-review-corrections
+type: run
+kind: synthesis
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: correct factual errors and claims that outrun the data, found by
+  an outside review of the book, paper and video scripts.'
+method: 'Checked each review item against a source or the data and changed prose only where they disagreed.
+  Opened: the Nature GT Sophy page (doi 10.1038/s41586-021-04357-7; its acknowledgements date the Race
+  Together events 2 July and 21 October 2021; published 9 February 2022); Wikipedia API extracts for Fable
+  Legends (cancelled 7 March 2016), Monte Carlo tree search (Total War: Rome II is its shipped example)
+  and Lotka-Volterra equations (closed orbits with a conserved quantity; chance in small populations can
+  end in extinction); the Papers, Please wiki pages Citation, Sounds and music, and Game development (citations
+  come out of the booth''s matrix printer; Wikipedia''s ''in-game fax'' disagrees); the RimWorld wiki
+  Time page (60 ticks a second at normal speed, 2,500 ticks an in-game hour, about 42 s). Computed: an
+  explicit-Euler Lotka-Volterra run whose conserved quantity grows until prey reach zero; the new AMI
+  against brute-force enumeration and identity and null cases. Read dist/entities for creature-learning
+  (earliest game petz, 1995), the feasibility anchors in vocab/rubrics.yaml, the rater-agreement table,
+  and princess-maker-2 (three periods a month) against short 2. Changed: scripts/analyze.py adds cluster_subgenre_ami
+  (Vinh, Epps and Bailey expected mutual information, arithmetic normalization as in _nmi), n_mechanics_independently_rated,
+  pct_rater_exact_* and pct_rater_within_one_* per scale, cocluster_together_pct and cocluster_apart_pct,
+  n_<type>_asserted and n_<type>_no_sources, n_run_models, top_run_model and n_runs_top_model. Book: Sophy
+  dates, Fable Legends dropped, Dogz as the first creature learner, Volterra cycles, the feasibility anchor,
+  chapter 5 retitled with rater coverage and agreement in its prose, preface sourcing, six layers as a
+  proposal, AMI in chapter 4, the chapter 3, 8, 12 and 13 claims narrowed, meta lines cut, co-cluster
+  thresholds as percentages, no sentence opening on a numeral, and repeated facts kept in one chapter
+  with references elsewhere. Paper: abstract, 2.3, 2.5 (every run an agent run), 4.1, 5.4, 5.6, 6.3. Media:
+  episode 3 citation slips, episode 6 2021 and the Genie limit trimmed, episode 12 summary and percentage,
+  short 2 time slots. salience-gated-llm-agents: 20 colonists at one call per in-game hour make about
+  1,730 calls per real hour at 1x, about 1.2 tokens a call under the 2,000-token budget; the design now
+  holds each call to 400 tokens and caps the colony at four calls per real hour (at most 1,600 tokens).
+  Its record cites no source, so re-checking meant the RimWorld timing above. Left: episode 12''s cluster-rule
+  sentence, which is true (cluster_k_drift 0, no W107); sentences reserved by the coordinator for the
+  tag audit; Elite and Infinite Craft facts, handled elsewhere; fixes in files this run does not own,
+  filed as proposals.'
+contract_version: '1.2'
+proposals:
+- kind: other
+  target: data/games/papers-please.yaml
+  detail: design_notes and the citation-penalty note say citations arrive by fax; the Papers, Please wiki
+    (Citation; Sounds and music lists printer sounds for citations; Game development describes the matrix
+    printer) shows they print at the booth. Wikipedia says in-game fax, so a fix needs a contested claim
+    or a better source.
+- kind: other
+  target: data/techniques/monte-carlo-tree-search.yaml
+  detail: 'key_results and the military-operations affects note use Fable Legends as an MCTS example;
+    Wikipedia''s Fable Legends article says it was cancelled on 7 March 2016 and never released. Total
+    War: Rome II is the only shipped example the record supports.'
+- kind: other
+  target: media/episodes/09-bets.md, media/mega/the-film.md
+  detail: Both narrate the old salience-gated cap of one call per colonist per in-game hour; the record
+    now caps the colony at four calls per real hour of 400 tokens each.
+- kind: other
+  target: media/episodes/10-what-breaks.md, media/shorts/006-one-normal-technique.md, media/mega/the-film.md
+  detail: Genie's sixty-second limit is narrated in episode 10, short 6 and the film; episode 6 no longer
+    states it. Keep it in one place, likely short 6 or episode 10.
+- kind: other
+  target: media/mega/the-film.md, media/subtitles/ja/12-how-this-was-made.md, report/src/05-structure.md
+  detail: cocluster_together renders as 0.9 of the samples; episode 12 and chapters 4 and 13 now use cocluster_together_pct.
+    Section 5.4's sentence sits in the k-drift paragraph reserved for the tag audit.
