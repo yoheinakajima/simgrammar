@@ -17,7 +17,7 @@ from collections import Counter, defaultdict
 
 import numpy as np
 
-from lib import vocab_terms
+from lib import counted, vocab_terms
 
 T = {
     "paper": "var(--paper,#fafaf7)", "paper2": "var(--paper-2,#f3f3ee)", "paper3": "var(--paper-3,#ebebe4)",
@@ -176,7 +176,7 @@ def matrix(shared, live, by_id, derived, tables, fam):
     H = int(max(hc, hy) + 8)
 
     body = [svg_open("matrix", W, H, "Every mechanic use in the catalog",
-                     f"A grid of {len(row_ids)} games by {len(col_ids)} mechanics. Filled squares are core uses, light squares supporting uses. "
+                     f"A grid of {counted(len(row_ids), 'game')} by {counted(len(col_ids), 'mechanic')}. Filled squares are core uses, light squares supporting uses. "
                      "Rows are grouped by cluster, columns by mechanic family.")]
     # band shading for alternate row groups
     for mode, spans in rspans.items():
@@ -232,7 +232,7 @@ def matrix(shared, live, by_id, derived, tables, fam):
     n_core = sum(1 for c in cells if c[2] == 2)
     return {
         "title": "Every use: the catalog as a grid",
-        "head": f"{len(row_ids)} games × {len(col_ids)} mechanics · {len(cells)} uses",
+        "head": f"{counted(len(row_ids), 'game')} × {counted(len(col_ids), 'mechanic')} · {counted(len(cells), 'use')}",
         "svg": "".join(body),
         "caption": f"Each square is one game using one mechanic: {n_core} core uses (dark) and {len(cells) - n_core} supporting uses (light). "
                    "Rows are grouped into the clusters of §5.4 and columns into mechanic families. Hover or tap to read a cell; reorder rows by release year or columns by first use.",
@@ -342,7 +342,7 @@ def strata(shared, live, by_id, derived, fam):
              for m in sorted(mechs, key=lambda m: (first[m.id], m.id))]
     return {
         "title": "The vocabulary, year by year",
-        "head": f"{n} mechanics · {y0} to {y1}",
+        "head": f"{counted(n, 'mechanic')} · {y0} to {y1}",
         "svg": "".join(body),
         "caption": "Cumulative mechanics by the year of their first catalog game, one layer per family, oldest families at the bottom. "
                    "Labels mark the years that added the most mechanics and the game that introduced most of them. Drag the year control, or hover or tap the chart, to read what each year added.",
@@ -534,7 +534,7 @@ def design_map(shared, live, by_id, derived, tables, sub, cfg):
     n_mixed = stats_cross(clusters, by_id)
     return {
         "title": "A map of the design space",
-        "head": f"{N} games · {C} islands · {k} nearest neighbours each",
+        "head": f"{counted(N, 'game')} · {counted(C, 'island')} · {k} nearest neighbours each",
         "svg": "".join(body),
         "caption": f"One island per cluster ({n_mixed} of {C} mix subgenres). Inside an island, lines join games to their nearest neighbours by shared mechanics "
                    "(inverse-prevalence weighted Jaccard, the measure behind the clustering); bridges join islands whose games are each other's nearest neighbours, wider for more links. "
@@ -817,7 +817,7 @@ def technique_flows(live, by_id, derived, vocabs, fam):
     zero = [fam[f]["label"].lower() for f in f_ids if tot_f[f] == 0]
     return {
         "title": "Where the techniques land",
-        "head": f"{len(t_ids)} techniques · {int(sum(modes['edges'].values()))} affects edges · {len(f_ids)} families",
+        "head": f"{counted(len(t_ids), 'technique')} · {counted(int(sum(modes['edges'].values())), 'affects edge')} · {counted(len(f_ids), 'family')}",
         "svg": "".join(body),
         "caption": "Each ribbon follows one technique's edges to one mechanic family, through the kind of change it makes. Darker ribbons come from techniques that have shipped in games. "
                    "Hover or tap a technique, an effect, or a family to isolate its ribbons; switch the width to weight each edge by maturity and effect, the exposure measure of §8.2."
@@ -892,7 +892,7 @@ def layer_profile(tables, fam, sub, cfg):
                 body.append(text(x + CW_ / 2, y + RH / 2 + 3, round(100 * v), 9, fill, "middle"))
     body.append(text(LBL, H - 10, "printed: share of uses, in percent, where 10 or more", 9, "faint"))
     body.append("</svg>")
-    return _plain("Where each subgenre spends its mechanics", f"{len(rows)} subgenres · {len(fams)} families", "".join(body),
+    return _plain("Where each subgenre spends its mechanics", f"{counted(len(rows), 'subgenre')} · {counted(len(fams), 'family')}", "".join(body),
                   f"Share of each subgenre's mechanic uses that falls in each mechanic family, for subgenres with at least {smin} catalog games. "
                   "Darker cells take a larger share; shares of 10 percent or more are printed. Families are ordered by their average share.",
                   "tables family-by-subgenre · dist/analysis/family-by-subgenre.csv",
@@ -927,13 +927,13 @@ def constraint_profile(live, fam):
             body.append(f'<line x1="{f1(sx(1))}" y1="{f1(y)}" x2="{f1(sx(v))}" y2="{f1(y)}" style="stroke:{T["rule2"]};stroke-width:1"/>')
             hot = (s != "legibility" and v >= 3) or (s == "legibility" and v < 3.3)
             body.append(f'<circle cx="{f1(sx(v))}" cy="{f1(y)}" r="3.6" style="fill:{T["accent"] if hot else T["ink"]}">'
-                        f'<title>{esc(fam[f]["label"])}: mean {lab} {v:.1f} over {count[f]} mechanics</title></circle>')
+                        f'<title>{esc(fam[f]["label"])}: mean {lab} {v:.1f} over {counted(count[f], 'mechanic')}</title></circle>')
     for i, f in enumerate(fams):
         y = TOP + i * RH + RH / 2
         body.append(text(LBL - 10, y + 3, f'{fam[f]["label"].lower()} · {count[f]}', 9, "ink2", "end"))
     body.append("</svg>")
     trows = [{"family": fam[f]["label"], "mechanics": count[f], **{s: round(means[f][s], 2) for s, _, _ in scores}} for f in fams]
-    return _plain("Ceiling scores by family", f"{len(fams)} families · {len(mechs)} mechanics", "".join(body),
+    return _plain("Ceiling scores by family", f"{counted(len(fams), 'family')} · {counted(len(mechs), 'mechanic')}", "".join(body),
                   "Mean rubric score of each family's mechanics on four of the five ceilings; determinism is a property of techniques and has its own figure. "
                   "Blue marks a family at 3 or above on a cost, or below 3.3 on legibility. Families are ordered by combined compute and authoring cost.",
                   "mechanic rubric scores · dist/entities/mechanics.json",
@@ -968,7 +968,7 @@ def technique_landscape(live, vocabs):
     trows = [{"technique": t.id, "year": t.data.get("year"), "maturity": t.data["maturity"], "determinism": t.data.get("determinism_impact")} for m in order for t in cols[m]]
     n_ship = len(cols["shipped"])
     key = _key([(DET_LABEL[d], DET_MARK[d](5, 5)) for d in ("preserves", "mitigable", "breaks")])
-    return _plain("Techniques by maturity in games", f"{len(techs)} techniques · {n_ship} shipped", "".join(body),
+    return _plain("Techniques by maturity in games", f"{counted(len(techs), 'technique')} · {n_ship} shipped", "".join(body),
                   "Every technique in the dataset under how far it has got in games, each with the year of the result the dataset cites, oldest first; the one shipped technique that is a norm across studios is marked. "
                   "The mark shows what the technique does to reproducibility when it runs.",
                   "technique records · dist/entities/techniques.json", {"columns": ["technique", "year", "maturity", "determinism"], "rows": trows,
@@ -1000,7 +1000,7 @@ def determinism_runtime(live, vocabs):
                         f'<title>{esc(t.data["name"])}: {tag}</title>{esc(short(t.data["name"], 44))}</text>')
     body.append("</svg>")
     trows = [{"technique": t.id, "determinism": d, "maturity": t.data["maturity"]} for d in order for t in cols[d]]
-    return _plain("What runtime techniques do to reproducibility", f"{len(techs)} techniques that run during play", "".join(body),
+    return _plain("What runtime techniques do to reproducibility", f"{counted(len(techs), 'technique')} that run during play", "".join(body),
                   "Techniques that can run during play, on a server or the player's device, grouped by what they do to reproducibility. "
                   "Within each group, shipped techniques come first and are set in dark text.",
                   "technique records · runtime and determinism_impact", {"columns": ["technique", "determinism", "maturity"], "rows": trows, "link_columns": ["technique"],
@@ -1041,7 +1041,7 @@ def opportunity_priorities(live, tables):
         y += h
     body.append(text(LBL, H - 10, "number before each name: novelty score · blue: the eight highest priorities", 9, "faint"))
     body.append("</svg>")
-    return _plain("Where the bets sit on impact and feasibility", f"{len(opps)} opportunities", "".join(body),
+    return _plain("Where the bets sit on impact and feasibility", f"{counted(len(opps), 'opportunity')}", "".join(body),
                   "Each opportunity placed by its impact and feasibility scores, with its novelty score before its name. "
                   "Blue names are the eight highest priorities, the weighted geometric mean of the three scores. Scores come from one rater's reading of anchor text.",
                   "tables opportunities-ranked · dist/analysis/opportunities-ranked.csv",
@@ -1077,7 +1077,7 @@ def prediction_timeline(live):
         y0 += bh
     body.append("</svg>")
     trows = [{"resolve_by": d, "opportunity": o.id} for d in dates for o in by[d]]
-    return _plain("When the predictions come due", f"{len(opps)} predictions · {dates[0]} to {dates[-1]}", "".join(body),
+    return _plain("When the predictions come due", f"{counted(len(opps), 'prediction')} · {dates[0]} to {dates[-1]}", "".join(body),
                   "Every opportunity's prediction under the date by which it must be resolved. None has been resolved yet; a resolution needs a run by a different operator and model from the one that wrote the bet.",
                   "opportunity records · falsifiable_signal.resolve_by", {"columns": ["resolve_by", "opportunity"], "rows": trows, "link_columns": ["opportunity"],
                                                                          "note": "Each prediction's resolve-by date."}, min_width=860)
@@ -1098,8 +1098,7 @@ def pipeline(live, stats):
         return (f'<path d="M{x1},{y1} L{x2},{y2}" style="fill:none;stroke:{T["ink2"]};stroke-width:1"/>'
                 f'<path d="M{x2},{y2} l-6,-3 l0,6 z" transform="rotate({f1(math.degrees(math.atan2(y2 - y1, x2 - x1)))} {x2} {y2})" style="fill:{T["ink2"]}"/>')
 
-    body.append(box(10, 40, 180, 110, "records", [f"{n['game']} games", f"{n['mechanic']} mechanics", f"{n['technique']} techniques",
-                                                    f"{n['opportunity']} opportunities", f"{n['source']} sources"], True))
+    body.append(box(10, 40, 180, 110, "records", [counted(n[t], t) for t in ("game", "mechanic", "technique", "opportunity", "source")], True))
     body.append(box(10, 175, 180, 70, "run log", ["who operated each change", "model, harness, method", "append-only"]))
     body.append(box(240, 40, 170, 95, "validator", ["schemas and vocabularies", "provenance and independence", "sources and quotes", "fails the build"]))
     body.append(box(460, 40, 170, 95, "analysis", ["prevalence, clusters", "white space, exposure", "priorities, figures", "deterministic"]))
@@ -1115,7 +1114,7 @@ def pipeline(live, stats):
     body.append(arrow(545, 172, 545, 139))
     body.append(text(240, 280, "every edition names the dataset version it was built from", 9, "faint"))
     body.append("</svg>")
-    trows = [{"stage": "records", "what": ", ".join(f"{v} {k}s" for k, v in n.items())}, {"stage": "validator", "what": "schemas, vocabularies, provenance, sources"},
+    trows = [{"stage": "records", "what": ", ".join(counted(v, k) for k, v in n.items())}, {"stage": "validator", "what": "schemas, vocabularies, provenance, sources"},
              {"stage": "analysis", "what": "derived values, tables, figures"}, {"stage": "assertions", "what": "prose checked against the data on every build"},
              {"stage": "outputs", "what": ", ".join(outs)}]
     return _plain("From records to every product", "one dataset · five products", "".join(body),

@@ -381,6 +381,20 @@ def lower_median(values: list) -> int | None:
     return vs[(len(vs) - 1) // 2] if vs else None
 
 
+def plural(word: str) -> str:
+    """The plural of an English noun as the site writes counts: opportunity → opportunities, game → games."""
+    if re.search(r"[^aeiou]y$", word):
+        return word[:-1] + "ies"
+    if re.search(r"(s|x|z|ch|sh)$", word):
+        return word + "es"
+    return word + "s"
+
+
+def counted(n, one: str, many: str | None = None) -> str:
+    """A count and its noun in the right number: "1 game", "2 games". `many` is for an irregular or multi-word plural."""
+    return f"{n} {one if n == 1 else (many or plural(one))}"
+
+
 def get_path(obj: dict, dotted: str) -> Any:
     cur: Any = obj
     for part in dotted.split("."):

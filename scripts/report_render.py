@@ -22,7 +22,32 @@ import re
 from collections import Counter
 from urllib.parse import urlparse
 
-from lib import ROOT, get_path, read_yaml, vocab_terms
+from lib import ROOT, get_path, load_schemas, read_yaml, vocab_terms
+
+# Analysis-table columns whose values are vocabulary terms: every table shows the term's label, as record pages do.
+VOCAB_COLUMNS = {"family": "mechanic_family", "family_a": "mechanic_family", "family_b": "mechanic_family", "subgenre": "subgenre",
+                 "maturity": "technique_maturity", "category": "technique_category", "effect": "effect", "opportunity_type": "opportunity_type",
+                 "horizon": "horizon", "kind": "source_kind"}
+TABLE_VOCAB = {"opportunities-ranked": {"type": "opportunity_type"}}   # a column whose name means something else in other tables
+RUBRIC_COLUMNS = {"rater-agreement": "field"}                          # a column that holds a rubric field's name
+
+
+def field_label(name: str) -> str:
+    """A rubric field in words, as the prose writes it: ai_leverage → AI leverage, tuning_difficulty → tuning difficulty."""
+    return re.sub(r"\bai\b", "AI", str(name).replace("_", " "))
+
+
+def table_value(ctx, table: str, col: str, v):
+    """A generated table's cell as a reader sees it: a vocabulary term's label, a rubric field in words, else the value."""
+    if col == RUBRIC_COLUMNS.get(table) and isinstance(v, str):
+        return field_label(v)
+    vn = TABLE_VOCAB.get(table, {}).get(col) or VOCAB_COLUMNS.get(col)
+    if vn and isinstance(v, (str, list)):
+        terms = vocab_terms(ctx.vocabs, vn)
+        label = lambda x: terms.get(str(x), {}).get("label", x)
+        return [label(x) for x in v] if isinstance(v, list) else label(v)
+    return v
+
 
 TOKEN_RE = re.compile(r"\{\{([a-z_]+):([^}]+)\}\}")
 LINK_RE = re.compile(r"\[\[([a-z0-9-]+)(?:\|([^\]]+))?\]\]")
@@ -48,6 +73,13 @@ class Context:
         self.citations: list[str] = []
         meta = read_yaml(ROOT / "report" / "meta.yaml") or {}
         self.site_url = (meta.get("site") or {}).get("url", "")
+        # each type's fields that take a vocabulary term ({type: {field: vocab}}), so a declared table shows labels
+        schemas = load_schemas()
+        self.field_vocab = {}
+        for t, spec in registry["types"].items():
+            props = (schemas.get(spec["schema"].rsplit("/", 1)[-1]) or {}).get("properties", {})
+            self.field_vocab[t] = {k: p.get("x-vocab") or (p.get("items") or {}).get("x-vocab") for k, p in props.items()
+                                   if p.get("x-vocab") or (p.get("items") or {}).get("x-vocab")}
 
     web_base = ""  # relative prefix from the page being rendered to the web root (mode "web")
 
@@ -239,6 +271,7 @@ def table_md(ctx: Context, name: str, mode: str) -> str | None:
         headers = [c.get("label") if isinstance(c, dict) else c.split(".")[-1].replace("_", " ") for c in cols]
         paths = [c["path"] if isinstance(c, dict) else c for c in cols]
         lines = ["| " + " | ".join(headers) + " |", "|" + "|".join("---" for _ in cols) + "|"]
+        fv = ctx.field_vocab.get(spec["entity"], {})
         for r in rows:
             cells = []
             for p in paths:
@@ -246,6 +279,9 @@ def table_md(ctx: Context, name: str, mode: str) -> str | None:
                 if p in ("name",):
                     cells.append(f"[{_fmt(v)}]({ctx.link_target(r['id'], mode)})")
                 else:
+                    if p in fv and v is not None:   # a vocabulary field shows its term's label
+                        terms = vocab_terms(ctx.vocabs, fv[p])
+                        v = [terms.get(str(x), {}).get("label", x) for x in v] if isinstance(v, list) else terms.get(str(v), {}).get("label", v)
                     cells.append(_cell_md(ctx, p, v, mode))
             lines.append("| " + " | ".join(cells) + " |")
         cap = f"\n*{spec['caption']}*\n" if spec.get("caption") else ""
@@ -267,7 +303,7 @@ def table_md(ctx: Context, name: str, mode: str) -> str | None:
                 cell = ", ".join(f"[{ctx.label(x)}]({ctx.link_target(x, mode)})" if x in ctx.by_id else _fmt(x) for x in shown)
                 cells.append(cell + (f", and {more} more" if more else ""))
             else:
-                cells.append(_cell_md(ctx, c, v, mode))
+                cells.append(_cell_md(ctx, c, table_value(ctx, name, c, v), mode))
         lines.append("| " + " | ".join(cells) + " |")
     return "\n".join(lines) + f"\n\n*{t['description']}*\n"
 

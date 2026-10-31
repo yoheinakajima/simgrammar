@@ -20,7 +20,7 @@ import re
 
 from PIL import Image, ImageDraw, ImageFont
 
-from lib import ROOT, read_yaml
+from lib import ROOT, counted, read_yaml
 
 W, H, ART, PAD = 1200, 630, 480, 56
 PAPER, PANEL, INK, MUTED, FAINT, RULE = (250, 250, 247), (238, 238, 233), (23, 23, 23), (85, 85, 79), (140, 140, 134), (200, 200, 194)
@@ -138,48 +138,49 @@ def images(w) -> dict[str, bytes]:
     top = pngs(e.id for e in mechs)
     counts = {t: len(live(t)) for t in ("game", "mechanic", "technique", "opportunity", "source")}
     meta = w.meta
-    foot = f'{counts["game"]} games · {counts["mechanic"]} mechanics · {counts["technique"]} techniques'
-    outs = {"web/og/site.png": card("simgrammar", meta["title"], meta["subtitle"] + ".", foot, top),
+    foot = " · ".join(counted(counts[t], t) for t in ("game", "mechanic", "technique"))
+    from web import LEAD, READER_NAME   # the front page's lead (its first sentence fits the card whole), and what indexes call their records
+    outs = {"web/og/site.png": card("simgrammar", meta["title"], LEAD.split(". ")[0] + ".", foot, top),
             "web/og/paper.png": card("the paper · v" + str(meta["version"]), meta["title"], meta["subtitle"] + ".", foot, top)}
     index = {
-        "game": ("Every game is a set of parts", "Each catalogued simulation game drawn as the mechanics it is built from.", f'{counts["game"]} games', top),
-        "mechanic": ("Mechanics", "Every mechanic as its icon, grouped by family and ordered by how many games use it.", f'{counts["mechanic"]} mechanics in 21 families', top),
-        "technique": ("Techniques", "Every mathematical, AI, ML, and LLM technique in the set, with its maturity in games.", f'{counts["technique"]} techniques',
+        "game": ("Every game is a set of parts", "Each catalogued simulation game drawn as the mechanics it is built from.", counted(counts["game"], "game"), top),
+        "mechanic": ("Mechanics", "Every mechanic as its icon, grouped by family and ordered by how many games use it.", f'{counted(counts["mechanic"], "mechanic")} in {counted(len(w.families()), "family")}', top),
+        "technique": ("Techniques", "Every mathematical, AI, ML, and LLM technique in the set, with its maturity in games.", counted(counts["technique"], "technique"),
                       pngs(e.id for e in sorted(live("technique"), key=lambda e: e.id))),
-        "opportunity": ("What could be built, and when", "Every design opportunity by horizon, with the mechanics it builds on and the risks it carries.",
-                        f'{counts["opportunity"]} opportunities', pngs(f"horizon-{h}" for h in ("now", "1-2y", "3-5y", "5y-plus"))),
-        "source": ("Sources", "Every source cited by a record or by the paper.", f'{counts["source"]} sources', top),
+        "opportunity": ("What could be built, and when", "Every design bet by horizon, with the mechanics it builds on and the risks it carries.",
+                        counted(counts["opportunity"], "bet"), pngs(f"horizon-{h}" for h in ("now", "1-2y", "3-5y", "5y-plus"))),
+        "source": ("Sources", "Every source cited by a record or by the paper.", counted(counts["source"], "source"), top),
     }
     for t, (title, desc, foot, icons) in index.items():
-        outs[f"web/og/{t}.png"] = card(f"{t} index", title, desc, foot, icons)
+        outs[f"web/og/{t}.png"] = card(f"{READER_NAME[t][1] if t in READER_NAME else t} index", title, desc, foot, icons)
     shown = []
     for v in w.episodes + w.shorts:
         shown += [i for i in v["shows"] if i not in shown]
     ne, ns = len(w.episodes), len(w.shorts)
-    outs["web/og/watch.png"] = card("watch", f"The book in {ne} episodes, and {ns} one-minute findings" if ne else f"{ns} findings, under a minute each",
+    outs["web/og/watch.png"] = card("watch", f"The book in {counted(ne, 'episode')}, and {counted(ns, 'one-minute finding')}" if ne else f"{counted(ns, 'finding')}, under a minute each",
                                     "Videos drawn from the dataset's records: episodes that follow the book, and shorts that each state one finding.",
-                                    f"{ne} episodes · {ns} shorts", pngs(shown))
+                                    f"{counted(ne, 'episode')} · {counted(ns, 'short')}", pngs(shown))
     for ep in w.episodes:
         chapters = " and ".join(str(c) for c in ep["covers"])
         n = len({i for sc in ep["scenes"] for i in sc["shows"]})
         outs[f"web/og/watch/{ep['key']}.png"] = card(f"episode {ep['n']} · chapter{'s' if len(ep['covers']) > 1 else ''} {chapters}", ep["title"],
                                                      ep["summary"],
-                                                     f"{w.mmss(ep['seconds'])} · {len(ep['scenes'])} scenes · {n} records on screen", pngs(ep["shows"][:16]))
+                                                     f"{w.mmss(ep['seconds'])} · {counted(len(ep['scenes']), 'scene')} · {counted(n, 'record')} on screen", pngs(ep["shows"][:16]))
     outs["web/og/book.png"] = card("the book", "The Grammar of Simulation, as a book", "The parts simulation games share, how they trade off, and where AI changes them.",
-                                   "13 chapters · glossary · catalog", top)
+                                   f"{counted(sum(1 for st in w.chapters if re.match(r'(0[1-9]|1[0-9])-', st)), 'chapter')} · glossary · catalog", top)
     for e in mechs:
         der = w.derived.get(e.id, {})
         outs[f"web/og/mechanic/{e.id}.png"] = card(f"mechanic · {e.id}", e.data["name"], e.data.get("summary", ""),
-                                                   f'used by {der.get("prevalence", 0)} games · first seen {der.get("earliest_year") or "n/a"}', pngs([e.id]))
+                                                   f'used by {counted(der.get("prevalence", 0), "game")} · first seen {der.get("earliest_year") or "n/a"}', pngs([e.id]))
     for e in live("game"):
         ms = sorted(e.data.get("mechanics", []), key=lambda m: (m.get("role") != "core", name(m["id"]) if m["id"] in w.by_id else m["id"]))
         outs[f"web/og/game/{e.id}.png"] = card(f"game · {e.id}", e.data["name"], e.data.get("summary", ""),
-                                               f'{len(ms)} parts · {e.data.get("year", "")} · {w.term("subgenre", e.data.get("subgenre")).lower()}',
+                                               f'{counted(len(ms), "part")} · {e.data.get("year", "")} · {w.term("subgenre", e.data.get("subgenre")).lower()}',
                                                pngs(m["id"] for m in ms[:16]))
     for e in live("technique"):
         outs[f"web/og/technique/{e.id}.png"] = card(f"technique · {e.id}", e.data["name"], e.data.get("summary", ""),
                                                     f'{w.term("technique_maturity", e.data.get("maturity")).lower()} · {e.data.get("year", "")} · '
-                                                    f'{w.derived.get(e.id, {}).get("affects_count", 0)} mechanics affected', pngs([e.id]))
+                                                    f'{counted(w.derived.get(e.id, {}).get("affects_count", 0), "mechanic")} affected', pngs([e.id]))
     for e in live("opportunity"):
         inv = [i for i in e.data.get("involves", []) if i in w.by_id]
         outs[f"web/og/opportunity/{e.id}.png"] = card(f"opportunity · {e.id}", e.data["name"], e.data.get("summary", ""),
@@ -192,5 +193,5 @@ def images(w) -> dict[str, bytes]:
         ms = [i for i, rs in w.book_refs.items() if any(r[0] == stem for r in rs) and w.by_id[i].type == "mechanic"]
         ms.sort(key=lambda i: -w.derived.get(i, {}).get("prevalence", 0))
         outs[f"web/og/book/{stem}.png"] = card(f"the book · {stem}", title, "A chapter of The Grammar of Simulation, rendered from the dataset.",
-                                               f"{len(ms)} mechanics in this chapter" if ms else "the book", pngs(ms[:16]) or top)
+                                               f"{counted(len(ms), 'mechanic')} in this chapter" if ms else "the book", pngs(ms[:16]) or top)
     return outs

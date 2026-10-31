@@ -1,0 +1,48 @@
+id: 2026-10-31-site-polish
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: fix the website wording and display problems an outside review found
+  (plurals, find page, titles, labels, share card, phone layout, alt text, Japanese subtitles, home and
+  about wording).'
+method: 'Site code only; no record, source, report or book text changed. Plurals: scripts/lib.py gains counted(), used for
+  every count the pages, the preview images (og.py) and the paper''s figure tables (viz.py) print, with a twin in simgrammar.js;
+  the site no longer says 1 games (5 pages), 1 records (486 source pages) or 42 opportunitys (figure 1), and og.py computes the
+  family and chapter counts it had typed. Filters on the find and index pages: a sentence says when nothing matches, and group
+  counts read 3 of 199 while filtering (tested in headless Chrome with ?q=traffic jam and ?q=traffic); without script nothing
+  changes. Source titles add the venue, or the kind when there is none; no two built pages now share a title. Generated
+  tables in the book, the paper markdown and the paper page show vocabulary labels and rubric fields in words, not ids
+  (report_render.table_value, shared with web.py); this moves the word counts of the chapters with such tables. The home
+  description and preview use the front page''s lead (the image its first sentence, which fits the card). Home findings take
+  the paper''s wording: rated harder to read, and no technique in this dataset is linked to (exposure is zero exactly when no
+  affects edge exists). The about page states from live counts how many records cite sources, how many claims quote one, and
+  that no source has an archived snapshot yet; pages of records with no source, and source pages, no longer say their facts
+  come from sources they cite. The nav and the opportunity index say bets; URLs and the paper keep opportunity. Phone layout,
+  checked in headless screenshots at 375 and 1280 px: the home findings pad alike, so the second row is no longer indented;
+  episode thumbnails drop the length plate and shorts move the play label under the poster, so neither covers the caption in
+  the frame. Subtitles: the build''s .srt files are timed from the scripts'' planned scenes, 3 to 5 minutes longer than every
+  published render, so they are not served. subtitles.vtt() times the same cues from the scene starts in media/published.yaml
+  and the narration window the video''s own captions use (lead 0.5 s, tail 0.8 s); the build writes all 12 Japanese tracks
+  into dist/web/media/subtitles/ja/, which the Pages workflow publishes with the site, and the episode player offers them as
+  a track and a link. A track is left out when its cues do not fit the render or a scene is worded differently from it; none
+  is. srt() output is byte-identical to before. Alt text: 4,352 of 10,634 images have alt=""; a parse of every page found none
+  that is the only label of its link or row (each is an icon beside its own name) and the posters already have alts, so the
+  count is unchanged. Not done: no English subtitle file exists to offer; diplomacy_cicero is a source''s stored name (data).
+  make check, make determinism and style_check pass.'
+contract_version: '1.2'
+proposals:
+- kind: other
+  target: web/register.css
+  detail: '`.number + .number` pads every number but the first, so a strip that wraps (two columns under 600 px) indents its
+    second row. scripts/web.py works around it on the home page with a hidden leading `.number`. Register could pad the first
+    number of each row alike at that breakpoint, and the workaround could go.'
+- kind: other
+  target: web/register.css
+  detail: 'The 16:9 and 9:16 `.plate` sits on the bottom left of the frame, where this series'' frames carry their caption, so
+    the site now leaves it off thumbnails and puts the shorts'' play label in a figcaption, which register.css hides in watch
+    tiles under 600 px. A plate position that avoids the foot of the frame would let phones show the length again.'
