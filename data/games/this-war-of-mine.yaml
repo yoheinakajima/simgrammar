@@ -83,9 +83,15 @@ mechanics:
   role: supporting
   note: Noisy actions while scavenging at night, such as breaking through obstacles, can alert people
     at the location.
+- id: scenario-objectives
+  role: supporting
+  note: Each scenario sets a group of civilians and a city, and the goal is to stay alive until the war
+    ends.
 sources:
 - src-wikipedia-this-war-of-mine
 - src-steam-2026-this-war-of-mine
 status: sourced
 provenance:
   created: 2026-10-24-catalog-gb
+  reviewed:
+  - 2026-10-31-tag-audit

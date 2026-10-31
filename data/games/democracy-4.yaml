@@ -79,6 +79,10 @@ mechanics:
   role: supporting
   note: Political capital, earned through loyal ministers, is spent each turn to introduce, cancel, or
     adjust policies, so it caps how fast the government can change.
+- id: budget-treasury
+  role: supporting
+  note: Taxes and spending set the national budget; the player must balance it and pay off debt without
+    losing votes.
 sources:
 - src-wikipedia-democracy-4
 - src-harris-2020-democracy4-fixed-income
@@ -86,3 +90,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-catalog-gi
+  reviewed:
+  - 2026-10-31-tag-audit

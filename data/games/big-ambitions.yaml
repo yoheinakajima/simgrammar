@@ -82,6 +82,9 @@ mechanics:
   note: Paid marketing campaigns raise customer traffic to the player's businesses.
 - id: variable-speed
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: The player takes loans, pays rent and staff, and manages the money of a growing business.
 sources:
 - src-steam-2026-big-ambitions
 status: sourced
@@ -89,3 +92,4 @@ provenance:
   created: 2026-10-24-catalog-ge
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

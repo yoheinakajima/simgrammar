@@ -87,6 +87,9 @@ mechanics:
   role: supporting
 - id: storage-capacity
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Six kinds of tax, tithes, trade, and the King's yearly tax fill or drain the lord's treasury.
 sources:
 - src-wikipedia-manor-lords
 - src-steam-2026-manor-lords
@@ -95,3 +98,4 @@ provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

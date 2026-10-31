@@ -96,6 +96,9 @@ mechanics:
   role: supporting
 - id: utility-action-selection
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Outside sandbox mode the park runs on limited funds that rides, staff, and research draw down.
 influenced_by:
 - rollercoaster-tycoon
 sources:
@@ -106,3 +109,4 @@ provenance:
   created: 2026-10-24-catalog-ge
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

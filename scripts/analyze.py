@@ -806,6 +806,15 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     stats["n_mechanics_zero_exposure"] = len(zero)
     total_uses = sum(derived[m.id]["prevalence"] for m in mechs) or 1
     stats["pct_uses_on_zero_exposure"] = _r(100 * sum(derived[m.id]["prevalence"] for m in zero) / total_uses, 0)
+    # opportunities propose techniques for mechanics that no published result reaches yet: count the opportunity-mechanic
+    # pairs that none of the opportunity's techniques has an affects edge to, and the share of uses left unreached once a
+    # mechanic that an opportunity proposes a technique for counts as reached
+    reach = {t.id: {a["id"] for a in t.data.get("affects", [])} for t in techs}
+    opp_pairs = [(m, o.data.get("applies") or []) for o in opps for m in o.data.get("involves") or []]
+    stats["n_opportunity_mechanic_pairs"] = len(opp_pairs)
+    stats["n_opportunity_pairs_unlinked"] = sum(1 for m, ts in opp_pairs if not any(m in reach.get(t, ()) for t in ts))
+    proposed = {m for m, ts in opp_pairs if ts}
+    stats["pct_uses_on_zero_exposure_unproposed"] = _r(100 * sum(derived[m.id]["prevalence"] for m in zero if m.id not in proposed) / total_uses, 0)
     top10 = sorted(mechs, key=lambda m: (-derived[m.id]["prevalence"], m.id))[:10]
     stats["n_top10_prevalent_zero_exposure"] = sum(1 for m in top10 if derived[m.id]["technique_exposure"] == 0)
     early = [derived[m.id]["earliest_year"] for m in mechs if derived[m.id]["earliest_year"]]

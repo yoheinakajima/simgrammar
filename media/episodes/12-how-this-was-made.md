@@ -40,15 +40,15 @@ Target runtime about 11 minutes: about 1,190 words of narration at 135 words a m
 
 **Picture.** A sentence from episode 1 on screen, with its hidden tokens revealed beneath it: a stat, two ranks, an assertion.
 
-**Frame.** record script=episodes/01-same-parts.md find="None of them simulates anything"
+**Frame.** record script=episodes/01-same-parts.md find="Four of them simulate nothing"
 
-**Voice.** Sentences are the hard part, because they interpret numbers. So every number in this series is a token the build fills in, and every sentence that interprets one carries a check. When episode 1 said the five most common parts don't simulate anything, the build checked all five ranks. If the data stops agreeing, the build fails until somebody rewrites the line.
+**Voice.** Sentences are the hard part, because they interpret numbers. So every number in this series is a token the build fills in, and every sentence that interprets one carries a check. When episode 1 first said the five most common parts don't simulate anything, the build checked all five ranks. Then a check of the catalog's tags found games that keep a treasury without the tag, the treasury moved into the five, and the build failed until the line was rewritten.
 
 ## 5. The rules came from failures (3:48 to 5:53)
 
 **Picture.** The first version of the catalog grid beside the current one. In the old grid, the pause, placement, and tech tree columns are almost empty. In the new one they're the fullest on the board.
 
-**Voice.** Most of the rules exist because something went wrong once. The first catalog was built by agents working in parallel, each taking a slice of games. An outside reviewer found that they'd recorded each game's distinctive parts and skipped the obvious ones: pause, building placement, tech trees. The finding that opened this series, that the most common parts don't simulate anything, wasn't visible in that first data. The gaps were filled, and the analysis was redone.
+**Voice.** Most of the rules exist because something went wrong once. The first catalog was built by agents working in parallel, each taking a slice of games. An outside reviewer found that they'd recorded each game's distinctive parts and skipped the obvious ones: pause, building placement, tech trees. The finding that opened this series, that most of the commonest parts don't simulate anything, wasn't visible in that first data. The gaps were filled, and the analysis was redone.
 
 **Voice.** The same review caught the paper calling some techniques impossible to reproduce when their own records said they could be. Now a sentence about a technique is checked against that technique's record.{{assert:field.monte-carlo-tree-search.determinism_impact == mitigable}}
 
@@ -56,7 +56,7 @@ Target runtime about 11 minutes: about 1,190 words of narration at 135 words a m
 
 **Voice.** A later review removed one game at a time and re-ran everything. Several claims about which games belong together broke, because the samples used to test the clusters were reshuffled whenever the catalog changed. Each game's place in each of the {{stat:cluster_subsamples}} samples is now fixed by a hash of its name, and a claim that two games belong together has to hold in at least {{stat:cocluster_together_pct}} percent of them.
 
-**Voice.** Even the number of clusters follows a written rule: the smallest number whose clusters stay stable across the samples. When the rule was first applied it gave {{stat:cluster_k}}, and that was fixed so new games wouldn't reshuffle everything. On today's data the rule would pick {{stat:cluster_rule_k}}.{{assert:cluster_k != cluster_rule_k}} The gap sits inside the stated tolerance, so the build doesn't object, and episode 3 only claims the groupings that survive resampling either way.{{assert:cluster_k_drift == 0}}
+**Voice.** Even the number of clusters follows a written rule: the smallest number whose clusters stay stable across the samples. The number is fixed so new games don't reshuffle everything, and when the data moves far enough that the rule would choose another, the build warns and the number is chosen again by the rule. Today it is {{stat:cluster_k}}.{{assert:cluster_k == cluster_rule_k}}{{assert:cluster_k_drift == 0}} Episode 3 only claims the groupings that survive resampling.
 
 ## 6. Runs (5:53 to 7:15)
 

@@ -74,6 +74,11 @@ affects:
 - id: programming-by-demonstration
   effect: deepens
   note: Demonstrated routines can be stored as verified, reusable code skills that generalize to new locations.
+- id: production-chain
+  effect: tunes
+  note: Code-writing agents can play a factory game's production chains as automated testers; in the Factorio
+    Learning Environment they found growth strategies such as electric drilling but failed at multi-step chains
+    such as electronic-circuit manufacturing, so they can probe early chains but not deep ones yet.
 builds_on: []
 deployed_in: []
 limitations:
@@ -93,3 +98,4 @@ provenance:
   created: 2026-10-24-techniques-llm-agents
   reviewed:
   - 2026-10-24-technique-links
+  - 2026-10-31-tag-audit

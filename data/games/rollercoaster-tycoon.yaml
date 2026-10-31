@@ -110,6 +110,9 @@ mechanics:
   role: supporting
 - id: utility-action-selection
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Parks start with limited money and a loan; rides, landscaping, and research all cost money.
 influenced_by:
 - transport-tycoon
 sources:
@@ -120,3 +123,4 @@ provenance:
   created: 2026-10-24-catalog-ge
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

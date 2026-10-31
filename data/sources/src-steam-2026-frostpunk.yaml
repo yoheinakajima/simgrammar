@@ -1,0 +1,15 @@
+id: src-steam-2026-frostpunk
+type: source
+name: Frostpunk on Steam
+kind: store-page
+authors:
+- 11 bit studios
+venue: Steam
+date: '2026'
+url: https://store.steampowered.com/app/323190/Frostpunk/
+accessed: '2026-10-31'
+notes: 11 bit studios; society survival around a heat-giving generator; laws that regulate society; decisions such
+  as the fate of a troubled citizen or the demands of a newborn faction add up to unexpected results; react to current
+  events; scenarios including The Fall of Winterhome.
+provenance:
+  created: 2026-10-31-tag-audit

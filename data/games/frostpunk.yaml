@@ -90,12 +90,22 @@ mechanics:
   role: supporting
 - id: storage-capacity
   role: supporting
+- id: triggered-event-chains
+  role: supporting
+  note: 'Scenario stories advance through events and decisions: the fate of a troubled citizen or the
+    demands of a new faction lead to further events that move hope and discontent.'
+- id: scenario-objectives
+  role: supporting
+  note: Each scenario sets its own situation, story, and goal, such as surviving the great storm in the
+    main campaign.
 influenced_by:
 - this-war-of-mine
 sources:
 - src-wikipedia-frostpunk
+- src-steam-2026-frostpunk
 status: sourced
 provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

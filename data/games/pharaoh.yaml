@@ -83,6 +83,9 @@ mechanics:
   role: supporting
 - id: storage-capacity
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: The palace holds the city treasury in deben, and exports are often needed to fund the city.
 influenced_by:
 - caesar-3
 sources:
@@ -92,3 +95,4 @@ provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

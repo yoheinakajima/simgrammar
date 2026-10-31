@@ -85,6 +85,9 @@ mechanics:
     weigh with price and quality when choosing among stores.
 - id: variable-speed
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: The firm must keep making a profit and avoid going bankrupt or being bought out.
 sources:
 - src-wikipedia-capitalism-video-game
 status: sourced
@@ -92,3 +95,4 @@ provenance:
   created: 2026-10-24-catalog-ge
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

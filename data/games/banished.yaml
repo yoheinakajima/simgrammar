@@ -84,6 +84,10 @@ mechanics:
   role: supporting
 - id: fire-spread
   role: supporting
+- id: resource-extraction
+  role: supporting
+  note: Workers mine iron, quarry rock, and cut forests on land set aside for them, so extraction
+    competes with housing for space.
 store_ids:
   steam: 242920
 claims:
@@ -101,3 +105,4 @@ provenance:
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-25-store-ids-pilot
+  - 2026-10-31-tag-audit

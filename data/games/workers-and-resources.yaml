@@ -91,6 +91,10 @@ mechanics:
   role: supporting
 - id: free-placement
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: The republic earns money by exporting goods through border customs houses and spends it on
+    imports and construction.
 sources:
 - src-wikipedia-workers-and-resources
 - src-steam-2026-workers-and-resources
@@ -99,3 +103,4 @@ provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

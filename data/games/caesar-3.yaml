@@ -91,13 +91,18 @@ mechanics:
   role: supporting
 - id: storage-capacity
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: The Senate holds the city treasury, and the governor must make money to keep the city funded.
 influenced_by:
 - simcity-1989
 sources:
 - src-wikipedia-caesar-iii
 - src-bvschaik-2026-julius
+- src-wikipedia-pharaoh
 status: sourced
 provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

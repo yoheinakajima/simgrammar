@@ -32,7 +32,7 @@ Vertical, about 50 seconds, about 100 words of narration. One finding, from the 
 
 **Frame.** compare games=princess-maker-2,the-sims
 
-**Voice.** Princess Maker 2 is filed as a life sim, and it lands far from The Sims.{{assert:derived.princess-maker-2.cluster != derived.the-sims.cluster}}
+**Voice.** Princess Maker 2 is filed as a life sim, and it rarely lands near The Sims.{{assert:cocluster.princess-maker-2.the-sims < 0.15}}
 
 ## 0:48 to 0:52. End card
 

@@ -1,16 +1,16 @@
 # Short 8. City builders don't tell stories
 
-Vertical, about 55 seconds, about 100 words of narration. One finding, from the white-space analysis (chapter 9, episode 8). Any scratch voice is synthetic and disclosed on screen; the release uses the host's voice. Footage: Cities: Skylines, Surviving Mars (`media/rights.yaml`).
+Vertical, about 55 seconds, about 100 words of narration. One finding, from the white-space analysis (chapter 9, episode 8). Any scratch voice is synthetic and disclosed on screen; the release uses the host's voice. Footage: Cities: Skylines, Surviving Mars, Frostpunk (`media/rights.yaml`).
 
 ## 0:00 to 0:06. The finding
 
-**Picture.** Two piles of game covers: a tall one labelled "place buildings," a short one labelled "story events." A single cover slides into the gap between them.
+**Picture.** Two piles of game covers: a tall one labelled "place buildings," a short one labelled "story events." Two covers slide into the gap between them.
 
 **Frame.** count kind=venn a=free-placement b=triggered-event-chains
 
-**On screen.** Place buildings: {{derived:free-placement.prevalence}} games. Story events: {{derived:triggered-event-chains.prevalence}}. Both: one.
+**On screen.** Place buildings: {{derived:free-placement.prevalence}} games. Story events: {{derived:triggered-event-chains.prevalence}}. Both: two.
 
-**Voice.** Only one game in our catalog lets you place buildings and also runs chains of story events: {{derived:free-placement.prevalence}} games do the first, {{derived:triggered-event-chains.prevalence}} the second.{{assert:cooccur.free-placement.triggered-event-chains == 1}}
+**Voice.** Only two games in our catalog let you place buildings and also run chains of story events: {{derived:free-placement.prevalence}} games do the first, {{derived:triggered-event-chains.prevalence}} the second.{{assert:cooccur.free-placement.triggered-event-chains == 2}}
 
 ## 0:06 to 0:28. The moment
 
@@ -22,11 +22,11 @@ Vertical, about 55 seconds, about 100 words of narration. One finding, from the 
 
 ## 0:28 to 0:46. The exception
 
-**Picture.** Surviving Mars: a colony of domes, then a Mystery's first event window.
+**Picture.** Surviving Mars: a colony of domes, then a Mystery's first event window. Frostpunk: an event window over the city around its generator.
 
 **Frame.** anatomy game=surviving-mars parts=free-placement,triggered-event-chains,power-grid,tech-tree current=triggered-event-chains
 
-**Voice.** The exception is Surviving Mars, which lays authored mysteries like plagues and AI revolts over a colony you lay out yourself. Even there, the mysteries are layered on top of the colony.{{assert:rank.whitespace.free-placement.triggered-event-chains == 1}}
+**Voice.** The exceptions are Surviving Mars, which lays authored mysteries like plagues and AI revolts over a colony you lay out yourself, and Frostpunk, whose scenarios move through events and choices about the city's people. In both, the story is about the colony or the city, never about where anything stands.{{assert:cooccur.free-placement.triggered-event-chains == 2}}
 
 ## 0:46 to 0:51. End card
 

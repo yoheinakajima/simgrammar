@@ -4,11 +4,13 @@ name: Bottleneck explainer for production networks
 summary: Explain where and why a production network is starved or blocked by combining sensitivity analysis
   of the actual simulation with grounded language explanations.
 opportunity_type: legibility-layer
-thesis: 'No technique in the dataset is linked to production chains, yet one of the mechanic''s documented
-  failure modes is diagnosis: starvation far upstream is hard to see, so players blame the wrong building. Differentiable
-  or finite-difference sensitivity of output to each machine, buffer, and route identifies the binding
-  constraint exactly; a constrained language layer turns that into a short explanation with links to the
-  machines involved. The same tool supports designers checking recipe balance.'
+thesis: 'Only one technique in the dataset is linked to production chains, and only as a playtester:
+  code-writing agents in the Factorio Learning Environment found simple growth strategies but
+  failed at multi-step chains. Yet one of the mechanic''s documented failure modes is diagnosis:
+  starvation far upstream is hard to see, so players blame the wrong building. Differentiable or
+  finite-difference sensitivity of output to each machine, buffer, and route identifies the
+  binding constraint exactly; a constrained language layer turns that into a short explanation
+  with links to the machines involved. The same tool supports designers checking recipe balance.'
 design_sketch: A bottleneck lens colors every producer by how much one more unit of it would raise the
   selected output, and a sentence explains the top constraint ('circuits are limited by copper cable,
   which is starved because the smelter column shares a belt with iron'). Clicking jumps to the machine.
@@ -47,10 +49,11 @@ falsifiable_signal:
     network to identify the limiting resource, machine, or link.
 sources: []
 assertions:
-- 'derived.production-chain.technique_count == 0'
+- 'derived.production-chain.technique_count == 1'
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-25-contributor-readiness
+  - 2026-10-31-tag-audit

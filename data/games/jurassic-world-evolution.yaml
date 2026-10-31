@@ -88,6 +88,10 @@ mechanics:
   note: Island star ratings unlock the next island in the Las Cinco Muertes archipelago.
 - id: variable-speed
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Dinosaurs, shops, and hotels earn the park money; challenge mode limits money and adds fees and
+    penalties.
 sources:
 - src-wikipedia-jurassic-world-evolution
 status: sourced
@@ -95,3 +99,4 @@ provenance:
   created: 2026-10-24-catalog-ge
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

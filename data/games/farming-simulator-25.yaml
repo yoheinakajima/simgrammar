@@ -89,6 +89,10 @@ mechanics:
   note: ModHub distributes developer-tested community mods that add vehicles, maps, and scripts.
 - id: variable-speed
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Farm money buys fields and equipment and is earned from crops, livestock, forestry, and
+    contracts.
 sources:
 - src-steam-2024-farming-simulator-25
 - src-wikipedia-farming-simulator
@@ -97,3 +101,4 @@ provenance:
   created: 2026-10-24-catalog-gc
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit
