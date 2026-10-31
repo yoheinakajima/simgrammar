@@ -164,8 +164,8 @@ Target runtime about 12 minutes: about 1,270 words of narration at 135 words a m
 
 **Voice.** Try it with a game from this year. List its parts, look up the first catalog game for each, and count the new ones. Most of the time you will find a few, and they are usually the parts the game is known for.
 
-**Picture.** The design map of the catalog fades in, islands of games, with Factorio and Anno 1800 highlighted on the same island.
+**Picture.** The design map of the catalog fades in, islands of games, with Factorio and Anno 1800 highlighted on neighbouring islands.
 
-**Voice.** Factorio and Anno 1800 are both built on production chains, and the dataset puts them in one family, with the other factory games and settlement builders. Next episode: how those families are drawn, and the games they put side by side.{{assert:cocluster.factorio.anno-1800 >= 0.9}}{{assert:derived.factorio.cluster == derived.anno-1800.cluster}}
+**Voice.** Factorio and Anno 1800 are both built on production chains, and the dataset puts them in neighbouring families, one of factory games and one of settlement builders. Next episode: how those families are drawn, and the games they put side by side.{{assert:cocluster.factorio.anno-1800 > 0.4}}{{assert:cocluster.factorio.anno-1800 < 0.7}}{{assert:derived.satisfactory.cluster == derived.factorio.cluster}}{{assert:derived.manor-lords.cluster == derived.anno-1800.cluster}}
 
 **On screen.** Every part and the first game that had it: simgrammar.com

@@ -1,0 +1,16 @@
+id: src-paradox-2020-ck3-dev-diary-17
+type: source
+name: 'CK3 Dev Diary #17 - Governments, Vassal Management, Laws, and Raiding'
+kind: tech-report
+authors:
+- Meneth
+venue: Paradox Interactive forums
+date: '2020-03-10'
+url: https://forum.paradoxplaza.com/forum/developer-diary/ck3-dev-diary-17-governments-vassal-management-laws-and-raiding.1352640/
+archived: https://web.archive.org/web/20231207162207/https://forum.paradoxplaza.com/forum/developer-diary/ck3-dev-diary-17-governments-vassal-management-laws-and-raiding.1352640/
+accessed: '2026-10-31'
+notes: 'Pre-release developer diary, read through the archived copy. Government types set vassal obligations: under clan
+  government happy vassals provide significantly more taxes and levies than unhappy ones; tribal realms pay for men-at-arms
+  with prestige rather than gold; beating a raid army recovers the gold it carries.'
+provenance:
+  created: 2026-10-31-tag-audit-follow-up

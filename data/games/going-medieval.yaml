@@ -101,13 +101,19 @@ mechanics:
   role: supporting
 - id: storage-capacity
   role: supporting
+- id: production-chain
+  role: supporting
+  note: At the fermenting station milk ferments into curdling milk and then cheese, which is cooked into a
+    meal; rough wine ages into aged wine the same way.
 influenced_by:
 - rimworld
 sources:
 - src-wikipedia-going-medieval
 - src-steam-2026-going-medieval
+- src-foxyvoxel-2022-going-medieval-update-4
 status: sourced
 provenance:
   created: 2026-10-24-catalog-gb
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit-follow-up

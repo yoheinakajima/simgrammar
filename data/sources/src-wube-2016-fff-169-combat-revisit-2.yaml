@@ -1,0 +1,16 @@
+id: src-wube-2016-fff-169-combat-revisit-2
+type: source
+name: 'Friday Facts #169 - Combat revisit 2'
+kind: tech-report
+authors:
+- Twinsen
+- Klonan
+venue: Factorio blog (Wube Software)
+date: '2016-12-16'
+url: https://factorio.com/blog/post/fff-169
+accessed: '2026-10-31'
+notes: 'Combat changes, and the Wave defense scenario: biters spawn in waves and head for the players'' rocket silo, each wave
+  advances the silo by 5 percent, kills pay a bounty spent on upgrades, and on wave 20 the team must launch a satellite to
+  win.'
+provenance:
+  created: 2026-10-31-tag-audit-follow-up

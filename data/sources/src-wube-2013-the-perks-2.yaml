@@ -1,0 +1,15 @@
+id: src-wube-2013-the-perks-2
+type: source
+name: The Perks (Part 2)
+kind: tech-report
+authors:
+- Tomas
+venue: Factorio blog (Wube Software)
+date: '2013-07-10'
+url: https://factorio.com/blog/post/the-perks-2
+accessed: '2026-10-31'
+notes: 'Alpha preorder perks update: the scenario pack has three mini campaigns. Tight spot gives little space, limited resources,
+  and a fixed amount of time to buy land and machines and sell a final product; Transport belt madness asks the player to connect
+  chests on a small island; Supply challenge has six chests whose demands change.'
+provenance:
+  created: 2026-10-31-tag-audit-follow-up

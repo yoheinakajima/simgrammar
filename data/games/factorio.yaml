@@ -162,11 +162,31 @@ mechanics:
     Age, and the rail planner lays segments between points.
 - id: free-placement
   role: supporting
+- id: scenario-objectives
+  role: supporting
+  note: 'Besides the freeplay sandbox, scenarios set goals and limits: Wave defense is won by launching a
+    satellite on wave 20, and the Tight spot missions give little space, limited resources, and a fixed amount
+    of time.'
 influenced_by:
 - minecraft
 store_ids:
   steam: 427520
 claims:
+- text: In the Wave defense scenario, biters attack the rocket silo in waves, and the team wins by launching a
+    satellite on wave 20.
+  sources:
+  - src-wube-2016-fff-169-combat-revisit-2
+  confidence: high
+  quote: 'on wave 20 you will have to launch a satellite to win'
+  locator: Wave defense
+- text: The Tight spot mini campaign in the 2013 scenario pack gives little space, limited resources, and a
+    fixed amount of time to buy land and machines and sell a product.
+  sources:
+  - src-wube-2013-the-perks-2
+  confidence: high
+  quote: 'Tight spot - Little space, limited resources and fixed amount of time. Buy land and machines and
+    sell your final product.'
+  locator: scenario pack list
 - text: Factorio was publicly purchasable as an alpha from its official site in 2013, after the February
     2013 Indiegogo campaign, three years before Steam early access on 2016-02-25; `year` records the 2013
     alpha.
@@ -196,9 +216,12 @@ sources:
 - src-wube-2024-fff-414-spoils-of-agriculture
 - src-wube-2024-fff-416-fluids
 - src-wube-2026-factorio-lua-api
+- src-wube-2016-fff-169-combat-revisit-2
+- src-wube-2013-the-perks-2
 status: sourced
 provenance:
   created: 2026-10-24-catalog-gh
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-25-store-ids-pilot
+  - 2026-10-31-tag-audit-follow-up

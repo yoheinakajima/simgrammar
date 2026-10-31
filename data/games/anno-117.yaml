@@ -85,12 +85,27 @@ mechanics:
   role: supporting
 - id: free-placement
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Each game starts in deficit; money from residents whose needs are met pays the maintenance of
+    production buildings, public services, ships, and military units.
 influenced_by:
 - anno-1800
+claims:
+- text: Money mainly covers maintenance, which production buildings, public service buildings, ships, and
+    military units all cost, and each game starts in deficit.
+  sources:
+  - src-ubisoft-2025-anno-117-getting-started
+  confidence: high
+  quote: 'Firstly, your money will mainly be used to cover maintenance costs. All production buildings, public
+    service buildings, ships and later military units cost your maintenance.'
+  locator: Making money
 sources:
 - src-wikipedia-anno-117
+- src-ubisoft-2025-anno-117-getting-started
 status: sourced
 provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit-follow-up

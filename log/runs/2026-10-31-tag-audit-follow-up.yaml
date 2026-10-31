@@ -1,0 +1,45 @@
+id: 2026-10-31-tag-audit-follow-up
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Check the likely tagging gaps the 2026-10-31 tag audit left in its proposals against primary
+  sources, add the tags those sources support, re-select the cluster count by its rule, and rewrite the
+  sentences the new data makes false.
+method: 'Each gap in run 2026-10-31-tag-audit''s tag-audit-follow-up proposal was checked against developer or publisher
+  material; subagents searched in parallel, and every page cited was fetched and read again in this session before
+  a tag was added. All eleven held: production-chain on RimWorld (Alpha 15 change list: wort ferments in barrels
+  into beer), Going Medieval (Update #4: milk ferments into curdling milk, then cheese, cooked into a meal) and
+  Banished (2013 dev blog: mines yield iron ore and coal, blacksmiths make tools; one workshop step after extraction,
+  as in Caesar III''s tag); scenario-objectives on Factorio (Friday Facts #169: Wave defense is won by launching
+  a satellite on wave 20; the 2013 scenario pack''s time-limited Tight spot); terraforming on Cities: Skylines (Airports
+  Dev Diary #5: soil stored and spent as players landscape) and Cities: Skylines II (City Services Part 1: Shift,
+  Level, Soften, Slope Terrain); budget-treasury on Anno 1800 (resident income, building upkeep), Anno 117 (maintenance
+  against resident income), Europa Universalis IV (manual section 4.4: income, expenses, automatic loans, bankruptcy)
+  and Crusader Kings III (dev diaries 17 and 18, read from Wayback copies because the forum blocks automated readers:
+  taxes, men-at-arms upkeep, debt); triggered-event-chains on Frostpunk 2 (patch 1.1.0: consequence arcs that open
+  on conditions). Neither Anno source says what a negative balance does; both were tagged on income against recurring
+  upkeep, the tag audit''s bar. Steam announcements render with JavaScript and were read through the Steam news
+  API, so those records carry notes, not quoted claims; the 2016 Paradox forum landscaping diary could not be fetched,
+  so the 2022 diary is cited. The tags moved the clustering rule''s pick from 17 to 22 (mean ARI 0.7531; 18 to 21
+  fall just short of 0.75), so this run became maintenance and k was re-selected by the
+  rule; W107 is silent. Each sentence whose assertion then failed was rewritten to what the data says: chapters
+  1, 3, 4, 9, 13, paper section 5, episodes 1, 2, 3, 8, 12, shorts 1 and 8, the film, two opportunity theses, and
+  the Japanese cues for episodes 1, 2, 3, 8. Factorio and Anno 1800 now share a cluster in 0.55 of subsamples, so
+  chapter 4 calls them neighbouring families. Chapter 9''s single-game lots for Kenshi, Against the Storm, and Captain
+  of Industry now hold two or three games, and Kerbal Space Program, Going Medieval, and Schedule I replace them.
+  13 records changed (11 games, 2 opportunities), so the pull request needs the bulk label: splitting would rewrite
+  and re-voice the same chapter 9 and episode 8 lines twice. 25 narration lines changed (13 reworded, 12 in numbers
+  only) and need re-voicing; no audio was generated.'
+contract_version: '1.2'
+proposals:
+- kind: rule
+  target: check-sources-steam-news
+  detail: 'scripts/check_sources.py cannot see the text of Steam announcements: store.steampowered.com/news pages
+    and their akamaihd mirrors carry the post in a data attribute that page_text drops, so a quoted claim on a
+    developer patch note would fail CI. Reading the announcement from the Steam news API (ISteamNews/GetNewsForApp,
+    matched by gid) would let records quote patch notes, which are often the only primary statement of a rule.'

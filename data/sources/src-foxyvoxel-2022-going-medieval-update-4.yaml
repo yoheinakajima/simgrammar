@@ -1,0 +1,17 @@
+id: src-foxyvoxel-2022-going-medieval-update-4
+type: source
+name: Update #4 | Animals & Pets
+kind: docs
+authors:
+- Foxy Voxel
+venue: Steam (Going Medieval announcements)
+date: '2022-06-01'
+url: https://store.steampowered.com/news/app/1029780/view/4469272893488700992
+accessed: '2026-10-31'
+notes: 'Developer update notes, read through the Steam news API (the store page renders the text with JavaScript). New resources
+  include curdling milk (made by fermenting milk), cheese (curdling milk turns into cheese via fermentation), Tart De Bry (a
+  meal cooked with cheese), and aged wine (rough wine turns into aged wine via fermentation); the new Fermenting station is
+  "an area for managing all fermentation, from fruit juice, to alcohol and cheese production"; animal pens, pets, and sheep
+  harvested for wool.'
+provenance:
+  created: 2026-10-31-tag-audit-follow-up

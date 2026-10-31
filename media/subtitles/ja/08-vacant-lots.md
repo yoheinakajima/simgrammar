@@ -16,17 +16,19 @@ Cities: Skylinesは、葬祭サービスの問題は見せてくれます。
 
 ## 3
 
-［建物の配置：{{derived:free-placement.prevalence}}本・イベントの連鎖：{{derived:triggered-event-chains.prevalence}}本・両方：2本］
+［建物の配置：{{derived:free-placement.prevalence}}本・イベントの連鎖：{{derived:triggered-event-chains.prevalence}}本・両方：3本］
 建物の配置は、カタログの{{derived:free-placement.prevalence}}本のゲームにあります。
 イベントの連鎖は{{derived:triggered-event-chains.prevalence}}本。
 Crusader Kings IIIで、ライバルの病気から継承争い、
 そして戦争へと話をつなぐ仕組みです。
 2つがランダムに散らばっていれば、両方を持つゲームは何本かあるはずです。
-実際は2本です。Surviving Marsでは、
+実際は3本です。Surviving Marsでは、
 自分で配置したコロニーの上に、
 疫病やAIの反乱といった書かれた物語「ミステリー」が重なります。
 Frostpunkでは、シナリオが街の人々をめぐるイベントと選択で進みます。
-どちらも、物語はコロニーや街全体の話です。
+Frostpunk 2では、発電機を長く止めたり、派閥への約束を破ったりすると、
+結果の連鎖が始まります。
+3本とも、物語はコロニーや街全体の話です。
 別の形を想像してみてください。
 神殿の隣に建てた酒場や、池が農民の畑を水浸しにする水車小屋が、
 影響を受ける人々の短いイベントを起こす。
@@ -78,9 +80,10 @@ SimCityでは、区画の価値は汚染と犯罪、中心からの距離で下�
 
 加齢は{{derived:lifecycle-aging.prevalence}}本のゲームにあり、
 生産チェーンは{{derived:production-chain.prevalence}}本にあります。
-両方を持つのはカタログに2本だけで、どちらも工場ゲームではありません。
+両方を持つのはカタログに3本だけで、どれも工場ゲームではありません。
 Dwarf Fortressでは、ドワーフが育ち、工房で働き、老衰で死にます。
 Timberbornでは、ビーバーが年をとりながら水力の工房を動かします。
+Banishedでは、村人が年をとる一方で、鍛冶屋が鉱石と石炭から道具を作ります。
 工場ゲームのほう、たとえばCaptain of Industryや
 Workers & Resourcesは、深い工業経済を回しています。
 でも、どちらの記録にも、年をとったり引退したりする労働者はいません。
@@ -128,10 +131,9 @@ Game Dev Tycoonは、
 ほかに誰も建てていない空き地に、すでに立っているゲームもあります。
 Prison Architectは、職員を一人ずつ雇い、
 電力網も配線する唯一のゲームです。
-生産チェーンと永久死が出会うのは、Kenshiだけです。
-生成マップにシナリオ目標を置くのは、Against the Stormだけ。
-入植地ごとに新しいマップが生まれ、
-女王の我慢が尽きる前に評判ゲージを満たせば勝ちです。
+財政と手動の操縦を組み合わせるのは、Kerbal Space Programだけです。
+契約の報酬でロケットを買い、
+着陸は自分の手で決めなければなりません。
 建物が1つだけの空き地も、ここでは空き地に数えます。
 建つことは誰かが証明済みなので、むしろ役に立つ空き地かもしれません。
 

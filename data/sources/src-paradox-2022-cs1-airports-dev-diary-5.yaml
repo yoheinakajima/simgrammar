@@ -1,0 +1,16 @@
+id: src-paradox-2022-cs1-airports-dev-diary-5
+type: source
+name: 'Airports Dev Diary #5'
+kind: tech-report
+authors:
+- Colossal Order
+- Paradox Interactive
+venue: 'Steam (Cities: Skylines announcements)'
+date: '2022-01-24'
+url: https://store.steampowered.com/news/app/255710/view/4237325463686111596
+accessed: '2026-10-31'
+notes: 'Free update notes alongside the Airports expansion, read through the Steam news API (the store page renders the text
+  with JavaScript). Under "Buy or sell soil": players still use and store soil as they landscape the terrain, and can now buy
+  or sell soil instead of running out and digging a hole, or building a mountain to dispose of excess soil.'
+provenance:
+  created: 2026-10-31-tag-audit-follow-up

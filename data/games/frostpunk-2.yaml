@@ -77,12 +77,18 @@ mechanics:
   role: supporting
 - id: free-placement
   role: supporting
+- id: triggered-event-chains
+  role: supporting
+  note: Consequence Arcs open when the city meets a condition, such as the generator kept off while fuel is available
+    or repeated failed promises to a hostile faction, and play out as follow-up events the Steward can complete.
 influenced_by:
 - frostpunk
 sources:
 - src-wikipedia-frostpunk-2
+- src-11bit-2024-frostpunk-2-patch-1-1-0
 status: sourced
 provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit-follow-up

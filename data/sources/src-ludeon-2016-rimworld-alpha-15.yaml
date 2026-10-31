@@ -1,0 +1,15 @@
+id: src-ludeon-2016-rimworld-alpha-15
+type: source
+name: Alpha 15 - Tutorial and Drugs released!
+kind: tech-report
+authors:
+- Tynan Sylvester
+venue: Ludeon Studios blog
+date: '2016-08-28'
+url: https://ludeon.com/blog/2016/08/alpha-15-tutorial-and-drugs-released/
+accessed: '2026-10-31'
+notes: 'RimWorld Alpha 15 release post and change list: tutorial, drug system, deep drilling. Among the changes, beer production
+  now takes several stages: colonists make wort at the brewer table, leave it in fermenting barrels for a while, then harvest
+  it as beer.'
+provenance:
+  created: 2026-10-31-tag-audit-follow-up

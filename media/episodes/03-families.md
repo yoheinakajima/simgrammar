@@ -18,7 +18,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Frame.** compare at="Both games run on production chains" games=factorio,anno-1800
 
-**Voice.** In Anno 1800, a street of houses is waiting for canned goulash from another island, on a ship that is late. Both games run on production chains, and the dataset puts them in the same family.{{assert:cocluster.factorio.anno-1800 >= 0.9}}
+**Voice.** In Anno 1800, a street of houses is waiting for canned goulash from another island, on a ship that is late. Both games run on production chains, and the dataset puts them in neighbouring families that merge about half the time.{{assert:cocluster.factorio.anno-1800 > 0.4}}{{assert:cocluster.factorio.anno-1800 < 0.7}}
 
 ## 2. Title (0:45 to 0:55)
 
@@ -46,7 +46,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Voice.** Families come from the parts games share, and a shared rare part counts for far more than a shared pause button. Production chains, in {{derived:production-chain.prevalence}} games, count for little; conveyor belts, in {{derived:conveyor-transport.prevalence}}, count for a lot.{{assert:derived.conveyor-transport.prevalence < derived.production-chain.prevalence}}
 
-**Voice.** Factorio and Anno 1800 land in one family with Satisfactory, Captain of Industry, Manor Lords, Caesar III, and Pharaoh, and inside it the rare parts keep Factorio closest to the other factory games.{{assert:derived.anno-1800.cluster == derived.factorio.cluster}}{{assert:derived.satisfactory.cluster == derived.factorio.cluster}}{{assert:derived.captain-of-industry.cluster == derived.factorio.cluster}}{{assert:derived.manor-lords.cluster == derived.anno-1800.cluster}}{{assert:derived.caesar-3.cluster == derived.anno-1800.cluster}}{{assert:sim_factorio_satisfactory > sim_factorio_anno_1800}}
+**Voice.** Factorio lands in a family with Satisfactory and Captain of Industry, and Anno 1800 in one with Manor Lords, Caesar III, and Pharaoh. The rare parts keep Factorio closest to the other factory games, so the two families share one cluster only about half the time.{{assert:cocluster.factorio.anno-1800 > 0.4}}{{assert:cocluster.factorio.anno-1800 < 0.7}}{{assert:derived.satisfactory.cluster == derived.factorio.cluster}}{{assert:derived.captain-of-industry.cluster == derived.factorio.cluster}}{{assert:derived.manor-lords.cluster == derived.anno-1800.cluster}}{{assert:derived.caesar-3.cluster == derived.anno-1800.cluster}}{{assert:sim_factorio_satisfactory > sim_factorio_anno_1800}}
 
 ## 5. How many families (2:55 to 4:10)
 
@@ -132,7 +132,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Frame.** compare at="Factorio shares a cluster with Railroad Tycoon" games=factorio,railroad-tycoon
 
-**Voice.** The method also finds descendants with different names. Offworld Trading Company, from 2015, shares a family with M.U.L.E., from 1983, in every resampling.{{assert:cocluster.mule.offworld-trading-company >= 0.9}} Its designer names M.U.L.E. and Railroad Tycoon as inspirations. Prices move with every purchase and sale, and you win by buying up your rivals' shares, a mechanic the catalog first records in Railroad Tycoon.{{assert:derived.equity-buyouts.earliest_game == railroad-tycoon}} Those old trading games keep a weaker tie to the factory games. Factorio shares a cluster with Railroad Tycoon in about three of four resamplings, and with Satisfactory in all of them.{{assert:cocluster.factorio.railroad-tycoon > 0.7}}{{assert:cocluster.factorio.railroad-tycoon < 0.85}}{{assert:cocluster.factorio.railroad-tycoon < cocluster.factorio.satisfactory}}
+**Voice.** The method also finds descendants with different names. Offworld Trading Company, from 2015, shares a family with M.U.L.E., from 1983, in every resampling.{{assert:cocluster.mule.offworld-trading-company >= 0.9}} Its designer names M.U.L.E. and Railroad Tycoon as inspirations. Prices move with every purchase and sale, and you win by buying up your rivals' shares, a mechanic the catalog first records in Railroad Tycoon.{{assert:derived.equity-buyouts.earliest_game == railroad-tycoon}} Those old trading games keep a weaker tie to the factory games. Factorio shares a cluster with Railroad Tycoon in about two of five resamplings, and with Satisfactory in all of them.{{assert:cocluster.factorio.railroad-tycoon > 0.35}}{{assert:cocluster.factorio.railroad-tycoon < 0.5}}{{assert:cocluster.factorio.railroad-tycoon < cocluster.factorio.satisfactory}}
 
 ## 8. The sequel that moved (8:12 to 9:19)
 

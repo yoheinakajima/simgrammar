@@ -106,6 +106,10 @@ mechanics:
 - id: content-sharing
   role: supporting
   note: Player-made buildings, vehicles, and maps are shared and downloaded through the Steam Workshop.
+- id: terraforming
+  role: supporting
+  note: In-game landscaping tools reshape the terrain, and the soil dug out is stored and spent when land is
+    raised; a 2022 free update let players buy or sell soil instead of digging a hole or piling up a hill.
 influenced_by:
 - simcity-4
 store_ids:
@@ -120,6 +124,7 @@ sources:
 - src-wikipedia-cities-skylines
 - src-paradoxwikis-2026-skylines-education
 - src-wikipedia-city-building-game
+- src-paradox-2022-cs1-airports-dev-diary-5
 status: sourced
 provenance:
   created: 2026-10-24-catalog-ga
@@ -127,3 +132,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-25-store-ids-pilot
   - 2026-10-31-tag-audit
+  - 2026-10-31-tag-audit-follow-up

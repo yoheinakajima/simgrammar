@@ -4,9 +4,9 @@ name: Placement that tells stories
 summary: City builders where where and what the player builds triggers specific, state-aware story events
   about the inhabitants of those buildings.
 opportunity_type: new-mechanic
-thesis: 'Building placement and triggered event chains are both common but share only two catalog games,
-  Surviving Mars and Frostpunk, and in both the events concern the colony or the city as a whole
-  rather than where any building stands. City builders tell almost no stories about what players
+thesis: 'Building placement and triggered event chains are both common but share only three catalog
+  games, Surviving Mars, Frostpunk, and Frostpunk 2, and in all three the events concern the colony or
+  the city as a whole rather than where any building stands. City builders tell almost no stories about what players
   build, and event-driven games rarely have spatial building. Events keyed to placement,
   adjacency, and the inhabitants affected (a tavern next to the temple, a mill that floods a
   farmer''s field) give layout a narrative consequence. Constrained generation can instantiate
@@ -48,7 +48,7 @@ falsifiable_signal:
     named inhabitants.
 sources: []
 assertions:
-- 'cooccur.free-placement.triggered-event-chains <= 2'
+- 'cooccur.free-placement.triggered-event-chains <= 3'
 - 'derived.free-placement.prevalence_rank <= 5'
 - 'derived.triggered-event-chains.prevalence_share >= 0.08'
 status: asserted
@@ -58,3 +58,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-25-review-round
   - 2026-10-31-tag-audit
+  - 2026-10-31-tag-audit-follow-up

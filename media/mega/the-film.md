@@ -137,7 +137,7 @@ Recompute these from the render when an episode or its narration changes: `scrip
 
 **Picture.** The grid's five fullest columns light up, then RimWorld's row with its core columns, each nearly empty.
 
-**Voice.** Four of the five parts that turn up most often in those games model nothing in the world: a pause button, building placement, mod support, and a tech tree. The fifth is a treasury.{{assert:derived.variable-speed.prevalence_rank == 1}}{{assert:derived.free-placement.prevalence_rank == 2}}{{assert:derived.modding-api.prevalence_rank == 3}}{{assert:derived.budget-treasury.prevalence_rank == 4}}{{assert:derived.tech-tree.prevalence_rank == 5}} And most games count at least one rare part among their core.{{assert:pct_games_with_rare_core >= 75}}
+**Voice.** Of the six parts that turn up most often in those games, five model nothing in the world: a pause button, building placement, mod support, scenario goals, and a tech tree. The sixth is a treasury.{{assert:derived.variable-speed.prevalence_rank == 1}}{{assert:derived.free-placement.prevalence_rank == 2}}{{assert:derived.budget-treasury.prevalence_rank == 3}}{{assert:derived.modding-api.prevalence_rank == 4}}{{assert:derived.scenario-objectives.prevalence_rank == 5}}{{assert:derived.tech-tree.prevalence_rank == 5}} And most games count at least one rare part among their core.{{assert:pct_games_with_rare_core >= 75}}
 
 **Picture.** The technique-flow ribbons draw in from the right and land on a handful of columns; most of the grid stays unlit.
 

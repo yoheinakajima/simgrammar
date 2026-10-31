@@ -1,6 +1,6 @@
 # Episode 8. Vacant lots
 
-Target runtime about 12 minutes: about 1,250 words of narration at 135 words a minute, plus a beat of picture-only footage per scene. Covers book chapter 9. Footage: Cities: Skylines, Surviving Mars, Frostpunk, SimCity (1989), Football Manager, SpaceChem, Space Engineers, Factorio, Spore, Besiege, Dwarf Fortress, Timberborn, Captain of Industry, Workers & Resources: Soviet Republic, Crusader Kings III, RimWorld, Stellaris, Prison Architect, Kenshi, Against the Storm, Kerbal Space Program, This War of Mine, Minecraft, all captured by us. Publisher video policies are tracked in `media/rights.yaml` and must be checked before release. Every number below is filled in from the dataset when the script is built, and the sentences that interpret numbers carry the same checks as the book.
+Target runtime about 12 minutes: about 1,250 words of narration at 135 words a minute, plus a beat of picture-only footage per scene. Covers book chapter 9. Footage: Cities: Skylines, Surviving Mars, Frostpunk, Frostpunk 2, SimCity (1989), Football Manager, SpaceChem, Space Engineers, Factorio, Spore, Besiege, Dwarf Fortress, Timberborn, Banished, Captain of Industry, Workers & Resources: Soviet Republic, Crusader Kings III, RimWorld, Stellaris, Prison Architect, Kerbal Space Program, This War of Mine, Minecraft, all captured by us. Publisher video policies are tracked in `media/rights.yaml` and must be checked before release. Every number below is filled in from the dataset when the script is built, and the sentences that interpret numbers carry the same checks as the book.
 
 **Summary.** Pairs of common mechanics that rarely share a game, like a city builder that tells stories about what you build or a factory whose workers grow old. A few lots are already built by a single game, and some may stay empty for good reason.
 
@@ -20,13 +20,13 @@ Target runtime about 12 minutes: about 1,250 words of narration at 135 words a m
 
 ## 3. The missing story (0:47 to 2:08)
 
-**Picture.** Two columns of game covers. On the left, games with building placement; it's long. On the right, games with triggered event chains; it's short. Two covers slide into the middle: Surviving Mars and Frostpunk.
+**Picture.** Two columns of game covers. On the left, games with building placement; it's long. On the right, games with triggered event chains; it's short. Three covers slide into the middle: Surviving Mars, Frostpunk, and Frostpunk 2.
 
 **Frame.** count kind=venn a=free-placement b=triggered-event-chains
 
-**On screen.** Building placement: {{derived:free-placement.prevalence}} games. Event chains: {{derived:triggered-event-chains.prevalence}} games. Both: 2.
+**On screen.** Building placement: {{derived:free-placement.prevalence}} games. Event chains: {{derived:triggered-event-chains.prevalence}} games. Both: 3.
 
-**Voice.** Placing buildings is in {{derived:free-placement.prevalence}} catalog games. Event chains, the machinery that lets Crusader Kings III follow a rival's illness with a succession crisis and then a war, are in {{derived:triggered-event-chains.prevalence}}. If the two were spread across games at random, several games would have both. Two do: Surviving Mars, whose Mysteries lay authored storylines like plagues and AI revolts over a colony you lay out yourself, and Frostpunk, whose scenarios move through events and choices about the city's people.{{assert:cooccur.free-placement.triggered-event-chains == 2}} In both, the stories are about the colony or the city as a whole. Picture the other version: a tavern built next to the temple, or a mill whose pond floods a farmer's field, firing a short event about the people it affects, with a choice and a consequence the game keeps track of. Manor Lords and Islanders each do a piece of it too.
+**Voice.** Placing buildings is in {{derived:free-placement.prevalence}} catalog games. Event chains, the machinery that lets Crusader Kings III follow a rival's illness with a succession crisis and then a war, are in {{derived:triggered-event-chains.prevalence}}. If the two were spread across games at random, several games would have both. Three do: Surviving Mars, whose Mysteries lay authored storylines like plagues and AI revolts over a colony you lay out yourself; Frostpunk, whose scenarios move through events and choices about the city's people; and Frostpunk 2, where leaving the generator off too long, or breaking promises to a faction, sets off a chain of consequences.{{assert:cooccur.free-placement.triggered-event-chains == 3}} In all three, the stories are about the colony or the city as a whole. Picture the other version: a tavern built next to the temple, or a mill whose pond floods a farmer's field, firing a short event about the people it affects, with a choice and a consequence the game keeps track of. Manor Lords and Islanders each do a piece of it too.
 
 **Voice.** Call those vacant lots: two mechanics, each common, from different corners of the design, that almost never share a game.
 
@@ -54,11 +54,11 @@ Target runtime about 12 minutes: about 1,250 words of narration at 135 words a m
 
 ## 6. Workers who grow old (5:13 to 6:21)
 
-**Picture.** Dwarf Fortress: a dwarf child grows into a smith across a time-lapse. Timberborn: beavers at a lumber mill. Then Captain of Industry and Workers & Resources: trucks, conveyors, smelters, and no faces.
+**Picture.** Dwarf Fortress: a dwarf child grows into a smith across a time-lapse. Timberborn: beavers at a lumber mill. Banished: an old villager walks past the blacksmith. Then Captain of Industry and Workers & Resources: trucks, conveyors, smelters, and no faces.
 
 **Frame.** count kind=venn a=lifecycle-aging b=production-chain
 
-**Voice.** Aging lives in {{derived:lifecycle-aging.prevalence}} games. Production chains live in {{derived:production-chain.prevalence}}. Only two catalog games have both, and neither is a factory game: Dwarf Fortress, whose dwarves grow up, work the workshops, and die of old age, and Timberborn, whose beavers age while they run water-powered mills.{{assert:cooccur.lifecycle-aging.production-chain == 2}} The factory games, Captain of Industry and Workers & Resources among them, run deep industrial economies, and neither record lists workers who age or retire.
+**Voice.** Aging lives in {{derived:lifecycle-aging.prevalence}} games. Production chains live in {{derived:production-chain.prevalence}}. Only three catalog games have both, and none is a factory game: Dwarf Fortress, whose dwarves grow up, work the workshops, and die of old age; Timberborn, whose beavers age while they run water-powered mills; and Banished, whose villagers grow old while the blacksmith turns ore and coal into tools.{{assert:cooccur.lifecycle-aging.production-chain == 3}} The factory games, Captain of Industry and Workers & Resources among them, run deep industrial economies, and neither record lists workers who age or retire.
 
 **Voice.** Put aging into a factory game and a bottleneck could be a missing mentor as easily as a missing machine. The demographic wave that fills Cities: Skylines with hearses would show up, years later, as a production line running short-handed.
 
@@ -80,15 +80,13 @@ Target runtime about 12 minutes: about 1,250 words of narration at 135 words a m
 
 ## 9. Lots already built (8:22 to 9:32)
 
-**Picture.** Prison Architect: a guard walks past a generator room. Kenshi: a squad member with a missing arm hauls ore. Against the Storm: a new map unfolds for a new settlement.
+**Picture.** Prison Architect: a guard walks past a generator room. Kerbal Space Program: a contract pays out in the space center, then a lander comes down by hand.
 
 **Frame.** count kind=venn a=staff-hiring b=power-grid
 
-**Frame.** count at="Kenshi is the only one" kind=venn a=production-chain b=permadeath
+**Frame.** count at="Kerbal Space Program is the only one" kind=venn a=budget-treasury b=embodied-skill-control
 
-**Frame.** count at="Against the Storm is the only one" kind=venn a=scenario-objectives b=procedural-terrain
-
-**Voice.** Some games already stand on lots nobody else has built. Prison Architect is the only catalog game that hires staff one by one and also wires a power grid.{{assert:cooccur.staff-hiring.power-grid == 1}} Kenshi is the only one where production chains meet permanent death.{{assert:cooccur.permadeath.production-chain == 1}} Against the Storm is the only one that sets scenario goals on generated maps: each settlement is a new map, won by filling a reputation gauge before the Queen's patience runs out.{{assert:cooccur.procedural-terrain.scenario-objectives == 1}} A lot with one building on it still counts as vacant here, and it might be the more useful kind, because somebody has already shown it can stand.
+**Voice.** Some games already stand on lots nobody else has built. Prison Architect is the only catalog game that hires staff one by one and also wires a power grid.{{assert:cooccur.staff-hiring.power-grid == 1}} Kerbal Space Program is the only one that pairs a treasury with flying by hand: contracts pay for the rocket, and you still have to land it yourself.{{assert:cooccur.budget-treasury.embodied-skill-control == 1}} A lot with one building on it still counts as vacant here, and it might be the more useful kind, because somebody has already shown it can stand.
 
 ## 10. Lots that might stay empty (9:32 to 10:40)
 

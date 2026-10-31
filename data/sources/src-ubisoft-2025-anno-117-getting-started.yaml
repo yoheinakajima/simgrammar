@@ -1,0 +1,16 @@
+id: src-ubisoft-2025-anno-117-getting-started
+type: source
+name: 'Getting started in Anno 117: Pax Romana'
+kind: tech-report
+authors:
+- Ubi-Thorlof
+venue: Anno Union (Ubisoft)
+date: '2025-10-01'
+url: https://www.anno-union.com/getting-started-in-anno-117-pax-romana/
+accessed: '2026-10-31'
+notes: 'Developer survival guide. Under Making money: each game starts in deficit; money mainly covers maintenance, which all
+  production buildings, public service buildings, ships, and later military units cost; construction also costs a one-time
+  sum; income rises when residents get goods and services that provide money, and production buildings add gold to buildings
+  within their radius.'
+provenance:
+  created: 2026-10-31-tag-audit-follow-up

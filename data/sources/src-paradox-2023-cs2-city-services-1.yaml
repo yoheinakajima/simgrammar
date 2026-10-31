@@ -1,0 +1,16 @@
+id: src-paradox-2023-cs2-city-services-1
+type: source
+name: City Services - Part 1
+kind: tech-report
+authors:
+- Colossal Order
+- Paradox Interactive
+venue: 'Steam (Cities: Skylines II announcements)'
+date: '2023-07-17'
+url: https://store.steampowered.com/news/app/949230/view/6079346804886311944
+accessed: '2026-10-31'
+notes: 'Pre-release developer diary, read through the Steam news API (the store page renders the text with JavaScript). Under
+  Landscaping: the Terraforming section adjusts terrain with Shift Terrain, Level Terrain, Soften Terrain, and Slope Terrain;
+  planted trees grow from saplings and regrow after forest fires; also telecom coverage from server farms and towers.'
+provenance:
+  created: 2026-10-31-tag-audit-follow-up

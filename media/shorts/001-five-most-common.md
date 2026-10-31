@@ -8,15 +8,15 @@ Vertical, about 50 seconds, about 100 words of narration. Scene lengths follow t
 
 **On screen.** The five most common parts of a simulation game.
 
-**Voice.** Four of the five parts that turn up most often in simulation games don't simulate anything.
+**Voice.** Most of the parts that turn up most often in simulation games don't simulate anything.
 
 ## 0:06 to 0:21. The five
 
 **Picture.** Two seconds per part, each labelled with its rank: RimWorld paused mid-raid; a building dropped onto an empty lot in Cities: Skylines; a mod list; a RollerCoaster Tycoon park's finances; Factorio's research screen.
 
-**Frame.** count kind=bars rank ids=variable-speed,free-placement,modding-api,budget-treasury,tech-tree
+**Frame.** count kind=bars rank ids=variable-speed,free-placement,budget-treasury,modding-api,scenario-objectives,tech-tree
 
-**Voice.** We broke {{stat:n_game}} of them into their parts. First is the pause button, in {{stat:most_prevalent_mechanic_share_pct}} percent of them. Then placing buildings where you like, support for mods, a treasury, and a tech tree.{{assert:derived.variable-speed.prevalence_rank == 1}}{{assert:derived.free-placement.prevalence_rank == 2}}{{assert:derived.modding-api.prevalence_rank == 3}}{{assert:derived.budget-treasury.prevalence_rank == 4}}{{assert:derived.tech-tree.prevalence_rank == 5}}
+**Voice.** We broke {{stat:n_game}} of them into their parts. First is the pause button, in {{stat:most_prevalent_mechanic_share_pct}} percent of them. Then placing buildings where you like, a treasury, support for mods, and, tied for fifth, scenario goals and a tech tree.{{assert:derived.variable-speed.prevalence_rank == 1}}{{assert:derived.free-placement.prevalence_rank == 2}}{{assert:derived.budget-treasury.prevalence_rank == 3}}{{assert:derived.modding-api.prevalence_rank == 4}}{{assert:derived.scenario-objectives.prevalence_rank == 5}}{{assert:derived.tech-tree.prevalence_rank == 5}}
 
 ## 0:21 to 0:31. Seventh place
 

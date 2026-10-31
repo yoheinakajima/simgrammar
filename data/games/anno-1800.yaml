@@ -87,12 +87,26 @@ mechanics:
   role: supporting
 - id: free-placement
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Residents generate the money balance and buildings draw upkeep from it; custom rules can scale
+    resident income or switch building upkeep off.
+claims:
+- text: Custom game rules set how much money residents generate and can switch off building upkeep costs,
+    which makes the game significantly easier.
+  sources:
+  - src-ubisoft-2018-anno-1800-have-it-your-way
+  confidence: high
+  quote: 'Inactive Upkeep – Turning off building upkeep costs will make the game significantly easier.'
+  locator: custom game rules list
 sources:
 - src-wikipedia-anno-1800
 - src-anno1800wiki-2026-population
 - src-anno1800wiki-2026-needs
+- src-ubisoft-2018-anno-1800-have-it-your-way
 status: sourced
 provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit-follow-up

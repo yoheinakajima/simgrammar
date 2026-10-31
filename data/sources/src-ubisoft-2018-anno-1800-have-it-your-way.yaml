@@ -1,0 +1,15 @@
+id: src-ubisoft-2018-anno-1800-have-it-your-way
+type: source
+name: 'DevBlog: Have it your way'
+kind: tech-report
+authors:
+- Ubi_MarcelH
+venue: Anno Union (Ubisoft)
+date: '2018-10-18'
+url: https://www.anno-union.com/what-you-will/
+accessed: '2026-10-31'
+notes: 'Anno 1800 developer blog on custom sessions. Difficulty presets regulate everything from the income players generate
+  to relocation costs; custom game rules include Income (the ratio of how much money residents generate), refund of construction
+  costs, city incidents, and Inactive Upkeep (turning off building upkeep costs makes the game significantly easier).'
+provenance:
+  created: 2026-10-31-tag-audit-follow-up

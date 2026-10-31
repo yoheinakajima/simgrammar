@@ -120,10 +120,24 @@ mechanics:
 - id: modding-api
   role: supporting
   note: 'Script and data files define events, countries, and rules; total conversions replace the setting.'
+- id: budget-treasury
+  role: supporting
+  note: Monthly income fills the treasury and expenses from advisors to army and fleet maintenance drain it;
+    running out of money takes loans automatically, and too much debt ends in bankruptcy.
+claims:
+- text: The economy screen lists income and expenses, and everything from advisors to fleet maintenance costs
+    money.
+  sources:
+  - src-paradox-2013-eu4-manual
+  confidence: high
+  quote: 'Everything costs, from Advisors right down to Fleet Maintenance.'
+  locator: section 4.4 Economy, p. 37
 sources:
 - src-wikipedia-europa-universalis-4
+- src-paradox-2013-eu4-manual
 status: sourced
 provenance:
   created: 2026-10-24-catalog-gi
   reviewed:
   - 2026-10-25-contributor-readiness
+  - 2026-10-31-tag-audit-follow-up

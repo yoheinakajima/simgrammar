@@ -1,0 +1,15 @@
+id: src-shiningrock-2013-this-week-in-review
+type: source
+name: This week in review...
+kind: tech-report
+authors:
+- Dukus
+venue: Shining Rock Software blog
+date: '2013-04-12'
+url: https://shiningrocksoftware.com/2013-04-12-this-week-in-review/
+accessed: '2026-10-31'
+notes: 'Banished development post: mines now yield coal as well as iron ore; townspeople heat homes with coal or firewood;
+  blacksmiths use coal to make steel tools, which last longer than iron tools; mines and similar buildings cannot be removed
+  from the landscape once built.'
+provenance:
+  created: 2026-10-31-tag-audit-follow-up
