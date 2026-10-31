@@ -450,7 +450,8 @@ class Web:
         bib_names = " and ".join(f"{a.rsplit(' ', 1)[1]}, {a.rsplit(' ', 1)[0]}" if " " in a and a != "SimGrammar contributors" else f"{{{a}}}"
                                  for a in self.analysis["byline"])
         bib = (f"@misc{{nakajima{meta['date'][:4]}grammar,\n  title = {{{meta['title']}: {meta['subtitle']}}},\n  author = {{{bib_names}}},\n"
-               f"  year = {{{meta['date'][:4]}}},\n  version = {{{meta['version']}}},\n  url = {{{self.site['url']}paper/}},\n  note = {{Dataset {self.short}; full sha256 in manifest.json}}\n}}")
+               f"  year = {{{meta['date'][:4]}}},\n  version = {{{meta['version']}}},\n" + (f"  doi = {{{meta['doi']}}},\n" if meta.get("doi") else "") +
+               f"  url = {{{self.site['url']}paper/}},\n  note = {{Dataset {self.short}; full sha256 in manifest.json}}\n}}")
         nruns = len(self.ents.get("run", []))
         header = f"""<nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../" data-internal>simgrammar</a></li><li>paper</li></ol></nav>
 <div class="page-header corners">

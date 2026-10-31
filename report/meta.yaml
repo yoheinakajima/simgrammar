@@ -6,7 +6,8 @@ byline_names: 3
 # Contributor profiles, keyed by GitHub handle. The contributors table (paper appendix D, book chapter 13, README) and
 # the byline are built from log/runs; a profile adds a display name and links, which the table lists and the site shows
 # in a card on hover. An operator without a profile is credited by handle. Add or edit your own in your PR: `name`, and
-# any of `x`, `linkedin`, and `website`, each an https link (x.com or twitter.com, and linkedin.com, for the first two).
+# any of `x`, `linkedin`, `website`, and `orcid`, each an https link (x.com or twitter.com, linkedin.com, and orcid.org
+# for x, linkedin, and orcid). CITATION.cff lists the byline's website and orcid.
 contributors:
   yoheinakajima:
     name: Yohei Nakajima
@@ -23,8 +24,11 @@ contributors:
     x: https://x.com/shreyko
     linkedin: https://www.linkedin.com/in/shreyans-kothari
     website: https://antimlabs.com
-date: "2026-10-25"
-version: "0.2"
+# The paper's version and release date, printed on its title page with the dataset_sha256 and written to CITATION.cff.
+# Bump both for a release, then tag it v<version> (decisions/ADR-0008). Once Zenodo mints the concept DOI for the
+# repository, add it here as `doi: "10.5281/zenodo.<n>"`; the build then puts it in CITATION.cff and the paper's BibTeX.
+date: "2026-10-31"
+version: "0.3"
 # The website projection (scripts/web.py -> dist/web). Changing these changes generated pages.
 site:
   url: "https://simgrammar.com/"

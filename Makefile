@@ -1,7 +1,7 @@
 PY ?= python3
 TMP ?= /tmp/simgrammar-determinism
 
-.PHONY: check validate style build sqlite find hooks determinism sources calibrate-sheet pr-check tasks
+.PHONY: check validate style build sqlite find hooks determinism sources calibrate-sheet pr-check tasks pdf
 
 check: validate style
 	$(PY) scripts/build.py --check
@@ -25,6 +25,11 @@ determinism:
 	PYTHONHASHSEED=1 $(PY) scripts/build.py --out $(TMP)/a
 	PYTHONHASHSEED=2 $(PY) scripts/build.py --out $(TMP)/b
 	diff -r $(TMP)/a $(TMP)/b && echo "determinism OK"
+
+# optional: typeset the paper as pdf-out/paper.pdf with tectonic (not part of check or CI; ADR-0008). Its first run
+# fetches TeX packages; one tectonic version gives a byte-identical PDF. `scripts/paper_pdf.py --tex-only` writes the source alone.
+pdf: build
+	$(PY) scripts/paper_pdf.py
 
 # network: fetch cited sources and check claim quotes and store ids (not part of the build)
 sources:

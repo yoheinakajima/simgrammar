@@ -2,6 +2,14 @@
 
 Contract, schema, vocabulary, and rubric changes. Data changes are tracked by run records in `log/runs/` and by git history.
 
+## 1.2 additions (2026-10-31, citable release)
+
+ADR-0008 (run `2026-10-31-citable-release`). No schema, vocabulary, or data rule changed.
+
+- **Paper:** version 0.3, dated 2026-10-31, in `report/meta.yaml`, which now says how a release is cut.
+- **Citation:** the build writes `CITATION.cff` (CFF 1.2.0) from `report/meta.yaml` and the byline; E023 and invariant I1 now cover it. Optional `doi` in `report/meta.yaml` (into `CITATION.cff` and the paper's BibTeX) and `orcid` in contributor profiles.
+- **PDF:** `make pdf` (`scripts/paper_pdf.py`) writes the paper as LaTeX with TikZ figures in `pdf-out/` and compiles it with tectonic, byte-identical for one tectonic version. Optional; not part of `make check` or CI.
+
 ## 1.2 additions (2026-10-27, three-lab review)
 
 Outside models reviewed the paper and the contribution rules cold: gemini-3.1-pro-preview, meta/muse-spark-1.3, and openai/gpt-5.3-codex for the scope-check code. Each finding was checked against the data before acting (ADR-0007, run `2026-10-25-gemini-review`, written under 1.1 and rebased onto 1.2).

@@ -128,7 +128,7 @@ Never type a dataset count ("140 games") into prose (E021). When a sentence inte
 
 ## 7. Never
 
-- Edit anything between `<!-- BEGIN GENERATED -->` markers, or commit `dist/` (it is gitignored; CI builds it).
+- Edit anything between `<!-- BEGIN GENERATED -->` markers or in `CITATION.cff` (the build writes both), or commit `dist/` (it is gitignored; CI builds it).
 - Cite a source you did not open, paraphrase inside a `quote`, or verify, rate, or resolve work from your own operator or model.
 - Change an existing record's `provenance.created`, drop a `reviewed` entry, or attribute a rating to any run but your own (E039).
 - Put more than 10 records or 30 sources in one PR, or more than one run (E039).
