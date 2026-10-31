@@ -1,0 +1,50 @@
+id: 2026-10-31-site-records
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: fix the record, index, find and about pages a pre-launch review
+  found confusing (section names, order, status, relations, links, contributor on-ramp, filters).'
+method: 'Checked each of the fourteen review points against a fresh dist/web before changing anything, then
+  changed only scripts/web.py (record pages, indexes, find, about); no record, source, report, book or media
+  file changed. After each change I rebuilt and checked the result in dist/web, by grep over every page and in
+  the desktop browser against a local static server at 1024, 768 and 390 px, with the filter script on and
+  off. Record pages: the order is now main text, used by (mechanics), relations, watch, mentioned in,
+  backlinks, claims, sources, about this record. "Appears in" is "mentioned in". A mechanic''s games left
+  backlinks for a used-by section, core and supporting, counted from the uses edges. Relations now come
+  before the mentions on every page, so a technique''s affected mechanics and a bet''s mechanics, techniques
+  and precedents no longer sit below them, and a mechanic''s relations include the mechanics that link to it
+  (required by, generalizes, synergy, tension) with their notes; other inverses stay in backlinks. Transcripts
+  start collapsed. A short''s poster links to the short on the watch page and carries the video in data-src.
+  Each parts-board note links to the sources section when the record has one. Opportunity records say bet
+  in the eyebrow and title. The about-this-record block links the record''s YAML on GitHub and CONTRIBUTING.md.
+  Game chips show their subgenre emblem wherever chips are drawn. Indexes: every table twin and register
+  filter carries status (sources have no status field), each header counts records by status, register
+  filters match summaries, the technique index groups by category as the mechanic and game indexes do, the
+  bet board drops horizons with no bet, and the mechanic dek defines a mechanic and says what exposure is.
+  Find: record rows show their id, the filter matches summaries, and the dek names ?q=. About: CONTRIBUTING.md
+  leads the start-with links; the research log cuts each purpose at a word boundary with an ellipsis, and the
+  actor keeps its own column with spaces between the cells so the page text keeps them apart. Not done: the
+  double rule above the sidebar''s facts heading did not reproduce; measured at all three widths, the only rule
+  above it is the aside''s own top border. In-place playback on record pages needs web/simgrammar.js video()
+  to read data-src before href; that function belongs to a parallel run, so it is a proposal here. I tested
+  the one-line change on a built copy only: the poster then plays its file, and without it a click loads the
+  watch page address as the video.'
+contract_version: '1.2'
+proposals:
+- kind: other
+  target: web/simgrammar.js
+  detail: 'video() takes the video file from the poster link''s href. Record pages now point that href at the
+    short on the watch page, so readers without script land there, and put the file in data-src. video()
+    should read a.getAttribute("data-src") || a.getAttribute("href") for the src, which keeps every other
+    poster as it is. Until it does, a click on a record page''s short with script on loads the watch page
+    address as the video.'
+- kind: other
+  target: AGENTS.md
+  detail: 'The website paragraph says a record page''s backlinks list every incoming edge. A mechanic page now
+    lists its games under used by and the mechanics that link to it under relations, and backlinks hold the
+    rest, so the sentence could read that the record page lists every incoming edge.'

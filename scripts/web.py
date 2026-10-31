@@ -223,6 +223,8 @@ class Web:
         if not e:
             return f'<span class="chip">{esc(eid)}</span>'
         ic = self.icon(eid, base, 24)
+        if not ic and e.type == "game" and e.data.get("subgenre") in self.icons:   # a game shows its subgenre's emblem, as its cards do
+            ic = self.icon(e.data["subgenre"], base, 24)
         return (f'<a class="chip" data-style="{"icon" if ic else "name"}" href="{base}{e.type}/{eid}/" data-internal>'
                 f'{ic}{esc(e.data.get("name", eid))}</a>')
 
@@ -656,10 +658,14 @@ class Web:
         t = re.sub(r"\[([^\]]+)\]\((?:\.\./)+wiki/(\w+)/([a-z0-9-]+)\.md\)", lambda m: f'<a href="{base}{m.group(2)}/{m.group(3)}/" data-internal>{m.group(1)}</a>', t)
         return t.replace("**", "").replace("*", "")
 
-    def short_figure(self, sh, base, width=270):
+    def short_figure(self, sh, base, width=270, href=None):
         """A short's poster, which plays in place. Its opening frame states the finding in its lower lines, so the play
-        label sits under the picture instead of on it, and the tile's eyebrow gives the length as well."""
-        return (f'<figure class="image" data-ratio="9/16"><a class="frame" href="{base}media/shorts/{esc(sh["file"])}" data-play>'
+        label sits under the picture instead of on it, and the tile's eyebrow gives the length as well. With `href`, the
+        poster links there without script (a record page sends readers to the short on the watch page) and carries the
+        video file in data-src for the player."""
+        mp4 = f'{base}media/shorts/{esc(sh["file"])}'
+        link = f'href="{esc(href)}" data-src="{mp4}" data-internal' if href else f'href="{mp4}"'
+        return (f'<figure class="image" data-ratio="9/16"><a class="frame" {link} data-play>'
                 f'<img src="{base}media/shorts/{esc(sh["poster"])}" width="{width}" height="{round(width * 16 / 9)}" alt="Short {sh["n"]}: {esc(sh["title"])}, opening frame" loading="lazy">'
                 f'</a><figcaption><span>play · {self.mmss(sh["seconds"])}</span></figcaption></figure>')
 
@@ -667,11 +673,12 @@ class Web:
         ss = self.shorts_of.get(e.id, [])
         if not ss:
             return ""
-        blocks = "".join(
-            f'<div class="split" data-style="watch">{self.short_figure(sh, base)}<div><p class="eyebrow"><span class="id">short {sh["n"]}</span> <span>{self.mmss(sh["seconds"])}</span></p>'
-            f'<h3>{esc(sh["title"])}</h3><details class="disclosure" open><summary>transcript</summary>{"".join(f"<p>{self.voice_html(v, base)}</p>" for v in sh["voice"])}</details>'
-            + (f'<p class="small faint">also on the pages for</p>{self.chips([i for i in sh["shows"] if i != e.id], base)}' if len(sh["shows"]) > 1 else "")
-            + "</div></div>" for sh in ss)
+        def block(sh):   # without script the poster opens the short on the watch page; with it the poster plays here
+            return (f'<div class="split" data-style="watch">{self.short_figure(sh, base, href=f"{base}watch/#{sh["key"]}")}<div><p class="eyebrow"><span class="id">short {sh["n"]}</span> <span>{self.mmss(sh["seconds"])}</span></p>'
+                    f'<h3>{esc(sh["title"])}</h3><details class="disclosure"><summary>transcript</summary>{"".join(f"<p>{self.voice_html(v, base)}</p>" for v in sh["voice"])}</details>'
+                    + (f'<p class="small faint">also on the pages for</p>{self.chips([i for i in sh["shows"] if i != e.id], base)}' if len(sh["shows"]) > 1 else "")
+                    + "</div></div>")
+        blocks = "".join(block(sh) for sh in ss)
         return self.section("watch", blocks, f'{counted(len(ss), "short")} with this record on screen')
 
     # ------------------------------------------------------------------ episodes
@@ -890,7 +897,7 @@ class Web:
                     refs[sid].append((stem, title, "cited in the text"))
         return refs
 
-    def appears_section(self, e, base):
+    def mentioned_section(self, e, base):
         src = e.type == "source"
         rows = [f'<div class="row"><div class="id">paper</div><div><h3><a href="{base}paper/#{hid}" data-internal>{esc(title)}</a></h3>'
                 f'<p>{"cited" if src else "linked"} in this section of the paper</p></div><div class="end">paper</div></div>' for hid, title in self.paper_refs.get(e.id, [])]
@@ -918,7 +925,7 @@ class Web:
         npp, nb, ne, ns = len(self.paper_refs.get(e.id, [])), len(self.book_refs.get(e.id, [])), len(by_ep), len((self.short_cites if src else self.shorts_of).get(e.id, []))
         right = " · ".join(x for x in (f'the paper, {counted(npp, "section")}' if npp else "", counted(nb, "chapter") if nb else "", counted(ne, "episode") if ne else "",
                                        counted(ns, "short") if ns else "") if x)
-        return self.section("appears in", f'<div class="register">{"".join(rows)}</div>', right)
+        return self.section("mentioned in", f'<div class="register">{"".join(rows)}</div>', right)
 
     def families(self):
         """Mechanics by family, families with the most mechanics first, each family's mechanics most used first."""
@@ -968,7 +975,8 @@ class Web:
         der = self.derived.get(e.id, {})
         plural = self.registry["types"][t]["plural"]
         st = d.get("status")
-        eyebrow = [f'<span class="id">{esc(self.registry["types"][t]["label"].lower())}</span>']
+        one = READER_NAME.get(t, (self.registry["types"][t]["label"].lower(),))[0]   # what the nav, index, and breadcrumb call this record
+        eyebrow = [f'<span class="id">{esc(one)}</span>']
         if d.get("deprecated"):
             eyebrow.append('<span class="status" data-state="superseded">deprecated</span>')
         meta = self.entity_meta(e)
@@ -981,7 +989,10 @@ class Web:
         if d.get("deprecated"):
             head += (f'<div class="note" data-surface="open"><span class="label">deprecated</span><p>{esc(d["deprecated"].get("reason", ""))} '
                      f'Superseded by {self.link(d["deprecated"]["superseded_by"], base)}.</p></div>')
-        main = ([self.parts_board(e, base)] if t == "game" else []) + [self.watch_section(e, base)]
+        listed = [sid for sid in d.get("sources") or [] if sid in self.by_id]   # the page's sources section lists these
+        # the subject first: what the record is and says, then what it connects to, then where the videos, paper, and book
+        # show it, then everything else that links here, the evidence, and how the record was made
+        main = [self.parts_board(e, base, bool(listed))] if t == "game" else []
         for f in LONG.get(t, []):
             if d.get(f):
                 cls = ' class="mono"' if f == "core_loop" else ""
@@ -1011,8 +1022,12 @@ class Web:
                             f'<p class="scope"><a href="{esc(self.gh("log/runs/" + r["run"] + ".yaml"))}">{esc(r["run"])}</a></p></div></div>' for r in d["ratings"])
             about.append((f'ratings · {len(d["ratings"])}', f'<p class="small muted">Scores rated by more than one rater; the score shown is the lower median.</p>'
                           f'<div class="register" data-kind="claims">{rrows}</div>'))
-        main.append(self.appears_section(e, base))
+        if t == "mechanic":
+            main.append(self.used_by(e, base))
         main.append(self.relations(e, base))
+        main.append(self.watch_section(e, base))
+        main.append(self.mentioned_section(e, base))
+        main.append(self.backlinks(e, base))
         claims = (d.get("key_results") or []) + (d.get("claims") or [])
         if claims:
             rows = []
@@ -1030,13 +1045,10 @@ class Web:
             if loc:
                 arch = f'<p class="scope">archived · <a href="{esc(d["archived"])}">wayback snapshot</a></p>' if d.get("archived") else ""
                 main.insert(0, self.section("locator", f'<p><a href="{esc(loc)}">{esc(loc)}</a></p>{arch}'))
-        if d.get("sources"):
+        if listed:
             rows = []
-            for sid in d["sources"]:
-                s = self.by_id.get(sid)
-                if not s:
-                    continue
-                sd = s.data
+            for sid in listed:
+                sd = self.by_id[sid].data
                 rows.append(f'<div class="row"><div class="id"></div><div><span class="who">{esc(", ".join(sd.get("authors", [])[:3]))}</span> ({esc(sd.get("date"))}). '
                             f'{self.link(sid, base)}. <span class="venue">{esc(sd.get("venue", ""))}</span></div></div>')
             main.append(self.section("sources", f'<div class="register" data-kind="refs">{"".join(rows)}</div>', f"{len(rows)}"))
@@ -1050,9 +1062,9 @@ class Web:
         body = head + f'<div class="split"><div style="min-width:0">{"".join(m for m in main if m)}</div><aside class="aside" style="min-width:0">{aside}</aside></div>'
         # a source's title names where it is published, since a store page and a wiki article often share a game's name
         where = (d.get("venue") or self.term("source_kind", d.get("kind")).lower()) if t == "source" else ""
-        title = " · ".join(x for x in (d.get("name", e.id), where if where != d.get("name") else "", self.registry["types"][t]["label"].lower(), "simgrammar") if x)
+        title = " · ".join(x for x in (d.get("name", e.id), where if where != d.get("name") else "", one, "simgrammar") if x)
         desc = d.get("summary") or d.get("notes") or d.get("name", e.id)
-        return self.page(title=title, desc=desc, body=body, depth=2, nav=t, path=f"{t}/{e.id}/", image=f"og/{t}/{e.id}.png" if t != "source" else "og/site.png")
+        return self.page(title=title, desc=desc, body=body, depth=2, nav=t, path=f"{t}/{e.id}/", image=f"og/{t}/{e.id}.png" if t != "source" else "og/source.png")
 
     STATUS_WHY = {"asserted": "Not yet backed by a source. It is in the queue for someone to source.",
                   "sourced": "Its facts cite the sources below. No second person has checked them yet.",
@@ -1072,12 +1084,27 @@ class Web:
             why = ("Every fact on this page comes from the record below, which cites no source yet: its facts are its author's reading until "
                    "someone adds a source. Any of it can be checked and corrected.")
         head = f'<p>{esc(why)} <a href="../../about/" data-internal>How the atlas is made</a>.</p>'
+        # the way to correct it: the record's file, which anyone can propose an edit to on GitHub, and the guide to doing so
+        path = f'{self.registry["types"][e.type]["dir"]}/{e.id}.yaml'
+        head += (f'<p class="small"><b>propose a change</b> <a href="{esc(self.gh(path))}">{esc(path)}</a>'
+                 f' · <a href="{esc(self.gh("CONTRIBUTING.md"))}">CONTRIBUTING.md</a></p>')
         say = self.STATUS_WHY.get(st, "")
         if st == "asserted" and self.cites(e):   # it lists sources, but they do not yet back its facts
             say = "Its sources do not yet back all of its facts. It is in the queue for someone to source."
         status = (f'<p><span class="status" data-state="{STATE.get(st, "optional")}">{esc(st)}</span> {esc(say)}</p>' if st else "")
         inner = head + status + "".join(f'<h3>{esc(h)}</h3>{html}' for h, html in parts if html) + twins
         return self.section("about this record", f'<details class="disclosure"><summary>status, checks, and history{f" · {esc(st)}" if st else ""}</summary>{inner}</details>')
+
+    @staticmethod
+    def clip(text, n):
+        """`text` cut to at most `n` characters at a word boundary, with an ellipsis when anything was cut."""
+        text = " ".join(str(text or "").split())
+        if len(text) <= n:
+            return text
+        cut = text[:n - 1]   # room for the ellipsis
+        if text[n - 1] != " " and " " in cut:   # the cut fell inside a word: drop the part of it that fits
+            cut = cut.rsplit(" ", 1)[0]
+        return cut.rstrip(" ,;:.") + "…"
 
     @staticmethod
     def cites(e):
@@ -1156,28 +1183,57 @@ class Web:
             out.append(f'<h3 style="margin-top:24px">across the catalog</h3><dl class="receipt">{dr}</dl>')
         return "".join(out)
 
+    MECHANIC_EDGES = ("requires", "specializes", "synergy", "tension")   # mechanic to mechanic: a mechanic page lists both directions in relations
+
     def relations(self, e, base):
+        """The records this one links to, each with its note. A mechanic page also lists the mechanics that link to it (another
+        mechanic's requires, specializes, synergy, or tension) under the inverse's name in vocab/edge_types.yaml, since a
+        symmetric edge is stored on only one of the two. A game's `uses` rows are its parts board."""
         et = vocab_terms(self.vocabs, "edge_types")
+        order = {k: i for i, k in enumerate(et)}
+
+        def row(label, other, a):
+            end = [x for x in (a.get("role"), self.term("effect", a["effect"]) if a.get("effect") else "") if x]
+            note = f'<p>{esc(a["note"])}</p>' if a.get("note") else ""
+            return (f'<div class="row"><div class="id">{esc(label)}</div><div><h3>{self.icon(other, base, 24)}{self.link(other, base)}</h3>{note}</div>'
+                    f'<div class="end">{esc(" · ".join(end))}</div></div>')
         rows = []
-        for ed in sorted(self.edges_out.get(e.id, []), key=lambda x: (x.type, x.target)):
-            if ed.type == "cites" or ed.target not in self.by_id:
+        for ed in self.edges_out.get(e.id, []):
+            if ed.type == "cites" or ed.target not in self.by_id or (e.type == "game" and ed.type == "uses"):
                 continue
             a = ed.attr_dict()
-            end = []
-            if a.get("role"):
-                end.append(a["role"])
-            if a.get("effect"):
-                end.append(self.term("effect", a["effect"]))
-            note = f'<p>{esc(a["note"])}</p>' if a.get("note") else ""
-            rank = 0 if a.get("role") == "core" else 1
-            if e.type == "game" and ed.type == "uses":
-                continue
-            rows.append((ed.type, rank, f'<div class="row"><div class="id">{esc(et[ed.type]["label"].lower())}</div><div><h3>{self.icon(ed.target, base, 24)}{self.link(ed.target, base)}</h3>{note}</div>'
-                         f'<div class="end">{esc(" · ".join(end))}</div></div>'))
-        out = []
-        if rows:
-            rows.sort(key=lambda r: (r[0], r[1]))
-            out.append(self.section("relations", f'<div class="register">{"".join(r[2] for r in rows)}</div>', counted(len(rows), "link")))
+            rows.append(((order[ed.type], 0, 0 if a.get("role") == "core" else 1, ed.target), row(et[ed.type]["label"].lower(), ed.target, a)))
+        if e.type == "mechanic":
+            for ed in self.edges_in.get(e.id, []):
+                if ed.type in self.MECHANIC_EDGES and ed.source in self.by_id:
+                    sym = et[ed.type].get("symmetric")   # a synergy reads the same from both ends, so both directions sort together
+                    rows.append(((order[ed.type], 0 if sym else 1, 1, ed.source), row(et[ed.type]["inverse"].replace("_", " "), ed.source, ed.attr_dict())))
+        if not rows:
+            return ""
+        rows.sort(key=lambda r: r[0])
+        return self.section("relations", f'<div class="register">{"".join(r[1] for r in rows)}</div>', counted(len(rows), "link"))
+
+    def used_by(self, e, base):
+        """A mechanic's games, core uses first: the edge the catalog is built from, so it is a section of its own rather than
+        a row of backlinks. Each chip opens the game, whose parts board says how it does the mechanic."""
+        games = {}
+        for ed in self.edges_in.get(e.id, []):
+            g = self.by_id.get(ed.source)
+            if ed.type == "uses" and g and not g.data.get("deprecated"):
+                games[ed.source] = ed.attr_dict().get("role")
+        if not games:
+            return ""
+        by_name = lambda i: (self.by_id[i].data.get("name", i).lower(), i)
+        groups = [(r, sorted((i for i, gr in games.items() if (gr == "core") == (r == "core")), key=by_name)) for r in ("core", "supporting")]
+        rows = "".join(f'<div class="row"><div class="id">{esc(self.term("mechanic_role", r).lower())}</div><div>{self.chips(ids, base)}</div><div class="end">{len(ids)}</div></div>'
+                       for r, ids in groups if ids)   # laid out as the backlinks are
+        ncore = len(groups[0][1])
+        return self.section("used by", f'<div class="register">{rows}</div>', counted(len(games), "game") + (f" · core in {ncore}" if ncore else ""))
+
+    def backlinks(self, e, base):
+        """Every other record that links here, by the inverse's name, as chips. A mechanic's games are under used by and the
+        mechanics that link to it under relations; a source's records are under cited by."""
+        et = vocab_terms(self.vocabs, "edge_types")
         inc = dict(self.derived.get(e.id, {}).get("incoming", {}))
         for ed in self.edges_in.get(e.id, []):   # the inverses the analysis does not list: synergy, requires, influenced, and the rest
             inv = et[ed.type].get("inverse", ed.type)
@@ -1185,19 +1241,16 @@ class Web:
                 inc.setdefault(inv, [])
                 if ed.source not in inc[inv]:
                     inc[inv].append(ed.source)
-        inc_rows = []
-        for k, ids in sorted(inc.items()):
-            if k == "cited_by":
-                continue
-            inc_rows.append(f'<div class="row"><div class="id">{esc(k.replace("_", " "))}</div><div>{self.chips(ids, base)}</div>'
-                            f'<div class="end">{len(ids)}</div></div>')
-        if inc_rows:
-            out.append(self.section("backlinks", f'<div class="register">{"".join(inc_rows)}</div>', "what links here"))
-        return "".join(out)
+        shown = {"cited_by"} | ({"used_by"} | {et[k]["inverse"] for k in self.MECHANIC_EDGES} if e.type == "mechanic" else set())
+        inc_rows = [f'<div class="row"><div class="id">{esc(k.replace("_", " "))}</div><div>{self.chips(ids, base)}</div><div class="end">{len(ids)}</div></div>'
+                    for k, ids in sorted(inc.items()) if k not in shown]
+        right = "what else links here" if e.type == "mechanic" else "what links here"
+        return self.section("backlinks", f'<div class="register">{"".join(inc_rows)}</div>', right) if inc_rows else ""
 
-    def parts_board(self, e, base):
-        """A game's mechanics drawn as its parts, core first, each with the note on how this game does it. It replaces the
-        game's `uses` rows in relations; the rows' text is all here, so the board is its own twin."""
+    def parts_board(self, e, base, sourced=False):
+        """A game's mechanics drawn as its parts, core first, each with the note on how this game does it, and, when the
+        record cites sources, a link down to them. It replaces the game's `uses` rows in relations; the rows' text is all
+        here, so the board is its own twin."""
         parts = []
         for ed in self.edges_out.get(e.id, []):
             if ed.type == "uses" and ed.target in self.by_id:
@@ -1209,6 +1262,8 @@ class Web:
         def tile(eid, a, size):
             fam = self.term("mechanic_family", self.by_id[eid].data["family"]).lower()
             note = f'<p>{esc(a["note"])}</p>' if a.get("note") else ""
+            if note and sourced:   # the evidence behind the note is in the record's sources, further down the page
+                note += '<p class="small"><a href="#sources" data-internal>sources</a></p>'
             return f'<div class="row"><div class="id">{self.icon(eid, base, size)}</div><div><small>{esc(fam)}</small><h3>{self.link(eid, base)}</h3>{note}</div></div>'
         core = [p for p in parts if p[0] == 0]
         rest = [p for p in parts if p[0] != 0]
@@ -1226,19 +1281,20 @@ class Web:
                 continue
             r = self.runs.get(rid)
             date = r.data.get("date") if r else ""
-            rows.append(f'<div class="row" data-state="done"><div class="id">{esc(date)}</div><span class="dot"></span><span class="kind">{esc(kind)}</span>'
-                        f'<span class="what"><a href="{esc(self.gh("log/runs/" + rid + ".yaml"))}">{esc(rid)}</a></span><span class="src">{esc(r.data.get("kind", "") if r else "")}</span></div>')
+            # spaces between the cells, which the grid ignores, keep the row's text apart when it is read or copied as text
+            rows.append(f'<div class="row" data-state="done"><div class="id">{esc(date)}</div> <span class="dot"></span> <span class="kind">{esc(kind)}</span> '
+                        f'<span class="what"><a href="{esc(self.gh("log/runs/" + rid + ".yaml"))}">{esc(rid)}</a></span> <span class="src">{esc(r.data.get("kind", "") if r else "")}</span></div>')
         return f'<div class="register" data-kind="log" data-style="timeline">{"".join(rows)}</div>' if rows else ""
 
     # ------------------------------------------------------------------ indexes
     def index(self, t):
         spec = {
             "game": (["name", "year", "subgenre", "_derived.cluster", "_derived.mechanic_count", "status"], ["name", "year", "subgenre", "cluster", "mechanics", "status"], ["name"]),
-            "mechanic": (["name", "family", "_derived.prevalence", "_derived.earliest_year", "maturity", "legibility", "emergence_potential", "ai_leverage", "_derived.technique_exposure"],
-                         ["name", "family", "games", "first seen", "maturity", "legibility", "emergence", "ai leverage", "exposure"], ["-_derived.prevalence", "name"]),
-            "technique": (["name", "category", "year", "maturity", "determinism_impact", "_derived.affects_count"], ["name", "category", "year", "maturity", "determinism", "mechanics"], ["name"]),
-            "opportunity": (["name", "opportunity_type", "horizon", "_derived.priority", "falsifiable_signal.resolve_by"], ["name", "type", "horizon", "priority", "resolves by"], ["-_derived.priority", "name"]),
-            "source": (["name", "kind", "venue", "date"], ["name", "kind", "venue", "date"], ["-date", "name"]),
+            "mechanic": (["name", "family", "_derived.prevalence", "_derived.earliest_year", "maturity", "legibility", "emergence_potential", "ai_leverage", "_derived.technique_exposure", "status"],
+                         ["name", "family", "games", "first seen", "maturity", "legibility", "emergence", "ai leverage", "exposure", "status"], ["-_derived.prevalence", "name"]),
+            "technique": (["name", "category", "year", "maturity", "determinism_impact", "_derived.affects_count", "status"], ["name", "category", "year", "maturity", "determinism", "mechanics", "status"], ["name"]),
+            "opportunity": (["name", "opportunity_type", "horizon", "_derived.priority", "falsifiable_signal.resolve_by", "status"], ["name", "type", "horizon", "priority", "resolves by", "status"], ["-_derived.priority", "name"]),
+            "source": (["name", "kind", "venue", "date"], ["name", "kind", "venue", "date"], ["-date", "name"]),   # a source has no status: it is the evidence
         }[t]
         cols, heads, sort = spec
         lst = [e for e in self.ents.get(t, []) if not e.data.get("deprecated")]
@@ -1266,7 +1322,7 @@ class Web:
                 row[c] = v
             rows.append(row)
         base = "../"
-        th = "".join(f'<th{" class=" + chr(34) + "num" + chr(34) if self._numeric(rows, c) else ""}>{esc(h)}</th>' for c, h in zip(cols, heads))
+        th = "".join(f'<th scope="col"{" class=" + chr(34) + "num" + chr(34) if self._numeric(rows, c) else ""}>{esc(h)}</th>' for c, h in zip(cols, heads))
         trs = []
         for row in rows:
             tds = "".join(f'<td{" class=" + chr(34) + "num" + chr(34) if self._numeric(rows, c) else ""}>{self.link(row[c], base) if c == "name" else esc(_fmt(row[c]))}</td>' for c in cols)
@@ -1275,22 +1331,25 @@ class Web:
         one, many = READER_NAME.get(t, (self.registry["types"][t]["label"].lower(), plural))   # what the index calls its records
         intro = {
             "game": "Each catalogued game drawn as the mechanics it is built from, core parts first. Each page holds the decomposition, design notes, claims, and sources.",
-            "mechanic": "Every mechanic as its icon, grouped by family and ordered by how many games use it. The table below holds every score: rubric anchors from 1 to 5, "
-                        "and exposure, the maturity-weighted reach of the technique set.",
-            "technique": "Every mathematical, AI, ML, and LLM technique in the set, with its maturity in games and what it does to reproducibility.",
+            "mechanic": "A mechanic is a named rule-system, one a designer would recognize across games, that owns one kind of state and one update rule: production "
+                        "chains, needs that decay, fog of war. Here every mechanic is its icon, grouped by family and ordered by how many games use it. The table below "
+                        "holds every score: rubric anchors from 1 to 5, and exposure, how much the techniques in this dataset reach the mechanic, each weighted by its "
+                        "maturity in games and by the kind of change it makes.",
+            "technique": "Every mathematical, AI, ML, and LLM technique in the set, grouped by category and drawn as the mechanics it changes, with its maturity in "
+                         "games. The table below adds what each one does to reproducibility.",
             "opportunity": "Every design bet on a board by horizon, highest impact first, with the mechanics it builds on, the techniques it uses, and the risks "
                            "those techniques carry. Each bet is an opportunity record with a dated, falsifiable prediction; the table orders them by priority.",
             "source": "Every source cited by a record or by the paper, newest first.",
         }[t]
         h1 = {"game": "Every game is a set of parts", "opportunity": "What could be built, and when"}.get(t, plural.capitalize())
-        placeholder = {"game": "filter by game or by a part it has"}.get(t, f"type to filter {many}")
+        placeholder = {"game": "filter by game or by a part it has", "technique": "filter by technique or a mechanic"}.get(t, f"type to filter {many}")
         table = f'<div class="table-wrap"><table class="data" data-style="dense" data-sortable data-filterable><thead><tr>{th}</tr></thead><tbody>{"".join(trs)}</tbody></table></div>'
-        visual = {"mechanic": self.mechanic_tiles, "game": self.game_parts, "opportunity": self.opportunity_board}.get(t)
+        visual = {"mechanic": self.mechanic_tiles, "game": self.game_parts, "technique": self.technique_groups, "opportunity": self.opportunity_board}.get(t)
         if visual:
             table = visual(lst, base) + f'<details class="disclosure"><summary>plain-text twin · {counted(len(rows), "row")}, sortable</summary>{table}</details>'
         body = (f'<nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../" data-internal>simgrammar</a></li><li>{esc(many)}</li></ol></nav>'
                 f'<div class="page-header"><p class="eyebrow"><span class="id">{esc(many)}</span> <span>{counted(len(rows), "record")}</span></p><h1>{esc(h1)}</h1>'
-                f'<p class="dek">{esc(intro)}</p><div class="twins"><b>this list as</b><a href="{esc(self.dl("tables/" + plural + ".csv", "../"))}">csv</a>'
+                f'<p class="dek">{esc(intro)}</p>{self.status_line(lst, base)}<div class="twins"><b>this list as</b><a href="{esc(self.dl("tables/" + plural + ".csv", "../"))}">csv</a>'
                 f'<a href="{esc(self.dl("entities/" + plural + ".json", "../"))}">json</a><a href="{esc(self.gh(self.registry["types"][t]["dir"]))}">yaml sources</a></div></div>'
                 f'<div class="controls" data-filter-controls hidden><label class="field"><span>filter</span><input type="search" data-filter placeholder="{esc(placeholder)}"></label>'
                 + (self.segmented("group", "Group games", [("subgenre", "by subgenre"), ("decade", "by decade")]) if t == "game" else "")
@@ -1315,13 +1374,33 @@ class Web:
         return (f'<section class="section" data-group><div class="section-line"><h2>{head}</h2>{f"<span>{esc(right)}</span>" if right else ""}</div>'
                 f'{inner}</section>')
 
+    @staticmethod
+    def query(e, *more):
+        """What an index row's filter matches, as the plain-text twin's row text does: the name, id, aliases, summary,
+        and status, and whatever else the row shows."""
+        d = e.data
+        return " ".join(str(x) for x in [d.get("name", e.id), e.id, *(d.get("aliases") or []), d.get("summary", ""), d.get("status", ""), *more] if x).lower()
+
+    def status_line(self, lst, base):
+        """How far the listed records' evidence goes, counted from the data, weakest first: every status some record has,
+        and verified even when none is, since it is the one a reader asks about. Sources have no status."""
+        n = defaultdict(int)
+        for e in lst:
+            if e.data.get("status"):
+                n[e.data["status"]] += 1
+        if not n:
+            return ""
+        shown = [f"{n[s]} {self.term('status', s).lower()}" for s in vocab_terms(self.vocabs, "status") if n[s] or s == "verified"]
+        return (f'<div class="meta"><span><a href="{base}about/#why-it-is-built-this-way" data-internal>status</a> · '
+                f'{" · ".join(esc(x) for x in shown)}</span></div>')
+
     def mechanic_tiles(self, lst, base):
         top = max((self.derived.get(e.id, {}).get("prevalence", 0) for e in lst), default=1) or 1
 
         def tile(e):
             der = self.derived.get(e.id, {})
             n = der.get("prevalence", 0)
-            q = " ".join([e.data["name"], e.id, *e.data.get("aliases", [])]).lower()
+            q = self.query(e, self.term("mechanic_family", e.data.get("family")))
             return (f'<a class="row" href="{base}mechanic/{e.id}/" data-q="{esc(q)}" data-internal>{self.icon(e.id, base, 48)}<h3>{esc(e.data["name"])}</h3>'
                     f'<span class="end"><span>{counted(n, "game")}</span><span>{der.get("earliest_year") or ""}</span></span>'
                     f'<span class="pbar"><i style="--p:{100 * n / top:.1f}%"></i></span></a>')
@@ -1340,7 +1419,7 @@ class Web:
             icons = "".join(f'<a href="{base}mechanic/{m["id"]}/" data-m="{m["id"]}" data-role="{esc(m.get("role", ""))}" '
                             f'title="{esc(mname.get(m["id"], m["id"]))} · {esc(m.get("role", ""))}" data-internal>{self.icon(m["id"], base, 24, mname.get(m["id"], m["id"]))}</a>'
                             for m in ms)
-            q = " ".join([e.data["name"], e.id, self.term("subgenre", e.data.get("subgenre"))] + [mname.get(m["id"], "") for m in ms]).lower()
+            q = self.query(e, self.term("subgenre", e.data.get("subgenre")), *[mname.get(m["id"], "") for m in ms])
             label = f' <span>{esc(self.term("subgenre", e.data.get("subgenre")))}</span>' if sub else ""
             return (f'<div class="row" data-q="{esc(q)}"><div class="id">{esc(e.data.get("year", ""))}</div><h3>{self.link(e.id, base)}{label}</h3>'
                     f'<div class="cluster" data-gap="icons">{icons}</div><div class="end">{len(ms)}</div></div>')
@@ -1361,6 +1440,30 @@ class Web:
         return (f'{legend}<div data-filter-scope data-parts-scope><div data-view="subgenre">{subs}</div>'
                 f'<div data-view="decade" hidden>{decs}</div></div>')
 
+    def technique_groups(self, lst, base):
+        """Techniques by category, as the mechanic index groups by family and the game index by subgenre: the largest
+        categories first, each technique a row with its year, its maturity in games, and the mechanics it changes as
+        icons, oldest first."""
+        mname = {e.id: e.data["name"] for e in self.ents.get("mechanic", [])}
+
+        def row(e):
+            d = e.data
+            ms = sorted({a["id"] for a in d.get("affects", []) if a["id"] in mname}, key=lambda m: (mname[m], m))
+            icons = "".join(f'<a href="{base}mechanic/{m}/" title="{esc(mname[m])}" data-internal>{self.icon(m, base, 24, mname[m])}</a>' for m in ms)
+            mat = self.term("technique_maturity", d.get("maturity"))
+            q = self.query(e, self.term("technique_category", d.get("category")), mat, *[mname[m] for m in ms])
+            return (f'<div class="row" data-q="{esc(q)}"><div class="id">{esc(d.get("year", ""))}</div><h3>{self.link(e.id, base)} <span>{esc(mat.lower())}</span></h3>'
+                    f'<div class="cluster" data-gap="icons">{icons}</div><div class="end">{len(ms)}</div></div>')
+        cats = defaultdict(list)
+        for e in lst:
+            cats[e.data.get("category")].append(e)
+        groups = "".join(
+            self.group(f'{self.icon(c, base, 24)}{esc(self.term("technique_category", c))} <span data-count>· {counted(len(ts), "technique")}</span>',
+                       f'<div class="register" data-kind="parts">{"".join(row(e) for e in sorted(ts, key=lambda e: (e.data.get("year", 0), e.data["name"])))}</div>',
+                       f'{counted(len({a["id"] for e in ts for a in e.data.get("affects", []) if a["id"] in mname}), "mechanic")} changed')
+            for c, ts in sorted(cats.items(), key=lambda kv: (-len(kv[1]), str(kv[0]))))
+        return f'<div data-filter-scope>{groups}</div>'
+
     def opportunity_board(self, lst, base):
         risk_labels = {str(t["id"]): t.get("label", t["id"]) for t in self.vocabs["risk"]["terms"]}
 
@@ -1375,20 +1478,21 @@ class Web:
             risks = sorted({r for x in techs for r in self.by_id[x].data.get("risks", [])})
             rk = '<div class="cluster" data-gap="icons">' + "".join(
                 f'<span title="{esc(risk_labels.get(r, r))}">{self.icon("risk-" + r, base, 24, risk_labels.get(r, r))}</span>' for r in risks) + "</div>"
-            q = " ".join([d["name"], e.id, d.get("summary", "")]).lower()
+            q = self.query(e, self.term("opportunity_type", d.get("opportunity_type")))
             dl = "".join(f"<dt>{k}</dt><dd>{self.meter(d.get(k))}</dd>" for k in ("impact", "feasibility", "novelty") if d.get(k) is not None)
             dl += f"<dt>builds on</dt><dd>{icons(d.get('involves', []))}</dd><dt>uses</dt><dd>{icons(techs)}</dd>"
             dl += f"<dt>risks</dt><dd>{rk}</dd>" if risks else ""
             return (f'<div class="row" data-q="{esc(q)}"><div class="id">{esc(self.term("opportunity_type", d.get("opportunity_type")).lower())}</div>'
                     f'<div><h3>{self.link(e.id, base)}</h3><p>{esc(d.get("summary", ""))}</p><dl class="receipt">{dl}</dl></div></div>')
         cols = []
-        for h in ("now", "1-2y", "3-5y", "5y-plus"):
+        for h in vocab_terms(self.vocabs, "horizon"):   # nearest first; a horizon no bet sits on gets no column
             ops = sorted((e for e in lst if e.data.get("horizon") == h), key=lambda e: (-(e.data.get("impact") or 0), -(e.data.get("feasibility") or 0), e.data["name"]))
-            inner = "".join(card(e) for e in ops) or '<div class="row"><p>none yet</p></div>'
+            if not ops:
+                continue
             cols.append(f'<section data-group><div class="section-line"><h2>{self.icon("horizon-" + h, base, 48)}{esc(self.term("horizon", h))} <span data-count>· {len(ops)}</span></h2></div>'
-                        f'<div class="register" data-kind="cards">{inner}</div></section>')
+                        f'<div class="register" data-kind="cards">{"".join(card(e) for e in ops)}</div></section>')
         legend = '<div class="legend">' + "".join(f'<span>{self.icon("risk-" + r, base, 24)}{esc(lbl)}</span>' for r, lbl in risk_labels.items()) + "</div>"
-        return f'{legend}<div class="grid" data-cols="4" data-gap="board" data-filter-scope>{"".join(cols)}</div>'
+        return f'{legend}<div class="grid" data-cols="{max(1, min(4, len(cols)))}" data-gap="board" data-filter-scope>{"".join(cols)}</div>'
 
     # ------------------------------------------------------------------ data page
     def about_page(self):
@@ -1417,8 +1521,9 @@ class Web:
                 ("make sqlite", "query everything with SQL")]
         crows = "".join(f'<div class="row"><div class="id"></div><div><code>{esc(c)}</code><span class="why">{esc(w)}</span></div></div>' for c, w in cmds)
         runs = sorted(self.ents.get("run", []), key=lambda r: (str(r.data.get("date")), r.id), reverse=True)
-        rrows = "".join(f'<div class="row" data-state="done"><div class="id">{esc(r.data.get("date"))}</div><span class="dot"></span><span class="kind">{esc(r.data.get("kind"))}</span>'
-                        f'<span class="what"><a href="{esc(self.gh("log/runs/" + r.id + ".yaml"))}">{esc(r.id)}</a> · {esc(r.data.get("purpose", "")[:140])}</span>'
+        # the actor keeps its own column; spaces between the cells, which the grid ignores, keep it apart from the purpose in the page's text
+        rrows = "".join(f'<div class="row" data-state="done"><div class="id">{esc(r.data.get("date"))}</div> <span class="dot"></span> <span class="kind">{esc(r.data.get("kind"))}</span> '
+                        f'<span class="what"><a href="{esc(self.gh("log/runs/" + r.id + ".yaml"))}">{esc(r.id)}</a> · {esc(self.clip(r.data.get("purpose", ""), 140))}</span> '
                         f'<span class="src">{esc(r.data.get("actor", ""))}</span></div>' for r in runs)
         vrows = "".join(f'<div class="row"><div class="id">{esc(n)}</div><div><p>{esc((v.get("description") or "").strip())}</p></div><div class="end">{counted(len(v.get("terms", [])), "term")}</div></div>'
                         for n, v in sorted(self.vocabs.items()) if n not in ("rubrics",))
@@ -1435,7 +1540,7 @@ class Web:
                 f'<h1>How the atlas is made, and why you can check it</h1><p class="dek">An atlas is only useful if you can trust it. This one is built so that any number '
                 f'on any page can be traced to the records and sources behind it, checked, and corrected, by anyone.</p>'
                 f'<div class="meta"><span><b>{self.byline_html("../")}</b></span><span><a href="../paper/#appendix-d-contributors" data-internal>all contributors</a></span></div>'
-                f'<div class="twins"><b>start with</b><a href="{esc(self.gh("AGENTS.md"))}">AGENTS.md</a><a href="{esc(self.gh("CONTRACT.md"))}">CONTRACT.md</a><a href="../llms.txt" data-internal>llms.txt</a></div></div>'
+                f'<div class="twins"><b>start with</b><a href="{esc(self.gh("CONTRIBUTING.md"))}">CONTRIBUTING.md</a><a href="{esc(self.gh("AGENTS.md"))}">AGENTS.md</a><a href="{esc(self.gh("CONTRACT.md"))}">CONTRACT.md</a><a href="../llms.txt" data-internal>llms.txt</a></div></div>'
                 + self.section("why it is built this way", f'<div class="register" data-size="wide">{wrows}</div>')
                 + self.section("downloads", f'<div class="register" data-size="wide">{frows}</div>', "generated projections, published beside this site")
                 + self.section("commands", f'<div class="register" data-kind="cmds">{crows}</div>', "from the repository root")
@@ -1454,7 +1559,10 @@ class Web:
         nq, na = sum(1 for c in claims if c.get("quote")), sum(1 for s in srcs if s.data.get("archived"))
         archived = (f"{na} of the {counted(len(srcs), 'source')} {'has' if na == 1 else 'have'} an archived snapshot so far" if na
                     else f"none of the {counted(len(srcs), 'source')} has an archived snapshot yet")
-        return (f"{sum(1 for e in recs if self.cites(e))} of the {counted(len(recs), 'record')} cite the sources their facts come from; the rest are "
+        st = self.analysis["stats"]   # the paper's section 2.4 states the same counts from the same stats
+        isare = lambda n: "is" if n == 1 else "are"
+        return (f"{st['n_sourced_or_verified']} of the {counted(st['n_records'], 'record')} {isare(st['n_sourced_or_verified'])} sourced or verified, "
+                f"{st['n_contested']} {isare(st['n_contested'])} contested with both sides cited, and {st['n_asserted']} {isare(st['n_asserted'])} "
                 f"marked asserted until someone sources them. {nq} of the {counted(len(claims), 'claim')}, on {counted(len(quoted), 'record')}, also "
                 f"quote the passage that supports them, and {archived}. A record is marked sourced when its facts have sources, and verified when "
                 "someone other than its author has checked them.")
@@ -1523,6 +1631,7 @@ class Web:
         mdr = MarkdownIt("commonmark", {"html": True}).enable("table")
         body = mdr.render(self.book_md(stem))
         body = body.replace("<table>", '<div class="table-wrap"><table class="data" data-style="dense">').replace("</table>", "</table></div>")
+        body = re.sub(r"<th(?=[ >])", '<th scope="col"', body)   # markdown tables put th only in the header row
         body = re.sub(r'<tr>\s*<td><a href="\.\./\.\./(game|mechanic)/([a-z0-9-]+)/">', r'<tr id="\2">\n<td><a href="../../\1/\2/">', body)   # rows of the glossary and the catalog
         body = self.person_links(body)
         title = re.search(r"^# (.*)$", self.built[f"book/{stem}.md"], re.M).group(1)
@@ -1629,17 +1738,18 @@ class Web:
                 d = e.data
                 if t == "source":
                     sub = " · ".join(x for x in (", ".join(d.get("authors", [])[:3]), str(d.get("date", "")), d.get("venue", "")) if x)
-                    rows.append(row(" ".join([d.get("name", e.id), e.id, sub]), "", f"{base}source/{e.id}/", d.get("name", e.id), sub, d.get("kind", "")))
-                else:
+                    rows.append(row(" ".join([d.get("name", e.id), e.id, sub]), e.id, f"{base}source/{e.id}/", d.get("name", e.id), sub, d.get("kind", "")))
+                else:   # the row shows the summary, so the filter matches it too
                     ic = self.card_icon(e, base, 24)
-                    rows.append(row(" ".join([d["name"], e.id, self.card_line(e)] + (d.get("aliases") or [])), "", f"{base}{t}/{e.id}/", d["name"],
-                                    d.get("summary", ""), self.card_line(e), ic))
-            groups.append((self.registry["types"][t]["plural"], rows))
+                    rows.append(row(self.query(e, self.card_line(e)), e.id, f"{base}{t}/{e.id}/", d["name"], d.get("summary", ""), self.card_line(e), ic))
+            groups.append((READER_NAME.get(t, ("", self.registry["types"][t]["plural"]))[1], rows))
         n = sum(len(r) for _, r in groups)
+        kinds = ", ".join(READER_NAME.get(t, (t,))[0] for t in self.CARD_TYPES)
         body = (f'<nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../" data-internal>simgrammar</a></li><li>find</li></ol></nav>'
                 f'<div class="page-header"><p class="eyebrow"><span class="id">find</span> <span>{counted(n, "page")}</span></p><h1>Find anything on this site</h1>'
-                f'<p class="dek">Every chapter, episode, short, game, mechanic, technique, opportunity, and source, each linked to its page. '
-                f'Type to filter by name, alias, or summary; each page links on to everything related to it.</p></div>'
+                f'<p class="dek">Every chapter, episode, short, {kinds}, and source, each linked to its page. '
+                f'Type to filter by name, id, alias, or summary, or add ?q= and a word to this page\'s address to open it already filtered; '
+                f'each page links on to everything related to it.</p></div>'
                 f'<div class="controls" data-filter-controls hidden><label class="field"><span>filter</span><input type="search" data-filter placeholder="type a name, an id, or a word"></label></div>'
                 + self.no_match("No page matches that filter.")
                 + f'<div data-filter-scope>' + "".join(self.group(f'{esc(title)} <span data-count>· {len(rows)}</span>', self.find_list(title, rows)) for title, rows in groups if rows) + "</div>")
