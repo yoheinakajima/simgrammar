@@ -501,6 +501,8 @@ class Web:
                f"  year = {{{meta['date'][:4]}}},\n  version = {{{meta['version']}}},\n" + (f"  doi = {{{meta['doi']}}},\n" if meta.get("doi") else "") +
                f"  url = {{{self.site['url']}paper/}},\n  note = {{Dataset {self.short}; full sha256 in manifest.json}}\n}}")
         nruns = len(self.ents.get("run", []))
+        doi_url = f"https://doi.org/{meta['doi']}" if meta.get("doi") else ""
+        doi_span = f' <span>doi <a href="{esc(doi_url)}">{esc(meta["doi"])}</a></span>' if doi_url else ""
         # the receipt counts what the site publishes, as the home page and the indexes do; manifest.json counts files,
         # which include deprecated records, so the receipt says how many of those there are
         dep = [counted(man["counts"][t] - counts[t], f"deprecated {t}") for t in man["counts"] if t in counts and man["counts"][t] > counts[t]]
@@ -508,7 +510,7 @@ class Web:
         published += f" · manifest.json counts files, so it also has {' and '.join(dep)}" if dep else ""
         header = f"""<nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../" data-internal>simgrammar</a></li><li>paper</li></ol></nav>
 <div class="page-header corners">
-  <p class="eyebrow"><span class="id">v{esc(meta['version'])}</span> <span>{esc(meta['date'])}</span> <span>dataset <b>{self.short}</b></span> <span>contract {esc(man['contract_version'])}</span></p>
+  <p class="eyebrow"><span class="id">v{esc(meta['version'])}</span> <span>{esc(meta['date'])}</span> <span>dataset <b>{self.short}</b></span> <span>contract {esc(man['contract_version'])}</span>{doi_span}</p>
   <h1>{esc(meta['title'])}</h1>
   <p class="dek">{esc(meta['subtitle'])}.</p>
   <div class="meta"><span><b>{authors_html}</b></span>{"".join(f"<span>{counted(counts[t], t)}</span>" for t in ("game", "mechanic", "technique", "opportunity", "source"))}<span>{counted(man['edges'], "link")} between games, mechanics, techniques, opportunities, and sources</span><span>{counted(nruns, "research run")}</span></div>
@@ -523,11 +525,12 @@ class Web:
 <section class="section" id="references"><div class="section-line"><h2>references <span>· {len(refs)} cited in the text</span></h2><a href="../source/" data-internal>all {counted(counts['source'], "source")}</a></div>
 <div class="register" data-kind="refs">{''.join(refs)}</div></section>
 <section class="section cite" id="cite"><div class="section-line"><h2>cite</h2><span>bibtex</span></div>
-<div class="cite-line"><span class="chip">{esc(authors)}</span><span class="chip">{esc(meta['date'][:4])}</span><span class="chip">v{esc(meta['version'])}</span><span class="chip">dataset {self.short}</span></div>
+<div class="cite-line"><span class="chip">{esc(authors)}</span><span class="chip">{esc(meta['date'][:4])}</span><span class="chip">v{esc(meta['version'])}</span><span class="chip">dataset {self.short}</span>{f'<span class="chip">doi {esc(meta["doi"])}</span>' if doi_url else ""}</div>
 <div class="prompt"><div class="copy-row"><span>bibtex</span><span>{esc(meta['title'].lower())} · v{esc(meta['version'])}</span></div><pre data-style="citation">{esc(bib)}</pre></div></section>
 <section class="section" id="receipt"><div class="section-line"><h2>build receipt <span>· reproduce this page</span></h2><span>python scripts/build.py</span></div>
 <dl class="receipt" data-size="wide"><dt>dataset</dt><dd><span class="hash" data-prefix="sha256:">{man['dataset_sha256']}</span></dd>
 <dt>contract</dt><dd>{esc(man['contract_version'])} · <a href="{esc(self.gh('CONTRACT.md'))}">CONTRACT.md</a></dd>
+{f'<dt>doi</dt><dd><a href="{esc(doi_url)}">{esc(meta["doi"])}</a> · Zenodo, newest version</dd>' if doi_url else ""}
 <dt>published</dt><dd>{esc(published)}</dd>
 <dt>edges</dt><dd>{man['edges']}</dd>
 <dt>generator</dt><dd>{esc(man['generator'])} · scripts/web.py · scripts/viz.py</dd>

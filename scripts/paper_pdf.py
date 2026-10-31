@@ -500,7 +500,8 @@ def latex(paper_md: str, meta: dict, manifest: dict, figures: dict) -> str:
         rf"\title{{\textbf{{{esc(fm['title'])}}}\\[0.5em]\large {esc(fm['subtitle'])}}}",
         r"\author{" + r" \and ".join(authors) + "}",
         rf"\date{{Version {esc(fm['version'])} \textperiodcentered{{}} {esc(fm['date'])}\\[0.6em]\small dataset sha256 \texttt{{{fm['dataset_sha256']}}}\\"
-        rf"contract {esc(manifest['contract_version'])} \textperiodcentered{{}} \url{{{esc_url(site + 'paper/')}}}}}",
+        rf"contract {esc(manifest['contract_version'])} \textperiodcentered{{}} \url{{{esc_url(site + 'paper/')}}}"
+        + (rf"\\doi \href{{{esc_url('https://doi.org/' + meta['doi'])}}}{{\texttt{{{esc(meta['doi'])}}}}}" if meta.get("doi") else "") + "}",
         r"\begin{document}",
         r"\maketitle\thispagestyle{fancy}",
         r"\tableofcontents",
