@@ -3,7 +3,7 @@
 # Written by scripts/video/publish.py from the renders in video-out; shows lists the records each video puts on screen.
 # An episode's scenes give each scene's start in seconds, the records it shows with when each first appears, and said,
 # a digest of its narration as rendered (lib.narration_digest).
-release: videos-2026-10-30c
+release: videos-2026-10-30d
 shorts:
   - {key: short-01, script: 001-five-most-common.md, file: short-01.mp4, seconds: 38.0,
      sha256: 6929ecda38f8126a9d340dfd282b4a416cc4f277c1a3bd6c1f9cc1d2e4bb7e42,
@@ -255,8 +255,8 @@ episodes:
        {"name": "Try one", "start": 361.2, "said": "4b9eeca89d03", "shows": {}},
        {"name": "Close", "start": 388.5, "said": "139e0d316338", "shows": {"causal-why-query": 388.5, "content-elastic-events": 388.5, "generated-inspection-shifts": 388.5, "generative-decoration-catalogs": 388.5, "illustrated-chronicles": 388.5, "local-first-ai-sims": 388.5, "parallel-autobalance": 388.5, "sim-instructor-coach": 388.5, "sims-as-agent-benchmarks": 388.5}},
      ]}
-  - {key: episode-12, script: 12-how-this-was-made.md, file: episode-12.mp4, seconds: 409.9, rendered: '2026-10-30',
-     sha256: 2c137259f540802a4aea2c531df867a72c23e8265d1cbbed1ad143eb57328a0f,
+  - {key: episode-12, script: 12-how-this-was-made.md, file: episode-12.mp4, seconds: 408.5, rendered: '2026-10-30',
+     sha256: 2f0a05994a4dabf62a8c644f34fdeb743bfc6f404c90d87b128133f9fa17a38c,
      poster: episode-12.jpg, poster_sha256: 78a05611e640b8a7951709b18519fc17967bf306c6113ce249989f2c7c70e9ac,
      thumb: episode-12-thumb.jpg, thumb_sha256: 76512623f3d92a6e35a16b5255251c672b8571ef94c758fcdc3cb88cc5eee4d5,
      shows: [utopia, fallout-shelter, game-dev-story, free-placement, pocket-city],
@@ -267,7 +267,7 @@ episodes:
        {"name": "Everything is a build", "start": 92.1, "said": "5b3768af4aaf", "shows": {}},
        {"name": "The rules came from failures", "start": 133.5, "said": "d3d0e626d3db", "shows": {}},
        {"name": "Runs", "start": 214.7, "said": "863cd0d6a384", "shows": {}},
-       {"name": "Evidence, and who checks it", "start": 263.9, "said": "dabe531cd76a", "shows": {"utopia": 263.9}},
-       {"name": "What the checks can't see", "start": 327.2, "said": "649c1492aa94", "shows": {}},
-       {"name": "Close", "start": 361.3, "said": "60a2eccfba9d", "shows": {}},
+       {"name": "Evidence, and who checks it", "start": 263.9, "said": "920ec90eae95", "shows": {"utopia": 263.9}},
+       {"name": "What the checks can't see", "start": 325.8, "said": "649c1492aa94", "shows": {}},
+       {"name": "Close", "start": 360.0, "said": "60a2eccfba9d", "shows": {}},
      ]}
