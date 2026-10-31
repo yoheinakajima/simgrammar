@@ -15,7 +15,11 @@ design_sketch: 'Colonists run a standard needs-and-utility loop. When an event c
   (death of a friend, public insult, near-starvation), the agent gets one model call with its trait list,
   recent memories, and the event, and must return a schema-valid object: a thought with mood value and
   duration, an optional relationship change, an optional one-line spoken reaction, and an optional new
-  goal. The player sees these as ordinary thoughts in the inspector, now specific to the colonist''s history.'
+  goal. Each call is held to 400 tokens, prompt and reply together, and the whole colony shares a cap of four
+  calls per real hour of play, counted in wall-clock time so that fast-forward does not raise it; when more
+  events cross the threshold than the cap allows, the most salient get the calls and the rest keep the stock
+  thought the utility system already writes. The player sees these as ordinary thoughts in the inspector,
+  now specific to the colonist''s history.'
 involves:
 - utility-action-selection
 - needs-decay
@@ -41,7 +45,8 @@ key_risks:
 - Salience thresholds tuned for drama can flood the log in crisis states.
 - Local model quality varies by hardware tier, creating uneven experiences.
 validation_experiment: 'Build a 20-colonist prototype with a pure-utility baseline and a salience-gated
-  variant capped at one model call per colonist per in-game hour. Run blind playtests (n>=30) rating believability
+  variant capped at four model calls per real hour for the whole colony, each held to 400 tokens (at most
+  1,600 tokens per player-hour at any game speed). Run blind playtests (n>=30) rating believability
   and attachment, log tokens per player-hour, and count state-contradiction errors per hour. Success:
   believability gain of at least one point on a 7-point scale at under 2,000 tokens per player-hour with
   contradiction rate below one per hour.'
@@ -58,3 +63,4 @@ provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-review-corrections

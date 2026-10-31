@@ -18,7 +18,7 @@ Every unit of variety in some mechanics must be made by hand: an animation for e
 
 ### 6.3 Legibility
 
-Players must form a working model of why the simulation did what it did, or they experience the depth as randomness. The rubric scores show the tension (§5.6): the mechanics that generate the most unscripted variety are the hardest to understand.{{assert:rho_legibility_emergence_potential < -0.2}}
+Players must form a working model of why the simulation did what it did, or they experience the depth as randomness. The rubric scores show the tension (§5.6): the mechanics rated as generating the most unscripted variety are rated the hardest to understand.{{assert:rho_legibility_emergence_potential < -0.2}}
 
 {{figure:legibility-vs-emergence}}
 

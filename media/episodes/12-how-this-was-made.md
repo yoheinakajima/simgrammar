@@ -2,7 +2,7 @@
 
 Target runtime about 11 minutes: about 1,190 words of narration at 135 words a minute, plus a beat of picture-only footage per scene. Covers book chapter 13. Footage: screen recordings of the repository, the build output, run records, and agents working in a terminal; a still of the Intellivision game Utopia. No other game footage. Every number below is filled in from the dataset when the script is built, and the sentences that interpret numbers carry the same checks as the book.
 
-**Summary.** Why the numbers in this series can be trusted. How the dataset behind it is built and checked: plain-text records, everything rebuilt on every change, rules that came from failures, a record of every run, and what the checks can't see. It ends on how anyone can extend it.
+**Summary.** How the numbers in this series are checked against the data, and what those checks can't catch. How the dataset behind it is built: plain-text records, everything rebuilt on every change, rules that came from failures, a record of every run, and what the checks can't see. It ends on how anyone can extend it.
 
 ## 1. Cold open (0:00 to 0:38)
 
@@ -54,7 +54,7 @@ Target runtime about 11 minutes: about 1,190 words of narration at 135 words a m
 
 **Picture.** The design map from episode 3, islands of games. One game at a time blinks out; some island borders shift.
 
-**Voice.** A later review removed one game at a time and re-ran everything. Several claims about which games belong together broke, because the samples used to test the clusters were reshuffled whenever the catalog changed. Each game's place in each of the {{stat:cluster_subsamples}} samples is now fixed by a hash of its name, and a claim that two games belong together has to hold in at least {{stat:cocluster_together}} of them.
+**Voice.** A later review removed one game at a time and re-ran everything. Several claims about which games belong together broke, because the samples used to test the clusters were reshuffled whenever the catalog changed. Each game's place in each of the {{stat:cluster_subsamples}} samples is now fixed by a hash of its name, and a claim that two games belong together has to hold in at least {{stat:cocluster_together_pct}} percent of them.
 
 **Voice.** Even the number of clusters follows a written rule: the smallest number whose clusters stay stable across the samples. When the rule was first applied it gave {{stat:cluster_k}}, and that was fixed so new games wouldn't reshuffle everything. On today's data the rule would pick {{stat:cluster_rule_k}}.{{assert:cluster_k != cluster_rule_k}} The gap sits inside the stated tolerance, so the build doesn't object, and episode 3 only claims the groupings that survive resampling either way.{{assert:cluster_k_drift == 0}}
 

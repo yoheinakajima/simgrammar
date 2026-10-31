@@ -20,6 +20,7 @@ from urllib.parse import urlparse
 import numpy as np
 from scipy.cluster.hierarchy import fcluster, linkage
 from scipy.spatial.distance import squareform
+from scipy.special import gammaln
 from scipy.stats import spearmanr
 
 from lib import CALIBRATION_SCALES, ROOT, calibration_agreement, independent, load_calibration, load_registry, read_yaml, vocab_terms
@@ -176,6 +177,10 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     stats["n_boundary_cases"] = sum(1 for g in games if g.data.get("boundary_case"))
     stats["n_sourced_or_verified"] = sum(1 for lst in live.values() for e in lst if e.data.get("status") in ("sourced", "verified"))
     stats["n_asserted"] = sum(1 for lst in live.values() for e in lst if e.data.get("status") == "asserted")
+    # per type: asserted records, and records that cite no source at all (the preface and paper say how far sourcing goes)
+    for t in ("game", "mechanic", "technique", "opportunity"):
+        stats[f"n_{t}_asserted"] = sum(1 for e in live.get(t, []) if e.data.get("status") == "asserted")
+        stats[f"n_{t}_no_sources"] = sum(1 for e in live.get(t, []) if not outgoing.get(e.id, {}).get("cites"))
     stats["n_families"] = len({m.data.get("family") for m in mechs})
     stats["n_subgenres"] = len({g.data.get("subgenre") for g in games})
     if mechs:
@@ -438,6 +443,13 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         stats["n_runs_verification"] = sum(1 for r in all_runs if r.data.get("kind") == "verification")
         stats["n_runs_agent"] = sum(1 for r in all_runs if r.data.get("actor") == "agent")
         stats["n_run_operators"] = len({str(r.data.get("operator", "")).strip().lower() for r in all_runs})
+        # which models the agent runs used (paper section 2.5 discloses that every run was an agent run)
+        run_models = Counter(str((r.data.get("agent") or {}).get("model", "")).strip() for r in all_runs if r.data.get("actor") == "agent")
+        stats["n_run_models"] = len(run_models)
+        if run_models:
+            top_model, n_top = max(run_models.items(), key=lambda kv: (kv[1], kv[0]))
+            stats["top_run_model"] = top_model
+            stats["n_runs_top_model"] = n_top
         # everyone who has operated a run, credited from the run log; names and links come from report/meta.yaml
         profiles = contributor_profiles(read_yaml(ROOT / "report" / "meta.yaml") or {})
         by_op: dict[str, list] = {}
@@ -688,6 +700,8 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         stats["cluster_stable_jaccard"] = st_cfg["stable_cluster"]
         stats["cocluster_together"] = st_cfg["together"]
         stats["cocluster_apart"] = st_cfg["apart"]
+        stats["cocluster_together_pct"] = int(round(100 * st_cfg["together"]))
+        stats["cocluster_apart_pct"] = int(round(100 * st_cfg["apart"]))
         # agreement with subgenre labels, against a permutation null (labels shuffled across games)
         sub_lab = [g.data.get("subgenre") for g in games]
         obs_ari, obs_nmi = _ari(labels, sub_lab), _nmi(labels, sub_lab)
@@ -702,6 +716,8 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         stats["cluster_subgenre_ari"] = _r(obs_ari, 2)
         stats["cluster_subgenre_nmi"] = _r(obs_nmi, 2)
         stats["cluster_subgenre_null_nmi"] = _r(float(np.mean(null_nmi)), 2)
+        # NMI corrected for chance: 0 is what unrelated labelings score on average, 1 is identical labelings
+        stats["cluster_subgenre_ami"] = _r(_ami(labels, sub_lab), 2)
         stats["p_cluster_subgenre_ari"] = _r((1 + sum(1 for x in null_ari if x >= obs_ari)) / (P + 1), 3)
         stats["p_cluster_subgenre_nmi"] = _r((1 + sum(1 for x in null_nmi if x >= obs_nmi)) / (P + 1), 3)
         stats["cluster_permutations"] = P
@@ -838,6 +854,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     runs = {r.id: r for r in ents.get("run", [])}
     pair_stats = defaultdict(lambda: {"scores": 0, "pairs": 0, "exact": 0, "within_one": 0})
     n_ratings = 0
+    rated_mechs: set[str] = set()
     for t in ("mechanic", "game", "technique", "opportunity"):
         for e in sorted(live.get(t, []), key=lambda e: e.id):
             per = defaultdict(list)
@@ -847,6 +864,8 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             for fld, rs in sorted(per.items()):
                 ps = [(x, y) for i, x in enumerate(rs) for y in rs[i + 1:] if independent(runs.get(x["run"]), runs.get(y["run"]))]
                 if ps:
+                    if t == "mechanic":
+                        rated_mechs.add(e.id)
                     ag = pair_stats[fld]
                     ag["scores"] += 1
                     ag["pairs"] += len(ps)
@@ -856,6 +875,11 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
                                  "columns": ["field", "scores", "pairs", "exact", "within_one"],
                                  "rows": [{"field": f, "scores": v["scores"], "pairs": v["pairs"], "exact": _r(v["exact"] / v["pairs"], 2), "within_one": _r(v["within_one"] / v["pairs"], 2)} for f, v in sorted(pair_stats.items())]}
     stats["n_ratings"] = n_ratings
+    # how far the second ratings reach, and how often independent raters agree on each scale (chapter 5)
+    stats["n_mechanics_independently_rated"] = len(rated_mechs)
+    for f, v in sorted(pair_stats.items()):
+        stats[f"pct_rater_exact_{f}"] = int(round(100 * v["exact"] / v["pairs"]))
+        stats[f"pct_rater_within_one_{f}"] = int(round(100 * v["within_one"] / v["pairs"]))
     stats["n_scores_independently_rated"] = sum(v["scores"] for v in pair_stats.values())
     stats["n_mechanic_scores"] = sum(1 for m in mechs for f, s in rub["scales"].items() if s.get("applies_to") == "mechanic" and m.data.get(f) is not None)
     n_mech_rated = sum(v["scores"] for f, v in pair_stats.items() if (rub["scales"].get(f) or {}).get("applies_to") == "mechanic")
@@ -959,6 +983,32 @@ def _nmi(a, b) -> float:
     ha = float(-(pa[pa > 0] * np.log(pa[pa > 0])).sum())
     hb = float(-(pb[pb > 0] * np.log(pb[pb > 0])).sum())
     return mi / ((ha + hb) / 2) if ha + hb else 1.0
+
+
+def _ami(a, b) -> float:
+    """Adjusted mutual information (Vinh, Epps and Bailey 2010), arithmetic-mean normalization like _nmi:
+    (MI - E[MI]) / (mean entropy - E[MI]), with E[MI] taken over all labelings with the same cluster sizes."""
+    C = _contingency(a, b)
+    n = C.sum()
+    ra, cb = C.sum(1), C.sum(0)
+    P = C / n
+    pa, pb = ra / n, cb / n
+    nz = P > 0
+    mi = float((P[nz] * np.log(P[nz] / np.outer(pa, pb)[nz])).sum())
+    ha = float(-(pa[pa > 0] * np.log(pa[pa > 0])).sum())
+    hb = float(-(pb[pb > 0] * np.log(pb[pb > 0])).sum())
+    emi = 0.0
+    for ai in ra:
+        for bj in cb:
+            lo, hi = int(max(1, ai + bj - n)), int(min(ai, bj))
+            if hi < lo:
+                continue
+            nij = np.arange(lo, hi + 1, dtype=float)
+            logp = (gammaln(ai + 1) + gammaln(bj + 1) + gammaln(n - ai + 1) + gammaln(n - bj + 1) - gammaln(n + 1)
+                    - gammaln(nij + 1) - gammaln(ai - nij + 1) - gammaln(bj - nij + 1) - gammaln(n - ai - bj + nij + 1))
+            emi += float((nij / n * np.log(n * nij / (ai * bj)) * np.exp(logp)).sum())
+    den = (ha + hb) / 2 - emi
+    return (mi - emi) / den if den else 1.0
 
 
 # ======================================================================= SVG
