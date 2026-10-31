@@ -1,0 +1,25 @@
+id: 2026-10-30-ep12-count
+type: run
+kind: synthesis
+date: '2026-10-30'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: reword episode 12''s sentence that states the live run and operator
+  counts, so the narration stops going stale with every run, re-voice that scene, re-render episode 12,
+  and stage it for a new release.'
+method: Episode 12's scene 7 said "That makes {{stat:n_runs}} runs from {{stat:n_run_operators}} operators", so its narration
+  went stale with every run any pull request adds (run 2026-10-30-plain-sources left it one behind). It now says runs come
+  from several operators, all of them working through agents, still checked by n_run_operators >= 3 and n_runs_agent ==
+  n_runs. The scene's Japanese subtitles were rewritten to match the current English; they still said nothing was verified,
+  that every run had one operator, and that a second rater had yet to count. The scene was voiced through the ElevenLabs
+  connector in the register's voice, model, and flow, two takes, and the take nearer the series' pace (60.56 s against 60.26
+  s expected) went to video-out/audio after its prompt was checked against the built text; 2,044 credits. Episode 12 was
+  rendered again with scripts/video/assemble.py and ffmpeg 6.1 (408.5 s, 1.4 s shorter), the previous render kept in video-out/backup-2026-10-30-ep12-count,
+  and scripts/video/publish.py staged the 24 videos for release videos-2026-10-30d. media/published.yaml changes only the
+  release name and episode 12's checksum, length, and scenes; the other 23 files and every poster and thumb are byte for
+  byte the previous release's. No episode scene on the built site is marked as worded differently.
+contract_version: '1.2'
+proposals: []

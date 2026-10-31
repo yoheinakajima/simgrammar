@@ -1,7 +1,7 @@
 # Narration register: the ElevenLabs take that voices each scene of the scripts in media/.
 # Voice Marcus, model eleven_v4, two takes generated per line; the take listed here is the one the videos use.
-# Workspace bcab2e23669147abb027867ccf1626c9, generated 2026-10-26. 34 takes were re-voiced 2026-10-30 (run
-# 2026-10-30-video-narration); for those, the take listed is the one whose length was nearer the series' pace.
+# Workspace bcab2e23669147abb027867ccf1626c9, generated 2026-10-26. 34 takes were re-voiced 2026-10-30 (runs
+# 2026-10-30-video-narration and 2026-10-30-ep12-count); for those, the take listed is the one whose length was nearer the series' pace.
 # Episodes and the film are one take per scene
 # with a Voice line, and shorts one take for the whole short. A key like mega/the-film.md#ep10.4 is episode 10,
 # scene 4 as the film re-voices it (Film wording in the film script). A take is stale once its script line changes;
@@ -129,7 +129,7 @@ takes:
   - {key: "episodes/12-how-this-was-made.md#4", session: xYDolpkCCVz7SugvzCTB, generation: 2ToNVszok9tTWtjCLY3u, seconds: 40.12}
   - {key: "episodes/12-how-this-was-made.md#5", session: wQbIG6m3w7Jzu2Fz3hLG, generation: aHq3NBIjup2dzG2YgRJr, seconds: 79.96}
   - {key: "episodes/12-how-this-was-made.md#6", session: atyqFeOlekmk3uZDj9J0, generation: W7HD7jVafTOqo0fDfTr9, seconds: 47.96}
-  - {key: "episodes/12-how-this-was-made.md#7", session: XYE4KkxEnrdJFlmDoevl, generation: ZTTxZQYD4rJxxWKD80ao, seconds: 61.92}
+  - {key: "episodes/12-how-this-was-made.md#7", session: xCSoxC0tSUOvSgGJlPHg, generation: uxpL7ydkr1dms5IJNtVW, seconds: 60.56}
   - {key: "episodes/12-how-this-was-made.md#8", session: p0xbnC9Q86lmRhBMGVhA, generation: IO7czVFkBMKyj9srqYzF, seconds: 32.91}
   - {key: "episodes/12-how-this-was-made.md#9", session: JAgOnTTCTuPdkCS4phC6, generation: atHbkoouOhuHYRHCq09P, seconds: 43.20}
   - {key: "mega/the-film.md#1", session: EpZZUl2YHUI2iHlFnfVB, generation: xDRho9WMfflCiJfXt7Tc, seconds: 53.16}
