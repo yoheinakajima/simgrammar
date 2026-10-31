@@ -1,0 +1,31 @@
+id: 2026-10-31-phone-width
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: check the live site at phone width, which the outside review could not, and
+  fix what breaks there.'
+method: >-
+  Changed no records or sources; this run touches web/register.css and one line of web/DESIGN.md. The live site
+  was opened in a 375 px viewport and each page was measured in the page itself: document scroll width against
+  client width, every element whose right edge passes the viewport outside a scrolling or clipping parent, every
+  text node whose box passes it, and the grid columns each register row resolves to. The home page, paper, indexes,
+  find, watch, an episode (its video plays inline) and the 404 page fit. Three bugs did not. Below 880 px a row's
+  .end is moved to grid column 2, and below 600 px the row becomes one column, so that column 2 became an implicit
+  second column and brought the register column back: the used-by, relations, mentioned-in and backlinks rows of
+  every record page and all 1,202 rows of find kept a 120 to 170 px label column beside a 170 to 220 px one, so a
+  mechanic's 39 games stacked one a line. The 600 px rule now spans .end across the row. The history timeline kept
+  its five desktop columns below 600 px, because its selector outranks the narrow log rule, leaving the run link 0
+  to 16 px wide, one character a line; it now puts the date, the event and the run kind on one line and the run
+  under them. Seven of the book's chapters (1, 2, 5, 6, 7, 8 and 11) scrolled sideways, up to 551 px, on bare URLs
+  in their references, which do not break; .prose now breaks a word that does not fit. The rules were injected into
+  the live pages before the edit and measured again on those seven chapters, a game, a mechanic, a technique, the
+  about page, find, an episode, the home page and the paper: none scrolls sideways and no row keeps a second column
+  except the boards, scenes, parts, relations and watch layouts that are meant to. The site-chrome run's 390 px pass
+  checked scrolling only, which is why the collapsed columns passed it.
+contract_version: '1.2'
+proposals: []

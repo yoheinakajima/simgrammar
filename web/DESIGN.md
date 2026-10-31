@@ -64,5 +64,5 @@ Readers come for simulation games, not for how the atlas is built. Every page ex
 ## Before you finish
 
 - Run `npx design-slop-cop <url>` on any new page. It must score 0/14.
-- Check the page at 390px wide. The register column collapses to inline ids; nothing scrolls horizontally except `.table-wrap` and, on phones, the family bar (`.family`), whose row of sister sites scrolls sideways when it does not fit. A citation to copy is a `pre[data-style="citation"]`, which wraps instead of scrolling.
+- Check the page at 390px wide. The register column collapses to inline ids, a row's end column drops under its text, and a history timeline puts each run under its date; nothing scrolls horizontally except `.table-wrap` and, on phones, the family bar (`.family`), whose row of sister sites scrolls sideways when it does not fit. A citation to copy is a `pre[data-style="citation"]`, which wraps instead of scrolling, and a bare URL in prose (a chapter's references) wraps too.
 - Confirm every new component has its twin shown in `components.html`.
