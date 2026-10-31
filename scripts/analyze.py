@@ -175,8 +175,19 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     stats["year_min"] = min(yrs) if yrs else None
     stats["year_max"] = max(yrs) if yrs else None
     stats["n_boundary_cases"] = sum(1 for g in games if g.data.get("boundary_case"))
-    stats["n_sourced_or_verified"] = sum(1 for lst in live.values() for e in lst if e.data.get("status") in ("sourced", "verified"))
-    stats["n_asserted"] = sum(1 for lst in live.values() for e in lst if e.data.get("status") == "asserted")
+    # evidence: status partitions the records (the four types that carry one) into sourced or verified, asserted, and
+    # contested, so n_sourced_or_verified + n_asserted + n_contested == n_records. Citing is a different count: it also
+    # holds the contested records, whose sources disagree, and asserted records that already cite a source in a claim but
+    # have not been promoted. Pages that state either take these stats rather than counting for themselves.
+    recs = [e for t in ("game", "mechanic", "technique", "opportunity") for e in live.get(t, [])]
+    status = Counter(e.data.get("status") for e in recs)
+    stats["n_records"] = len(recs)
+    stats["n_sourced_or_verified"] = status.get("sourced", 0) + status.get("verified", 0)
+    stats["n_asserted"] = status.get("asserted", 0)
+    stats["n_verified"] = status.get("verified", 0)
+    stats["n_contested"] = status.get("contested", 0)
+    stats["n_records_citing"] = sum(1 for e in recs if outgoing.get(e.id, {}).get("cites"))
+    stats["n_asserted_citing"] = sum(1 for e in recs if e.data.get("status") == "asserted" and outgoing.get(e.id, {}).get("cites"))
     # per type: asserted records, and records that cite no source at all (the preface and paper say how far sourcing goes)
     for t in ("game", "mechanic", "technique", "opportunity"):
         stats[f"n_{t}_asserted"] = sum(1 for e in live.get(t, []) if e.data.get("status") == "asserted")
@@ -435,10 +446,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         stats["n_predictions_first_date"] = sum(1 for d in rb if d == rb[0]) if rb else 0
         stats["n_predictions_by_2027"] = sum(1 for d in rb if d <= "2027-12-31")
         stats["n_predictions_by_2028"] = sum(1 for d in rb if d <= "2028-12-31")
-        st_live = Counter(e.data.get("status") for lst in live.values() for e in lst)
-        stats["n_verified"] = st_live.get("verified", 0)
-        stats["n_contested"] = st_live.get("contested", 0)
-        all_runs = ents.get("run", [])
+        all_runs = ents.get("run", [])   # (n_verified and n_contested are counted with the other statuses, above)
         stats["n_runs"] = len(all_runs)
         stats["n_runs_verification"] = sum(1 for r in all_runs if r.data.get("kind") == "verification")
         stats["n_runs_agent"] = sum(1 for r in all_runs if r.data.get("actor") == "agent")

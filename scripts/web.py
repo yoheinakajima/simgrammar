@@ -21,6 +21,7 @@ from their GitHub release and checks each sha256. Pages work without JavaScript;
 """
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 import re
@@ -43,6 +44,9 @@ FAVICON = "free-placement"   # the icon the browser tab shows
 # The front page's lead, also its link-preview description: what the atlas is for a reader, where the paper's subtitle says it for a scholar.
 LEAD = ("Every simulation game is assembled from a shared set of parts: production chains, needs, markets, weather, raids. Naming the parts shows "
         "why games feel alike, which combinations no one has built yet, and where AI can change how a game plays.")
+# What the catalog admits as a simulation game, in the words of the game inclusion test's point (b) (AGENTS.md §3)
+SIM_GAME = ("Here a simulation game is one whose core loop is driven by a model of some system, such as an economy, an ecology, "
+            "a body, or a machine, whose state changes without the player scripting each change.")
 STATE = {"asserted": "optional", "sourced": "waiting", "verified": "done", "contested": "blocked"}
 SKIP_FACTS = {"id", "type", "name", "aliases", "summary", "status", "provenance", "sources", "claims", "deprecated", "key_results", "falsifiable_signal",
               "assertions", "ratings", "store_ids", "archived"}
@@ -55,6 +59,27 @@ LISTS = {"mechanic": ["design_levers", "failure_modes", "dynamics", "open_questi
 
 def esc(s) -> str:
     return html.escape("" if s is None else str(s), quote=True)
+
+
+def attr(s) -> str:
+    """Text for a double-quoted attribute or the title: only &, " and < need escaping, so an apostrophe reaches a link
+    preview as an apostrophe, not as &#x27;."""
+    return ("" if s is None else str(s)).replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;")
+
+
+def asset(name: str) -> str:
+    """A file from web/ as the site serves it under assets/."""
+    return (WEB_SRC / name).read_text(encoding="utf-8")
+
+
+# IBM Plex, self-hosted from the vendored files in media/fonts (SIL OFL 1.1, which allows redistribution with the
+# license beside the fonts); register.css declares the same five faces. Mono 600 and 700 are not vendored, so the
+# browser draws them from Mono Medium.
+FONTS = ("IBMPlexSans-Regular", "IBMPlexSans-Medium", "IBMPlexSans-SemiBold", "IBMPlexMono-Regular", "IBMPlexMono-Medium")
+# The faces every page sets above the fold (text, headings, labels, the brand), fetched before the stylesheet asks for
+# them: on a first visit, a face that arrives after the first paint reflows the header and moves the home page's icon
+# grid down (a layout shift of 0.11 at 390px wide, none with these preloaded).
+PRELOAD = ("IBMPlexSans-Regular", "IBMPlexSans-SemiBold", "IBMPlexMono-Regular", "IBMPlexMono-Medium")
 
 
 def host(url: str) -> str:
@@ -131,6 +156,8 @@ class Web:
         self.by_id = ctx.by_id
         self.derived = analysis["derived"]
         self.short = manifest["dataset_sha256"][:8]
+        # each asset's URL carries a hash of its own bytes, so a deploy that changes it is not hidden by the 10-minute Pages cache
+        self.asset_v = {f: hashlib.sha256(asset(f).encode("utf-8")).hexdigest()[:8] for f in ("register.css", "simgrammar.js")}
         self.types = [t for t, s in registry["types"].items() if not s.get("meta")]
         self.props = {t: schemas[Path(registry["types"][t]["schema"]).name]["properties"] for t in self.types}
         self.edges_out, self.edges_in = defaultdict(list), defaultdict(list)
@@ -210,13 +237,17 @@ class Web:
         """Generated projections are not committed; the Pages workflow publishes them under /dist/ beside the site."""
         return f"{base}dist/{path}"
 
-    def page(self, *, title, desc, body, depth, nav, path, image="og/site.png"):
-        base = "../" * depth
-        fam = "".join(f'<li><a href="{esc(u)}">{esc(n)}</a></li>' for n, u in self.site.get("family", []))
-        fam += f'<li><a href="{base or "./"}" aria-current="true" data-internal>simgrammar</a></li>'
-        navh, utility = ("".join(f'<a href="{base}{href}"{" aria-current=" + chr(34) + "page" + chr(34) if key == nav else ""} data-internal>{label}</a>'
-                                 for key, label, href in links) for links in (NAV, UTILITY))
+    def page(self, *, title, desc, body, depth, nav, path, image="og/site.png", base=None, noindex=False):
+        """A complete page. Links climb `depth` levels to the site root; `base` overrides that (the 404 page passes "/",
+        since Pages serves it at whatever address was asked for). Flex items in the chrome are separated by whitespace
+        so that copied text and screen readers do not run one item's last word into the next item's first."""
+        base = "../" * depth if base is None else base
+        fam = " ".join([f'<li><a href="{esc(u)}">{esc(n)}</a></li>' for n, u in self.site.get("family", [])]
+                       + [f'<li><a href="{base or "./"}" aria-current="true" data-internal>simgrammar</a></li>'])
+        navh, utility = (" ".join(f'<a href="{base}{href}"{" aria-current=" + chr(34) + "page" + chr(34) if key == nav else ""} data-internal>{label}</a>'
+                                  for key, label, href in links) for links in (NAV, UTILITY))
         url = self.site["url"] + path
+        v = self.asset_v
         if 'data-person="' in body:
             body += f'<script type="application/json" id="people">{self.people_json()}</script>'
         return f"""<!doctype html>
@@ -225,27 +256,26 @@ class Web:
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>{esc(title)}</title>
-<meta name="description" content="{esc(desc)}">
-<link rel="canonical" href="{esc(url)}">
+<title>{attr(title)}</title>
+<meta name="description" content="{attr(desc)}">{chr(10) + '<meta name="robots" content="noindex">' if noindex else ""}
+<link rel="canonical" href="{attr(url)}">
 <meta property="og:type" content="article">
-<meta property="og:title" content="{esc(title)}">
-<meta property="og:description" content="{esc(desc)}">
-<meta property="og:url" content="{esc(url)}">
-<meta property="og:image" content="{esc(self.site['url'] + image)}">
+<meta property="og:title" content="{attr(title)}">
+<meta property="og:description" content="{attr(desc)}">
+<meta property="og:url" content="{attr(url)}">
+<meta property="og:image" content="{attr(self.site['url'] + image)}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="{base}assets/favicon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{base}assets/register.css">
+{"".join(f'<link rel="preload" href="{base}assets/fonts/{f}.woff2" as="font" type="font/woff2" crossorigin>' for f in PRELOAD)}
+<link rel="stylesheet" href="{base}assets/register.css?v={v['register.css']}">
 <link rel="alternate" type="text/markdown" href="{base}paper.md" title="The paper as markdown">
-<script src="{base}assets/simgrammar.js" defer></script>
+<script src="{base}assets/simgrammar.js?v={v['simgrammar.js']}" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#content">Skip to content</a>
-<div class="family shell" aria-label="Site family"><ul>{fam}</ul><span>simulation games, part by part</span></div>
+<div class="family shell" aria-label="Site family"><ul>{fam}</ul> <span>simulation games, part by part</span></div>
 <header class="topbar shell">
   <a class="brand" href="{base or './'}" data-internal>simgrammar <small>the grammar of simulation</small></a>
   <input type="checkbox" id="menu" class="menu-toggle"><label for="menu" class="menu-label">menu</label>
@@ -254,7 +284,7 @@ class Web:
 </header>
 <main id="content" class="shell">
 {body}
-<footer class="site-footer"><span>paper v{esc(self.meta['version'])} · dataset {self.short}</span><span><a href="{base}about/" data-internal>how this is made</a> · <a href="{esc(self.site['repo'])}">github</a></span></footer>
+<footer class="site-footer"><span>paper v{esc(self.meta['version'])} · dataset {self.short}</span> <span class="visually-hidden">·</span> <span><a href="{base}about/" data-internal>how this is made</a> · <a href="{esc(self.site['repo'])}">github</a></span></footer>
 </main>
 </body>
 </html>
@@ -278,25 +308,34 @@ class Web:
             return f'<a href="https://github.com/{esc(v)}">{esc(v)}</a>'
         return esc(_fmt(v))
 
-    def table(self, columns, headers, rows, base, link_cols=(), caption=None, cap=None, name=None):
-        th = "".join(f'<th{" class=" + chr(34) + "num" + chr(34) if self._numeric(rows, c) else ""}>{esc(h)}</th>' for c, h in zip(columns, headers))
+    def table(self, columns, headers, rows, base, link_cols=(), caption=None, cap=None, name=None, label=None):
+        """A sortable table. Its caption is the table's own <caption>, drawn under it as the paragraph it replaces was;
+        a table with no caption gets a visually hidden one from `label` or its name, so a screen reader can name every
+        table. Header cells carry scope="col", and when the first column names the record a row is about, that column's
+        cells are row headers."""
+        links = set(link_cols)
+        num = {c: self._numeric(rows, c) for c in columns}
+        th = "".join(f'<th scope="col"{" class=" + chr(34) + "num" + chr(34) if num[c] else ""}>{esc(h)}</th>' for c, h in zip(columns, headers))
+        row_head = bool(columns) and columns[0] in links
         trs = []
         for r in rows:
             tds = []
-            for c in columns:
+            for k, c in enumerate(columns):
                 v = r.get(c) if isinstance(r, dict) else None
-                cls = ' class="num"' if self._numeric(rows, c) else ""
+                cls = ' class="num"' if num[c] else ""
                 if name == "contributors" and c == "contributor":   # the name opens the contributor's card
                     tds.append(f'<td><a href="https://github.com/{esc(r["github"])}" data-person="{esc(r["github"])}">{esc(v)}</a></td>')
                     continue
-                tds.append(f"<td{cls}>{self.cell(c, v, base, set(link_cols), cap)}</td>")
+                tag = "th" if row_head and k == 0 else "td"
+                tds.append(f'<{tag}{" scope=" + chr(34) + "row" + chr(34) if tag == "th" else ""}{cls}>{self.cell(c, v, base, links, cap)}</{tag}>')
             trs.append("<tr>" + "".join(tds) + "</tr>")
+        hidden = label or (name.replace("-", " ").capitalize() if name else None)
+        cap_html = f"<caption>{esc(caption)}</caption>" if caption else f'<caption class="visually-hidden">{esc(hidden)}</caption>' if hidden else ""
         t = (f'<div class="table-wrap"><table class="data" data-style="dense" data-sortable{" data-name=" + chr(34) + esc(name) + chr(34) if name else ""}>'
-             f"<thead><tr>{th}</tr></thead><tbody>{''.join(trs)}</tbody></table></div>")
-        cap_html = f'<p class="small muted">{esc(caption)}</p>' if caption else ""
+             f"{cap_html}<thead><tr>{th}</tr></thead><tbody>{''.join(trs)}</tbody></table></div>")
         if len(rows) > 40:
-            return f'<details class="disclosure"><summary>table · {len(rows)} rows{" · " + esc(name) if name else ""}</summary>{t}{cap_html}</details>'
-        return t + cap_html
+            return f'<details class="disclosure"><summary>table · {len(rows)} rows{" · " + esc(name) if name else ""}</summary>{t}</details>'
+        return t
 
     @staticmethod
     def _numeric(rows, c):
@@ -335,7 +374,12 @@ class Web:
                         v = [self.term(vn, x) for x in v] if isinstance(v, list) else self.term(vn, v)
                     row[p] = v
                 rows.append(row)
-            return self.table(paths, heads, rows, base, link_cols={"name"}, caption=spec.get("caption"), name=name)
+            # a table with no caption is named, for a screen reader, by the one vocabulary term that selects its rows
+            flt, label = spec.get("filter") or {}, None
+            if len(flt) == 1 and isinstance(next(iter(flt.values())), str) and self.vocab_of(ent_t, next(iter(flt))):
+                f, val = next(iter(flt.items()))
+                label = f'{self.registry["types"][ent_t]["plural"].capitalize()} whose {f.replace("_", " ")} is {self.term(self.vocab_of(ent_t, f), val).lower()}'
+            return self.table(paths, heads, rows, base, link_cols={"name"}, caption=spec.get("caption"), name=name, label=label)
         t = self.analysis["tables"].get(name)
         if t is None:
             return None
@@ -377,7 +421,8 @@ class Web:
             twin = self.report_table(tw["table"], base) or ""
             nrows = len(self.analysis["tables"][tw["table"]]["rows"])
         else:
-            twin = self.table(tw["columns"], [c.replace("_", " ") for c in tw["columns"]], tw["rows"], base, link_cols=tw.get("link_columns", []), cap=8)
+            twin = self.table(tw["columns"], [c.replace("_", " ") for c in tw["columns"]], tw["rows"], base, link_cols=tw.get("link_columns", []), cap=8,
+                              label=f'Figure {n}, {v["title"]}, as a table')
             nrows = len(tw["rows"])
         if twin.startswith("<details"):
             twin = re.sub(r"^<details class=\"disclosure\"><summary>.*?</summary>", "", twin)[: -len("</details>")]
@@ -422,6 +467,7 @@ class Web:
             counter["n"] += 1
             return self.figure_static(name, counter["n"]) if kind == "FIGURE" else self.figure_viz(name, counter["n"], "../")
         body = body.replace("<table>", '<div class="table-wrap"><table class="data" data-style="dense">').replace("</table>", "</table></div>")
+        body = re.sub(r"<th(?=[ >])", '<th scope="col"', body)   # the prose's own tables, whose header cells are all column headers
         body = re.sub(r"<!--(TABLE|FIGURE|VIZ):([a-z0-9-]+)-->", place, body)
         self.paper_refs.clear()
         for m in re.finditer(r'<h2 id="([^"]+)">(.*?)</h2>(.*?)(?=<h2 id=|\Z)', body, re.S):
@@ -453,12 +499,17 @@ class Web:
                f"  year = {{{meta['date'][:4]}}},\n  version = {{{meta['version']}}},\n" + (f"  doi = {{{meta['doi']}}},\n" if meta.get("doi") else "") +
                f"  url = {{{self.site['url']}paper/}},\n  note = {{Dataset {self.short}; full sha256 in manifest.json}}\n}}")
         nruns = len(self.ents.get("run", []))
+        # the receipt counts what the site publishes, as the home page and the indexes do; manifest.json counts files,
+        # which include deprecated records, so the receipt says how many of those there are
+        dep = [counted(man["counts"][t] - counts[t], f"deprecated {t}") for t in man["counts"] if t in counts and man["counts"][t] > counts[t]]
+        published = ", ".join(f"{counts.get(t, n)} {t}" for t, n in man["counts"].items())
+        published += f" · manifest.json counts files, so it also has {' and '.join(dep)}" if dep else ""
         header = f"""<nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="../" data-internal>simgrammar</a></li><li>paper</li></ol></nav>
 <div class="page-header corners">
   <p class="eyebrow"><span class="id">v{esc(meta['version'])}</span> <span>{esc(meta['date'])}</span> <span>dataset <b>{self.short}</b></span> <span>contract {esc(man['contract_version'])}</span></p>
   <h1>{esc(meta['title'])}</h1>
   <p class="dek">{esc(meta['subtitle'])}.</p>
-  <div class="meta"><span><b>{authors_html}</b></span>{"".join(f"<span>{counted(counts[t], t)}</span>" for t in ("game", "mechanic", "technique", "opportunity", "source"))}<span>{counted(man['edges'], "typed edge")}</span><span>{counted(nruns, "research run")}</span></div>
+  <div class="meta"><span><b>{authors_html}</b></span>{"".join(f"<span>{counted(counts[t], t)}</span>" for t in ("game", "mechanic", "technique", "opportunity", "source"))}<span>{counted(man['edges'], "link")} between games, mechanics, techniques, opportunities, and sources</span><span>{counted(nruns, "research run")}</span></div>
   <div class="actions"><a class="btn" href="#abstract" data-internal>Read the paper</a><a class="btn" data-style="ghost" href="../about/" data-internal>How it is made</a><a class="btn" data-style="ghost" href="{esc(self.site['repo'])}">Contribute on GitHub</a></div>
   <div class="twins"><b>this paper as</b><a href="../paper.md" data-internal>markdown</a><a href="../references.bib" data-internal>bibtex</a><a href="../manifest.json" data-internal>manifest json</a><a href="../llms.txt" data-internal>llms.txt</a></div>
 </div>"""
@@ -471,11 +522,11 @@ class Web:
 <div class="register" data-kind="refs">{''.join(refs)}</div></section>
 <section class="section cite" id="cite"><div class="section-line"><h2>cite</h2><span>bibtex</span></div>
 <div class="cite-line"><span class="chip">{esc(authors)}</span><span class="chip">{esc(meta['date'][:4])}</span><span class="chip">v{esc(meta['version'])}</span><span class="chip">dataset {self.short}</span></div>
-<div class="prompt"><div class="copy-row"><span>bibtex</span><span>{esc(meta['title'].lower())} · v{esc(meta['version'])}</span></div><pre>{esc(bib)}</pre></div></section>
+<div class="prompt"><div class="copy-row"><span>bibtex</span><span>{esc(meta['title'].lower())} · v{esc(meta['version'])}</span></div><pre data-style="citation">{esc(bib)}</pre></div></section>
 <section class="section" id="receipt"><div class="section-line"><h2>build receipt <span>· reproduce this page</span></h2><span>python scripts/build.py</span></div>
 <dl class="receipt" data-size="wide"><dt>dataset</dt><dd><span class="hash" data-prefix="sha256:">{man['dataset_sha256']}</span></dd>
 <dt>contract</dt><dd>{esc(man['contract_version'])} · <a href="{esc(self.gh('CONTRACT.md'))}">CONTRACT.md</a></dd>
-<dt>entities</dt><dd>{', '.join(f'{n} {t}' for t, n in man['counts'].items())}</dd>
+<dt>published</dt><dd>{esc(published)}</dd>
 <dt>edges</dt><dd>{man['edges']}</dd>
 <dt>generator</dt><dd>{esc(man['generator'])} · scripts/web.py · scripts/viz.py</dd>
 <dt>check</dt><dd><code>make check</code> fails if any page differs from a fresh build</dd></dl>
@@ -511,10 +562,12 @@ class Web:
         """The front door: what the atlas is and why it matters, then a way into every part of it. The paper has its own tab."""
         base, meta, st = "", self.meta, self.analysis["stats"]
         counts = self.counts()
+        # the rubric scores come from one model rater, and a second rater has re-scored a share of them (paper §5.6 and its caveats)
+        rater = "mostly from one model" if st.get("n_scores_independently_rated") else "from one model"
         findings = [
             (f'{st["pct_uses_since_2010_on_pre2001"]:.0f}%', "of the parts in games since 2010 were already in a game by 2000", "5.2"),
             # the paper's wording: legibility falls as emergence potential, the unscripted variety a mechanic generates, rises
-            (f'{st["rho_legibility_emergence_potential"]}', "mechanics that generate more unscripted variety are rated harder to read (ρ)", "5.6"),
+            (f'{st["rho_legibility_emergence_potential"]}', f"mechanics that generate more unscripted variety are rated harder to read (ρ, on scores {rater})", "5.6"),
             # exposure is zero exactly when no technique record has an affects edge to the mechanic
             (f'{st["pct_uses_on_zero_exposure"]:.0f}%', "of mechanic uses fall on mechanics that no technique in this dataset is linked to", "8.2"),
             (f'{st["n_technique_runtime_breaks"]} of {st["n_technique_runtime"]}', "AI techniques that run during play break exact replay", "6.4"),
@@ -579,6 +632,7 @@ class Web:
   <p class="eyebrow"><span class="id">atlas</span> <span>simulation games, part by part</span></p>
   <h1>{esc(meta['title'])}</h1>
   <p class="dek">{esc(LEAD)}</p>
+  <p class="dek">{esc(SIM_GAME)}</p>
   <div class="meta"><span><b>{self.byline_html(base)}</b></span><span>{counted(counts['game'], 'game')}</span><span>{counted(counts['mechanic'], 'mechanic')}</span><span>{counted(counts['technique'], 'technique')}</span><span>{counted(counts['opportunity'], 'bet')}</span></div>
   <div class="actions"><a class="btn" href="game/" data-internal>Browse the games</a><a class="btn" data-style="ghost" href="watch/" data-internal>Watch the series</a><a class="btn" data-style="ghost" href="book/" data-internal>Read the book</a><a class="btn" data-style="ghost" href="paper/" data-internal>Read the paper</a></div>
 </div>
@@ -1612,10 +1666,18 @@ class Web:
         return "\n".join(lines)
 
     def not_found(self):
-        body = ('<div class="page-header"><p class="eyebrow"><span class="id">404</span></p><h1>No record at this address</h1>'
-                '<p class="dek">Record ids never change once merged, so this address never held a page, or the record was deprecated before it was published.</p>'
-                '<div class="actions"><a class="btn" href="/" data-internal>Back to the start</a></div></div>')
-        return self.page(title="Not found · simgrammar", desc="Page not found.", body=body, depth=0, nav="", path="404.html").replace('href="assets/', 'href="/assets/').replace('src="assets/', 'src="/assets/')
+        """Pages serves 404.html at the address that was asked for, at any depth, so every link on it is root-absolute.
+        It is not a page to index, and its canonical address is the site root."""
+        mech = min((e for e in self.ents.get("mechanic", []) if not e.data.get("deprecated")),
+                   key=lambda e: (-self.derived.get(e.id, {}).get("prevalence", 0), e.id), default=None)
+        example = f"/mechanic/ and /mechanic/{mech.id}/" if mech else "/mechanic/"
+        indexes = " ".join(f'<a href="/{href}" data-internal>{esc(label.lower())}</a>' for _, label, href in NAV)
+        body = ('<div class="page-header"><p class="eyebrow"><span class="id">404</span></p><h1>No page at this address</h1>'
+                f'<p class="dek">The indexes and record pages use the singular type, as in {esc(example)}, so a plural such as /mechanics/ finds nothing. '
+                'Record ids never change once merged, so an address that once held a record page still holds it.</p>'
+                '<div class="actions"><a class="btn" href="/" data-internal>Back to the start</a><a class="btn" data-style="ghost" href="/find/" data-internal>Find a page</a></div>'
+                f'<div class="twins"><b>indexes</b>{indexes}</div></div>')
+        return self.page(title="Not found · simgrammar", desc="Page not found.", body=body, depth=0, nav="", path="", base="/", noindex=True)
 
 
 def favicon(png: bytes) -> bytes:
@@ -1659,12 +1721,17 @@ def build_web(ents, edges, analysis, vocabs, registry, schemas, ctx, manifest, m
     outs["web/CNAME"] = meta["site"]["domain"] + "\n"
     root = meta["site"]["url"]
     pages = sorted(k[len("web/"):-len("index.html")] for k in outs if k.startswith("web/") and k.endswith("index.html"))
+    lastmod = esc(str(meta["date"]))   # the paper's date (report/meta.yaml), never the clock: the build is deterministic
     outs["web/sitemap.xml"] = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-                               + "".join(f"  <url><loc>{esc(root + p)}</loc></url>\n" for p in pages) + "</urlset>\n")
+                               + "".join(f"  <url><loc>{esc(root + p)}</loc><lastmod>{lastmod}</lastmod></url>\n" for p in pages) + "</urlset>\n")
     outs["web/robots.txt"] = f"User-agent: *\nAllow: /\nSitemap: {root}sitemap.xml\n"
     outs["web/.nojekyll"] = ""
     for f in ("register.css", "simgrammar.js"):
-        outs[f"web/assets/{f}"] = (WEB_SRC / f).read_text(encoding="utf-8")
+        outs[f"web/assets/{f}"] = asset(f)
+    fonts = ROOT / "media" / "fonts"
+    for f in FONTS:
+        outs[f"web/assets/fonts/{f}.woff2"] = (fonts / f"{f}.woff2").read_bytes()
+    outs["web/assets/fonts/OFL.txt"] = (fonts / "OFL.txt").read_text(encoding="utf-8")   # the license travels with the fonts
     for i in sorted(w.icons):
         outs[f"web/assets/icons/{i}.png"] = w.built[f"visual/icons/{i}@4x.png"]
     if FAVICON in w.icons:

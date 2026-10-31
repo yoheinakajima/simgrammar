@@ -161,11 +161,15 @@
     });
   }
 
-  /* a poster becomes its video; without script the poster links the file */
+  /* a poster becomes its video (its data-src, else the file it links); without script the poster links the file, or
+     the page that plays it. The video takes its name from the poster's alt text, less the words that describe the still
+     ("Short 3: …, opening frame" names "Short 3: …"). */
   function video(a) {
     var img = $("img", a);
-    var v = el("video", { "class": a.className, src: a.getAttribute("href"), poster: img ? img.getAttribute("src") : "", controls: "", playsinline: "", preload: "auto" });
+    var v = el("video", { "class": a.className, src: a.getAttribute("data-src") || a.getAttribute("href"), poster: img ? img.getAttribute("src") : "", controls: "", playsinline: "", preload: "auto" });
     if (img) { v.setAttribute("width", img.getAttribute("width")); v.setAttribute("height", img.getAttribute("height")); }
+    var name = img ? (img.getAttribute("alt") || "").replace(/, (opening frame|title card|a frame from the episode)$/, "") : "";
+    if (name) v.setAttribute("aria-label", name);
     var tracks = $("template[data-tracks]", a.parentNode);   // subtitle tracks the page offers for this video
     if (tracks) v.appendChild(document.importNode(tracks.content, true));
     a.parentNode.replaceChild(v, a);

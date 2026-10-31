@@ -1,0 +1,42 @@
+id: 2026-10-31-site-chrome
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: fix the site-wide problems a pre-launch review found (404 page,
+  contrast, build receipt, record tallies, table semantics, fonts, previews, sitemap, caching, mobile).'
+method: >-
+  Changed no records or sources; this run touches the site templates (scripts/web.py page shell, home, paper,
+  table, 404, sitemap), scripts/og.py, web/register.css, web/simgrammar.js, web/DESIGN.md, one stat block in
+  scripts/analyze.py, and the short dataset hash in scripts/build.py and scripts/paper_pdf.py. Each item was checked
+  in a fresh dist/web, served locally and driven through headless Chromium over CDP at 1280 and 390 px (320 px for
+  the citation): no page of /, /paper/, a mechanic, a game, /find/ or an episode scrolls sideways except the family
+  bar and .table-wrap. Contrast ratios were computed with the WCAG formula against --paper and --paper-2 for every
+  theme; --faint and --open were scaled darker along their own hue to the lightest value at or above 4.5:1. The
+  record tallies differed because the about page counts records that cite a source (397) while the paper counts
+  statuses (394 sourced or verified, 71 asserted), and the paper omits the one contested record, which cites both
+  sides; two asserted records already cite a source in a claim. Status partitions the 466 records, so analyze.py now
+  publishes n_records, n_records_citing and n_asserted_citing beside the status counts. The fonts are the vendored
+  IBM Plex woff2 files in media/fonts under the SIL Open Font License 1.1, which allows redistribution with the
+  license, so OFL.txt is copied beside them; Plex Mono SemiBold and Bold are not vendored, so the browser draws those
+  weights from Mono Medium. A cold first load showed a 0.11 layout shift at 390 px from the font swap moving the home
+  page's icon grid; preloading the four faces every page uses removed it. A card per source in og.py measured about
+  18 ms each, over half again on the build for several hundred sources, so source pages should use the index card
+  og/source.png; that choice is wired in the record page template, which this run did not edit. Figure 4's readout
+  did not truncate at any width tried (320 to 1280): it is one wrapping line, and the reported cut falls at about the
+  hundredth character, which suggests a tool's display limit, so it is unchanged.
+contract_version: '1.2'
+proposals:
+- kind: other
+  target: report/src/02-method.md
+  detail: Section 2.4 says how many entities are sourced or verified and how many asserted, which do not sum to the
+    total because the contested record is left out; add "and {{stat:n_contested}} contested" (or state the total with
+    {{stat:n_records}}) so the sentence partitions the records.
+- kind: other
+  target: media/fonts
+  detail: Vendor IBMPlexMono-SemiBold.woff2 and IBMPlexMono-Bold.woff2 (same OFL license) and declare them in
+    register.css, so mono labels at 600 and 700 use the real weights instead of a bold drawn from Mono Medium.

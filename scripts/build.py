@@ -475,7 +475,7 @@ def build() -> tuple[dict[str, str | bytes], dict[str, str]]:
     dataset = sha256(canonical_json(sorted(ent_hashes.items())))
     paper = paper.replace("{DATASET}", dataset)
     for k in [k for k in outs if k.startswith(("book/", "media/"))]:
-        outs[k] = outs[k].replace("{DATASET}", dataset[:12])
+        outs[k] = outs[k].replace("{DATASET}", dataset[:8])   # the short form the site uses; the full hash is in the manifest
     outs["paper/paper.md"] = paper
     manifest = {
         "contract_version": registry["contract_version"],

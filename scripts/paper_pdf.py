@@ -476,7 +476,7 @@ def latex(paper_md: str, meta: dict, manifest: dict, figures: dict) -> str:
     site = meta["site"]["url"]
     tex_body = Paper(site, figures).blocks(md.parse(body))
     authors = [esc(a) for a in fm["author"]]
-    short = fm["dataset_sha256"][:12]
+    short = fm["dataset_sha256"][:8]   # the short form the site and the book use
     pdfmeta = ", ".join([f"pdftitle={{{esc(fm['title'])}: {esc(fm['subtitle'])}}}", f"pdfauthor={{{', '.join(authors)}}}",
                          f"pdfsubject={{Version {esc(fm['version'])}, dataset sha256 {fm['dataset_sha256']}}}"])
     return "\n".join([
