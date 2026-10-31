@@ -7,6 +7,7 @@ This file is the design contract for agents working in this repository. Read it 
 - The only stylesheet is `register.css`. Do not add another. Do not add Tailwind, shadcn, or a component library.
 - Do not write inline `<style>` blocks or new classes for variants. Use the grammar below. If a variant does not exist, add it to `register.css` as a `data-*` value on the existing component, not as a new class.
 - No JavaScript is required for any page to be complete. Interactive controls must degrade to a complete static table or list.
+- Type is IBM Plex, self-hosted: `register.css` declares the faces, and the build copies the vendored files from `media/fonts` (SIL OFL 1.1, license included) to `assets/fonts/`. Pages load nothing from another host.
 
 ## Grammar
 
@@ -21,7 +22,7 @@ This file is the design contract for agents working in this repository. Read it 
 
 - Looks are tokens. To change how pages look, write or edit a skin in `skins/` following `skins/_schema.md`; never edit component rules for a look. A skin may set any token in the schema and nothing else.
 - Set `data-skin` on `<html>`; load the skin after `register.css`.
-- Meet the contrast floors in the schema. A dark paper needs a light `--deep` block.
+- Meet the contrast floors in the schema. A dark paper needs a light `--deep` block. Small text needs 4.5:1: `--muted`, `--faint` and `--open` are at least that on `--paper` and `--paper-2` in every theme in `register.css`, and `--deep-faint` on each theme's `--deep`.
 - Every skin file starts with the seven-line image brief; the prompt templates depend on it.
 
 ## Images
@@ -63,5 +64,5 @@ Readers come for simulation games, not for how the atlas is built. Every page ex
 ## Before you finish
 
 - Run `npx design-slop-cop <url>` on any new page. It must score 0/14.
-- Check the page at 390px wide. The register column collapses to inline ids; nothing scrolls horizontally except `.table-wrap`.
+- Check the page at 390px wide. The register column collapses to inline ids; nothing scrolls horizontally except `.table-wrap` and, on phones, the family bar (`.family`), whose row of sister sites scrolls sideways when it does not fit. A citation to copy is a `pre[data-style="citation"]`, which wraps instead of scrolling.
 - Confirm every new component has its twin shown in `components.html`.

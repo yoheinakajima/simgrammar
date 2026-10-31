@@ -6,8 +6,11 @@ vendored IBM Plex fonts (media/fonts). scripts/web.py calls images() and every p
   og/<type>.png                  the game, mechanic, technique, opportunity, and source indexes
   og/watch.png, og/book.png      the watch page and the book's contents
   og/watch/<episode>.png         every episode page
-  og/<type>/<id>.png             every game, mechanic, technique, and opportunity page
+  og/<type>/<id>.png             every game, mechanic, technique, and opportunity page, deprecated ones included
   og/book/<chapter>.png          every book chapter
+
+A source page uses its index's card, og/source.png: a card per source costs about 18 ms, which across several hundred
+sources would add over half again to every build (and twice over to make determinism), for pages that are rarely shared.
 
 A 480 px panel on the left draws the subject: a record's icon, a game's parts, an opportunity's mechanics, a chapter's
 mechanics, or for the indexes the icons of what they list. Icons are pasted at 2, 1, 1/2 or 1/4 of their 192 px raster,
@@ -85,6 +88,15 @@ def art(im: Image.Image, icons: list[bytes]):
         im.paste(ic, (x0 + (k % cols) * (size + gap), y0 + (k // cols) * (size + gap)), ic)
 
 
+_site: dict = {}
+
+
+def site_domain() -> str:
+    if "domain" not in _site:   # read once: parsing meta.yaml for every card took an eighth of the card's time
+        _site["domain"] = read_yaml(ROOT / "report" / "meta.yaml")["site"]["domain"]
+    return _site["domain"]
+
+
 def card(eyebrow: str, title: str, desc: str, foot: str, icons: list[bytes]) -> bytes:
     im = Image.new("RGB", (W, H), PAPER)
     d = ImageDraw.Draw(im)
@@ -94,7 +106,7 @@ def card(eyebrow: str, title: str, desc: str, foot: str, icons: list[bytes]) -> 
     d.rectangle([0, 0, W - 1, H - 1], outline=INK, width=2)
     x, tw = ART + PAD, W - ART - 2 * PAD
     mark = font("Mono-Medium", 20)
-    domain = read_yaml(ROOT / "report" / "meta.yaml")["site"]["domain"]
+    domain = site_domain()
     d.text((W - PAD, PAD + 2), domain, font=mark, fill=FAINT, anchor="ra")
     eb = font("Mono-Medium", 22)
     d.text((x, PAD), wrap(eyebrow, eb, tw - int(mark.getlength(domain)) - 24, 1)[0], font=eb, fill=MUTED)
@@ -151,6 +163,9 @@ def images(w) -> dict[str, bytes]:
                         counted(counts["opportunity"], "bet"), pngs(f"horizon-{h}" for h in ("now", "1-2y", "3-5y", "5y-plus"))),
         "source": ("Sources", "Every source cited by a record or by the paper.", counted(counts["source"], "source"), top),
     }
+    def reader(t):   # what a reader calls the record type: opportunity records are bets on the site, as the nav and the indexes say
+        return READER_NAME[t][0] if t in READER_NAME else t
+
     for t, (title, desc, foot, icons) in index.items():
         outs[f"web/og/{t}.png"] = card(f"{READER_NAME[t][1] if t in READER_NAME else t} index", title, desc, foot, icons)
     shown = []
@@ -183,9 +198,16 @@ def images(w) -> dict[str, bytes]:
                                                     f'{counted(w.derived.get(e.id, {}).get("affects_count", 0), "mechanic")} affected', pngs([e.id]))
     for e in live("opportunity"):
         inv = [i for i in e.data.get("involves", []) if i in w.by_id]
-        outs[f"web/og/opportunity/{e.id}.png"] = card(f"opportunity · {e.id}", e.data["name"], e.data.get("summary", ""),
+        outs[f"web/og/opportunity/{e.id}.png"] = card(f"{reader('opportunity')} · {e.id}", e.data["name"], e.data.get("summary", ""),
                                                       f'horizon {w.term("horizon", e.data.get("horizon")).lower()} · impact {e.data.get("impact")} of 5',
                                                       pngs(inv[:16]))
+    # a deprecated record keeps its page, so it keeps a card: what it drew before, and what replaced it
+    for t in ("game", "mechanic", "technique", "opportunity"):
+        for e in sorted((e for e in w.ents.get(t, []) if e.data.get("deprecated")), key=lambda e: e.id):
+            succ = (e.data["deprecated"] or {}).get("superseded_by")
+            ids = ([m["id"] for m in e.data.get("mechanics", [])] if t == "game" else e.data.get("involves", []) if t == "opportunity" else [e.id])
+            outs[f"web/og/{t}/{e.id}.png"] = card(f"{reader(t)} · {e.id}", e.data.get("name", e.id), e.data.get("summary", ""),
+                                                  f"deprecated · superseded by {name(succ)}" if succ in w.by_id else "deprecated", pngs(ids[:16]))
     for stem in w.chapters:
         if stem == "00-contents":
             continue
