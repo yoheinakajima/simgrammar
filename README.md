@@ -15,7 +15,8 @@ How it is made, downloads, and the research log: **[simgrammar.com/about](https:
 | You want | Open |
 |---|---|
 | The website: the games, mechanics, techniques, and bets, the videos, the book, and the paper with interactive figures | **[simgrammar.com](https://simgrammar.com/)** |
-| The report (paper form) | [paper.md](https://simgrammar.com/dist/paper/paper.md) · BibTeX: [references.bib](https://simgrammar.com/dist/paper/references.bib) |
+| The report (paper form) | [paper.md](https://simgrammar.com/dist/paper/paper.md) · BibTeX: [references.bib](https://simgrammar.com/dist/paper/references.bib) · PDF: `make pdf` builds it locally with [tectonic](https://tectonic-typesetting.github.io) |
+| How to cite it | [`CITATION.cff`](CITATION.cff) (GitHub's "Cite this repository"), with the dataset SHA-256 from the manifest for the exact data |
 | Every projection in one download | [simgrammar-dist.zip](https://simgrammar.com/dist/simgrammar-dist.zip): tables, full records, graph, analysis, wiki, paper, manifest |
 | Tables | [games.csv](https://simgrammar.com/dist/tables/games.csv), [mechanics.csv](https://simgrammar.com/dist/tables/mechanics.csv), [edges.csv](https://simgrammar.com/dist/tables/edges.csv), and the rest on the [about page](https://simgrammar.com/about/) |
 | A graph | [nodes.jsonl](https://simgrammar.com/dist/graph/nodes.jsonl), [edges.jsonl](https://simgrammar.com/dist/graph/edges.jsonl), Cytoscape JSON, GraphML for Gephi |

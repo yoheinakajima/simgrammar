@@ -1,0 +1,49 @@
+id: 2026-10-31-citable-release
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: make the dataset and paper citable (paper version 0.3, a CITATION.cff
+  written by the build, an optional deterministic PDF of the paper, and notes on what arXiv and a Zenodo
+  DOI need).'
+method: 'Build, scripts and docs only; no record, source or report text changed (ADR-0008). Paper: report/meta.yaml version
+  0.2 to 0.3 and date 2026-10-25 to 2026-10-31. The build already stamped dataset_sha256 into paper.md''s front matter, the
+  paper page, its BibTeX and the book; the PDF also prints it on its title page and in each footer. Citation: scripts/build.py
+  writes CITATION.cff (CFF 1.2.0) from report/meta.yaml and the paper''s byline, and E023 now checks it like a GENERATED block:
+  a hand edit and a missing file both fail build --check. It holds no hash or count, so data PRs leave it alone. An optional
+  `doi` in report/meta.yaml and `orcid` in contributor profiles (https orcid.org only) feed it and the paper''s BibTeX. cffconvert
+  2.0.0, installed in a scratch virtualenv, validates the committed file and a variant with a doi, an orcid, a handle-only
+  author and "SimGrammar contributors". PDF: pandoc is not installed, and the vendored IBM Plex fonts are woff2, which XeTeX
+  cannot load; tectonic 0.17.0 is (/opt/homebrew/bin). scripts/paper_pdf.py (make pdf, after make build) turns dist/paper/paper.md
+  into LaTeX with markdown-it, the parser web.py uses, and each figure SVG into TikZ, then runs tectonic in deterministic
+  mode with SOURCE_DATE_EPOCH from the paper''s date. Output goes to pdf-out/ (gitignored), because make build prunes dist/.
+  Three builds in three directories under two hash seeds gave the same 60-page PDF, sha256 67f214c2fc2b95a58f767f654fc1f7467126d6d637897c0f2187a2ece70ae1b6,
+  for dataset cfaa3e2c2c16. Pages read back with PDFKit (title, contents, abstract, three figures, appendix tables, references)
+  render as on the site; seven bold table headers overflow by 1.4 pt. Not done: no CI job builds the PDF (tectonic fetches
+  its bundle over the network, which I11 keeps out of the build), and the source was not compiled on arXiv. arXiv: since 2025-10-31
+  its CS section rejects review articles and position papers that have not passed peer review (blog.arxiv.org), so a submission
+  must be a dataset and method paper. It would lead with the dataset, schema, contract and the assertion-checked deterministic
+  build, and give the findings, opportunities and predictions as results of that method rather than as a survey or a position.
+  Upload pdf-out/paper.tex with pdf-out/figures/ as TeX source and choose the xelatex compiler: arXiv''s 2025 submission system
+  compiles XeLaTeX on TeX Live 2023 and 2025, and it wants the source of a TeX-made paper, not its PDF. A first submission
+  may need an endorsement. Zenodo DOI, operator steps: sign in to zenodo.org with GitHub and switch on yoheinakajima/simgrammar
+  in its GitHub settings; merge this PR; publish a GitHub release tagged v0.3 at the merge commit (Zenodo archives published
+  releases, not bare tags, and fills the record from CITATION.cff); then put the concept DOI Zenodo mints in report/meta.yaml
+  as doi, run make build, and commit the changed CITATION.cff in a maintenance PR. make check passes.'
+contract_version: '1.2'
+proposals:
+- kind: other
+  target: report/src/00-abstract.md
+  detail: 'For an arXiv cs submission, reframe the abstract and introduction as a dataset and method paper: lead with the
+    open dataset, its schema and contract, and the build that checks every interpretive sentence against the data, and
+    present the clusters, white space, technique exposure, opportunities and predictions as results of that method.
+    Report prose is maintainer-reviewed, so this run left it unchanged.'
+- kind: other
+  target: .github/workflows
+  detail: 'A release workflow could build the PDF with a pinned tectonic version on a published release and attach it to
+    the release, so the Zenodo archive and the GitHub release carry the same PDF. It stays out of check.yml because
+    tectonic fetches its bundle over the network.'

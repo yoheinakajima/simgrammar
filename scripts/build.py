@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Project data/ into every output format. Deterministic: same data -> byte-identical dist/.
 
-  python scripts/build.py              write dist/ and refresh GENERATED blocks in README.md, CONTRACT.md, AGENTS.md
-  python scripts/build.py --check      build in memory; exit 1 if a GENERATED block is stale (E023). Writes nothing.
+  python scripts/build.py              write dist/, refresh GENERATED blocks in README.md, CONTRACT.md, AGENTS.md, and write CITATION.cff
+  python scripts/build.py --check      build in memory; exit 1 if a GENERATED block or CITATION.cff is stale (E023). Writes nothing.
   python scripts/build.py --out DIR    write the projections to DIR instead of dist/ (CI builds twice under different
                                        PYTHONHASHSEED values and diffs the two trees to prove determinism, I11)
   python scripts/build.py --sqlite     also write dist/simgrammar.sqlite
@@ -59,6 +59,7 @@ from web import build_web  # noqa: E402
 
 DIST = ROOT / "dist"
 GENERATED_DOCS = ["README.md", "CONTRACT.md", "AGENTS.md"]
+CITATION = "CITATION.cff"  # committed like a GENERATED block, but the build writes the whole file
 REQUIRED_BLOCKS = {"CONTRACT.md": ["rules", "edge-types", "vocab-index", "rubric-index"]}
 
 
@@ -290,6 +291,42 @@ def generated_blocks(ents, analysis, vocabs, registry) -> dict[str, str]:
     return blocks
 
 
+def citation_cff(meta: dict, analysis: dict) -> str:
+    """CITATION.cff (Citation File Format 1.2.0), read by GitHub's "Cite this repository" and by Zenodo when a release is
+    tagged (ADR-0008). Title, version, date, and links come from report/meta.yaml, the authors from the byline the paper uses.
+    Nothing in it moves with the data, so data PRs leave it alone; the dataset_sha256 in dist/manifest.json pins the data."""
+    q = lambda s: json.dumps(str(s), ensure_ascii=False)  # a JSON string is a valid YAML double-quoted scalar
+    profiles = analyze.contributor_profiles(meta)
+    handles = {r["contributor"]: r["github"] for r in analysis["tables"]["contributors"]["rows"]}
+    lines = ["# Written by scripts/build.py from report/meta.yaml and the byline it computes from log/runs. Edit those and run",
+             "# `make build`; `make check` fails when this file is stale (E023). Data and report text are CC BY 4.0, code is",
+             "# Apache-2.0 (LICENSE). Cite the dataset_sha256 in dist/manifest.json with it to pin the exact data.",
+             "cff-version: 1.2.0",
+             f"message: {q('If you use SimGrammar, cite it as below, with the dataset_sha256 from dist/manifest.json for the data you used.')}",
+             "type: dataset",
+             f"title: {q(meta['title'] + ': ' + meta['subtitle'])}",
+             f"abstract: {q(meta['subtitle'] + '.')}",
+             f"version: {q(meta['version'])}",
+             f"date-released: {q(meta['date'])}",
+             "authors:"]
+    for a in analysis["byline"]:
+        h = handles.get(a)
+        if h is None:  # "SimGrammar contributors", once the byline runs past byline_names
+            lines.append(f"  - name: {q(a)}")
+            continue
+        pf = profiles.get(h.lower(), {})
+        if " " in a:
+            given, family = a.rsplit(" ", 1)
+            lines += [f"  - given-names: {q(given)}", f"    family-names: {q(family)}", f"    alias: {q(h)}"]
+        else:
+            lines.append(f"  - alias: {q(h)}")
+        lines += [f"    {k}: {q(pf[k])}" for k in ("orcid", "website") if pf.get(k)]
+    lines += ["license: CC-BY-4.0", f"url: {q(meta['site']['url'])}", f"repository-code: {q(meta['site']['repo'])}"]
+    if meta.get("doi"):
+        lines.append(f"doi: {q(meta['doi'])}")
+    return "\n".join(lines) + "\n"
+
+
 def build() -> tuple[dict[str, str | bytes], dict[str, str]]:
     registry = load_registry()
     vocabs = load_vocabs()
@@ -494,6 +531,7 @@ def build() -> tuple[dict[str, str | bytes], dict[str, str]]:
                 if f"<!-- BEGIN GENERATED: {req} -->" not in new or f"<!-- END GENERATED: {req} -->" not in new:
                     raise SystemExit(f"E023 build: {name} is missing the required GENERATED block '{req}'; restore the BEGIN/END markers")
             docs[name] = new
+    docs[CITATION] = citation_cff(meta, analysis)
     return outs, docs
 
 
@@ -527,11 +565,11 @@ def main():
             print(f"{f['rule']} {f['name']}: {f['file']}: {f['message']}")
         raise SystemExit("build aborted: fix validation errors first")
     outs, docs = build()
-    doc_changed = sorted(k for k, v in docs.items() if (ROOT / k).read_text(encoding="utf-8") != v)
+    doc_changed = sorted(k for k, v in docs.items() if not (ROOT / k).exists() or (ROOT / k).read_text(encoding="utf-8") != v)
     if args.check:
         if doc_changed:
             for k in doc_changed:
-                print(f"E023 build: {k} GENERATED block out of date; run `make build` and commit it")
+                print(f"E023 build: {k} {'is' if k == CITATION else 'GENERATED block'} out of date; run `make build` and commit it")
             raise SystemExit(1)
         print(f"build --check OK ({len(outs)} files built in memory; GENERATED blocks fresh)")
         return

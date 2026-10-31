@@ -7,3 +7,5 @@ dist/
 .claude/
 # Video renders and narration audio (scripts/video); kept out of dist/ because make build prunes it.
 video-out/
+# The paper's LaTeX source and PDF (make pdf, scripts/paper_pdf.py); kept out of dist/ for the same reason.
+pdf-out/

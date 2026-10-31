@@ -27,7 +27,7 @@ from lib import CALIBRATION_SCALES, ROOT, calibration_agreement, independent, lo
 
 MATURITY_ORDER = ["research", "prototype", "shipped-niche", "shipped-mainstream"]
 # links a contributor profile may carry (report/meta.yaml), in display order, with the hosts each must point at
-PROFILE_LINKS = {"x": ("x.com", "twitter.com"), "linkedin": ("linkedin.com",), "website": ()}
+PROFILE_LINKS = {"x": ("x.com", "twitter.com"), "linkedin": ("linkedin.com",), "website": (), "orcid": ("orcid.org",)}
 
 
 def contributor_profiles(meta: dict) -> dict:

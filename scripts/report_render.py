@@ -312,9 +312,9 @@ GITHUB_HANDLE_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$")
 
 
 def link_label(url: str) -> str:
-    """A profile link's label: x, linkedin, or the site's host."""
+    """A profile link's label: x, linkedin, orcid, or the site's host."""
     host = (urlparse(url).hostname or "").lower().removeprefix("www.")
-    return {"x.com": "x", "twitter.com": "x"}.get(host) or ("linkedin" if host == "linkedin.com" or host.endswith(".linkedin.com") else host)
+    return {"x.com": "x", "twitter.com": "x", "orcid.org": "orcid"}.get(host) or ("linkedin" if host == "linkedin.com" or host.endswith(".linkedin.com") else host)
 
 
 def _cell_md(ctx, path, v, mode):
