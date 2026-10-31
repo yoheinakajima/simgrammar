@@ -1,0 +1,35 @@
+id: 2026-10-30-video-narration
+type: run
+kind: synthesis
+date: '2026-10-30'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: cut the method passages in the narration of episodes 1 to 9 to what
+  a viewer needs, re-voice every scene whose words changed (those edits, and scenes whose numbers moved
+  with the data since the 2026-10-26 render), re-render the episodes and shorts, and stage them for a
+  new release.'
+method: 'The narration of episodes 1 to 9 keeps what a viewer needs from each method passage and drops the rest, following
+  the content audit''s video findings: episode 1''s line that every number is checked; episode 2''s dating caveat and chance
+  test, cut to a sentence each; episode 3''s clustering recipe, resampling rule, genre statistics, and rater note; episode
+  4''s caption card, Spearman line, and rater paragraph, with the rater stated once in two sentences; the rater frames and
+  notes in episodes 5, 7, and 9; episode 8''s lot rule, baseline caveat, and pull-request mock-up; episode 9''s priority
+  formula; and phrasing like "the dataset''s record lists" where a direct claim does. Every assertion behind a sentence
+  that stays was kept. Episodes 10 to 12 and the shorts are unchanged, since 11 and 12 are about how predictions and the
+  dataset are checked. The Japanese subtitles were rewritten for the same scenes (episode 4''s also still said no score
+  had a second rating). A scene''s take was re-voiced when the digest of its built narration no longer matched the captions
+  of the 2026-10-26 render: the edited scenes, and scenes whose numbers moved with the data, 34 lines in all (31 episode
+  scenes and shorts 1, 3, and 12). They were voiced through the ElevenLabs connector in the register''s voice, model, and
+  flows, two takes each, and for each line the take whose length was nearer the series'' median pace (16.96 characters a
+  second in episodes, 16.15 in shorts, from the takes that did not change) went to video-out/audio; every prompt was checked
+  against the built text and every file''s length against the take. Episode 12''s scene 7 was voiced again once this run''s
+  own record made the run count 58. That used 43,654 credits. media/narration.yaml lists the new takes. The 12 episodes
+  and 12 shorts were rendered with scripts/video/assemble.py and ffmpeg 6.1 into a separate folder, checked frame by frame
+  in the edited scenes, and moved into video-out/out and video-out/final, with the previous renders kept in video-out/backup-2026-10-30-narration;
+  the film, which the site does not carry, was not rendered. The episodes run 3.5 minutes shorter in all, most of it episode
+  3. scripts/video/publish.py staged the files for release videos-2026-10-30b and wrote media/published.yaml, and on the
+  built site no episode scene is marked as worded differently from its video.'
+contract_version: '1.2'
+proposals: []

@@ -44,7 +44,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Picture.** Every game in the catalog becomes a bundle of cards. Common cards, like the pause button, shrink almost to nothing; rare cards grow. Bundles with similar large cards drift together into clumps.
 
-**Voice.** To group games, the dataset turns each one into its list of mechanics. Core parts count double. Each part is weighted by how rare it is, so two games that share a rare part count as much closer than two games that share a pause button. Production chains, in {{derived:production-chain.prevalence}} games, count for little; conveyor belts, in {{derived:conveyor-transport.prevalence}}, count for a lot.{{assert:derived.conveyor-transport.prevalence < derived.production-chain.prevalence}} Then the build joins the closest games, and the closest groups, until it has a chosen number of clusters.
+**Voice.** Families come from the parts games share, and a shared rare part counts for far more than a shared pause button. Production chains, in {{derived:production-chain.prevalence}} games, count for little; conveyor belts, in {{derived:conveyor-transport.prevalence}}, count for a lot.{{assert:derived.conveyor-transport.prevalence < derived.production-chain.prevalence}}
 
 **Voice.** Factorio lands with Satisfactory, shapez 2, Dyson Sphere Program, and Captain of Industry. Anno 1800 lands with Manor Lords, Banished, Caesar III, and Pharaoh.{{assert:derived.satisfactory.cluster == derived.factorio.cluster}}{{assert:derived.captain-of-industry.cluster == derived.factorio.cluster}}{{assert:derived.manor-lords.cluster == derived.anno-1800.cluster}}{{assert:derived.caesar-3.cluster == derived.anno-1800.cluster}}
 
@@ -52,11 +52,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Picture.** The catalog drops a fifth of its games at random, re-clusters, and compares the result with the full clustering. A score ticks up and down. The process repeats, fast, a thousand times. A curve of average agreement against the number of clusters draws itself, nearly flat on the right.
 
-**Voice.** The build re-clusters {{stat:cluster_subsamples}} random subsets of the games and checks how well each agrees with the full result. The stated rule takes the smallest number of clusters whose average agreement reaches {{stat:cluster_min_mean_ari}}. When it was last applied, that was {{stat:cluster_k}}. On today's data the same rule picks {{stat:cluster_rule_k}}.{{assert:cluster_rule_k != cluster_k}}{{assert:cluster_k_drift == 0}}
-
-**Voice.** The curve is that flat. So the number of families is a weak fact, and this series only claims pairings that survive the resampling. When it says two games belong together, they share a cluster in at least {{stat:cocluster_together}} of those subsets. When it says they stand apart, in at most {{stat:cocluster_apart}}. Each claim is checked every time the dataset is built. By a separate measure, {{stat:n_stable_clusters}} of the {{stat:n_clusters}} clusters keep their shape across the resampling, and the rest shift as games come and go.{{assert:n_stable_clusters >= 10}}{{assert:n_stable_clusters < n_clusters}}
-
-**On screen.** Together: ≥ {{stat:cocluster_together}} of subsamples. Apart: ≤ {{stat:cocluster_apart}}.
+**Voice.** The exact number of families is soft. Leave out a fifth of the games and the borders move, so this series only claims pairings that hold up when the catalog is reshuffled {{stat:cluster_subsamples}} times. {{stat:n_stable_clusters}} of the {{stat:n_clusters}} families keep their shape through all of it, and the rest shift as games come and go.{{assert:n_stable_clusters >= 10}}{{assert:n_stable_clusters < n_clusters}}
 
 ## 6. Odd couples (4:10 to 7:04)
 
@@ -158,7 +154,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Picture.** The design map with each game coloured by its store genre. Most islands are mostly one colour; many have a second and third.
 
-**Voice.** Knowing a game's family tells you a good deal about its genre: normalized mutual information is {{stat:cluster_subgenre_nmi}}, against {{stat:cluster_subgenre_null_nmi}} when the labels are shuffled at random.{{assert:cluster_subgenre_nmi > cluster_subgenre_null_nmi}}{{assert:p_cluster_subgenre_nmi <= 0.01}} By a stricter score, the adjusted Rand index, where 1 would mean the families reproduce the genres exactly, agreement is only {{stat:cluster_subgenre_ari}}.{{assert:cluster_subgenre_ari < 0.6}} And {{stat:n_clusters_cross_subgenre}} of the {{stat:n_clusters}} clusters mix genres. Mechanics recover where games came from far better than chance, and they still cross genre lines often.{{assert:n_clusters_cross_subgenre >= 10}}
+**Voice.** Knowing a game's family tells you a good deal about its genre, far more than chance would.{{assert:cluster_subgenre_nmi > cluster_subgenre_null_nmi}}{{assert:p_cluster_subgenre_nmi <= 0.01}} And {{stat:n_clusters_cross_subgenre}} of the {{stat:n_clusters}} families still mix genres.{{assert:n_clusters_cross_subgenre >= 10}}
 
 **Voice.** A game's family says what it is built from, and that is the part a designer can borrow.
 
@@ -168,7 +164,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Frame.** compare games=game-of-life,hamurabi show=shared
 
-**Voice.** Games with very few mechanics look alike by what they lack: the Game of Life has only {{derived:game-of-life.mechanic_count}} mechanics, one of them the turn structure it shares with Hamurabi and The Oregon Trail, so it clusters with them.{{assert:cocluster.hamurabi.game-of-life >= 0.9}}{{assert:derived.game-of-life.mechanic_count <= 3}} Some clusters fall apart under resampling: the one that holds Frostpunk, Plague Inc., Timberborn, and FTL changes from subset to subset, and only Frostpunk and Against the Storm stay together.{{assert:cocluster.frostpunk.against-the-storm >= 0.9}} The clustering also sees which parts a game uses and ignores how they are tuned, and every decomposition so far was written by one model rater. A second rater is the next test of these families.
+**Voice.** Games with very few mechanics look alike by what they lack: the Game of Life has only {{derived:game-of-life.mechanic_count}} mechanics, one of them the turn structure it shares with Hamurabi and The Oregon Trail, so it clusters with them.{{assert:cocluster.hamurabi.game-of-life >= 0.9}}{{assert:derived.game-of-life.mechanic_count <= 3}} And the families see which parts a game uses. How a game tunes them, which is often what makes it, is invisible here.
 
 ## 11. Close (11:15 to 12:09)
 

@@ -54,11 +54,9 @@ Target runtime about 12 minutes: about 1,260 words of narration at 135 words a m
 
 **Frame.** chain nodes="prompt-box:Type anything,social-exchanges:One of a few social moves,storyteller-director:The drama manager picks the next scene" verbs="maps to,feeds" from=facade
 
-**Frame.** count at="The rater who scored every mechanic also judged" kind=stat stat=rho_authoring_cost_ai_leverage label="between authoring cost and judged openness to AI, across every mechanic"
-
 **Voice.** Open input hits the same ceiling. Façade, from 2005, let you type anything to a married couple at dinner. Behind the text box, each sentence was mapped to one of a small set of social moves, and a drama manager picked the next scene from a library its authors had written. One analysis counted 30 kinds of speech act and 27 story beats [@src-evans-2014-versu].
 
-**Voice.** The rater who scored every mechanic also judged how open each one is to AI, and the two judgments line up. The mechanics that cost the most to author are the ones rated most open to generative models.{{assert:rho_authoring_cost_ai_leverage > 0.2}}{{assert:mean_ai_leverage_authoring_4plus > mean_ai_leverage_authoring_2_or_less}} It's one rater, so that's a consistent reading, not a finding twice confirmed.
+**Voice.** The mechanics that cost the most to write by hand are also the ones judged most open to generative models.{{assert:rho_authoring_cost_ai_leverage > 0.2}}{{assert:mean_ai_leverage_authoring_4plus > mean_ai_leverage_authoring_2_or_less}}
 
 ## 5. Ticks per second (4:24 to 6:05)
 
@@ -66,7 +64,7 @@ Target runtime about 12 minutes: about 1,260 words of narration at 135 words a m
 
 **Frame.** count kind=set ids="agent-pathfinding:Paths recomputed after an edit,heat-transfer:Heat moving between thousands of cells,request-provider-logistics:A sky full of logistics robots"
 
-**Voice.** Every real-time simulation advances its whole world many times a second while drawing the screen. When fast-forward can't keep up late in a game, you're seeing every other system's cost at once: paths recomputed after you edit the map, heat moving between thousands of cells, a sky full of logistics robots in a big factory. The records list each of those as a failure mode.
+**Voice.** Every real-time simulation advances its whole world many times a second while drawing the screen. When fast-forward can't keep up late in a game, you're seeing every other system's cost at once: paths recomputed after you edit the map, heat moving between thousands of cells, a sky full of logistics robots in a big factory.
 
 **Picture.** Noita: a pool of oil catches fire, steam bursts out of a flooded chamber, a ceiling of sand collapses. Every pixel moves.
 
