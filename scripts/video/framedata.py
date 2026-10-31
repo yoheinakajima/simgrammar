@@ -1,8 +1,9 @@
 """Resolve a **Frame.** line into what render.html's templates draw (ADR-0006).
 
 Every number a frame shows is read here from dist/entities, dist/analysis, the run records, or vocab/, and every frame
-carries a source line saying where. Labels the script gives (a panel caption, "Zone growth") are prose and are linted
-with the script. The grammar is scripts/visual/frames.py; scripts/visual/check.py validates the same lines (E040).
+carries a source line saying where, in words a viewer reads: record names, not ids, file paths, or field names.
+Labels the script gives (a panel caption, "Zone growth") are prose and are linted with the script. The grammar is
+scripts/visual/frames.py; scripts/visual/check.py validates the same lines (E040).
 """
 import csv, io, json, os, re, sys, hashlib
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -67,6 +68,28 @@ def label(i):
         if i in D[k]:
             return D[k][i].get('label', i)
     return i
+
+
+def rec(i):
+    """A record's name for a frame's source line: the game, mechanic, technique, bet, or source a viewer would recognize."""
+    D = data()
+    for k in ('G', 'M', 'T', 'B', 'S'):
+        if i in D[k]:
+            return D[k][i]['name']
+    return label(i)
+
+
+def the(i):
+    n = rec(i)
+    return n if n.startswith('The ') else 'the ' + n
+
+
+FIELD_WORDS = {'falsifiable_signal': 'prediction', 'involves': 'mechanics', 'applies': 'techniques', 'validation_experiment': 'experiment',
+               'key_risks': 'risks', 'determinism_impact': 'reproducibility', 'deployed_in': 'shipped in', 'design_sketch': 'design sketch'}
+
+
+def fields_words(fields):
+    return ', '.join(FIELD_WORDS.get(x, x.replace('_', ' ')) for x in fields)
 
 
 def names(i, extra=()):
@@ -243,14 +266,14 @@ def resolve(text, scene_onscreen='', out_dir=None):
             parts.append(el(i, n=prev(i), year=d.get('earliest_year'), first=D['G'].get(d.get('earliest_game'), {}).get('name', '')))
         f.update(t='anatomy', name=g['name'], meta=game_meta(g), N=NG, counts=counts, dates=bool(a.get('dates')), firsts=want == 'firsts',
                  subject=el(g['subgenre']) if g.get('subgenre') in D['icons'] else None, parts=parts, chip=chip_game(a['game']),
-                 source=f"counts: catalog games using each part · {a['game']} record" + (" · years: earliest_year, earliest_game" if a.get('dates') or want == 'firsts' else ''))
+                 source=f"counts: catalog games using each part · {the(a['game'])} record" + (" · years: each part's first catalog game" if a.get('dates') or want == 'firsts' else ''))
         f['elements'] = ids
     elif t == 'anatomy' and 'hub' in a:
         sp = FR.items(a['spokes'])
         gid, _, mid = a.get('from', ':').partition(':')
         f.update(t='hub', hub=el(a['hub']), spokes=[el(i, label(i), need=lab, w=len(sp) - k) for k, (i, lab) in enumerate(sp)],
                  weights='line weight: offer × need (illustrative)' if a.get('weights') else '', note=use_note(gid, mid) if mid else '',
-                 chip=chip_mech(mid) if mid in D['M'] else '', source=f"objects and needs: {gid} record, {mid}" if mid else '')
+                 chip=chip_mech(mid) if mid in D['M'] else '', source=f"objects and needs: {the(gid)} record, {rec(mid)}" if mid else '')
         f['elements'] = [i for i, _ in sp]
     elif t == 'anatomy':
         f.update(t='blank', slots=6, label='your game', dates=bool(a.get('dates')))
@@ -278,7 +301,7 @@ def resolve(text, scene_onscreen='', out_dir=None):
             strip = [{'text': x.lower(), 'on': x.lower().startswith(a['strip'].lower())} for x in items]
         g = D['G'].get(gid)
         f.update(rows=out_rows, strip=strip, title=f"{g['name'].lower()} · {g['year']}" if g else '', N=NG, fan=bool(a.get('fan')),
-                 chip=chip_game(gid) if g else '', source=(f"rules: {gid} record" + (" · counts: catalog games" if any(n['n'] for r in out_rows for n in r['nodes']) else '')) if g else ('counts: catalog games' if any(n['n'] for r in out_rows for n in r['nodes']) else ''))
+                 chip=chip_game(gid) if g else '', source=(f"rules: {the(gid)} record" + (" · counts: catalog games" if any(n['n'] for r in out_rows for n in r['nodes']) else '')) if g else ('counts: catalog games' if any(n['n'] for r in out_rows for n in r['nodes']) else ''))
         f['elements'] = [n['id'] for r in out_rows for n in r['nodes']]
     elif t == 'compare' and 'games' in a:
         ga, gb = [i for i, _ in FR.items(a['games'])]
@@ -290,14 +313,14 @@ def resolve(text, scene_onscreen='', out_dir=None):
             side['own'] = [el(m, n=prev(m)) for m in own]
         f.update(t='games', a=A, b=B, show=show, same=A['cluster'] == B['cluster'] and bool(A['cluster']), N=NG,
                  shared=[el(m, n=prev(m)) for m in shared], nshared=len(shared),
-                 source=f"families: game clusters (dist/analysis/game-clusters.csv) · parts: {ga} and {gb} records" + (" · counts: catalog games" if show != 'family' else ''))
+                 source=f"families: the catalog's game clusters · parts: {the(ga)} and {rec(gb)} records" + (" · counts: catalog games" if show != 'family' else ''))
         f['elements'] = [m['id'] for m in f['shared']] if show == 'shared' else [m['id'] for m in A['own'] + B['own']] if show == 'own' else []
     elif t == 'compare':
         gid, _, mid = a.get('from', ':').partition(':')
         f.update(a={'title': a['a'], 'items': [el(i, lab) for i, lab in FR.items(a['a_items'])]},
                  b={'title': a['b'], 'items': [el(i, lab) for i, lab in FR.items(a['b_items'])]},
                  note=use_note(gid, mid) if mid else '', chip=chip_game(gid) if gid in D['G'] else '',
-                 source=f"{gid} record, {mid}" if mid else '')
+                 source=f"{the(gid)} record, {rec(mid)}" if mid else '')
         f['elements'] = [i for i, _ in FR.items(a['a_items']) + FR.items(a['b_items'])]
     elif t == 'count':
         count(f, a, D, NG, scene_onscreen, out_dir)
@@ -315,9 +338,9 @@ def resolve(text, scene_onscreen='', out_dir=None):
             else:
                 key = 'w_' + i.replace('score-', '')
                 terms.append({'op': sym, 'open': '(' in op, 'close': ')' in op, 'pow': w.get(key), **el(i, lab)})
-        src = f"rule: {gid} record, {mid}" if mid else f"rule: {gid} record" if gid else ''
+        src = f"rule: {the(gid)} record, {rec(mid)}" if mid else f"rule: {the(gid)} record" if gid else ''
         if a.get('rule'):
-            src = f"rule: vocab/rubrics.yaml composites.{a['rule']} (weighted geometric mean)"
+            src = f"rule: the scoring rubric's {a['rule'].replace('_', ' ')} formula, a weighted geometric mean"
         f.update(result=el(*r), terms=terms, note=use_note(gid, mid) if mid else '', chip=chip_game(gid) if gid in D['G'] else '', source=src)
         f['elements'] = [x['id'] for x in terms if x.get('id')] + [r[0]]
     elif t == 'scale' and 'field' in a:
@@ -325,7 +348,7 @@ def resolve(text, scene_onscreen='', out_dir=None):
         sc = D['rubrics']['scales'][fld]; m = D['M'][mid]
         f.update(mech=el(mid), field=fld.replace('_', ' '), question=sc['question'], value=m[fld],
                  levels=[{'n': int(k), 'text': v} for k, v in sorted(sc['levels'].items(), key=lambda kv: int(kv[0]))],
-                 chip=chip_mech(mid), source=f"score: {mid} record, {fld} · anchors: vocab/rubrics.yaml")
+                 chip=chip_mech(mid), source=f"score: {the(mid)} record, {fld.replace('_', ' ')} · anchors: the scoring rubric's written anchors")
         f['elements'] = [mid]
     elif t == 'scale':
         ids = [i for i, _ in FR.items(a['ids'])]
@@ -335,7 +358,7 @@ def resolve(text, scene_onscreen='', out_dir=None):
             lv = {int(k): v for k, v in sc['levels'].items()}
             rulers.append({'field': fld.replace('_', ' '), 'question': sc['question'], 'lo': lv[min(lv)], 'hi': lv[max(lv)], 'n': max(lv),
                            'marks': [dict(el(i), v=D['M'][i][fld]) for i in ids]})
-        f.update(t='rulers', rulers=rulers, source=f"scores: {', '.join(ids)} records · anchors: vocab/rubrics.yaml")
+        f.update(t='rulers', rulers=rulers, source=f"scores: the {', '.join(rec(i) for i in ids)} records · anchors: the scoring rubric's written anchors")
         f['elements'] = ids
     elif t == 'record':
         record(f, a, D, NG, scene_onscreen)
@@ -356,10 +379,10 @@ def resolve(text, scene_onscreen='', out_dir=None):
         shots = memo[key]
         caps = {'life': ['generation 0', 'generation 120', f"generation {a.get('gens', '1103')}"], 'wfc': ['one placed tile', 'a third of the grid', 'every cell decided']}.get(sim, ['start', 'later', 'much later'])
         if src in D['T']:
-            mech, note, chip, source = el(src), first_sentence(D['T'][src].get('mechanism', '')), chip_tech(src), f"rule: {src} record · drawn by a toy simulation of that rule"
+            mech, note, chip, source = el(src), first_sentence(D['T'][src].get('mechanism', '')), chip_tech(src), f"rule: {the(src)} record · drawn by a toy simulation of that rule"
         else:
             mech, note = el(mid), use_note(src, mid)
-            chip, source = (chip_game(src) if src in D['G'] else ''), f"rule: {src} record, {mid} · drawn by a toy simulation of that rule, not the game"
+            chip, source = (chip_game(src) if src in D['G'] else ''), f"rule: {the(src)} record, {rec(mid)} · drawn by a toy simulation of that rule, not the game"
         f.update(plates=plates(sim, shots, key, out_dir), w=int(shots[0].shape[1]), h=int(shots[0].shape[0]), caps=caps,
                  mech=mech, note=note, chip=chip, source=source, label='toy simulation of the rule')
     elif t == 'mockup':
@@ -377,7 +400,7 @@ def count(f, a, D, NG, onscreen, out_dir):
         exp_order = sorted(D['M'], key=lambda m: (-D['M'][m]['_derived'].get('technique_exposure', 0), m))
         f.update(t='bars', N=NG, rank=bool(a.get('rank') or a.get('rank_by')),
                  items=[el(i, lab, n=prev(i), rank=(exp_order.index(i) + 1) if by_exp else D['M'][i]['_derived'].get('prevalence_rank')) for i, lab in FR.items(a['ids'])],
-                 source='counts: catalog games using each mechanic · ranks: ' + ('technique_exposure' if by_exp else 'prevalence_rank'))
+                 source='counts: catalog games using each mechanic · ranked by ' + ('how many techniques reach it' if by_exp else 'how many games use it'))
         f['elements'] = ids
     elif k == 'tiles':
         fam = a['family']
@@ -389,7 +412,7 @@ def count(f, a, D, NG, onscreen, out_dir):
         if a.get('dates'):
             summary += f" · the first in {min(x['year'] for x in tiles)}"
         f.update(t='tiles', family=D['family'][fam]['label'], icon=fam if fam in D['icons'] else None, tiles=tiles, lits=lits, summary=summary,
-                 source='mechanics of the family' + (', and the techniques whose affects edges name them' if lits else '') + (' · years: earliest_year' if a.get('dates') else ''))
+                 source='mechanics of the family' + (', and the techniques linked to them' if lits else '') + (' · years: first catalog game' if a.get('dates') else ''))
     elif k == 'roles':
         prevs = {'core': [], 'supporting': []}
         for g in D['G'].values():
@@ -401,12 +424,12 @@ def count(f, a, D, NG, onscreen, out_dir):
         med = {kk: D['stats'][f'median_prevalence_{kk}_uses'] for kk in prevs}
         f.update(t='roles', bins=[f"{lo}–{hi}" if hi < 999 else f"{lo}+" for lo, hi in bins], hist=hist, med=med,
                  uses={kk: len(v) for kk, v in prevs.items()},
-                 source='uses of each mechanic, by how many catalog games use it · medians: stats median_prevalence_core_uses, median_prevalence_supporting_uses')
+                 source='uses of each mechanic, by how many catalog games use it · medians: core and supporting uses')
     elif k == 'venn':
         A, B = a['a'], a['b']
         both = games_with(A, B)
         f.update(t='venn', a=el(A, n=prev(A)), b=el(B, n=prev(B)), both=[g['name'] for g in both], nboth=len(both), N=NG,
-                 source=f"games using {A}, {B}, and both: catalog game records")
+                 source=f"games using {rec(A)}, {rec(B)}, and both: catalog game records")
         f['elements'] = [A, B]
     elif k == 'set':
         groups = [g for g, _ in FR.items(a.get('groups', ''))] if a.get('groups') else []
@@ -422,14 +445,14 @@ def count(f, a, D, NG, onscreen, out_dir):
                 row.append(e)
             rows.append(row)
         f.update(t='set', rows=rows, groups=groups, dates=bool(a.get('dates')),
-                 source=('years: earliest_year, earliest_game of each mechanic; year and maturity of each technique' if a.get('dates') else ''))
+                 source=('years: first catalog game of each mechanic; year and maturity of each technique' if a.get('dates') else ''))
         f['elements'] = [e['id'] for r in rows for e in r]
     elif k == 'units':
         labels = [x for x, _ in FR.items(a.get('labels', ''))]
         gid, _, mid = a['from'].partition(':')
         f.update(t='units', total=int(a['total']), on=int(a['on']), also=int(a['also']) if a.get('also') else None,
                  unit=el(a.get('unit', 'person')), labels=labels, chip=chip_game(gid) if gid in D['G'] else '',
-                 source=f"numbers: {gid} record, {mid}" if mid else f"numbers: {gid} record")
+                 source=f"numbers: {the(gid)} record, {rec(mid)}" if mid else f"numbers: {the(gid)} record")
     elif k == 'figures':
         cols = [c for c, _ in FR.items(a['cols'])]
         rows = []
@@ -437,7 +460,7 @@ def count(f, a, D, NG, onscreen, out_dir):
             lab, _, vals = r.rpartition(':')
             rows.append({'label': lab.strip(), 'vals': [v.strip() for v in vals.split(',')]})
         srcs = [s for s, _ in FR.items(a['from'])]
-        f.update(t='figures', cols=cols, rows=rows, source='figures: ' + ', '.join(f"{D['S'][s]['name']} ({s})" if s in D['S'] else s for s in srcs))
+        f.update(t='figures', cols=cols, rows=rows, source='figures: ' + ', '.join(rec(s) for s in srcs))
     elif k == 'tally':
         rows, n = tally(a['of'], a['field'], a.get('where', ''))
         pre = TERM_ICON.get(a['field'], '')
@@ -445,7 +468,7 @@ def count(f, a, D, NG, onscreen, out_dir):
         what = {'technique': 'techniques', 'opportunity': 'bets', 'record': 'records', 'link': 'technique links'}[a['of']]
         scope = {'in-play': ' that can run during play', 'shipped': ' shipped in a game'}.get(a.get('where', ''), '')
         f.update(t='tally', items=items, N=n, of=what + scope, ordered=a['field'] in ('risks',),
-                 source=f"{a['field'].replace('_', ' ')} of every {what[:-1]}{scope}: {('technique' if a['of'] == 'link' else a['of'])} records · terms: vocab/{VOCAB_OF.get(a['field'], a['field'])}.yaml")
+                 source=f"{a['field'].replace('_', ' ')} of every {what[:-1]}{scope}: {('technique' if a['of'] == 'link' else 'catalog' if a['of'] == 'record' else a['of'])} records · terms: the {VOCAB_OF.get(a['field'], a['field']).replace('_', ' ')} vocabulary")
         f['elements'] = [x['id'] for x in items]
     elif k == 'piles':
         side = lambda ids: [dict(el(i), mat=D['vocab']['technique_maturity'][D['T'][i]['maturity']]['label'].lower()) for i, _ in FR.items(ids)]
@@ -456,7 +479,7 @@ def count(f, a, D, NG, onscreen, out_dir):
         mid = a['id']; d = D['M'][mid]['_derived']
         users = sorted((g for g in D['G'].values() if any(u['id'] == mid for u in g['mechanics'])), key=lambda g: (g['year'], g['id']))
         f.update(t='spread', mech=el(mid), years=[g['year'] for g in users], games=[g['name'] for g in users], fifth=d.get('year_fifth_game'),
-                 n=len(users), N=NG, chip=chip_mech(mid), source=f"games using {mid}, by release year: catalog game records")
+                 n=len(users), N=NG, chip=chip_mech(mid), source=f"games using {rec(mid)}, by release year: catalog game records")
         f['elements'] = [mid]
     elif k == 'stat':
         key = a['stat']
@@ -464,14 +487,14 @@ def count(f, a, D, NG, onscreen, out_dir):
             raise KeyError(f"no stat '{key}' in dist/analysis/stats.json")
         v = D['stats'][key]
         shown = f"{v:g}%" if key.startswith('pct_') else (f"ρ = {v:.2f}" if key.startswith('rho_') else f"{v:g}")
-        f.update(t='stat', value=shown, label=a.get('label', ''), source=f"stat: {key} (dist/analysis/stats.json)")
+        f.update(t='stat', value=shown, label=a.get('label', ''), source='computed from the catalog records')
     elif k == 'ranked':
         n = int(a.get('n', 6))
         order = sorted(D['B'], key=lambda b: (-D['B'][b]['_derived'].get('priority', 0), b))[:n]
         f.update(t='ranked', rows=[{'id': b, 'rank': i + 1, 'name': D['B'][b]['name'], 'priority': D['B'][b]['_derived'].get('priority'),
                                      'horizon': D['vocab']['horizon'].get(D['B'][b].get('horizon'), {}).get('label', D['B'][b].get('horizon')),
                                      'outcome': D['B'][b]['_derived'].get('prediction_status', '')} for i, b in enumerate(order)],
-                 N=len(D['B']), source='bets by priority: opportunities-ranked (dist/analysis) · outcome: prediction_status')
+                 N=len(D['B']), source='bets by priority: the ranked bets · outcome: each prediction\'s status')
         f['elements'] = order
     elif k == 'packages':
         rows = []
@@ -491,7 +514,7 @@ def timeline(f, a, D, NG):
             d = D['M'][i]['_derived']
             items.append(el(i, year=d.get('earliest_year'), first=D['G'].get(d.get('earliest_game'), {}).get('name', '')))
         ys = [x['year'] for x in items]
-        f.update(items=items, lo=(min(ys) // 10) * 10, hi=(max(ys) // 10 + 1) * 10, source='first catalog game for each mechanic: earliest_year, earliest_game')
+        f.update(items=items, lo=(min(ys) // 10) * 10, hi=(max(ys) // 10 + 1) * 10, source='first catalog game for each mechanic, and its year')
         f['elements'] = ids
     elif kind == 'gap':
         ids = [i for i, _ in FR.items(a['ids'])]
@@ -501,13 +524,13 @@ def timeline(f, a, D, NG):
             rows.append(el(i, y1=d.get('earliest_year'), g1=D['G'].get(d.get('earliest_game'), {}).get('name', ''),
                            y2=d.get('second_year'), g2=D['G'].get(d.get('second_game'), {}).get('name', '')))
         ys = [r['y1'] for r in rows] + [r['y2'] for r in rows if r['y2']]
-        f.update(t='gap', rows=rows, lo=(min(ys) // 10) * 10, hi=(max(ys) // 10 + 1) * 10, source='first and second catalog game for each mechanic: earliest_game, second_game')
+        f.update(t='gap', rows=rows, lo=(min(ys) // 10) * 10, hi=(max(ys) // 10 + 1) * 10, source='first and second catalog game for each mechanic')
         f['elements'] = ids
     elif kind == 'due':
         date = a.get('date') or str(D['B'][a['bet']]['falsifiable_signal']['resolve_by'])
         due = sorted((b for b in D['B'].values() if str(b['falsifiable_signal']['resolve_by']) == date), key=lambda b: (-b['_derived'].get('priority', 0), b['id']))
         f.update(t='due', date=fmt_date(date), cards=[{'id': b['id'], 'name': b['name'], 'rank': bet_rank(b['id']), 'pred': b['falsifiable_signal']['prediction']} for b in due],
-                 n=len(due), source=f"bets resolving on {date}: falsifiable_signal.resolve_by")
+                 n=len(due), source=f"bets whose predictions resolve on {date}")
         f['elements'] = [b['id'] for b in due]
         if a.get('bet'):
             f['chip'] = chip_bet(a['bet'])
@@ -519,7 +542,7 @@ def timeline(f, a, D, NG):
         for y in sorted(ys):
             run += ys[y]; rows.append({'year': y, 'n': ys[y], 'cum': run})
         last = max(str(b['falsifiable_signal']['resolve_by']) for b in D['B'].values())
-        f.update(t='dueyears', rows=rows, N=len(D['B']), last=fmt_date(last), source='bets by the year they resolve: falsifiable_signal.resolve_by')
+        f.update(t='dueyears', rows=rows, N=len(D['B']), last=fmt_date(last), source='bets by the year their predictions resolve')
     elif kind == 'techniques':
         by = {}
         for tq in sorted(D['T'].values(), key=lambda x: (x.get('year') or 0, x['id'])):
@@ -542,7 +565,7 @@ def record(f, a, D, NG, onscreen):
             elif v:
                 rows.append([fl.replace('_', ' '), [first_sentence(v)]])
         stamps = [x.strip().rstrip('.') for x in re.split(r'(?<=\.)\s+', a['stamps'] if a.get('stamps') and a['stamps'] != 'onscreen' else onscreen) if x.strip()] if a.get('stamps') else []
-        f.update(mech=el(mid), kicker='mechanic · ' + D['family'][m['family']]['label'].lower(), rows=rows, stamps=stamps, chip=chip_mech(mid), source=f"{mid} record: " + ", ".join(fields))
+        f.update(mech=el(mid), kicker='mechanic · ' + D['family'][m['family']]['label'].lower(), rows=rows, stamps=stamps, chip=chip_mech(mid), source=f"{the(mid)} record: " + fields_words(fields))
         f['elements'] = [mid]
     elif 'bet' in a:
         bid = a['bet']; b = D['B'][bid]
@@ -550,14 +573,14 @@ def record(f, a, D, NG, onscreen):
         rows = [bet_field(b, fl, D) for fl in fields]
         f.update(mech={'id': bid, 'icon': 'dataset-record' if 'dataset-record' in D['icons'] else None, 'label': b['name'], 'size': 48},
                  kicker=f"bet · rank {bet_rank(bid)} of {len(D['B'])} · {D['vocab']['horizon'].get(b.get('horizon'), {}).get('label', b.get('horizon'))}",
-                 rows=[r for r in rows if r], stamps=[], cols=len(fields) == 2, chip=chip_bet(bid), source=f"{bid} record: " + ", ".join(fields))
+                 rows=[r for r in rows if r], stamps=[], cols=len(fields) == 2, chip=chip_bet(bid), source=f"{the(bid)} record: " + fields_words(fields))
     elif 'bets' in a:
         cards = []
         for bid, _ in FR.items(a['bets']):
             b = D['B'][bid]; fs = b['falsifiable_signal']
             cards.append({'id': bid, 'name': b['name'], 'pred': fs['prediction'], 'crit': [c.strip() for c in re.split(r';\s|(?<=\.)\s', fs['criteria']) if c.strip()][:3],
                           'due': fmt_date(str(fs['resolve_by']))})
-        f.update(t='cards', cards=cards, source='predictions: falsifiable_signal of ' + ', '.join(c['id'] for c in cards))
+        f.update(t='cards', cards=cards, source='predictions: the ' + ', '.join(c['name'] for c in cards) + (' bets' if len(cards) > 1 else ' bet'))
         f['elements'] = [c['id'] for c in cards]
     elif 'technique' in a:
         tid = a['technique']; tq = D['T'][tid]
@@ -578,7 +601,7 @@ def record(f, a, D, NG, onscreen):
             elif v:
                 rows.append([fl.replace('_', ' '), [first_sentence(v)]])
         f.update(mech=el(tid), kicker=f"ai technique · {D['category'][tq['category']]['label'].lower()} · {tq.get('year')}", rows=rows, stamps=[],
-                 chip=chip_tech(tid), source=f"{tid} record: " + ", ".join(fields))
+                 chip=chip_tech(tid), source=f"{the(tid)} record: " + fields_words(fields))
         f['elements'] = [tid]
     elif 'run' in a:
         r = D['runs'][a['run']]
@@ -587,7 +610,7 @@ def record(f, a, D, NG, onscreen):
                 ['model', [ag.get('model', '') if isinstance(ag, dict) else str(ag)]], ['purpose', [first_sentence(r.get('purpose', ''))]],
                 ['method', [clip(first_sentence(r.get('method', '')), 220)]]]
         f.update(mech={'id': r['id'], 'icon': 'event-log' if 'event-log' in D['icons'] else None, 'label': 'Run record', 'size': 48}, kicker='run · log/runs',
-                 rows=rows, stamps=[], source=f"log/runs/{r['id']}.yaml")
+                 rows=rows, stamps=[], source=f"the run record {r['id']}")
     elif 'game' in a:
         g = D['G'][a['game']]
         rows = [['year', [str(g['year'])]], ['status', [g.get('status', '')]]]
@@ -597,14 +620,14 @@ def record(f, a, D, NG, onscreen):
                 rows.append(['sources', [D['S'][s]['name'] if s in D['S'] else s for s in c.get('sources', [])]])
         f.update(mech=el(g['subgenre']) if g.get('subgenre') else {'id': g['id'], 'icon': None, 'label': g['name'], 'size': 48},
                  kicker=f"game · {game_meta(g)}", rows=rows, stamps=[g['status']] if g.get('status') == 'contested' else [], chip=chip_game(a['game']),
-                 source=f"{a['game']} record: year, status, claims")
+                 source=f"{the(a['game'])} record: year, status, claims")
         f['mech'] = dict(f['mech'], label=g['name'])
     elif 'script' in a:
         path = os.path.join(ROOT, 'media', a['script'])
         line = next(ln for ln in open(path, encoding='utf-8').read().splitlines() if a['find'] in ln)
         parts = re.split(r'(\{\{[^}]*\}\})', line)
         f.update(t='source', title=a.get('title', ''), parts=[{'tok': p.startswith('{{'), 'text': p} for p in parts if p], file=f"media/{a['script']}",
-                 source=f"the script's source: media/{a['script']}")
+                 source='the script as written, before the build fills in its numbers')
     else:
         f.update(t='card', title=a.get('title', ''), lines=FR.lines(a['lines']), numbered=bool(a.get('numbered')), source='')
 
@@ -636,13 +659,13 @@ def mockup(f, a, D):
     src = a.get('from', '') or a.get('bet', '')
     srcname = ''
     if a.get('bet'):
-        srcname = f"design: {a['bet']} record (design_sketch)"
+        srcname = f"design: {the(a['bet'])} record, design sketch"
         f['chip'] = chip_bet(a['bet'])
     elif src in D['T']:
-        srcname = f"numbers: {src} record"
+        srcname = f"numbers: {the(src)} record"
         f['chip'] = chip_tech(src)
     elif src.partition(':')[0] in D['G']:
-        srcname = f"{src.partition(':')[0]} record"
+        srcname = f"{the(src.partition(':')[0])} record"
     f.update(t='mockup', kind=kind, tag=lab, title=a.get('title', ''), lines=FR.lines(a.get('lines', '')), items=items, subject=a.get('subject', ''),
              chart=a.get('chart', ''), button=a.get('button', ''),
              label={'mock-up': 'mock-up, not a game screen', 're-enactment': 're-enactment, not a recording', 'stand-in': 'stand-in, not footage'}[lab],

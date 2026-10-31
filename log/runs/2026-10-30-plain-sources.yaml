@@ -1,0 +1,26 @@
+id: 2026-10-30-plain-sources
+type: run
+kind: maintenance
+date: '2026-10-30'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: say each video frame''s source in plain words, with record names
+  instead of ids and no repository paths or field names, re-render the episodes and shorts, and stage
+  them for a new release.'
+method: 'Every video frame keeps the source line ADR-0006 asks for, now in words a viewer reads. scripts/video/framedata.py
+  names records by their names instead of their ids (the Crusader Kings III record, not crusader-kings-3), drops the repository
+  paths (vocab/rubrics.yaml, dist/analysis/stats.json and game-clusters.csv, log/runs/<id>.yaml, media/<script>), and says
+  field names in words (a prediction''s deadline instead of falsifiable_signal.resolve_by, first catalog game instead of
+  earliest_year and earliest_game, the scoring rubric''s written anchors). Every Frame line in the episodes and shorts was
+  resolved and its source line read. The 12 episodes and 12 shorts were rendered again with scripts/video/assemble.py and
+  ffmpeg 6.1 into a separate folder and compared with the files of release videos-2026-10-30b: the same length, frame count,
+  and audio (MD5) in all 24, and render states that differ only in the source line (and the folder of cached toy-simulation
+  images). Short 12 has no data frames and did not change. The renders were moved into video-out/out and video-out/final,
+  the previous ones kept in video-out/backup-2026-10-30-plain-sources, and scripts/video/publish.py staged them for release
+  videos-2026-10-30c. This run''s record makes episode 12''s run count 59, one more than its narration says, so that scene
+  is marked as worded differently until it is voiced again.'
+contract_version: '1.2'
+proposals: []
