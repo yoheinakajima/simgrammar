@@ -1064,7 +1064,7 @@ class Web:
         where = (d.get("venue") or self.term("source_kind", d.get("kind")).lower()) if t == "source" else ""
         title = " · ".join(x for x in (d.get("name", e.id), where if where != d.get("name") else "", one, "simgrammar") if x)
         desc = d.get("summary") or d.get("notes") or d.get("name", e.id)
-        return self.page(title=title, desc=desc, body=body, depth=2, nav=t, path=f"{t}/{e.id}/", image=f"og/{t}/{e.id}.png" if t != "source" else "og/site.png")
+        return self.page(title=title, desc=desc, body=body, depth=2, nav=t, path=f"{t}/{e.id}/", image=f"og/{t}/{e.id}.png" if t != "source" else "og/source.png")
 
     STATUS_WHY = {"asserted": "Not yet backed by a source. It is in the queue for someone to source.",
                   "sourced": "Its facts cite the sources below. No second person has checked them yet.",
@@ -1322,7 +1322,7 @@ class Web:
                 row[c] = v
             rows.append(row)
         base = "../"
-        th = "".join(f'<th{" class=" + chr(34) + "num" + chr(34) if self._numeric(rows, c) else ""}>{esc(h)}</th>' for c, h in zip(cols, heads))
+        th = "".join(f'<th scope="col"{" class=" + chr(34) + "num" + chr(34) if self._numeric(rows, c) else ""}>{esc(h)}</th>' for c, h in zip(cols, heads))
         trs = []
         for row in rows:
             tds = "".join(f'<td{" class=" + chr(34) + "num" + chr(34) if self._numeric(rows, c) else ""}>{self.link(row[c], base) if c == "name" else esc(_fmt(row[c]))}</td>' for c in cols)
@@ -1559,7 +1559,10 @@ class Web:
         nq, na = sum(1 for c in claims if c.get("quote")), sum(1 for s in srcs if s.data.get("archived"))
         archived = (f"{na} of the {counted(len(srcs), 'source')} {'has' if na == 1 else 'have'} an archived snapshot so far" if na
                     else f"none of the {counted(len(srcs), 'source')} has an archived snapshot yet")
-        return (f"{sum(1 for e in recs if self.cites(e))} of the {counted(len(recs), 'record')} cite the sources their facts come from; the rest are "
+        st = self.analysis["stats"]   # the paper's section 2.4 states the same counts from the same stats
+        isare = lambda n: "is" if n == 1 else "are"
+        return (f"{st['n_sourced_or_verified']} of the {counted(st['n_records'], 'record')} {isare(st['n_sourced_or_verified'])} sourced or verified, "
+                f"{st['n_contested']} {isare(st['n_contested'])} contested with both sides cited, and {st['n_asserted']} {isare(st['n_asserted'])} "
                 f"marked asserted until someone sources them. {nq} of the {counted(len(claims), 'claim')}, on {counted(len(quoted), 'record')}, also "
                 f"quote the passage that supports them, and {archived}. A record is marked sourced when its facts have sources, and verified when "
                 "someone other than its author has checked them.")
@@ -1628,6 +1631,7 @@ class Web:
         mdr = MarkdownIt("commonmark", {"html": True}).enable("table")
         body = mdr.render(self.book_md(stem))
         body = body.replace("<table>", '<div class="table-wrap"><table class="data" data-style="dense">').replace("</table>", "</table></div>")
+        body = re.sub(r"<th(?=[ >])", '<th scope="col"', body)   # markdown tables put th only in the header row
         body = re.sub(r'<tr>\s*<td><a href="\.\./\.\./(game|mechanic)/([a-z0-9-]+)/">', r'<tr id="\2">\n<td><a href="../../\1/\2/">', body)   # rows of the glossary and the catalog
         body = self.person_links(body)
         title = re.search(r"^# (.*)$", self.built[f"book/{stem}.md"], re.M).group(1)
