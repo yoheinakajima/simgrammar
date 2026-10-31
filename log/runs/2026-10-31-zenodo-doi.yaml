@@ -1,0 +1,26 @@
+id: 2026-10-31-zenodo-doi
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: archive the v0.3 release on Zenodo and record its concept DOI, as ADR-0008 lays
+  out.'
+method: >-
+  Changed no records or sources; this run adds one line to report/meta.yaml, and the build rewrites CITATION.cff
+  from it. The operator's Zenodo account, signed in through their own browser, had not synced the repository list
+  for a month, so simgrammar was missing until a sync; its switch was then turned on, and GitHub listed Zenodo's
+  webhook. Tag v0.3 was created on b5edd49 (main after #51 and #55), with the PDF from `make pdf` attached (sha256
+  16cb8fd0..., dataset 6e87b0ed...). GitHub delivered the release events, and Zenodo accepted the released event (202)
+  and answered the published event with 409, its reply to a duplicate. The repository's page on Zenodo returned an
+  internal server error, so the record was found through Zenodo's public records API: version DOI
+  10.5281/zenodo.23846210 and concept DOI 10.5281/zenodo.23846209, whose doi.org link redirects to Zenodo. The record
+  read CITATION.cff for the title, the three authors in byline order, CC-BY-4.0 and version v0.3, and archived the
+  tag's zip (2.9 MB). It is filed as software, although CITATION.cff says dataset: Zenodo's GitHub integration does
+  not map the CFF type, so the operator can change it on the record. The concept DOI goes in meta.yaml because it
+  resolves to the newest version, as the ADR asks.
+contract_version: '1.2'
+proposals: []
