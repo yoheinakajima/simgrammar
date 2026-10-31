@@ -1,0 +1,19 @@
+id: src-mateas-2009-defining-operational-logics
+type: source
+name: Defining Operational Logics
+kind: paper
+authors:
+- Michael Mateas
+- Noah Wardrip-Fruin
+venue: 'Proceedings of DiGRA 2009 Conference: Breaking New Ground: Innovation in Games, Play, Practice and Theory'
+date: '2009'
+url: https://dl.digra.org/index.php/dl/article/view/490
+doi: 10.26503/dl.v2009i1.490
+accessed: '2026-10-31'
+notes: 'Read the full-text PDF (author order as printed there; the DiGRA record reverses it). Operational logics
+  connect fundamental abstract operations, which determine the state evolution of a system, with how authors
+  and players understand them; a logic is an authoring strategy, supported by abstract processes or lower-level
+  logics, for the behaviors a system must show to be read as representing a domain. Discusses graphical and
+  resource management logics.'
+provenance:
+  created: 2026-10-31-paper-related-work

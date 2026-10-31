@@ -1,0 +1,19 @@
+id: src-bjork-2005-patterns-in-game-design
+type: source
+name: Patterns in Game Design
+kind: book
+authors:
+- Staffan Björk
+- Jussi Holopainen
+venue: Charles River Media (Game Development Series)
+date: '2005'
+url: https://openlibrary.org/isbn/1584503548
+isbn: '1584503548'
+accessed: '2026-10-31'
+notes: 'Library and bookseller records only; the book was not read. Open Library lists Charles River Media,
+  448 pages, published 20 December 2004; a university catalogue gives Hingham, Mass., c2005. The AbeBooks
+  synopsis describes a collection of design choices called patterns, giving designers a shared vocabulary,
+  in two parts: theory and the pattern template, then the patterns grouped by aspect of gameplay. The pattern
+  template is described in src-bjork-2003-game-design-patterns.'
+provenance:
+  created: 2026-10-31-paper-related-work

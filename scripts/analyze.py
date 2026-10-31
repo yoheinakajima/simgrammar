@@ -23,7 +23,7 @@ from scipy.spatial.distance import squareform
 from scipy.special import gammaln
 from scipy.stats import spearmanr
 
-from lib import CALIBRATION_SCALES, ROOT, calibration_agreement, independent, load_calibration, load_registry, read_yaml, vocab_terms
+from lib import CALIBRATION_SCALES, ROOT, calibration_agreement, independent, load_calibration, load_registry, lower_median, read_yaml, vocab_terms
 
 MATURITY_ORDER = ["research", "prototype", "shipped-niche", "shipped-mainstream"]
 # links a contributor profile may carry (report/meta.yaml), in display order, with the hosts each must point at
@@ -893,6 +893,26 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     stats["n_mechanic_scores"] = sum(1 for m in mechs for f, s in rub["scales"].items() if s.get("applies_to") == "mechanic" and m.data.get(f) is not None)
     n_mech_rated = sum(v["scores"] for f, v in pair_stats.items() if (rub["scales"].get(f) or {}).get("applies_to") == "mechanic")
     stats["pct_mechanic_scores_independently_rated"] = _r(100 * n_mech_rated / max(stats["n_mechanic_scores"], 1), 0)
+    # robustness of the legibility-emergence correlation (§5.6): on the mechanics where both fields carry the creating
+    # run's original rating and a rating from a run independent of it, the correlation under each rater's scores. Several
+    # independent ratings of one field are reduced to their lower median, as a stored score is.
+    pair_fields = ("legibility", "emergence_potential")
+    orig_sc, second_sc = [], []
+    for m in mechs:
+        created = runs.get((m.data.get("provenance") or {}).get("created"))
+        rs = m.data.get("ratings") or []
+        o = {f: [r["value"] for r in rs if r["field"] == f and created is not None and r["run"] == created.id] for f in pair_fields}
+        s = {f: [r["value"] for r in rs if r["field"] == f and independent(runs.get(r["run"]), created)] for f in pair_fields}
+        if all(o[f] for f in pair_fields) and all(s[f] for f in pair_fields):
+            orig_sc.append(tuple(o[f][0] for f in pair_fields))
+            second_sc.append(tuple(lower_median(s[f]) for f in pair_fields))
+    stats["n_mechanics_second_rated_legibility_emergence"] = len(second_sc)
+    for key, sc in (("second_rater", second_sc), ("original_rater", orig_sc)):
+        r = p = None
+        if len(sc) >= 5 and all(len({x[i] for x in sc}) > 1 for i in range(2)):
+            r, p = spearmanr([x[0] for x in sc], [x[1] for x in sc])
+        stats[f"rho_legibility_emergence_potential_{key}"] = _r(r, 2)
+        stats[f"p_legibility_emergence_potential_{key}"] = _r(p, 3)
     cal = load_calibration(load_registry())
     cal_rows = []
     for r in sorted(runs.values(), key=lambda r: r.id):

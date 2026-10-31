@@ -1,0 +1,19 @@
+id: src-hunicke-2004-mda
+type: source
+name: 'MDA: A Formal Approach to Game Design and Game Research'
+kind: paper
+authors:
+- Robin Hunicke
+- Marc LeBlanc
+- Robert Zubek
+venue: AAAI Workshop Papers 2004 (WS-04-04)
+date: '2004'
+url: https://aaai.org/papers/ws04-04-001-mda-a-formal-approach-to-game-design-and-game-research/
+accessed: '2026-10-31'
+notes: 'Read the AAAI page and the authors'' PDF (users.cs.northwestern.edu/~hunicke/MDA.pdf). Splits a game
+  into mechanics (its components at the level of data representation and algorithms), dynamics (the run-time
+  behavior of the mechanics acting on player inputs and each other''s outputs over time) and aesthetics (the
+  emotional responses evoked in the player); developed for the GDC Game Design and Tuning Workshop, 2001 to
+  2004.'
+provenance:
+  created: 2026-10-31-paper-related-work

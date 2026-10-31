@@ -1,0 +1,20 @@
+id: src-shaker-2016-procedural-content-generation
+type: source
+name: 'Procedural Content Generation in Games: A Textbook and an Overview of Current Research'
+kind: book
+authors:
+- Noor Shaker
+- Julian Togelius
+- Mark J. Nelson
+venue: Springer
+date: '2016'
+url: https://pcgbook.com/
+doi: 10.1007/978-3-319-42716-4
+accessed: '2026-10-31'
+notes: 'Read the authors'' site and chapter 6, Rules and mechanics (Nelson, Togelius, Browne, Cook). The chapters
+  cover generators by method (search-based, constructive, grammars, planning, answer set programming) and by
+  content type. Chapter 6 encodes and generates game rules, for board games with Ludi and more tentatively for
+  2D games with graphical logic, mostly by evolutionary search, and calls each generator an executable micro-theory
+  of game design.'
+provenance:
+  created: 2026-10-31-paper-related-work

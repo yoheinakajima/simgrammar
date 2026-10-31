@@ -1,0 +1,18 @@
+id: src-jarvinen-2007-applied-ludology
+type: source
+name: 'Introducing Applied Ludology: Hands-on Methods for Game Studies'
+kind: paper
+authors:
+- Aki Järvinen
+venue: 'Proceedings of DiGRA 2007 Conference: Situated Play'
+date: '2007'
+url: https://dl.digra.org/index.php/dl/article/view/280
+doi: 10.26503/dl.v2007i1.280
+accessed: '2026-10-31'
+notes: 'Read the full-text PDF. Summarizes the method of the author''s dissertation Games without Frontiers:
+  any game can be identified through nine categories of game elements (components, environment, ruleset, game
+  mechanics, theme, information, interface, players, contexts), and game mechanics are the actions players
+  take as means to attain goals. The dissertation''s repository (trepo.tuni.fi) refused automated access on
+  2026-10-31, so the dissertation itself was not read.'
+provenance:
+  created: 2026-10-31-paper-related-work
