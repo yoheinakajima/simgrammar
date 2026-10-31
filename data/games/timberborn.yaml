@@ -79,6 +79,14 @@ mechanics:
   role: supporting
 - id: free-placement
   role: supporting
+- id: production-chain
+  role: supporting
+  note: Water-powered workshops such as lumber mills turn logs into planks and then machinery, forming
+    multi-step production chains.
+- id: resource-extraction
+  role: supporting
+  note: Lumberjacks fell trees and later updates add metal mining, so output depends on the trees and
+    deposits within reach.
 sources:
 - src-wikipedia-timberborn
 - src-steam-2026-timberborn
@@ -88,3 +96,4 @@ provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

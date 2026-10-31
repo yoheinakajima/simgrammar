@@ -14,11 +14,11 @@ Vertical, about 55 seconds, about 100 words of narration. One finding, from tech
 
 ## 0:05 to 0:22. The number
 
-**Picture.** Fourteen labelled tiles for the family's mechanics. All but two go grey.
+**Picture.** Fourteen labelled tiles for the family's mechanics. All but three go grey.
 
 **Frame.** count kind=tiles family=resources-production lit=affected
 
-**Voice.** Resources and production is the most used family in our catalog. Of its {{stat:n_family_mechanics_resources_production}} mechanics, {{stat:n_family_zero_exposure_resources_production}} have no AI technique pointed at them, production chains included.{{assert:n_family_zero_exposure_resources_production >= 10}}{{assert:derived.production-chain.technique_exposure == 0}}
+**Voice.** Resources and production is the most used family in our catalog. Of its {{stat:n_family_mechanics_resources_production}} mechanics, {{stat:n_family_zero_exposure_resources_production}} have no AI technique pointed at them. Production chains get one, and only to test them.{{assert:n_family_zero_exposure_resources_production >= 10}}{{assert:derived.production-chain.technique_count == 1}}
 
 ## 0:22 to 0:40. The moment
 

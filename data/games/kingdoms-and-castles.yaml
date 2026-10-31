@@ -83,6 +83,9 @@ mechanics:
   role: supporting
 - id: storage-capacity
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Taxes on the population fund the castle and the kingdom's buildings.
 sources:
 - src-wikipedia-kingdoms-and-castles
 - src-steam-2026-kingdoms-and-castles
@@ -91,3 +94,4 @@ provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

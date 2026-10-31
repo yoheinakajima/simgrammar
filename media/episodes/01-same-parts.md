@@ -2,7 +2,7 @@
 
 Target runtime about 9 minutes: about 880 words of narration at 135 words a minute, plus a beat of picture-only footage per scene. Covers book chapters 1 and 2. Footage: RimWorld, Dwarf Fortress, SimCity (1989), Factorio, Oxygen Not Included, The Sims, Frostpunk, all captured by us; a still of Façade. Publisher video policies are tracked in `media/rights.yaml` and must be checked before release. Every number below is filled in from the dataset when the script is built, and the sentences that interpret numbers carry the same checks as the book.
 
-**Summary.** RimWorld taken apart into its mechanics, then every game in the catalog the same way. The most common parts simulate nothing, the parts a game can't do without are much rarer, and each genre spends its parts differently.
+**Summary.** RimWorld taken apart into its mechanics, then every game in the catalog the same way. Most of the commonest parts simulate nothing, the parts a game can't do without are much rarer, and each genre spends its parts differently.
 
 ## 1. Cold open (0:00 to 0:52)
 
@@ -64,11 +64,11 @@ Target runtime about 9 minutes: about 880 words of narration at 135 words a minu
 
 ## 6. The most common parts (4:10 to 5:02)
 
-**Picture.** The grid narrows to its fullest columns. Five light up in turn, each over a two-second clip: a paused raid, a building dropped on a lot, a mod list, a research screen, a scenario goal. Then a sixth: ore riding a belt into a furnace.
+**Picture.** The grid narrows to its fullest columns. Five light up in turn, each over a two-second clip: a paused raid, a building dropped on a lot, a mod list, a park's finances, a research screen. Then the seventh: ore riding a belt into a furnace.
 
-**Frame.** count kind=bars rank ids=variable-speed,free-placement,modding-api,tech-tree,scenario-objectives,production-chain
+**Frame.** count kind=bars rank ids=variable-speed,free-placement,modding-api,budget-treasury,tech-tree,production-chain
 
-**Voice.** The five most common parts are the pause button, placing buildings, mod support, a tech tree, and scenario goals.{{assert:derived.variable-speed.prevalence_rank == 1}}{{assert:derived.free-placement.prevalence_rank == 2}}{{assert:derived.modding-api.prevalence_rank == 3}}{{assert:derived.tech-tree.prevalence_rank <= 5}}{{assert:derived.scenario-objectives.prevalence_rank <= 5}} None of them simulates anything. They handle the player: when the world runs, where things go, who can change the rules. Production chains come sixth, the first part on the list that models something in the world.{{assert:derived.production-chain.prevalence_rank == 6}}
+**Voice.** The five most common parts are the pause button, placing buildings, mod support, a treasury, and a tech tree.{{assert:derived.variable-speed.prevalence_rank == 1}}{{assert:derived.free-placement.prevalence_rank == 2}}{{assert:derived.modding-api.prevalence_rank == 3}}{{assert:derived.budget-treasury.prevalence_rank == 4}}{{assert:derived.tech-tree.prevalence_rank == 5}} Four of them simulate nothing. They handle the player: when the world runs, where things go, who can change the rules. The treasury keeps the books, taxes and fees in, upkeep and wages out. After scenario goals, production chains come seventh, the first part on the list that models a physical process.{{assert:derived.scenario-objectives.prevalence_rank == 6}}{{assert:derived.production-chain.prevalence_rank == 7}}
 
 **Voice.** The pause button is in {{stat:most_prevalent_mechanic_share_pct}} percent of catalog games, and core in exactly one: Universe Sandbox, where running a solar system faster can change how it ends.{{assert:derived.variable-speed.core_count == 1}}
 

@@ -88,6 +88,10 @@ mechanics:
     talks end in strikes and failed supply talks in lost shipments.
 - id: utility-action-selection
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Money is spent on rides, shops, and staff and earned from tickets and sales; loans can be taken
+    out and wages are negotiated.
 sources:
 - src-wikipedia-theme-park
 status: sourced
@@ -95,3 +99,4 @@ provenance:
   created: 2026-10-24-catalog-ge
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

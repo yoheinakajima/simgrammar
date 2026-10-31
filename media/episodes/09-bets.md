@@ -30,9 +30,9 @@ Target runtime about 12 minutes: about 1,230 words of narration at 135 words a m
 
 **Voice.** A tool that answered the question directly wouldn't need new AI. Add a little capacity to each machine and belt in turn, and measure how much the output rises. The one that raises it most is the constraint. Then a short generated sentence names it: circuits are limited by copper cable, which is starved because the smelters share a belt with iron.
 
-**On screen.** Production chains: used by {{derived:production-chain.prevalence}} catalog games. Techniques in the dataset aimed at them: none.
+**On screen.** Production chains: used by {{derived:production-chain.prevalence}} catalog games. Techniques in the dataset aimed at them: one, as a tester.
 
-**Voice.** That's one of the bets in the dataset, the bottleneck explainer. Production chains are among the most common mechanics in the catalog, and no technique in the dataset points at them.{{assert:derived.production-chain.prevalence_rank <= 10}}{{assert:derived.production-chain.technique_exposure == 0}}
+**Voice.** That's one of the bets in the dataset, the bottleneck explainer. Production chains are among the most common mechanics in the catalog, and only one technique in the dataset points at them, and all it does is test them.{{assert:derived.production-chain.prevalence_rank <= 10}}{{assert:derived.production-chain.technique_count == 1}}
 
 ## 4. What a bet contains (2:11 to 3:50)
 
@@ -86,7 +86,7 @@ Target runtime about 12 minutes: about 1,230 words of narration at 135 words a m
 
 **Voice.** Another bet near the top goes back to the cook from episode 1. Most of what a colonist does is routine: eat, sleep, haul. Cheap rules handle that. The memorable moments are rare, a death, an insult, a breakdown. So keep the rules running every tick, and call a language model only when something crosses a threshold of importance.{{assert:rank.opportunities-ranked.salience-gated-llm-agents <= 5}}
 
-**Voice.** The model's answer has to fit a schema: a thought with a mood value and a duration, maybe a change to a relationship, maybe one spoken line. It lands in the same list that explained her breakdown. The test caps the model at one call per colonist per in-game hour and measures believability in blind playtests, tokens per player-hour, and contradictions, like a colonist mourning someone who's still alive. Success needs a point of believability on a seven-point scale, under two thousand tokens per player-hour, and fewer than one contradiction an hour.
+**Voice.** The model's answer has to fit a schema: a thought with a mood value and a duration, maybe a change to a relationship, maybe one spoken line. It lands in the same list that explained her breakdown. The test caps the whole colony at four model calls per real hour, each held to 400 tokens, and measures believability in blind playtests, tokens per player-hour, and contradictions, like a colonist mourning someone who's still alive. Success needs a point of believability on a seven-point scale, under two thousand tokens per player-hour, and fewer than one contradiction an hour.
 
 ## 8. Mods from a sentence (7:46 to 8:43)
 

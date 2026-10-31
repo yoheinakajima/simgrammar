@@ -96,6 +96,10 @@ mechanics:
   role: core
   note: Track is laid tile by tile across terrain whose slope and features add cost, linking up to 32
     stations.
+- id: budget-treasury
+  role: supporting
+  note: The company starts with one million dollars, half equity and half loan, and building stops when
+    funds run out.
 influenced_by:
 - simcity-1989
 sources:
@@ -104,3 +108,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-catalog-ge
+  reviewed:
+  - 2026-10-31-tag-audit

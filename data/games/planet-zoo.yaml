@@ -89,6 +89,10 @@ mechanics:
   role: supporting
 - id: free-placement
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Career, challenge, and franchise modes run on a zoo economy that pays for staff, facilities, and
+    animals.
 influenced_by:
 - zoo-tycoon
 - planet-coaster
@@ -99,3 +103,4 @@ provenance:
   created: 2026-10-24-catalog-ge
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

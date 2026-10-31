@@ -80,6 +80,9 @@ mechanics:
   note: Scenarios set targets such as a financial milestone within a set number of years, at several difficulties.
 - id: variable-speed
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Production lines must keep a profit, and building space is bought with company funds.
 sources:
 - src-wikipedia-big-pharma
 status: sourced
@@ -87,3 +90,4 @@ provenance:
   created: 2026-10-24-catalog-ge
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

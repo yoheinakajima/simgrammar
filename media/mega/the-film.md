@@ -63,7 +63,7 @@ The film re-voices these episode scenes so their cross-references name the film'
 
 **Voice.** Another bet near the top goes back to the cook from chapter 1. Most of what a colonist does is routine: eat, sleep, haul. Cheap rules handle that. The memorable moments are rare, a death, an insult, a breakdown. So keep the rules running every tick, and call a language model only when something crosses a threshold of importance.{{assert:rank.opportunities-ranked.salience-gated-llm-agents <= 5}}
 
-**Voice.** The model's answer has to fit a schema: a thought with a mood value and a duration, maybe a change to a relationship, maybe one spoken line. It lands in the same list that explained her breakdown. The test caps the model at one call per colonist per in-game hour and measures believability in blind playtests, tokens per player-hour, and contradictions, like a colonist mourning someone who's still alive. Success needs a point of believability on a seven-point scale, under two thousand tokens per player-hour, and fewer than one contradiction an hour.
+**Voice.** The model's answer has to fit a schema: a thought with a mood value and a duration, maybe a change to a relationship, maybe one spoken line. It lands in the same list that explained her breakdown. The test caps the whole colony at four model calls per real hour, each held to 400 tokens, and measures believability in blind playtests, tokens per player-hour, and contradictions, like a colonist mourning someone who's still alive. Success needs a point of believability on a seven-point scale, under two thousand tokens per player-hour, and fewer than one contradiction an hour.
 
 ### Episode 10, scene 4: Same inputs, same world
 
@@ -95,17 +95,17 @@ The film re-voices these episode scenes so their cross-references name the film'
 
 **Voice.** The whole dataset is a folder of plain-text records. Everything else is built from it on every change: the paper, the website, the book, and the script for this film. Nothing computed is stored. A mechanic's prevalence, a game's cluster, a bet's priority: each is worked out again on every build, because a stored copy would drift.
 
-**Voice.** Sentences are the hard part, because they interpret numbers. So every number in this series is a token the build fills in, and every sentence that interprets one carries a check. When chapter 1 said the five most common parts don't simulate anything, the build checked all five ranks. If the data stops agreeing, the build fails until somebody rewrites the line.
+**Voice.** Sentences are the hard part, because they interpret numbers. So every number in this series is a token the build fills in, and every sentence that interprets one carries a check. When chapter 1 said four of the five most common parts don't simulate anything, the build checked all five ranks. If the data stops agreeing, the build fails until somebody rewrites the line.
 
 ### Episode 12, scene 5: The rules came from failures
 
-**Voice.** Most of the rules exist because something went wrong once. The first catalog was built by agents working in parallel, each taking a slice of games. An outside reviewer found that they'd recorded each game's distinctive parts and skipped the obvious ones: pause, building placement, tech trees. The finding that opened this series, that the most common parts don't simulate anything, wasn't visible in that first data. The gaps were filled, and the analysis was redone.
+**Voice.** Most of the rules exist because something went wrong once. The first catalog was built by agents working in parallel, each taking a slice of games. An outside reviewer found that they'd recorded each game's distinctive parts and skipped the obvious ones: pause, building placement, tech trees. The finding that opened this series, that most of the commonest parts don't simulate anything, wasn't visible in that first data. The gaps were filled, and the analysis was redone.
 
 **Voice.** The same review caught the paper calling some techniques impossible to reproduce when their own records said they could be. Now a sentence about a technique is checked against that technique's record.{{assert:field.monte-carlo-tree-search.determinism_impact == mitigable}}
 
-**Voice.** A later review removed one game at a time and re-ran everything. Several claims about which games belong together broke, because the samples used to test the clusters were reshuffled whenever the catalog changed. Each game's place in each of the {{stat:cluster_subsamples}} samples is now fixed by a hash of its name, and a claim that two games belong together has to hold in at least {{stat:cocluster_together}} of them.
+**Voice.** A later review removed one game at a time and re-ran everything. Several claims about which games belong together broke, because the samples used to test the clusters were reshuffled whenever the catalog changed. Each game's place in each of the {{stat:cluster_subsamples}} samples is now fixed by a hash of its name, and a claim that two games belong together has to hold in at least {{stat:cocluster_together_pct}} percent of them.
 
-**Voice.** Even the number of clusters follows a written rule: the smallest number whose clusters stay stable across the samples. When the rule was first applied it gave {{stat:cluster_k}}, and that was fixed so new games wouldn't reshuffle everything. On today's data the rule would pick {{stat:cluster_rule_k}}.{{assert:cluster_k != cluster_rule_k}} The gap sits inside the stated tolerance, so the build doesn't object, and chapter 3 only claims the groupings that survive resampling either way.{{assert:cluster_k_drift == 0}}
+**Voice.** Even the number of clusters follows a written rule: the smallest number whose clusters stay stable across the samples. The number is fixed so new games don't reshuffle everything, and when the data moves far enough that the rule would choose another, the build warns and the number is chosen again by the rule. Today it is {{stat:cluster_k}}.{{assert:cluster_k == cluster_rule_k}}{{assert:cluster_k_drift == 0}} Chapter 3 only claims the groupings that survive resampling.
 
 ## YouTube chapters
 
@@ -137,11 +137,11 @@ Recompute these from the render when an episode or its narration changes: `scrip
 
 **Picture.** The grid's five fullest columns light up, then RimWorld's row with its core columns, each nearly empty.
 
-**Voice.** The five parts that turn up most often in those games model nothing in the world: a pause button, building placement, mod support, a tech tree, and scenario goals.{{assert:derived.variable-speed.prevalence_rank == 1}}{{assert:derived.free-placement.prevalence_rank == 2}}{{assert:derived.modding-api.prevalence_rank == 3}}{{assert:derived.tech-tree.prevalence_rank <= 5}}{{assert:derived.scenario-objectives.prevalence_rank <= 5}} And most games count at least one rare part among their core.{{assert:pct_games_with_rare_core >= 75}}
+**Voice.** Four of the five parts that turn up most often in those games model nothing in the world: a pause button, building placement, mod support, and a tech tree. The fifth is a treasury.{{assert:derived.variable-speed.prevalence_rank == 1}}{{assert:derived.free-placement.prevalence_rank == 2}}{{assert:derived.modding-api.prevalence_rank == 3}}{{assert:derived.budget-treasury.prevalence_rank == 4}}{{assert:derived.tech-tree.prevalence_rank == 5}} And most games count at least one rare part among their core.{{assert:pct_games_with_rare_core >= 75}}
 
 **Picture.** The technique-flow ribbons draw in from the right and land on a handful of columns; most of the grid stays unlit.
 
-**Voice.** Research on AI in games lands on a few of those columns. {{stat:n_mechanics_zero_exposure}} mechanics, carrying {{stat:pct_uses_on_zero_exposure}} percent of every use in the catalog, have no technique in the dataset aimed at them, production chains and budgets among them.{{assert:pct_uses_on_zero_exposure >= 40}}{{assert:derived.production-chain.technique_exposure == 0}}{{assert:derived.budget-treasury.technique_exposure == 0}}
+**Voice.** Research on AI in games lands on a few of those columns. {{stat:n_mechanics_zero_exposure}} mechanics, carrying {{stat:pct_uses_on_zero_exposure}} percent of every use in the catalog, have no technique in the dataset aimed at them, the treasury among them.{{assert:pct_uses_on_zero_exposure >= 40}}{{assert:derived.budget-treasury.technique_exposure == 0}}
 
 **Picture.** A calendar strip scrolls forward; dates light up one by one, the first group bunched on a single day.
 

@@ -96,9 +96,15 @@ mechanics:
   role: supporting
   note: Each block has hit points, and damaged functional blocks such as thrusters, reactors, and gyroscopes
     stop working until welded back.
+- id: content-sharing
+  role: supporting
+  note: Ships and stations are saved as blueprints and shared, and mods and blueprints are browsed and
+    downloaded through the Steam Workshop.
 sources:
 - src-wikipedia-space-engineers
 - src-steam-2026-space-engineers
 status: sourced
 provenance:
   created: 2026-10-24-catalog-gg
+  reviewed:
+  - 2026-10-31-tag-audit

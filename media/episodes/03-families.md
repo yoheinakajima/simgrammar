@@ -2,7 +2,7 @@
 
 Target runtime about 12 minutes: about 1,280 words of narration at 135 words a minute, plus a beat of picture-only footage per scene. Covers book chapter 4. Footage: Factorio, Anno 1800, Papers, Please, Princess Maker 2, Job Simulator, Besiege, Farming Simulator 25, iRacing, Black & White, Creatures, inZOI, AI Dungeon, Elite, Elite Dangerous, M.U.L.E., Offworld Trading Company, Frostpunk, Frostpunk 2; publisher video policies are tracked in `media/rights.yaml` and must be checked before release. Every number below is filled in from the dataset when the script is built, and the sentences that interpret numbers carry the same checks as the book.
 
-**Summary.** Group games by their mechanics instead of their genre and families appear: series that stay together, a sequel that moved, and odd couples like Papers, Please and Princess Maker 2. How far the families match genre, and where they fall apart.
+**Summary.** Group games by their mechanics instead of their genre and families appear: series that stay together, survival city builders that sit with grand strategy, and odd couples like Papers, Please and Princess Maker 2. How far the families match genre, and where they fall apart.
 
 ## 1. Cold open (0:00 to 0:45)
 
@@ -18,7 +18,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Frame.** compare at="Both games run on production chains" games=factorio,anno-1800
 
-**Voice.** In Anno 1800, a street of houses is waiting for canned goulash from another island, on a ship that is late. Both games run on production chains. The dataset puts them in different families.{{assert:cocluster.factorio.anno-1800 < 0.5}}
+**Voice.** In Anno 1800, a street of houses is waiting for canned goulash from another island, on a ship that is late. Both games run on production chains, and the dataset puts them in the same family.{{assert:cocluster.factorio.anno-1800 >= 0.9}}
 
 ## 2. Title (0:45 to 0:55)
 
@@ -46,7 +46,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Voice.** Families come from the parts games share, and a shared rare part counts for far more than a shared pause button. Production chains, in {{derived:production-chain.prevalence}} games, count for little; conveyor belts, in {{derived:conveyor-transport.prevalence}}, count for a lot.{{assert:derived.conveyor-transport.prevalence < derived.production-chain.prevalence}}
 
-**Voice.** Factorio lands with Satisfactory, shapez 2, Dyson Sphere Program, and Captain of Industry. Anno 1800 lands with Manor Lords, Banished, Caesar III, and Pharaoh.{{assert:derived.satisfactory.cluster == derived.factorio.cluster}}{{assert:derived.captain-of-industry.cluster == derived.factorio.cluster}}{{assert:derived.manor-lords.cluster == derived.anno-1800.cluster}}{{assert:derived.caesar-3.cluster == derived.anno-1800.cluster}}
+**Voice.** Factorio and Anno 1800 land in one family with Satisfactory, Captain of Industry, Manor Lords, Caesar III, and Pharaoh, and inside it the rare parts keep Factorio closest to the other factory games.{{assert:derived.anno-1800.cluster == derived.factorio.cluster}}{{assert:derived.satisfactory.cluster == derived.factorio.cluster}}{{assert:derived.captain-of-industry.cluster == derived.factorio.cluster}}{{assert:derived.manor-lords.cluster == derived.anno-1800.cluster}}{{assert:derived.caesar-3.cluster == derived.anno-1800.cluster}}{{assert:sim_factorio_satisfactory > sim_factorio_anno_1800}}
 
 ## 5. How many families (2:55 to 4:10)
 
@@ -68,7 +68,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Frame.** compare at="Two other job sims" games=powerwash-simulator,house-flipper show=shared
 
-**Voice.** Job Simulator belongs with Besiege and The Incredible Machine, because nearly every object in reach is a physics object you can grab, throw, or combine. Two other job sims, PowerWash Simulator and House Flipper, stand apart in a family of their own, built on tools and contracts.{{assert:derived.job-simulator.cluster == derived.besiege.cluster}}{{assert:derived.job-simulator.cluster != derived.powerwash-simulator.cluster}}
+**Voice.** Job Simulator belongs with Besiege and The Incredible Machine, because nearly every object in reach is a physics object you can grab, throw, or combine. Two other job sims, PowerWash Simulator and House Flipper, usually land apart, in a family of their own, built on tools and contracts.{{assert:derived.job-simulator.cluster == derived.besiege.cluster}}{{assert:cocluster.job-simulator.powerwash-simulator < 0.2}}
 
 **Picture.** Farming Simulator 25: a combine harvester working a field in a straight GPS line. Cut to iRacing: a car in a pit lane.
 
@@ -98,9 +98,9 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Frame.** compare games=theme-hospital,rollercoaster-tycoon show=shared
 
-**Frame.** compare at="they still stand apart from the life sims" games=theme-hospital,the-sims
+**Frame.** compare at="they usually land apart from the life sims" games=theme-hospital,the-sims
 
-**Voice.** Theme Hospital, RollerCoaster Tycoon, and Game Dev Tycoon hold together on hiring staff, research, and crowds with preferences. Their patients and visitors have needs, as The Sims' characters do, and they still stand apart from the life sims. The player is running a business that serves a crowd.{{assert:derived.rollercoaster-tycoon.cluster == derived.theme-hospital.cluster}}{{assert:derived.theme-hospital.cluster != derived.the-sims.cluster}}
+**Voice.** Theme Hospital, RollerCoaster Tycoon, and Game Dev Tycoon hold together on hiring staff, research, and crowds with preferences. Their patients and visitors have needs, as The Sims' characters do, and they usually land apart from the life sims. The player is running a business that serves a crowd.{{assert:derived.rollercoaster-tycoon.cluster == derived.theme-hospital.cluster}}{{assert:cocluster.theme-hospital.the-sims < 0.15}}
 
 **Picture.** RimWorld's colony and The Sims' house, side by side.
 
@@ -132,7 +132,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Frame.** compare at="Factorio shares a cluster with Railroad Tycoon" games=factorio,railroad-tycoon
 
-**Voice.** The method also finds descendants with different names. Offworld Trading Company, from 2015, shares a family with M.U.L.E., from 1983, in every resampling.{{assert:cocluster.mule.offworld-trading-company >= 0.9}} Its designer names M.U.L.E. and Railroad Tycoon as inspirations. Prices move with every purchase and sale, and you win by buying up your rivals' shares, a mechanic the catalog first records in Railroad Tycoon.{{assert:derived.equity-buyouts.earliest_game == railroad-tycoon}} Those old trading games keep a weaker tie to the factory games. Factorio shares a cluster with Railroad Tycoon in about half the resamplings, and with Satisfactory in all of them.{{assert:cocluster.factorio.railroad-tycoon > 0.3}}{{assert:cocluster.factorio.railroad-tycoon < 0.7}}{{assert:cocluster.factorio.railroad-tycoon < cocluster.factorio.satisfactory}}
+**Voice.** The method also finds descendants with different names. Offworld Trading Company, from 2015, shares a family with M.U.L.E., from 1983, in every resampling.{{assert:cocluster.mule.offworld-trading-company >= 0.9}} Its designer names M.U.L.E. and Railroad Tycoon as inspirations. Prices move with every purchase and sale, and you win by buying up your rivals' shares, a mechanic the catalog first records in Railroad Tycoon.{{assert:derived.equity-buyouts.earliest_game == railroad-tycoon}} Those old trading games keep a weaker tie to the factory games. Factorio shares a cluster with Railroad Tycoon in about three of four resamplings, and with Satisfactory in all of them.{{assert:cocluster.factorio.railroad-tycoon > 0.7}}{{assert:cocluster.factorio.railroad-tycoon < 0.85}}{{assert:cocluster.factorio.railroad-tycoon < cocluster.factorio.satisfactory}}
 
 ## 8. The sequel that moved (8:12 to 9:19)
 
@@ -140,7 +140,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Frame.** compare games=frostpunk,against-the-storm show=shared
 
-**Voice.** Frostpunk is the one series in the catalog that splits. Frostpunk is a survival city builder around a single coal generator. Temperature falls on a schedule, and the laws you sign trade your people's welfare for output. Its nearest neighbour is Against the Storm.{{assert:derived.against-the-storm.cluster == derived.frostpunk.cluster}}
+**Voice.** Frostpunk is a survival city builder around a single coal generator. Temperature falls on a schedule, and the laws you sign trade your people's welfare for output. Its nearest neighbour is Against the Storm.{{assert:derived.against-the-storm.cluster == derived.frostpunk.cluster}}
 
 **Picture.** Frostpunk 2: a council chamber, a hundred seats coloured by faction, a vote count climbing toward 51.
 
@@ -148,7 +148,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Frame.** compare at="Its parts put it with Tropico 6" games=frostpunk-2,tropico-6 show=shared
 
-**Voice.** Frostpunk 2 builds districts instead of buildings and passes laws through a council of a hundred delegates. Most laws need 51 votes. Broken promises anger factions, and faction tension can end in civil war. The developer describes social survival as a bigger threat than the cold. Its parts put it with Tropico 6 and Europa Universalis IV, and it shares a cluster with the first game in fewer than half of the resamplings.{{assert:derived.frostpunk-2.cluster == derived.tropico-6.cluster}}{{assert:cocluster.frostpunk.frostpunk-2 < 0.5}}
+**Voice.** Frostpunk 2 builds districts instead of buildings and passes laws through a council of a hundred delegates. Most laws need 51 votes. Broken promises anger factions, and faction tension can end in civil war. The developer describes social survival as a bigger threat than the cold. Its parts put it with Tropico 6 and Europa Universalis IV, and the first game sits there too: its laws and its story events put both with the rulers, apart from SimCity.{{assert:derived.frostpunk-2.cluster == derived.tropico-6.cluster}}{{assert:cocluster.frostpunk.frostpunk-2 >= 0.9}}{{assert:derived.frostpunk.cluster != derived.simcity-1989.cluster}}
 
 ## 9. How much genre explains (9:19 to 10:14)
 

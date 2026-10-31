@@ -105,6 +105,10 @@ mechanics:
   role: supporting
   note: 'XML definitions and C# assemblies, usually patched in with Harmony, distributed through Steam
     Workshop.'
+- id: tech-tree
+  role: supporting
+  note: Pawns at research stations progress along a tech tree from tribal technologies to space-age
+    ones, including the ship parts needed to leave.
 influenced_by:
 - dwarf-fortress
 store_ids:
@@ -118,3 +122,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-25-contributor-readiness
   - 2026-10-25-store-ids-pilot
+  - 2026-10-31-tag-audit

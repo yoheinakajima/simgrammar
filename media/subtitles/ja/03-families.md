@@ -11,8 +11,8 @@ Factorioでは、電力が足りないと
 Anno 1800では、職人の家が並ぶ通りが
 別の島から届く缶詰のグーラッシュを待っています。
 それを積んだ船は遅れています。
-どちらのゲームも生産チェーンで動いています。
-データセットは、2つを別のファミリーに入れています。
+どちらのゲームも生産チェーンで動いていて、
+データセットは2つを同じファミリーに入れています。
 
 ## 2
 
@@ -41,10 +41,9 @@ Annoは需要のゲームです。
 珍しい部品の共有は、ポーズボタンの共有よりずっと重く数えます。
 生産チェーンは{{derived:production-chain.prevalence}}本にあるので軽く、
 ベルトコンベアは{{derived:conveyor-transport.prevalence}}本なので重く数えます。
-Factorioの隣には、Satisfactory、shapez 2、
-Dyson Sphere Program、Captain of Industry。
-Anno 1800の隣には、Manor Lords、Banished、
-Caesar III、Pharaohが来ます。
+FactorioとAnno 1800は、Satisfactory、Captain of Industry、
+Manor Lords、Caesar III、Pharaohと同じファミリーに入ります。
+その中では珍しい部品のおかげで、Factorioはほかの工場ゲームのいちばん近くにいます。
 
 ## 5
 
@@ -63,14 +62,14 @@ Papers, Pleaseは、国境でパスポートを調べるゲームです。
 どちらも、時間は決まった枠でやって来て、
 お金は苦しく、用意されたイベントが次々に届きます。
 国境では、正しい判断ごとに給料が出て、
-ミスはファックスで届く違反通知になります。
+ミスは印刷された違反通知の紙になって出てきます。
 給料は、家族の家賃と食費と暖房に消えます。
 国境での1回の勤務と、娘の1か月は、同じ種類の予算です。
 Job SimulatorはBesiegeやThe Incredible Machineと同じ仲間です。
 手の届く物のほとんどが、つかみ、投げ、
 組み合わせられる物理オブジェクトだからです。
 ほかの2本のジョブシム、PowerWash SimulatorとHouse Flipperは、
-道具と請負仕事でできた、別のファミリーにいます。
+たいていは、道具と請負仕事でできた別のファミリーに入ります。
 Farming Simulatorはレースゲームと同じ側にいて、
 Stardew Valleyや牧場物語とは離れています。
 その農場は、400台を超える実在メーカーの機械の車両群で、
@@ -87,7 +86,7 @@ Europa Universalis IV、Civilization、Stellaris。
 Theme Hospital、RollerCoaster Tycoon、Game Dev Tycoonは、
 スタッフの雇用、研究、好みを持つ群衆でまとまります。
 患者や来場者にはThe Simsの住人と同じく欲求がありますが、
-それでもライフシムとは離れています。
+たいていはライフシムとは離れたところに入ります。
 プレイヤーが動かしているのは、群衆に仕える商売だからです。
 コロニーシムはまとまっています。
 RimWorldとDwarf Fortress、Oxygen Not Included。
@@ -113,12 +112,11 @@ SimCityとSimCity 4、The SimsとThe Sims 4。
 ライバルの株を買い占めると勝ちです。
 カタログでこのメカニクスを最初に記録しているのは、Railroad Tycoonです。
 こうした古い交易ゲームは、工場ゲームとも弱くつながっています。
-FactorioがRailroad Tycoonと同じクラスタに入るのは再標本化の約半分。
+FactorioがRailroad Tycoonと同じクラスタに入るのは、再標本化の約4回に3回。
 Satisfactoryとは、すべてで同じです。
 
 ## 8
 
-Frostpunkは、カタログで唯一、分かれるシリーズです。
 Frostpunkは、ひとつの石炭ジェネレーターを囲む
 サバイバル都市建設ゲームです。
 気温は予定どおりに下がり、
@@ -131,7 +129,8 @@ Frostpunk 2は、建物ではなく地区を建て、
 派閥の対立は内戦で終わることもあります。
 開発者は、寒さよりも社会の存続のほうが大きな脅威だと説明しています。
 その部品はTropico 6やEuropa Universalis IVの側にあり、
-1作目と同じクラスタに入るのは、再標本化の半分に満たない回数です。
+1作目もそこにいます。
+法律と物語のイベントが、2作とも統治者たちの側に置き、SimCityからは離しています。
 
 ## 9
 

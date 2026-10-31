@@ -81,6 +81,9 @@ mechanics:
   note: Relations with foreign powers affect trade and aid.
 - id: variable-speed
   role: supporting
+- id: scenario-objectives
+  role: supporting
+  note: Single-player missions set objectives on preset islands, alongside the sandbox mode.
 sources:
 - src-wikipedia-tropico-6
 status: sourced
@@ -88,3 +91,4 @@ provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

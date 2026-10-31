@@ -8,23 +8,23 @@ Vertical, about 50 seconds, about 100 words of narration. Scene lengths follow t
 
 **On screen.** The five most common parts of a simulation game.
 
-**Voice.** The five parts that turn up most often in simulation games don't simulate anything.
+**Voice.** Four of the five parts that turn up most often in simulation games don't simulate anything.
 
 ## 0:06 to 0:21. The five
 
-**Picture.** Two seconds per part, each labelled with its rank: RimWorld paused mid-raid; a building dropped onto an empty lot in Cities: Skylines; a mod list; Factorio's research screen; a RollerCoaster Tycoon scenario goal.
+**Picture.** Two seconds per part, each labelled with its rank: RimWorld paused mid-raid; a building dropped onto an empty lot in Cities: Skylines; a mod list; a RollerCoaster Tycoon park's finances; Factorio's research screen.
 
-**Frame.** count kind=bars rank ids=variable-speed,free-placement,modding-api,tech-tree,scenario-objectives
+**Frame.** count kind=bars rank ids=variable-speed,free-placement,modding-api,budget-treasury,tech-tree
 
-**Voice.** We broke {{stat:n_game}} of them into their parts. First is the pause button, in {{stat:most_prevalent_mechanic_share_pct}} percent of them. Then placing buildings where you like, support for mods, a tech tree, and scenario goals.{{assert:derived.variable-speed.prevalence_rank == 1}}{{assert:derived.free-placement.prevalence_rank == 2}}{{assert:derived.modding-api.prevalence_rank == 3}}{{assert:derived.tech-tree.prevalence_rank <= 5}}{{assert:derived.scenario-objectives.prevalence_rank <= 5}}
+**Voice.** We broke {{stat:n_game}} of them into their parts. First is the pause button, in {{stat:most_prevalent_mechanic_share_pct}} percent of them. Then placing buildings where you like, support for mods, a treasury, and a tech tree.{{assert:derived.variable-speed.prevalence_rank == 1}}{{assert:derived.free-placement.prevalence_rank == 2}}{{assert:derived.modding-api.prevalence_rank == 3}}{{assert:derived.budget-treasury.prevalence_rank == 4}}{{assert:derived.tech-tree.prevalence_rank == 5}}
 
-## 0:21 to 0:31. Sixth place
+## 0:21 to 0:31. Seventh place
 
-**Picture.** The sixth column lights up. Factorio: ore rides a belt into a furnace and comes out as plates.
+**Picture.** The seventh column lights up. Factorio: ore rides a belt into a furnace and comes out as plates.
 
 **Frame.** chain nodes=ore,plate,gear verbs="in a furnace,in an assembler"
 
-**Voice.** Production chains come sixth, and they're the first part on the list that models something in the world: ore into plates, plates into gears.{{assert:derived.production-chain.prevalence_rank == 6}}
+**Voice.** The exception is the treasury, money in and money out. Production chains come seventh, and they're the first part on the list that models a physical process: ore into plates, plates into gears.{{assert:derived.production-chain.prevalence_rank == 7}}
 
 ## 0:31 to 0:43. Where the identity is
 

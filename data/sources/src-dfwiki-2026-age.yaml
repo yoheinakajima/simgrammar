@@ -1,0 +1,15 @@
+id: src-dfwiki-2026-age
+type: source
+name: Age
+kind: encyclopedia
+authors:
+- Dwarf Fortress Wiki contributors
+venue: Dwarf Fortress Wiki
+date: '2026'
+url: https://dwarffortresswiki.org/index.php/DF2014:Age
+accessed: '2026-10-31'
+notes: Age sets a creature's life stage and, until grown, its body size; dwarves are babies from zero to one, children
+  from one to twelve, then adults; most organic creatures, fortress dwarves included, die of old age within a range set
+  by the MAXAGE token, checked at the start of every year.
+provenance:
+  created: 2026-10-31-tag-audit

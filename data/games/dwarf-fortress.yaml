@@ -151,6 +151,13 @@ mechanics:
 - id: modding-api
   role: supporting
   note: 'Raw text files define creatures, materials, and reactions; DFHack adds Lua and C++ scripting.'
+- id: lifecycle-aging
+  role: supporting
+  note: Dwarves are babies until one, children until twelve, then adults, and die of old age, which the
+    game checks at the start of every year.
+- id: resource-extraction
+  role: supporting
+  note: Miners dig stone, ore, and gems level by level, and ores are smelted into metal bars.
 store_ids:
   steam: 975370
 sources:
@@ -158,6 +165,7 @@ sources:
 - src-adams-2015-df-simulation-principles
 - src-dfwiki-2026-legends
 - src-dfwiki-2026-stress
+- src-dfwiki-2026-age
 status: sourced
 provenance:
   created: 2026-10-24-catalog-gb
@@ -165,3 +173,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-25-contributor-readiness
   - 2026-10-25-store-ids-pilot
+  - 2026-10-31-tag-audit

@@ -1,7 +1,8 @@
 # Narration register: the ElevenLabs take that voices each scene of the scripts in media/.
 # Voice Marcus, model eleven_v4, two takes generated per line; the take listed here is the one the videos use.
 # Workspace bcab2e23669147abb027867ccf1626c9, generated 2026-10-26. 34 takes were re-voiced 2026-10-30 (runs
-# 2026-10-30-video-narration and 2026-10-30-ep12-count); for those, the take listed is the one whose length was nearer the series' pace.
+# 2026-10-30-video-narration and 2026-10-30-ep12-count) and 37 on 2026-10-31 (runs 2026-10-31-review-corrections and
+# 2026-10-31-tag-audit); for those, the take listed is the one whose length was nearer the series' pace.
 # Episodes and the film are one take per scene
 # with a Voice line, and shorts one take for the whole short. A key like mega/the-film.md#ep10.4 is episode 10,
 # scene 4 as the film re-voices it (Film wording in the film script). A take is stale once its script line changes;
@@ -12,32 +13,32 @@ voice: {name: Marcus, voice_id: 6WjhCXzqp2hnSqFtrG8P, model: eleven_v4}
 flows: {episodes: 9Gjpr3tlYAMkxWsf9i5l, film: 9Gjpr3tlYAMkxWsf9i5l, shorts: yrAjUmYMO7QksVZLJUWu}
 takes:
   - {key: "episodes/01-same-parts.md#1", session: AYrjdPSbCufT2sxTTgsl, generation: Ub9ka6AZEUa4iiuzFv91, seconds: 26.44}
-  - {key: "episodes/01-same-parts.md#3", session: Ln7VshH8nkOFmqQolyzf, generation: 7Xv9X5bruSnPnsLVdb3H, seconds: 48.64}
+  - {key: "episodes/01-same-parts.md#3", session: GERqr2Y7tMOLlxc4mJc8, generation: uDHI38AL2ng6x79lS4ho, seconds: 49.20}
   - {key: "episodes/01-same-parts.md#4", session: Yyhb0f3NO5m8aSEaVVfe, generation: huTFR1KunzUdKuBuqYNM, seconds: 37.28}
-  - {key: "episodes/01-same-parts.md#5", session: YWkgHp2yXtQDaNsPWn0u, generation: IkDjq7uhdpEMRbh9ufCm, seconds: 26.40}
-  - {key: "episodes/01-same-parts.md#6", session: jlKCXlpJhGXqx8KL6SRF, generation: BRiRsDufOAhIRH3UcE03, seconds: 29.68}
+  - {key: "episodes/01-same-parts.md#5", session: SEWvGONQkAGaFmFtdVlj, generation: icavdrs8SisSgnvhbmJx, seconds: 26.48}
+  - {key: "episodes/01-same-parts.md#6", session: TBUPk6T0yg7uYxOcQVXv, generation: S9ZK564EaOoSFe2E3gjh, seconds: 35.28}
   - {key: "episodes/01-same-parts.md#7", session: Vv0wKm4UJ4wCElEPf7Ic, generation: QdSyQy5FRZAe3w2xpmvK, seconds: 15.28}
   - {key: "episodes/01-same-parts.md#8", session: TnE5eZUBAOfaixL3liyP, generation: 8pfViFOIDLDth4ezBZbF, seconds: 68.83}
-  - {key: "episodes/01-same-parts.md#9", session: ToxsVPUX77SNqtZswje0, generation: 9o8ZLmfvuBcEllifp8HZ, seconds: 29.88}
+  - {key: "episodes/01-same-parts.md#9", session: JZQJrOrk6VMRSb0IsOWA, generation: MwUTkPBjVRyVaVG2Wx3O, seconds: 30.48}
   - {key: "episodes/01-same-parts.md#10", session: GqEzdqCWHNLuZheFiQyg, generation: gG269FAU5VdQdYEeA5ME, seconds: 15.92}
   - {key: "episodes/02-old-parts.md#1", session: UWAF14lhkQICXtTo4YGB, generation: hBikw2RitUpoKN5tFuA6, seconds: 20.43}
   - {key: "episodes/02-old-parts.md#3", session: B1uu4Wru9n5CVUPIfhY1, generation: VXvwkmVnbVmqKExWD3Mu, seconds: 12.28}
   - {key: "episodes/02-old-parts.md#4", session: og4REgBWSlPwvfzykIPx, generation: oIFYXGrqEhITmr2476aL, seconds: 56.80}
   - {key: "episodes/02-old-parts.md#5", session: hy7Lk6oKXrPB48JBKGRG, generation: qamsqfYNeMDyWs7mzLYK, seconds: 28.11}
-  - {key: "episodes/02-old-parts.md#6", session: ynaqC2TwNoHYrBYyg8tp, generation: StvhVSbrAXcdZoGpN9jA, seconds: 24.48}
-  - {key: "episodes/02-old-parts.md#7", session: ha1CC0RdBh9QlPnvetu3, generation: eaoWyjT8xIB7qDzoACoH, seconds: 103.71}
+  - {key: "episodes/02-old-parts.md#6", session: cJYNHHkW54xHvhO8eyCp, generation: 7obvHvgWCucy74B0Aj6n, seconds: 24.72}
+  - {key: "episodes/02-old-parts.md#7", session: K0zOFjIkooLNYkg4RLhQ, generation: sQ6MCXPD3HwW4lPqQanQ, seconds: 104.48}
   - {key: "episodes/02-old-parts.md#8", session: 5LgcZRifiWyCc3YtHmLQ, generation: kTL1XadmoEv33DegPAGG, seconds: 90.36}
   - {key: "episodes/02-old-parts.md#9", session: UTCuFKmg7UGfo4uQ1TjI, generation: Lig1qFMPedzdq6ZX7yJT, seconds: 42.37}
   - {key: "episodes/02-old-parts.md#10", session: QTzvxQs9Bw5sghpkw2Pi, generation: lcAux73jhjw4EkQEohaI, seconds: 43.00}
-  - {key: "episodes/02-old-parts.md#11", session: Qaal8kDXNnTlWN4qDOd1, generation: TEwHdf15cyA3VGGZhE2s, seconds: 21.97}
-  - {key: "episodes/03-families.md#1", session: JbxsxjmuC8dDNwmDaauX, generation: ZOoznHrG3ZhEnxgjcfY4, seconds: 21.39}
-  - {key: "episodes/03-families.md#3", session: aNagyJJJ1IJgWrUxgEMM, generation: VLPAqoFeVyfxjerXBi4z, seconds: 36.21}
-  - {key: "episodes/03-families.md#4", session: yJsFH8opxyUdHiYyXh5C, generation: NHAWT9Kjc2NW8uRQI8oz, seconds: 24.32}
-  - {key: "episodes/03-families.md#5", session: Kk6JZTyrm7bIKTynokvy, generation: pZg2mDvDhYApMfb89dff, seconds: 16.56}
-  - {key: "episodes/03-families.md#6", session: 5AqiDSjLOyJGCUg6JTlM, generation: NJLixZgDMsN8qVqWNG94, seconds: 119.33}
-  - {key: "episodes/03-families.md#7", session: eNagc5maLlC7ANgqZb7c, generation: riP40pWyT7lB6l397tVN, seconds: 46.60}
-  - {key: "episodes/03-families.md#8", session: fzsjqMyZlRDO2CTq3khk, generation: acURaV5YCS3fo9V1BlgM, seconds: 40.99}
-  - {key: "episodes/03-families.md#9", session: 9zsBlZzTCgLqoLtjtKUi, generation: dpmHDfzC5uzqOO8CJCLc, seconds: 13.84}
+  - {key: "episodes/02-old-parts.md#11", session: D7HzCqamp3B6eiivJmcJ, generation: HR5jUdiabASAmEI2gCkI, seconds: 24.40}
+  - {key: "episodes/03-families.md#1", session: cIDMu1K8MyVtSWFT3zuH, generation: KhQ7YxDb6HZQwe4vKM4j, seconds: 21.12}
+  - {key: "episodes/03-families.md#3", session: wTKMAu1158Ya9k05m1VE, generation: ERgvMqthKpLIN0cTt1NI, seconds: 36.48}
+  - {key: "episodes/03-families.md#4", session: rLGK21muXfuDhrGpW2gu, generation: lFCz7DVeOBfiTLe4fVlr, seconds: 25.36}
+  - {key: "episodes/03-families.md#5", session: BCpwtXSFPEQ9zRd0kzp4, generation: oe03OcpK6UPL4Q8kjQNI, seconds: 16.48}
+  - {key: "episodes/03-families.md#6", session: jBRm71svm56L99DAOxim, generation: g7Cd8GUgMYGo3rzXVj6O, seconds: 122.00}
+  - {key: "episodes/03-families.md#7", session: l2Mr8hWovrZKU3fdptxj, generation: IG9aW5M8UfLv1W3ymAP0, seconds: 47.20}
+  - {key: "episodes/03-families.md#8", session: 5mClAcTqV8fg9mPuEusj, generation: mgonKpULOcb1hCxoFJAU, seconds: 38.56}
+  - {key: "episodes/03-families.md#9", session: PaRnkQBUFf0RUrGybBN7, generation: SZ6y2iKgThocGcfQdoiN, seconds: 14.08}
   - {key: "episodes/03-families.md#10", session: q84VpMxq6rJr5vLjwfUU, generation: D7SmQaKm6PqVmzOQ4NjF, seconds: 18.72}
   - {key: "episodes/03-families.md#11", session: zCyYYoq3i4sEaBfLFs1q, generation: b2HdeZRHM4P7XxQOyVts, seconds: 27.72}
   - {key: "episodes/04-deep-and-hard-to-read.md#1", session: Z5Hjjv0DFILVPoH6gDfw, generation: zDtW0Utr1rAxuJsf2nLf, seconds: 21.79}
@@ -48,7 +49,7 @@ takes:
   - {key: "episodes/04-deep-and-hard-to-read.md#7", session: HlnVRhDZm6WT2helLeMP, generation: EEcZB5GBnR8C9bmgqV0L, seconds: 30.85}
   - {key: "episodes/04-deep-and-hard-to-read.md#8", session: ig6yIfxwIk0OeyGVOTHa, generation: H6fTJIxVEyHoSgRGVKpE, seconds: 49.87}
   - {key: "episodes/04-deep-and-hard-to-read.md#9", session: pXBFmxg6y6nBXf0lZMJa, generation: 5ESCyihxssPnO633Mxv6, seconds: 64.84}
-  - {key: "episodes/04-deep-and-hard-to-read.md#10", session: bXmsQDbqMGVVvCjbwZJV, generation: c1Ae9jpsh9eZa1O9nKpD, seconds: 35.71}
+  - {key: "episodes/04-deep-and-hard-to-read.md#10", session: ovJ5oj6mPlXGKzQqzVl7, generation: N9RlANyUybPCEVAupjdk, seconds: 36.00}
   - {key: "episodes/04-deep-and-hard-to-read.md#11", session: AGfGGlPVdpmEmyUrlThV, generation: 0nRxk6XQhhQlfSc3WeVo, seconds: 30.51}
   - {key: "episodes/05-five-ceilings.md#1", session: TTroe14RF1VO3GYZiRL6, generation: id4Ja331AZCZr4p84I7b, seconds: 9.40}
   - {key: "episodes/05-five-ceilings.md#3", session: STet9DDpXQBQDXXS0a52, generation: 96tdcTv3kQ5KUQlgYVdp, seconds: 73.17}
@@ -65,40 +66,40 @@ takes:
   - {key: "episodes/06-what-ai-shipped.md#5", session: Ekio7tx1lWF8X6UxgRzr, generation: bN2eehsQzFNMOWHogrsX, seconds: 39.55}
   - {key: "episodes/06-what-ai-shipped.md#6", session: ceRPHQNYnIwuPAA8EB04, generation: OKRaILRKCLrajdA34JKq, seconds: 41.87}
   - {key: "episodes/06-what-ai-shipped.md#7", session: CpsUJ67NjZKl4aKIBq0y, generation: zlvkXwmwjGYkgzg8g78D, seconds: 75.55}
-  - {key: "episodes/06-what-ai-shipped.md#8", session: HaCxB1cQKV1DwG7OGmHZ, generation: gHcKATqiJgeWzohmr0lx, seconds: 46.29}
+  - {key: "episodes/06-what-ai-shipped.md#8", session: RLCxOtwEwwRId6p8htZj, generation: GB5mlZE5jvwbOraOqki9, seconds: 46.64}
   - {key: "episodes/06-what-ai-shipped.md#9", session: FCHTxt2IWVlm9AF93Cjf, generation: h3ctBPjIjVios5Qql8As, seconds: 30.75}
-  - {key: "episodes/06-what-ai-shipped.md#10", session: Nc39u9TZIMVf7d29RKyI, generation: kCfKulk0rf4eYjQoRTrY, seconds: 72.75}
+  - {key: "episodes/06-what-ai-shipped.md#10", session: LE1c2RzIJAywhRW9gBY0, generation: 139UFR2vW1Bz4zUnaTNL, seconds: 68.56}
   - {key: "episodes/06-what-ai-shipped.md#11", session: hqfo61TDopMtDcHdEB9B, generation: Kwi2RrfKZrrRZrmd3mO3, seconds: 19.12}
   - {key: "episodes/06-what-ai-shipped.md#12", session: uPUehLChEcuh9MXD02S9, generation: NsdOxZ72Wz6B3OPc31c3, seconds: 35.87}
   - {key: "episodes/06-what-ai-shipped.md#13", session: E0B7nMXgp2gkr0TeKuw8, generation: dUVtRceXxrOsmfCG0c7W, seconds: 8.83}
   - {key: "episodes/07-where-ai-lands.md#1", session: 6Xrzneg0SpmDFmNBZHkW, generation: cwwJyZBLOHS3nTcLEbh2, seconds: 14.68}
-  - {key: "episodes/07-where-ai-lands.md#3", session: cXU7GQcLfguXJghJiNam, generation: Y0Vrx3lB45E5FIAoStrw, seconds: 47.07}
+  - {key: "episodes/07-where-ai-lands.md#3", session: YRGPlyRcMGQEQHuygpQo, generation: 5oG8dB7rmvhXC1o9Cp25, seconds: 45.60}
   - {key: "episodes/07-where-ai-lands.md#4", session: oNGFI8oKcX3OoY8x4yUL, generation: 7otnvKOdqtYOm694jvHY, seconds: 20.88}
-  - {key: "episodes/07-where-ai-lands.md#5", session: ZxtlB4585ud38F2vIS5S, generation: 3ZViYgjl671hHEkYdw8C, seconds: 39.76}
+  - {key: "episodes/07-where-ai-lands.md#5", session: NgOoEUnLORE5nHmSBKKl, generation: zjX9IF1I4zsLzMDIPl2S, seconds: 40.00}
   - {key: "episodes/07-where-ai-lands.md#6", session: eAKGn6dJHKGQ6ij0sbz1, generation: wbDjiVmZg0RDJL8zwuCF, seconds: 41.87}
   - {key: "episodes/07-where-ai-lands.md#7", session: FhallMTFdLzIuKpyenbb, generation: RurLOundm8DQUsylC0Zk, seconds: 28.68}
   - {key: "episodes/07-where-ai-lands.md#8", session: tJ5aaJD5R1tWct5PNfFR, generation: KwP2Kdjv6G4UxwKOqRDJ, seconds: 40.36}
   - {key: "episodes/07-where-ai-lands.md#9", session: fJVW301JN49n0IznqS4q, generation: JX3Ox5phG45GGEaPQa6t, seconds: 53.47}
-  - {key: "episodes/07-where-ai-lands.md#10", session: up1Xy02WMdDpHfabTQ0n, generation: WSuxe0HfG6pLztivuKMD, seconds: 73.52}
+  - {key: "episodes/07-where-ai-lands.md#10", session: 17QKSJ33MJlOYabEXpsi, generation: fSCZEOK2EvMlqpdBGxQF, seconds: 75.92}
   - {key: "episodes/07-where-ai-lands.md#11", session: k5RgixBSaj01k2JOKXlB, generation: gMeqD5masHyx1jnshsxk, seconds: 44.40}
   - {key: "episodes/07-where-ai-lands.md#12", session: b4WsZO97ve4xYddtTS3j, generation: tIGJBbnjN0WACGjjIAzn, seconds: 9.56}
   - {key: "episodes/08-vacant-lots.md#1", session: 37c0yURltlp7K0rvhqib, generation: 3wGhAZEIWVjMz4Fn13sL, seconds: 15.57}
-  - {key: "episodes/08-vacant-lots.md#3", session: qrI8oQlVgdIUiPzksSxs, generation: RefWr62wxQblJWu1LboV, seconds: 50.13}
+  - {key: "episodes/08-vacant-lots.md#3", session: epa1FODG9zGDPl2IqG2P, generation: AaF2DWb1dqzGPcJ8KEkG, seconds: 54.24}
   - {key: "episodes/08-vacant-lots.md#4", session: OCdStq3g3OBxbeJwavl3, generation: TM1kMgGShYtLsk2kfIrT, seconds: 52.35}
-  - {key: "episodes/08-vacant-lots.md#5", session: CaSj38j5Mlux4iNOHCNR, generation: UWgjArRwk82cpzDDPKLH, seconds: 49.12}
-  - {key: "episodes/08-vacant-lots.md#6", session: O1HiRUP2nz04Iua28Nh2, generation: MJwRC5FKbD26Dczp9q2O, seconds: 43.15}
-  - {key: "episodes/08-vacant-lots.md#7", session: fIUNXPmhVhWEprhh1yke, generation: BssuA5m0YbHkK6mLrYS3, seconds: 39.16}
-  - {key: "episodes/08-vacant-lots.md#8", session: g5D0WivUDxoOvWAWn6OF, generation: yJyAdvWqMmy5jT1nC0Gz, seconds: 35.47}
-  - {key: "episodes/08-vacant-lots.md#9", session: rHBsDcZpBFD8aueaL0JH, generation: nSkY8AptKnpUVnoatqQd, seconds: 39.00}
-  - {key: "episodes/08-vacant-lots.md#10", session: 1oUel8cU9O2SyNq56rDr, generation: ogMciIwTU6IhxycLd1Xq, seconds: 41.09}
+  - {key: "episodes/08-vacant-lots.md#5", session: meKa6qxPAybsx6m6Uu1F, generation: FnWsOTraw3ICUbe9SNoe, seconds: 49.36}
+  - {key: "episodes/08-vacant-lots.md#6", session: rxUiwuf10Qogzp22aVun, generation: oZk8XZC7NpohftwuPQAK, seconds: 40.08}
+  - {key: "episodes/08-vacant-lots.md#7", session: UkMe2hNi2x8c01pZMLDj, generation: ep34scBELz4KBqmbIGZV, seconds: 45.04}
+  - {key: "episodes/08-vacant-lots.md#8", session: hWg6WOXS5uAnTd5ZSY5K, generation: uFAcoOZK8L5DHehx7ECZ, seconds: 42.64}
+  - {key: "episodes/08-vacant-lots.md#9", session: JGT4GEge33BiVxsb8Jh2, generation: kbCISRq4RhOC1qf5Gltf, seconds: 32.00}
+  - {key: "episodes/08-vacant-lots.md#10", session: tKYtls30QKLxSupUyBJh, generation: w8DkiVXyO4g7QaC9KKZ1, seconds: 49.04}
   - {key: "episodes/08-vacant-lots.md#11", session: D1NjCO7YqHuQ3hKHTqLZ, generation: oyOAdxsVwqrPyAUf9Wga, seconds: 22.48}
   - {key: "episodes/08-vacant-lots.md#12", session: TozEV3rTvX9JLfrW2MNI, generation: yVU5HS3Oa1nlufeFk94n, seconds: 9.56}
   - {key: "episodes/09-bets.md#1", session: WJS5AjYhFTc7j1C74KGT, generation: pmFCBuE9XH2yJup3IsrS, seconds: 20.04}
-  - {key: "episodes/09-bets.md#3", session: KKekRz0aQWH1bWB81SlW, generation: oEcZJC2NtEiaJpB7Z3kd, seconds: 40.56}
+  - {key: "episodes/09-bets.md#3", session: BfXOfP8KwyVmGg34hXXs, generation: XiMMumSvir1yPIxGqAT3, seconds: 42.32}
   - {key: "episodes/09-bets.md#4", session: UalfruWH2hwyqGBWS8iY, generation: ipnfTEls74hu3B4rB3ue, seconds: 43.04}
   - {key: "episodes/09-bets.md#5", session: 2qYL73nI9k4BaAXbv6mu, generation: E0r0ogvOG3fuEZ4tc0mT, seconds: 68.60}
   - {key: "episodes/09-bets.md#6", session: HeQQ9QSV5n9H4OCQqvDA, generation: CLqYba6ngQYswYp25ktO, seconds: 21.79}
-  - {key: "episodes/09-bets.md#7", session: 5WuKVxTzuEwhreRxqnYf, generation: WcbLZtTVeF42R3EzorYN, seconds: 53.08}
+  - {key: "episodes/09-bets.md#7", session: MrhlAa9sMUMZrJFDBe2A, generation: WGvf6LwZ2T83bpY3W0Td, seconds: 53.76}
   - {key: "episodes/09-bets.md#8", session: 1cYDy2QhcGf6qgS1uRNC, generation: ydyIPGwprzMS0J88yn2Y, seconds: 31.01}
   - {key: "episodes/09-bets.md#9", session: uoduVnzd9MEuZkp61q0b, generation: RFJGSPiHliAIAisHe9do, seconds: 37.49}
   - {key: "episodes/09-bets.md#10", session: ipA3GsD0vDM28rKzry7p, generation: zn96gBjxEUtmT54xGYru, seconds: 29.57}
@@ -126,8 +127,8 @@ takes:
   - {key: "episodes/11-keeping-score.md#11", session: 8fcslNdwZnkUn7VRWxJJ, generation: kRfVfzBJpiEDYA94RR27, seconds: 14.21}
   - {key: "episodes/12-how-this-was-made.md#1", session: Se9TAA7uYXwlrjYrE5Yo, generation: PbD0CQyUVhFfoCD770jk, seconds: 17.40}
   - {key: "episodes/12-how-this-was-made.md#3", session: UgtytCyUQDlp5pdJ8D1V, generation: KAlcrAnNEfxwhHrDCBQb, seconds: 68.21}
-  - {key: "episodes/12-how-this-was-made.md#4", session: xYDolpkCCVz7SugvzCTB, generation: 2ToNVszok9tTWtjCLY3u, seconds: 40.12}
-  - {key: "episodes/12-how-this-was-made.md#5", session: wQbIG6m3w7Jzu2Fz3hLG, generation: aHq3NBIjup2dzG2YgRJr, seconds: 79.96}
+  - {key: "episodes/12-how-this-was-made.md#4", session: DpeqVTyQjp9hJ3fHEbXc, generation: Q8V6PRtCgs2nKG4ptwev, seconds: 45.28}
+  - {key: "episodes/12-how-this-was-made.md#5", session: U9JWQXEhwu7IwVzDtMgC, generation: KrNpnDcBvxyDBOBsB80m, seconds: 79.92}
   - {key: "episodes/12-how-this-was-made.md#6", session: atyqFeOlekmk3uZDj9J0, generation: W7HD7jVafTOqo0fDfTr9, seconds: 47.96}
   - {key: "episodes/12-how-this-was-made.md#7", session: xCSoxC0tSUOvSgGJlPHg, generation: uxpL7ydkr1dms5IJNtVW, seconds: 60.56}
   - {key: "episodes/12-how-this-was-made.md#8", session: p0xbnC9Q86lmRhBMGVhA, generation: IO7czVFkBMKyj9srqYzF, seconds: 32.91}
@@ -148,14 +149,14 @@ takes:
   - {key: "mega/the-film.md#ep11.6", session: ZElIn9725uIwy233zBOc, generation: yJMlgZuSZ0LP0ONMY53X, seconds: 44.12}
   - {key: "mega/the-film.md#ep12.4", session: rjQEUPZ46vxPffbWDnxS, generation: gzgtJV4PfUbkOr5EJPav, seconds: 40.28}
   - {key: "mega/the-film.md#ep12.5", session: fATyTFmrYarmgooKSteS, generation: YWWFXbY0ddfkCVQlsL7i, seconds: 81.71}
-  - {key: "shorts/001-five-most-common.md", session: tKQv4URKzLYVTCDs73lr, generation: hT9TD2NRlf6uph8fWdgI, seconds: 34.48}
-  - {key: "shorts/002-stardew-older-parts.md", session: QekYGnjCBQZiKEp4CK1U, generation: q4a2VXg8nHHVZU2UHTOc, seconds: 36.36}
-  - {key: "shorts/003-border-and-daughter.md", session: S1MWlwxzCtlIwFPH1lta, generation: cST04m2sqPoSJ5EbVpOG, seconds: 31.36}
+  - {key: "shorts/001-five-most-common.md", session: ocMX4Q16ZwRHhemanRUF, generation: V9mSPJ7A4glJkVT0quzk, seconds: 37.60}
+  - {key: "shorts/002-stardew-older-parts.md", session: a0OSsRCaa7StiCTdfPY9, generation: UtgmKTGt7JiVJqQI6vPd, seconds: 37.28}
+  - {key: "shorts/003-border-and-daughter.md", session: aoVr8LzJbsiBS8iHJSq2, generation: f98Rzdvf9tJa9tS5oKUI, seconds: 32.16}
   - {key: "shorts/004-decorating-makes-raids-bigger.md", session: kIArxtaGFwYk44nNUFwV, generation: HCe9yqokKlvrUxdr459q, seconds: 32.68}
   - {key: "shorts/005-the-fridge-knows.md", session: MyvdeB8Et99vFGiH3MLa, generation: pWDuEgFNuqD8i1x6gTH3, seconds: 32.44}
   - {key: "shorts/006-one-normal-technique.md", session: T3HKIlq3JmjbCGIS3brp, generation: 1Qj9j7iivV5t41GbDdps, seconds: 36.91}
-  - {key: "shorts/007-most-used-least-touched.md", session: rVnCei7DpxohhmnjOCha, generation: mR0eeRuncYDEFyNNK6Ba, seconds: 32.21}
-  - {key: "shorts/008-city-builders-no-stories.md", session: RPvGqevKSbuvJfGodCMF, generation: SyynSD9QGLf29RZvbCy4, seconds: 34.12}
+  - {key: "shorts/007-most-used-least-touched.md", session: fXghCLBGwlG4urjoykqu, generation: Zh2sFQ2fmGbHMnmuxxSI, seconds: 34.72}
+  - {key: "shorts/008-city-builders-no-stories.md", session: NCd4K6Z01vtm6QuLzHdz, generation: WNwEFHzWIIMn9yTjs9X1, seconds: 40.56}
   - {key: "shorts/009-why-button.md", session: U96PSYpg8lOIfnc48NAV, generation: jwxEoP2hRQ495BVZfQLo, seconds: 35.16}
   - {key: "shorts/010-desync.md", session: dvksYFFDKDSIc1GUr6d8, generation: 5sUmZIUb5RSZNNzxYUrw, seconds: 31.48}
   - {key: "shorts/011-same-day.md", session: WhYNLcG81fE1BZtU4m2P, generation: uV6b5LUEEotyXP0ZLZv1, seconds: 31.09}

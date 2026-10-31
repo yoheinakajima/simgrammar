@@ -99,6 +99,13 @@ mechanics:
   role: supporting
 - id: free-placement
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: The city starts with a sum of money; taxes and service budgets set income and spending, and
+    money buys new land tiles.
+- id: content-sharing
+  role: supporting
+  note: Player-made buildings, vehicles, and maps are shared and downloaded through the Steam Workshop.
 influenced_by:
 - simcity-4
 store_ids:
@@ -119,3 +126,4 @@ provenance:
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-25-store-ids-pilot
+  - 2026-10-31-tag-audit

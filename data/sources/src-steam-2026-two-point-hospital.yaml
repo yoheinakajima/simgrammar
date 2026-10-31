@@ -1,0 +1,15 @@
+id: src-steam-2026-two-point-hospital
+type: source
+name: Two Point Hospital on Steam
+kind: store-page
+authors:
+- Two Point Studios
+venue: Steam
+date: '2026'
+url: https://store.steampowered.com/app/535930/Two_Point_Hospital/
+accessed: '2026-10-31'
+notes: Two Point Studios, published by Sega; design rooms and corridors for patient and cash flow; upgrade machines,
+  staff, and layouts to make more money; set treatment prices, watch turnover, take out loans; balance the workforce
+  against profit.
+provenance:
+  created: 2026-10-31-tag-audit

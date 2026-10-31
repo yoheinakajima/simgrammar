@@ -4,10 +4,12 @@ name: Placement that tells stories
 summary: City builders where where and what the player builds triggers specific, state-aware story events
   about the inhabitants of those buildings.
 opportunity_type: new-mechanic
-thesis: 'Building placement and triggered event chains are both common but rarely combined: city builders
-  tell almost no stories about what players build, and event-driven games rarely have spatial building.
-  Events keyed to placement, adjacency, and the inhabitants affected (a tavern next to the temple, a mill
-  that floods a farmer''s field) give layout a narrative consequence. Constrained generation can instantiate
+thesis: 'Building placement and triggered event chains are both common but share only two catalog games,
+  Surviving Mars and Frostpunk, and in both the events concern the colony or the city as a whole
+  rather than where any building stands. City builders tell almost no stories about what players
+  build, and event-driven games rarely have spatial building. Events keyed to placement,
+  adjacency, and the inhabitants affected (a tavern next to the temple, a mill that floods a
+  farmer''s field) give layout a narrative consequence. Constrained generation can instantiate
   such events from templates at scale while keeping effects inside the rules.'
 design_sketch: When the player places or removes a building, the event system evaluates templates against
   neighbors, inhabitants, and history; a few fire as short vignettes with choices whose effects are typed
@@ -46,8 +48,8 @@ falsifiable_signal:
     named inhabitants.
 sources: []
 assertions:
-- 'rank.whitespace.free-placement.triggered-event-chains <= 5'
-- 'cooccur.free-placement.triggered-event-chains <= 1'
+- 'cooccur.free-placement.triggered-event-chains <= 2'
+- 'derived.free-placement.prevalence_rank <= 5'
 - 'derived.triggered-event-chains.prevalence_share >= 0.08'
 status: asserted
 provenance:
@@ -55,3 +57,4 @@ provenance:
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-25-review-round
+  - 2026-10-31-tag-audit

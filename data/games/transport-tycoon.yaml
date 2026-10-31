@@ -108,6 +108,9 @@ mechanics:
     map, with costs for terrain changes and demolition.
 - id: variable-speed
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: The company starts on borrowed money and pays interest until the loan is repaid.
 influenced_by:
 - railroad-tycoon
 - simcity-2000
@@ -119,3 +122,4 @@ provenance:
   created: 2026-10-24-catalog-ge
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

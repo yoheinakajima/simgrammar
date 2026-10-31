@@ -96,6 +96,10 @@ mechanics:
 - id: weather
   role: supporting
   note: Weather and seasons affect solar and wind output and climate conditions.
+- id: budget-treasury
+  role: supporting
+  note: Tax rates, fees, and ordinances fund the city, and city funds buy more map tiles as milestones
+    are reached.
 influenced_by:
 - cities-skylines
 sources:
@@ -107,3 +111,4 @@ provenance:
   created: 2026-10-24-catalog-ga
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

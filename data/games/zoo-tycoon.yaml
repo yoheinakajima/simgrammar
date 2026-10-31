@@ -75,6 +75,9 @@ mechanics:
   note: Scenery such as topiary, lamp posts, and benches gives a small guest happiness boost.
 - id: variable-speed
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Guest and animal happiness keep income steady, and research costs money.
 sources:
 - src-wikipedia-zoo-tycoon
 status: sourced
@@ -82,3 +85,4 @@ provenance:
   created: 2026-10-24-catalog-ge
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

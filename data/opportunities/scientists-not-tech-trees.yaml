@@ -4,11 +4,12 @@ name: Research by named scientists
 summary: Replace the abstract research meter with named researchers whose skills, relationships, and rivalries
   determine what gets discovered and when.
 opportunity_type: mechanic-upgrade
-thesis: 'Tech trees are among the most widely used mechanics in the catalog and among the least simulated: research
-  is a currency spent on a graph. Relationship systems are common too, but the white-space analysis shows
-  the two rarely meet. Research performed by a small population of named scientists with skills, collaborations,
-  and grudges turns progression into a social system and makes breakthroughs into stories, using the same
-  agent stack as colony sims.'
+thesis: 'Tech trees are among the most widely used mechanics in the catalog and among the least
+  simulated: research is a currency spent on a graph. Relationship systems are common too, but the
+  two share only two catalog games, Crusader Kings III and RimWorld, and in neither do the
+  researchers'' relationships change what is discovered. Research performed by a small population
+  of named scientists with skills, collaborations, and grudges turns progression into a social
+  system and makes breakthroughs into stories, using the same agent stack as colony sims.'
 design_sketch: 'Each project needs a lead and collaborators; compatibility and rivalry change speed and
   the chance of side discoveries; scientists publish, poach, and defect. The tech graph becomes partially
   stochastic: what is discovered depends on who works together.'
@@ -47,10 +48,11 @@ sources: []
 assertions:
 - 'derived.tech-tree.prevalence_rank <= 5'
 - 'derived.relationship-values.prevalence_share >= 0.08'
-- 'rank.whitespace.relationship-values.tech-tree <= 10'
+- 'cooccur.relationship-values.tech-tree <= 2'
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-25-contributor-readiness
+  - 2026-10-31-tag-audit

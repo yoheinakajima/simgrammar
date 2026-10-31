@@ -22,7 +22,7 @@ The opportunities share a small set of principles, each a response to the ceilin
 
 ### 9.3 By the ceiling they relax
 
-**Legibility.** [[causal-why-query]] answers why-questions from the event log; [[bottleneck-explainer]] points at the binding constraint in production networks, a widely used mechanic with no technique attached;{{assert:derived.production-chain.technique_exposure == 0}} [[branch-preview-forecasts]] shows distributions of futures before a decision; [[explained-delegation]] makes delegated subsystems accountable; [[sim-instructor-coach]] narrates mistakes in operation sims.
+**Legibility.** [[causal-why-query]] answers why-questions from the event log; [[bottleneck-explainer]] points at the binding constraint in production networks, a widely used mechanic that one technique reaches, and only as a playtester;{{assert:derived.production-chain.technique_count == 1}} [[branch-preview-forecasts]] shows distributions of futures before a decision; [[explained-delegation]] makes delegated subsystems accountable; [[sim-instructor-coach]] narrates mistakes in operation sims.
 
 **Authoring cost.** [[content-elastic-events]] removes the ceiling on event decks; [[generated-inspection-shifts]] gives rule-checking games endless fair cases; [[generative-decoration-catalogs]] and [[learned-build-assist]] widen creative modes; [[generated-recipe-graphs]] and [[qd-scenario-libraries]] cut the cost of progression content; [[language-modding]] hands extension to players.
 

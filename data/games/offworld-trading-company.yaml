@@ -80,6 +80,9 @@ mechanics:
   role: supporting
 - id: free-placement
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Each company's cash comes from selling resource stockpiles, and enough of it buys out a rival.
 influenced_by:
 - mule
 - railroad-tycoon
@@ -93,3 +96,4 @@ provenance:
   created: 2026-10-24-catalog-ge
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

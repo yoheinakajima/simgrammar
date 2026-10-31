@@ -103,12 +103,17 @@ mechanics:
   role: supporting
 - id: utility-action-selection
   role: supporting
+- id: budget-treasury
+  role: supporting
+  note: Treatment prices, staff wages, and loans set the hospital bank balance.
 influenced_by:
 - theme-hospital
 sources:
 - src-wikipedia-two-point-hospital
+- src-steam-2026-two-point-hospital
 status: sourced
 provenance:
   created: 2026-10-24-catalog-ge
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-tag-audit

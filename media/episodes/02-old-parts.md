@@ -86,7 +86,7 @@ Target runtime about 12 minutes: about 1,270 words of narration at 135 words a m
 
 **Frame.** anatomy at="Little Computer People, from 1985" game=little-computer-people parts=firsts
 
-**Voice.** Elite, from 1984, regenerated eight galaxies of 256 systems from a seed instead of storing them, which let a universe fit on an eight-bit machine. It is the catalog's first game with generated terrain and with trade routes.{{assert:derived.procedural-terrain.earliest_game == elite}}{{assert:derived.trade-routes.earliest_game == elite}} The Incredible Machine, from 1993, brought rigid-body physics and sharing your designs with other players, and its physics has no random numbers, so a machine that works once works every time.{{assert:derived.rigid-body-physics.earliest_game == the-incredible-machine}}{{assert:derived.content-sharing.earliest_game == the-incredible-machine}}
+**Voice.** Elite, from 1984, regenerated eight galaxies of 256 systems from a seed instead of storing them, which let a universe fit on an eight-bit machine. It is the catalog's first game with a generated map, and the first with trade routes.{{assert:derived.procedural-terrain.earliest_game == elite}}{{assert:derived.trade-routes.earliest_game == elite}} The Incredible Machine, from 1993, brought rigid-body physics and sharing your designs with other players, and its physics has no random numbers, so a machine that works once works every time.{{assert:derived.rigid-body-physics.earliest_game == the-incredible-machine}}{{assert:derived.content-sharing.earliest_game == the-incredible-machine}}
 
 **Voice.** Little Computer People, from 1985, introduced needs that decay, personality traits, and typing requests in plain English to a character who decides, depending on his mood, whether to do what you ask.{{assert:derived.needs-decay.earliest_game == little-computer-people}}{{assert:derived.natural-language-interaction.earliest_game == little-computer-people}} Each disk's serial number seeded a different resident.
 
@@ -164,8 +164,8 @@ Target runtime about 12 minutes: about 1,270 words of narration at 135 words a m
 
 **Voice.** Try it with a game from this year. List its parts, look up the first catalog game for each, and count the new ones. Most of the time you will find a few, and they are usually the parts the game is known for.
 
-**Picture.** The design map of the catalog fades in, islands of games, with Factorio and Anno 1800 highlighted on different islands.
+**Picture.** The design map of the catalog fades in, islands of games, with Factorio and Anno 1800 highlighted on the same island.
 
-**Voice.** Factorio and Anno 1800 are both built on production chains, and the dataset puts them in different families. Next episode: how those families are drawn, and the games they put side by side.{{assert:cocluster.factorio.anno-1800 < 0.5}}
+**Voice.** Factorio and Anno 1800 are both built on production chains, and the dataset puts them in one family, with the other factory games and settlement builders. Next episode: how those families are drawn, and the games they put side by side.{{assert:cocluster.factorio.anno-1800 >= 0.9}}{{assert:derived.factorio.cluster == derived.anno-1800.cluster}}
 
 **On screen.** Every part and the first game that had it: simgrammar.com
