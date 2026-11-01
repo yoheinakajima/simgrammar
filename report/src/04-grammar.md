@@ -4,14 +4,56 @@
 
 This report proposes six layers as a frame for reading any simulation game, with each mechanic filed under the layer where it does most of its work. The dataset does not tag layers, so the frame organizes the analysis and is not tested by it.
 
-1. **Substrate: what exists.** State is held as aggregate stocks (a treasury, a population count), individual agents (a colonist with needs), fields on a grid (pollution, temperature, land value), networks (roads, pipes, social ties), or continuous bodies (a wing, a chassis). The substrate fixes the cost curve: aggregates are cheap and faceless, agents are expensive and legible, fields scale with map area, continuous physics scales with contacts and timestep. The `substrate` field on every mechanic records this ({{table:mechanics-by-substrate}}).
-2. **Dynamics: how it changes.** Update rules form feedback loops. Most simulation games pair a reinforcing growth loop (more citizens, more taxes, more buildings) with balancing loops that resist it (congestion, pollution, unrest, raids). Difficulty is the relative strength of those loops; a death spiral is a reinforcing loop running in reverse. The `feedback` field records the dominant polarity per mechanic.
-3. **Coupling: how subsystems touch.** Depth comes less from the number of systems than from how many share state. Systems couple through shared stocks (power, money, labor), shared space (a factory lowers neighboring land value), and shared agents (the same colonist hauls, eats, and grieves). [[dwarf-fortress]] is deep because nearly everything touches nearly everything else; a game with many isolated systems feels like many small games.
-4. **Control: how intent enters.** The player acts directly (an avatar, a unit), places and zones, sets parameters, issues orders that agents pick up, writes programs, or speaks. Each step away from direct control widens the *control gap*, the designed distance between what the player wants and what happens. Too narrow and the game is a toy; too wide and the player is a spectator. {{table:games-by-agency}}
-5. **Legibility: how state leaves.** Overlays, inspectors, tooltips, advisors, alerts, graphs, chronicles, and forecasts expose hidden state. This layer is what lets deep simulations ship: [[rimworld]] itemizes every mood modifier, and Paradox games nest tooltips until each number decomposes into causes. Legibility mechanics own no simulation state of their own; they are the interface between coupling and comprehension.
-6. **Pacing and stakes: when the player looks and what can be lost.** Time models (pause, speed, turns, wall clock), failure models (soft setbacks, permadeath, cascading collapse), and narrative directors decide when attention is demanded and what a mistake costs. {{table:games-by-time-model}}
+1. **Substrate: what exists.** State is held as aggregate stocks (a treasury, a population count), individual agents (a colonist with needs), fields on a grid (pollution, temperature, land value), networks (roads, pipes, social ties), or continuous bodies (a wing, a chassis). The substrate fixes the cost curve: aggregates are cheap and faceless, agents are expensive and legible, fields scale with map area, continuous physics scales with contacts and timestep. The `substrate` field on every mechanic records this (first table below).
+2. **Dynamics: how it changes.** Update rules form feedback loops. Most simulation games pair a reinforcing growth loop (more citizens, more taxes, more buildings) with balancing loops that resist it (congestion, pollution, unrest, raids). On this frame's reading, difficulty is the relative strength of those loops, and a death spiral is a reinforcing loop running in reverse. The `feedback` field records the dominant polarity per mechanic.
+3. **Coupling: how subsystems touch.** The frame's hypothesis is that depth comes less from the number of systems than from how many share state. Systems couple through shared stocks (power, money, labor), shared space (a factory lowers neighboring land value), and shared agents (the same colonist hauls, eats, and grieves). [[dwarf-fortress]], where nearly everything touches nearly everything else, is consistent with the hypothesis, and a game with many isolated systems can feel like many small games; the dataset measures neither depth nor coupling. The couplings it does record are judged edges between mechanics, {{count:edge:synergy}} `synergy` and {{count:edge:tension}} `tension`, which one run added in a single pass over the taxonomy against one-line definitions rather than operational criteria (§2.5). They record that run's judgment, and a pair with no tension edge is unmeasured, not known to be compatible.
+4. **Control: how intent enters.** The player acts directly (an avatar, a unit), places and zones, sets parameters, issues orders that agents pick up, writes programs, or speaks. Each step away from direct control widens the *control gap*, the designed distance between what the player wants and what happens. Too narrow and the game is a toy; too wide and the player is a spectator (second table below).
+5. **Legibility: how state leaves.** Overlays, inspectors, tooltips, advisors, alerts, graphs, chronicles, and forecasts expose hidden state. The frame proposes that this layer is what lets deep simulations ship: [[rimworld]] itemizes every mood modifier, and Paradox games nest tooltips until each number decomposes into causes. Legibility mechanics own no simulation state of their own; they are the interface between coupling and comprehension.
+6. **Pacing and stakes: when the player looks and what can be lost.** Time models (pause, speed, turns, wall clock), failure models (soft setbacks, permadeath, cascading collapse), and narrative directors decide when attention is demanded and what a mistake costs (third table below).
+
+{{table:mechanics-by-substrate}}
+
+*Mechanics by the kinds of state they hold (`substrate`). A mechanic can hold more than one kind and is counted once under each, so the unit is a mechanic-substrate pair and the column can sum to more than the {{count:mechanic}} mechanics.*
+
+{{table:games-by-agency}}
+
+*Games by agency model (`agency_model`). A game can combine several ways of acting and is counted once under each, so the unit is a game-agency pair and the column can sum to more than the {{count:game}} games.*
+
+{{table:games-by-time-model}}
+
+*Games by time model (`time_model`). Each game has exactly one, so the unit is a game and the column sums to the {{count:game}} games.*
 
 A compact description of a simulation game is its investment profile across these layers. City builders invest in substrate (fields and networks) and legibility (overlays); colony sims in agents, coupling, and pacing (storytellers); vehicle sims in continuous substrate and direct control; programming games in control alone, with nearly no hidden state. These profiles are a reading of the catalog; the clustering (§5) works from each game's mechanics alone and is told neither the subgenres nor the layers.
+
+The next table is this paper's proposal for how its three frames fit together: for each family of §4.2, the layer where its mechanics mostly work, and the ceilings of §6 that bear on it most. The dataset tags each mechanic's family and tags neither layers nor ceilings, so the table organizes the reading and is not a result. The ceilings are a judgment drawn from §6 and from the family means in its ceilings figure; determinism is a property of techniques (§6.4), so it is listed where a family's mechanics depend on reproducible or shared state.
+
+| Family | Primary layer | Ceilings that bear on it |
+|---|---|---|
+| {{vocab:mechanic_family:resources-production}} | Dynamics | none in particular |
+| {{vocab:mechanic_family:logistics-networks}} | Coupling | compute, legibility |
+| {{vocab:mechanic_family:economy-finance}} | Dynamics | none in particular |
+| {{vocab:mechanic_family:agents-behavior}} | Dynamics | believability, authoring, compute |
+| {{vocab:mechanic_family:social-relations}} | Coupling | believability, authoring, legibility |
+| {{vocab:mechanic_family:population-lineage}} | Dynamics | compute, legibility |
+| {{vocab:mechanic_family:governance-policy}} | Control | legibility |
+| {{vocab:mechanic_family:space-construction}} | Control | authoring |
+| {{vocab:mechanic_family:physics-materials}} | Substrate | compute, determinism |
+| {{vocab:mechanic_family:environment-ecology}} | Dynamics | compute, legibility |
+| {{vocab:mechanic_family:biology-health}} | Dynamics | authoring, believability |
+| {{vocab:mechanic_family:time-pacing}} | Pacing and stakes | none in particular |
+| {{vocab:mechanic_family:information-legibility}} | Legibility | legibility, as the answer to it |
+| {{vocab:mechanic_family:control-automation}} | Control | compute, determinism |
+| {{vocab:mechanic_family:progression-goals}} | Pacing and stakes | authoring |
+| {{vocab:mechanic_family:risk-failure}} | Pacing and stakes | none in particular |
+| {{vocab:mechanic_family:narrative-generation}} | Pacing and stakes | authoring, determinism |
+| {{vocab:mechanic_family:world-generation}} | Substrate | compute |
+| {{vocab:mechanic_family:multiplayer-persistence}} | Pacing and stakes | determinism, compute |
+| {{vocab:mechanic_family:conflict-defense}} | Pacing and stakes | compute, legibility |
+| {{vocab:mechanic_family:operation-procedure}} | Control | authoring |
+
+*The paper's proposal, not a tagged field: each mechanic family's primary layer (§4.1) and the ceilings (§6) that bear on it most. Authoring is the authoring-cost ceiling, believability the believability of agents.*
+
+The word legibility does four jobs here, and they differ in what stands behind them. The legibility layer is the job of getting state out to the player; the information-and-legibility family is the mechanics that do that job (§4.2); the legibility ceiling is the limit on how much hidden state a player can follow (§6.3); and the legibility score is one rater's reading of how easily a player forms an accurate model of a single mechanic (§2.3). The family is a tagged field and the score a judged number, while the layer and the ceiling are this paper's frames.
 
 {{viz:layer-profile}}
 
