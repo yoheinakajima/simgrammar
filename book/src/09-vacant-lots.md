@@ -28,13 +28,13 @@ In [[theme-hospital|Theme Hospital]] a GP diagnoses patients or sends them to sp
 
 Packages also show how slowly the vocabulary recombines. A designer who starts a city builder inherits zoning, demand, land value, and traffic; one who starts a grand strategy game inherits war score and conversion. Packages are part of why later games reuse old parts (chapter 3) and why games cluster into families (chapter 4): a family is held together by mechanics that rarely travel alone.
 
-## Lots no one has built
+## Empty lots
 
-Most pairs of mechanics have never shared a game because one of the two is rare. The lots worth looking at, the white space, are pairs of common mechanics, from different families, that almost never meet and have no recorded reason to fight.
+Most pairs of mechanics have never shared a catalog game because one of the two is rare. The lots worth looking at, the white space, are pairs of common mechanics, from different families, that almost never meet in the catalog and have no recorded reason to fight.
 
 <details class="disclosure"><summary>which empty pairs count</summary>
 
-Most possible pairs of mechanics have never shared a game, and most of those empty pairs are uninteresting, because at least one of the two mechanics is rare. The white-space analysis keeps only the pairs where the emptiness means something. Both mechanics must appear in at least {{stat:whitespace_min_games}} catalog games. They must come from different families, since two mechanics from the same family are often alternatives. Neither may be a time-and-pacing control, because a game's time model already decides them. The pair must not be recorded as being in design tension: the dataset holds {{count:edge:tension}} such edges, such as building assistance that favours organic shapes against strict structural rules that punish them. And the two must share at most one game. {{stat:n_whitespace_pairs}} pairs pass.{{assert:n_whitespace_pairs >= 100}}
+Most possible pairs of mechanics have never shared a catalog game, and most of those empty pairs are uninteresting, because at least one of the two mechanics is rare. The white-space analysis keeps only the pairs where the emptiness means something. Both mechanics must appear in at least {{stat:whitespace_min_games}} catalog games. They must come from different families, since two mechanics from the same family are often alternatives. Neither may be a time-and-pacing control, because a game's time model already decides them. The pair must not be recorded as being in design tension: the dataset holds {{count:edge:tension}} such edges, such as building assistance that favours organic shapes against strict structural rules that punish them. And the two must share at most one game. {{stat:n_whitespace_pairs}} pairs pass.{{assert:n_whitespace_pairs >= 100}}
 
 </details>
 
@@ -44,15 +44,15 @@ The figure lays out every pair of common mechanics as a plan of lots. The mechan
 
 {{viz:vacant-lots}}
 
-The ranking uses the gap between how often a pair would share games by chance and how often it does.
+The ranking uses the gap between how often a pair would share games by chance and how often it does. The last two columns check each pair against catalogs scattered at random with every game keeping its number of parts and every part its number of games: how often the pair shares a game there on average, and the share of those catalogs where it shares as few games as it does here.
 
 {{table:whitespace}}
 
-Read the table as a list of candidates for a designer to check, ranked by a simple measure.
+Read the table as a list of candidates for a designer to check, ranked by a simple measure. Each pair in it shares more games in at least 95 percent of the random catalogs than it does in the real one.{{assert:n_whitespace_top_null_p05 == whitespace_top_n}}
 
 <details class="disclosure"><summary>the limits of this list</summary>
 
-Expected co-occurrence treats each mechanic as spread across games independently of how many mechanics each game has. Games with many mechanics make every pair more likely, so a pair whose mechanics sit mostly in small games can look emptier than it is. A null model that preserved each game's size would shorten the list, and the dataset has not built one yet. The threshold is a choice too: {{stat:whitespace_min_games}} games was 8 percent of the catalog when it was fixed, and the analysis file records that it should be revisited as the catalog grows. A lot can also look empty because of where the vocabulary draws its lines; the Factorio blueprints in the next section are an example.
+Expected co-occurrence treats each mechanic as spread across games independently of how many mechanics each game has. The random catalogs keep each game's size, and because common mechanics sit mostly in larger games they expect more shared games than independence does for every pair on the list, so measured against them the gaps would be larger than the table shows.{{assert:n_whitespace_null_above_independence == n_whitespace_pairs}} The list as a whole is also longer than chance would make it: a random catalog has about {{stat:n_whitespace_pairs_null_mean}} pairs that pass the same screen, against {{stat:n_whitespace_pairs}} here.{{assert:n_whitespace_pairs > n_whitespace_pairs_null_hi}} Neither check knows which games each mechanic actually sits in, so a pair whose mechanics sit mostly in small games can still look emptier than it is. A pair also qualifies with one shared game or none, so one or two tags missing from a record can put it on the list, and {{stat:n_whitespace_pairs_asserted}} of the {{stat:n_whitespace_pairs}} pairs involve a mechanic that has no source yet. The tension edges that keep pairs off the list came from a single pass over the taxonomy, so a pair without one has never been judged compatible. The threshold is a choice too: {{stat:whitespace_min_games}} games was 8 percent of the catalog when it was fixed, and the analysis file records that it should be revisited as the catalog grows. A lot can also look empty because of where the vocabulary draws its lines; the Factorio blueprints in the next section are an example.
 
 </details>
 
@@ -92,11 +92,11 @@ Machines and friendships are a second. Modular assembly, building a ship, coaste
 
 Some of the catalog's games already stand on lots that no other catalog game has built. [[prison-architect|Prison Architect]] is the only one that both hires staff one by one and wires a power grid.{{assert:cooccur.staff-hiring.power-grid == 1}} [[kerbal-space-program|Kerbal Space Program]] is the only one that pairs a treasury with flying by hand: in career mode, contract payouts fund parts, fuel, crew, and facility upgrades, and the player still flies the ascent, the landing, and the docking.{{assert:cooccur.budget-treasury.embodied-skill-control == 1}}{{assert:rank.whitespace.budget-treasury.embodied-skill-control <= 10}} [[going-medieval|Going Medieval]] is the only one that pairs worker skills, which improve with use, with terrain the player digs out and fills: settlers who get better at hunting and combat live in cellars, moats, and caverns carved from the ground.{{assert:cooccur.agent-skills.terraforming == 1}}{{assert:rank.whitespace.agent-skills.terraforming <= 10}} [[schedule-i|Schedule I]] is the only one where production chains are run by staff hired one by one: botanists, cooks, and janitors work the player's properties, and higher products need multi-step chains at chemistry stations.{{assert:cooccur.production-chain.staff-hiring == 1}}{{assert:rank.whitespace.production-chain.staff-hiring <= 15}}
 
-Each of those pairs qualifies as white space, because the definition allows a single shared game. The table therefore holds two kinds of lot: the ones nobody has built and the ones exactly one game has.
+Each of those pairs qualifies as white space, because the definition allows a single shared game. The table therefore holds two kinds of lot: the ones no catalog game has built and the ones exactly one has.
 
 ## What makes a lot worth building
 
-The catalog is a sample. It favours games that are well documented in English, and a game outside it may already combine any of these pairs. That is the cheapest way to close a lot: find the game, add it to the catalog with its sources, and the build recomputes the table. If the pair stops qualifying, every sentence in this chapter that depends on it fails its assertion and has to be rewritten.
+The catalog is a sample. It favours games that are well documented in English, and a game outside it may already combine any of these pairs. That is the cheapest way to close a lot: find the game, add it to the catalog with its sources, and the build recomputes the table. If the pair stops qualifying, every sentence in this chapter that depends on it fails its assertion and has to be rewritten. In a catalog of {{count:game}} games, a lot nobody has built and a lot the catalog has not sampled look the same.
 
 A lot is worth building when the two mechanics feed each other. In the SimCity package, traffic lowers land value, and land value decides where the city grows and so where the traffic goes. Placement and events would feed each other if the events changed what the player builds next. Aging and production would if the workforce's age structure set the factory's throughput years later, the same demographic echo that fills Cities: Skylines' hearses, with a production consequence.
 

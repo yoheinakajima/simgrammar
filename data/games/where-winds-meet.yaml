@@ -38,7 +38,9 @@ core_loop: explore the open world -> talk to NPCs in free text or voice -> take 
 design_notes: Included as a boundary case for natural-language interaction at scale. The Steam AI disclosure
   describes NPC text and voice chat generated in real time from player input. The main questline and combat
   remain authored and rule-based, so the language model sits beside the simulation rather than inside
-  its state.
+  its state. `year` is the first public release, the open beta for PC in China in December 2024; the
+  worldwide release followed in November 2025. The Chinese and global versions are operated separately,
+  and the mechanics here are those of the global version that the Steam AI disclosure describes.
 mechanics:
 - id: natural-language-interaction
   role: core
@@ -58,8 +60,18 @@ claims:
   sources:
   - src-steam-2025-where-winds-meet
   confidence: high
+- text: The game's first public release was an open beta for PC in China on 2024-12-27, before the worldwide
+    release on 2025-11-14.
+  sources:
+  - src-wikipedia-where-winds-meet
+  confidence: high
+  quote: In China, the game was launched in open beta for PC on December 27, 2024
+  locator: Release
 sources:
 - src-steam-2025-where-winds-meet
+- src-wikipedia-where-winds-meet
 status: asserted
 provenance:
   created: 2026-10-24-catalog-additions
+  reviewed:
+  - 2026-10-31-es-review-growth-white-space

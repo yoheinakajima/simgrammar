@@ -352,7 +352,7 @@ def strata(shared, live, by_id, derived, fam):
         "min_width": 680,
         "data": data_script("strata", data),
         "twin": {"columns": ["year", "mechanic", "family", "first_game"], "rows": trows, "link_columns": ["mechanic", "first_game"],
-                 "note": "Every mechanic in order of first appearance in the catalog. First appearance is a lower bound on true origin."},
+                 "note": "Every mechanic in order of first appearance in the catalog. First appearance is an upper bound on the year a mechanic originated: it is at least that old."},
     }
 
 
