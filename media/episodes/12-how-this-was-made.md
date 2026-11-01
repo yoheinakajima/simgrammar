@@ -42,7 +42,7 @@ Target runtime about 11 minutes: about 1,190 words of narration at 135 words a m
 
 **Frame.** record script=episodes/01-same-parts.md find="Five of those six simulate nothing"
 
-**Voice.** Sentences are the hard part, because they interpret numbers. So every number in this series is a token the build fills in, and every sentence that interprets one carries a check. When episode 1 first said the five most common parts don't simulate anything, the build checked all five ranks. Then a check of the catalog's tags found games that keep a treasury without the tag, the treasury moved into the five, and the build failed until the line was rewritten.
+**Voice.** Sentences are the hard part, because they interpret numbers. So every number in this series is a token the build fills in, and every sentence that ranks, compares, or groups those numbers carries a check. The check confirms the sentence still matches the data; it can't tell whether the reading is right. When episode 1 first said the five most common parts don't simulate anything, the build checked all five ranks. Then a check of the catalog's tags found games that keep a treasury without the tag, the treasury moved into the five, and the build failed until the line was rewritten.
 
 ## 5. The rules came from failures (3:48 to 5:53)
 

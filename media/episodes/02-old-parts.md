@@ -30,13 +30,13 @@ Target runtime about 12 minutes: about 1,270 words of narration at 135 words a m
 
 **Voice.** That game is Hamurabi. The dataset behind this series lists {{derived:hamurabi.mechanic_count}} mechanics in it, and all of them are still in use. Crop growing turns up in {{derived:crop-cultivation.prevalence}} games in the catalog, including Stardew Valley.{{assert:derived.crop-cultivation.earliest_game == hamurabi}}{{assert:derived.crop-cultivation.prevalence >= 20}}
 
-## 4. A date is a lower bound (1:21 to 2:52)
+## 4. A date is an upper bound (1:21 to 2:52)
 
 **Picture.** A timeline. Each mechanic card drops onto the year of its first catalog game. Then a second, faded track appears above the first, labelled "outside the catalog": a mainframe program, a book cover, two board games, a Minecraft mod.
 
 **Frame.** timeline ids=variable-speed,free-placement,tech-tree,dynasty-succession,culture-religion-conversion
 
-**Voice.** Each date is the first game in this catalog with that part, so it is a floor: Hamurabi itself was written from a description of an older program, The Sumerian Game, from 1964.
+**Voice.** Each date is the first game in this catalog with that part, so the part is at least that old: Hamurabi itself was written from a description of an older program, The Sumerian Game, from 1964.
 
 **Voice.** Plenty of the rest came from outside games altogether. SimCity took its model of urban growth from Jay Forrester's book Urban Dynamics. Civilization took its technology tree from a board game, and Railroad Tycoon started from another board game, 1830. The Sims borrowed its idea of a house from an architecture book, A Pattern Language. Factorio grew out of two Minecraft mods that added pipes and machines.
 
@@ -54,9 +54,9 @@ Target runtime about 12 minutes: about 1,270 words of narration at 135 words a m
 
 ## 6. Testing the story (3:36 to 4:44)
 
-**Picture.** Thirty-seven cards shuffle out of the full catalog at random, then shrink to the sizes of the early games. A counter tallies the mechanics they cover. The shuffle repeats, fast, and a histogram of counts builds up. A marker shows where the real early games land.
+**Picture.** Cards shuffle out of the later games at random until they hold as many mechanic uses as the early games. A counter tallies the mechanics they cover. The shuffle repeats, fast, and a histogram of counts builds up. A marker shows where the real early games land.
 
-**Voice.** It looks like a golden age, and chance comes close to it. {{stat:n_games_by_2000}} games drawn at random from every era cover {{stat:n_mechanics_seen_null_mean}} mechanics on average, against {{stat:n_mechanics_seen_by_2000}} for the real early games.{{assert:n_mechanics_seen_null_mean <= n_mechanics_seen_by_2000}}{{assert:p_mechanics_seen_by_2000 > 0.05}}{{assert:p_mechanics_seen_by_2000 < 0.2}} A few dozen games from any period show most of the vocabulary. What holds up is narrower: new parts come from a handful of games in every decade, and later games are built mostly from parts that already existed.
+**Voice.** It looks like a golden age, and chance matches it. Random sets of later games, holding as many mechanic uses as the early ones, cover {{stat:n_mechanics_seen_null_uses_round}} mechanics on average, against {{stat:n_mechanics_seen_by_2000}} for the real early games.{{assert:n_mechanics_seen_null_uses_mean > n_mechanics_seen_by_2000}}{{assert:p_mechanics_seen_uses > 0.05}} A few dozen games from any period show most of the vocabulary. What holds up is narrower: new parts come from a handful of games in every decade.
 
 ## 7. The founding games (4:44 to 7:03)
 
