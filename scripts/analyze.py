@@ -898,12 +898,15 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             u = np.array([int(hashlib.sha256(f"{seed}:{b}:{gid}".encode()).hexdigest()[:12], 16) / 16 ** 12 for gid in gids])
             subs.append(np.flatnonzero(u < frac))
         Zs = [linkage(squareform(D[np.ix_(sb, sb)], checks=False), method="average") for sb in subs]
+        # every subsample's cut at every candidate k, kept for the curve and for the checks by k below
+        sub_cuts = {}
         curve = []
         for kk in range(st_cfg["k_min"], st_cfg["k_max"] + 1):
             Lk = fcluster(Z, t=kk, criterion="maxclust")
-            aris = [_ari_int(Lk[sb], fcluster(Zb, t=kk, criterion="maxclust")) for sb, Zb in zip(subs, Zs)]
+            sub_cuts[kk] = [fcluster(Zb, t=kk, criterion="maxclust") for Zb in Zs]
+            aris = [_ari_int(Lk[sb], lb) for sb, lb in zip(subs, sub_cuts[kk])]
             curve.append({"k": kk, "clusters": int(len(set(Lk.tolist()))), "mean_ari": _r(float(np.mean(aris)), 4), "_mean": float(np.mean(aris)),
-                          "p10_ari": _r(float(np.percentile(aris, 10)), 4),
+                          "p10_ari": _r(float(np.percentile(aris, 10)), 4), "p90_ari": _r(float(np.percentile(aris, 90)), 4),
                           "largest_cluster_share": _r(Counter(Lk.tolist()).most_common(1)[0][1] / N, 2)})
         thr, tol = float(st_cfg["min_mean_ari"]), float(st_cfg.get("drift_tolerance", 0.0))
         passing = [r for r in curve if r["_mean"] >= thr]
@@ -913,34 +916,41 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         # drift only when the evidence is clear: the configured k has fallen well below the threshold, or a smaller k
         # now clears it by the same margin. Differences inside the margin are resampling noise, not a reason to move k.
         drift = (k_chosen in mean_at and mean_at[k_chosen] < thr - tol) or any(r["_mean"] >= thr + tol for r in curve if r["k"] < k_chosen)
+        # the rule's pick under other thresholds (B2: the 0.75 is a convention, so show what it decides)
+        # (each alternatives list is reported by its lowest and highest value, as <stat>_lo and <stat>_hi)
+        alts = st_cfg.get("alternatives") or {}
+        for end, t_ in (("lo", min(alts.get("min_mean_ari", [thr]))), ("hi", max(alts.get("min_mean_ari", [thr])))):
+            hit = [r["k"] for r in curve if r["_mean"] >= float(t_)]
+            stats[f"cluster_min_mean_ari_{end}"] = float(t_)
+            stats[f"cluster_rule_k_{end}"] = hit[0] if hit else None
+        # the k the rule cannot tell from the configured one: the run of k up to it whose mean ARI is within the drift
+        # tolerance of the threshold (E28 asks whether the headline readings hold there)
+        k_near = k_chosen
+        while k_near - 1 in mean_at and mean_at[k_near - 1] >= thr - tol:
+            k_near -= 1
         for r in curve:
             r["selection"] = ", ".join(x for x, hit in (("configured", r["k"] == k_chosen), ("rule today", r["k"] == k_rule)) if hit)
             del r["_mean"]
-        tables["cluster-stability"] = {"description": f"Agreement between the full clustering and re-clusterings of {B} subsamples, each holding about {int(frac * 100)}% of games (adjusted Rand index), for each candidate k. The selection rule picks the smallest k whose mean ARI reaches {thr}; k is fixed in report/analysis.yaml from the last selection, and the validator warns (W107) only when the configured k falls more than {tol} below the threshold or a smaller k clears it by more than {tol}.",
-                                       "columns": ["k", "clusters", "mean_ari", "p10_ari", "largest_cluster_share", "selection"], "rows": curve}
+        tables["cluster-stability"] = {"description": f"Agreement between the full clustering and re-clusterings of {B} subsamples, each holding about {int(frac * 100)}% of games (adjusted Rand index between the full clustering restricted to the subsample's games and the subsample's own clustering, with its 10th and 90th percentiles across subsamples), for each candidate k. The selection rule picks the smallest k whose mean ARI reaches {thr}; k is fixed in report/analysis.yaml from the last selection, and the validator warns (W107) only when the configured k falls more than {tol} below the threshold or a smaller k clears it by more than {tol}.",
+                                       "columns": ["k", "clusters", "mean_ari", "p10_ari", "p90_ari", "largest_cluster_share", "selection"], "rows": curve}
         stats["cluster_rule_k"] = k_rule
         stats["cluster_k_drift"] = 1 if drift else 0
+        stats["cluster_k_near_min"] = k_near
+        stats["cluster_p10_ari"] = next(r["p10_ari"] for r in curve if r["k"] == k_chosen)
         labels = fcluster(Z, t=k_chosen, criterion="maxclust")
         co = np.zeros((N, N))
         both = np.zeros((N, N))
-        jac = defaultdict(list)
-        for sb, Zb in zip(subs, Zs):
-            lb = fcluster(Zb, t=k_chosen, criterion="maxclust")
+        for sb, lb in zip(subs, sub_cuts[k_chosen]):
             co[np.ix_(sb, sb)] += (lb[:, None] == lb[None, :])
             both[np.ix_(sb, sb)] += 1
-            # cluster-wise Jaccard (Hennig 2007): each full cluster against its best-matching subsample cluster
-            la = labels[sb]
-            ct = np.zeros((int(labels.max()) + 1, int(lb.max()) + 1))
-            np.add.at(ct, (la, lb), 1)
-            rows_, cols_ = ct.sum(1), ct.sum(0)
-            for c in range(1, ct.shape[0]):
-                if rows_[c] > 0:
-                    jac[c].append(float(np.max(ct[c] / (rows_[c] + cols_ - ct[c]))))
         C = np.where(both > 0, co / np.maximum(both, 1), 0.0)
         np.fill_diagonal(C, 1.0)
         cocluster = {"index": {g.id: i for i, g in enumerate(games)}, "value": lambda i, j: _r(float(C[i, j]), 3),
                      "together": st_cfg["together"], "apart": st_cfg["apart"]}
-        clust_jac = {c: float(np.mean(v)) for c, v in jac.items()}
+        # cluster-wise Jaccard (Hennig 2007, subsetting): the stability column. The full-membership version is reported
+        # beside it for comparison (E9); with 80% subsamples it cannot much exceed 0.8 even when nothing regroups.
+        clust_jac = _cluster_jaccard(labels, subs, sub_cuts[k_chosen])
+        full_jac = _cluster_jaccard(labels, subs, sub_cuts[k_chosen], restrict=False)
         clusters = defaultdict(list)
         for g, lab in zip(games, labels):
             clusters[int(lab)].append(g)
@@ -955,53 +965,290 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
                 scored.append((share_in * math.log((share_in + 1e-9) / (share_all + 1e-9) + 1), mid))
             scored.sort(key=lambda x: (-x[0], x[1]))
             topm = [mid for _, mid in scored[: cl["top_mechanics_per_cluster"]]]
-            subs = Counter(g.data.get("subgenre") for g in members).most_common(2)
+            top_subs = Counter(g.data.get("subgenre") for g in members).most_common(2)
             label = " + ".join(by_id[m].data["name"] for m in topm[:2])
             for g in members:
                 derived[g.id]["cluster"] = f"C{ci:02d}"
             crow.append({"cluster": f"C{ci:02d}", "label": label, "size": len(members),
                          "stability": _r(clust_jac.get(lab, 0.0), 2),
-                         "dominant_subgenres": ", ".join(f"{sub_terms.get(s, {}).get('label', s)} ({n})" for s, n in subs),
+                         "dominant_subgenres": ", ".join(f"{sub_terms.get(s, {}).get('label', s)} ({n})" for s, n in top_subs),
                          "signature_mechanics": topm,
                          "members": [g.id for g in sorted(members, key=lambda g: (float(np.mean([D[gidx[g.id], gidx[o.id]] for o in members])), g.id))]})
-        tables["game-clusters"] = {"description": f"Games clustered by weighted Jaccard similarity of mechanic sets (average linkage, k={k_chosen} chosen by subsample stability, core weight {cl['core_weight']}{', inverse-prevalence weighting so ubiquitous mechanics do not dominate' if cl.get('idf') else ''}). Stability is the mean Jaccard overlap between the cluster and its best match when {int(st_cfg['fraction'] * 100)}% subsamples are re-clustered (at least {st_cfg['stable_cluster']} counts as stable). Signature mechanics maximize within-cluster share x log-lift. Members are ordered by centrality (mean distance to the rest of the cluster), so the first members are the most typical.",
+        min_size = int(st_cfg.get("min_family_size", 1))
+        tables["game-clusters"] = {"description": f"Games clustered by weighted Jaccard similarity of mechanic sets (average linkage, k={k_chosen} chosen by subsample stability, core weight {cl['core_weight']}{', inverse-prevalence weighting so ubiquitous mechanics do not dominate' if cl.get('idf') else ''}). Stability is the cluster's mean best-match Jaccard overlap across {B} subsamples of about {int(st_cfg['fraction'] * 100)}% of games: in each subsample the cluster is restricted to the games the subsample keeps and compared with every cluster of the subsample's own clustering (for cluster A, subsample S, and subsample cluster B, |A n S n B| / |(A n S) u B|), the best match counts, and subsamples keeping none of the cluster's games are skipped. A cluster with stability of at least {st_cfg['stable_cluster']} and at least {min_size} games counts as stable. Signature mechanics maximize within-cluster share x log-lift. Members are ordered by centrality (mean distance to the rest of the cluster), so the first members are the most typical.",
                                    "columns": ["cluster", "label", "size", "stability", "dominant_subgenres", "signature_mechanics", "members"], "rows": crow,
                                    "link_columns": ["signature_mechanics", "members"], "max_links": 8}
-        # how often clusters cut across subgenres
-        cross = sum(1 for r in crow if len(set(by_id[g].data.get("subgenre") for g in r["members"])) > 1)
+        # how often clusters cut across subgenres: any second subgenre (the original count), and stricter shares (E8)
+        sub_lab = [g.data.get("subgenre") for g in games]
+        sub_names, sub_codes = np.unique(np.asarray(sub_lab, dtype=object).astype(str), return_inverse=True)
+        nS = len(sub_names)
+        mixed_shares = [float(s) for s in cl.get("mixed_shares", [])]
+        cross = _n_mixed(labels, sub_codes, nS)
         stats["n_clusters"] = len(crow)
         stats["n_clusters_cross_subgenre"] = cross
+        stats["pct_clusters_cross_subgenre"] = _r(100 * cross / len(crow), 0)
+        for s_ in mixed_shares:
+            stats[f"n_clusters_mixed_{int(round(100 * s_))}"] = _n_mixed(labels, sub_codes, nS, s_)
+            stats[f"pct_clusters_mixed_{int(round(100 * s_))}"] = _r(100 * stats[f"n_clusters_mixed_{int(round(100 * s_))}"] / len(crow), 0)
+            stats[f"cluster_mixed_share_{int(round(100 * s_))}"] = int(round(100 * s_))
         stats["cluster_k"] = k_chosen
         stats["cluster_mean_ari"] = next(r["mean_ari"] for r in curve if r["k"] == k_chosen)
         stats["cluster_drift_tolerance"] = tol
         stats["cluster_min_mean_ari"] = st_cfg["min_mean_ari"]
         stats["cluster_subsamples"] = st_cfg["subsamples"]
         stats["cluster_subsample_pct"] = int(round(st_cfg["fraction"] * 100))
-        stats["n_stable_clusters"] = sum(1 for r in crow if r["stability"] >= st_cfg["stable_cluster"])
+        # a stable cluster reaches the Jaccard threshold and holds at least min_family_size games: a pair or trio is
+        # described by how often its games co-cluster, not by a cluster's stability (E28)
+        stable_thr = float(st_cfg["stable_cluster"])
+        stats["cluster_min_family_size"] = min_size
+        stats["n_stable_clusters"] = sum(1 for r in crow if r["stability"] >= stable_thr and r["size"] >= min_size)
+        stats["n_stable_clusters_any_size"] = sum(1 for r in crow if r["stability"] >= stable_thr)
+        for end, t_ in (("lo", min(alts.get("stable_cluster", [stable_thr]))), ("hi", max(alts.get("stable_cluster", [stable_thr])))):
+            stats[f"cluster_stable_jaccard_{end}"] = float(t_)
+            stats[f"n_stable_clusters_jaccard_{end}"] = sum(1 for r in crow if r["stability"] >= float(t_) and r["size"] >= min_size)
+        lab_of = {r["cluster"]: lab for r, (lab, _) in zip(crow, ordered)}
+        stats["n_stable_clusters_full_membership"] = sum(1 for r in crow if _r(full_jac.get(lab_of[r["cluster"]], 0.0), 2) >= stable_thr)
+        stats["cluster_full_membership_max"] = _r(max(full_jac.values()), 2)
         stats["cluster_stable_jaccard"] = st_cfg["stable_cluster"]
         stats["cocluster_together"] = st_cfg["together"]
         stats["cocluster_apart"] = st_cfg["apart"]
         stats["cocluster_together_pct"] = int(round(100 * st_cfg["together"]))
         stats["cocluster_apart_pct"] = int(round(100 * st_cfg["apart"]))
-        # agreement with subgenre labels, against a permutation null (labels shuffled across games)
-        sub_lab = [g.data.get("subgenre") for g in games]
+        # agreement with subgenre labels, against a permutation null (labels shuffled across games). Shuffling keeps
+        # every subgenre's size, so E[MI], and with it AMI's correction, is the same for every shuffle.
         obs_ari, obs_nmi = _ari(labels, sub_lab), _nmi(labels, sub_lab)
+        C_obs = _contingency(labels, sub_lab)
+        emi_obs = _emi(C_obs.sum(1), C_obs.sum(0), C_obs.sum())
         prng = np.random.default_rng(st_cfg.get("permutations_seed", st_cfg["seed"] + 1))
-        null_ari, null_nmi = [], []
+        null_ari, null_nmi, null_ami = [], [], []
+        null_mixed = defaultdict(list)
         arr = np.array(sub_lab, dtype=object)
         for _ in range(st_cfg["permutations"]):
-            perm = arr[prng.permutation(N)]
+            order = prng.permutation(N)
+            perm = arr[order]
             null_ari.append(_ari(labels, perm))
             null_nmi.append(_nmi(labels, perm))
+            null_ami.append(_ami(labels, perm, emi=emi_obs))
+            for s_ in [1.0] + mixed_shares:
+                null_mixed[s_].append(_n_mixed(labels, sub_codes[order], nS, s_))
         P = st_cfg["permutations"]
         stats["cluster_subgenre_ari"] = _r(obs_ari, 2)
         stats["cluster_subgenre_nmi"] = _r(obs_nmi, 2)
         stats["cluster_subgenre_null_nmi"] = _r(float(np.mean(null_nmi)), 2)
+        # (+ 0.0 turns a rounded -0.0 into 0.0, which is what both chance-corrected scores average under the null)
+        stats["cluster_subgenre_null_ari"] = _r(float(np.mean(null_ari)), 2) + 0.0
+        stats["cluster_subgenre_null_ami"] = _r(float(np.mean(null_ami)), 2) + 0.0
         # NMI corrected for chance: 0 is what unrelated labelings score on average, 1 is identical labelings
         stats["cluster_subgenre_ami"] = _r(_ami(labels, sub_lab), 2)
         stats["p_cluster_subgenre_ari"] = _r((1 + sum(1 for x in null_ari if x >= obs_ari)) / (P + 1), 3)
         stats["p_cluster_subgenre_nmi"] = _r((1 + sum(1 for x in null_nmi if x >= obs_nmi)) / (P + 1), 3)
         stats["cluster_permutations"] = P
+        # shuffled labels mix almost every cluster, so the mixed count is read against that null: p is the share of
+        # shuffles with as few mixed clusters as observed (clusters purer than chance)
+        stats["cluster_null_mixed"] = _r(float(np.mean(null_mixed[1.0])), 1)
+        stats["p_cluster_mixed"] = _r((1 + sum(1 for x in null_mixed[1.0] if x <= cross)) / (P + 1), 3)
+        for s_ in mixed_shares:
+            stats[f"cluster_null_mixed_{int(round(100 * s_))}"] = _r(float(np.mean(null_mixed[s_])), 1)
+        # many subgenre labels are small; pool them, or leave their games out, and recompute agreement (E8)
+        small_n = int(cl.get("small_subgenre_games", 5))
+        sub_n = Counter(sub_lab)
+        big = np.array([sub_n[s] >= small_n for s in sub_lab])
+        stats["cluster_small_subgenre_games"] = small_n
+        stats["n_subgenres_small"] = sum(1 for v in sub_n.values() if v < small_n)
+        stats["n_games_small_subgenres"] = int((~big).sum())
+        stats["cluster_subgenre_ami_pooled"] = _r(_ami(labels, [s if sub_n[s] >= small_n else "(pooled)" for s in sub_lab]), 2)
+        stats["cluster_subgenre_ami_large_only"] = _r(_ami(labels[big], [s for s, k_ in zip(sub_lab, big) if k_]), 2)
+        stats["cluster_subgenre_ari_large_only"] = _r(_ari(labels[big], [s for s, k_ in zip(sub_lab, big) if k_]), 2)
+
+        # the headline readings at other k (E28, B2): agreement, mixing, and stable clusters for a spread of cuts and for
+        # every k the rule cannot tell from the configured one
+        rep_k = sorted({int(x) for x in cl.get("report_k", []) if st_cfg["k_min"] <= int(x) <= st_cfg["k_max"]} | {k_chosen})
+        by_k = {}
+        for kk in sorted(set(rep_k) | set(range(k_near, k_chosen + 1))):
+            Lk = labels if kk == k_chosen else fcluster(Z, t=kk, criterion="maxclust")
+            size_k = Counter(Lk.tolist())
+            jk = {c: _r(v, 2) for c, v in _cluster_jaccard(Lk, subs, sub_cuts[kk]).items()}
+            row = {"k": kk, "clusters": len(size_k), "ami_subgenre": _r(_ami(Lk, sub_lab), 2), "mixed": _n_mixed(Lk, sub_codes, nS)}
+            for s_ in mixed_shares:
+                row[f"mixed_{int(round(100 * s_))}"] = _n_mixed(Lk, sub_codes, nS, s_)
+            row["stable_any_size"] = sum(1 for v in jk.values() if v >= stable_thr)
+            row["stable"] = sum(1 for c, v in jk.items() if v >= stable_thr and size_k[c] >= min_size)
+            row["largest_cluster_share"] = _r(max(size_k.values()) / N, 2)
+            by_k[kk] = row
+        mcols = [f"mixed_{int(round(100 * s_))}" for s_ in mixed_shares]
+        tables["cluster-k-sensitivity"] = {"description": f"The clustering's headline readings at other numbers of clusters. ami_subgenre: adjusted mutual information with subgenre labels. mixed: clusters holding more than one subgenre; " + "; ".join(f"{c}: clusters whose largest subgenre holds less than {c.split('_')[1]}% of their games" for c in mcols) + f". stable_any_size: clusters whose stability (best-match Jaccard, as in game-clusters) reaches {stable_thr}; stable: those that also hold at least {min_size} games. k={k_chosen} is the configured cut.",
+                                           "columns": ["k", "clusters", "ami_subgenre", "mixed"] + mcols + ["stable_any_size", "stable", "largest_cluster_share"],
+                                           "rows": [by_k[kk] for kk in rep_k]}
+        near = [by_k[kk] for kk in range(k_near, k_chosen + 1)]
+        stats["cluster_subgenre_ami_near_min"] = min(r["ami_subgenre"] for r in near)
+        stats["cluster_subgenre_ami_near_max"] = max(r["ami_subgenre"] for r in near)
+        stats["pct_clusters_mixed_near_min"] = _r(min(100 * r["mixed"] / r["clusters"] for r in near), 0)
+        stats["pct_clusters_mixed_near_max"] = _r(max(100 * r["mixed"] / r["clusters"] for r in near), 0)
+        stats["n_stable_clusters_near_min"] = min(r["stable"] for r in near)
+        stats["n_stable_clusters_near_max"] = max(r["stable"] for r in near)
+        for kk in rep_k:
+            stats[f"cluster_subgenre_ami_k{kk}"] = by_k[kk]["ami_subgenre"]
+            stats[f"n_stable_clusters_k{kk}"] = by_k[kk]["stable"]
+            stats[f"pct_clusters_mixed_k{kk}"] = _r(100 * by_k[kk]["mixed"] / by_k[kk]["clusters"], 0)
+
+        # other methods on the same distances (E10). Ward's criterion needs Euclidean distances, so it runs on a
+        # classical multidimensional scaling of D (every positive eigenvalue kept; coordinates rounded so that BLAS noise
+        # cannot reorder merges). Complete linkage is cut at k when its merges allow it; games sharing no mechanic sit at
+        # distance 1, so its last merges tie there and the finest cut below that distance is used instead.
+        J_ = np.eye(N) - 1.0 / N
+        ev, evec = np.linalg.eigh(-0.5 * J_ @ (D ** 2) @ J_)
+        pos = ev > 1e-9 * ev.max()
+        Y = np.round(evec[:, pos] * np.sqrt(ev[pos]), 9)
+        L_ward = fcluster(linkage(Y, method="ward"), t=k_chosen, criterion="maxclust")
+        Zc = linkage(squareform(D, checks=False), method="complete")
+        L_comp = fcluster(Zc, t=k_chosen, criterion="maxclust")
+        if len(set(L_comp.tolist())) < k_chosen:
+            below = Zc[:, 2][Zc[:, 2] < Zc[:, 2].max()]
+            L_comp = fcluster(Zc, t=float(below.max()) if below.size else 0.0, criterion="distance")
+        stats["pct_game_pairs_no_shared_mechanic"] = _r(100 * float(np.mean(D[np.triu_indices(N, 1)] >= 1.0)), 0)
+        stats["cluster_mds_dims"] = int(pos.sum())
+        stats["pct_mds_negative_eigen"] = _r(100 * float(-ev[ev < 0].sum() / np.abs(ev).sum()), 1)
+        stats["cluster_ward_ari"] = _r(_ari(labels, L_ward), 2)
+        stats["cluster_ward_ami"] = _r(_ami(labels, L_ward), 2)
+        stats["cluster_ward_subgenre_ami"] = _r(_ami(L_ward, sub_lab), 2)
+        stats["cluster_ward_largest_share"] = _r(Counter(L_ward.tolist()).most_common(1)[0][1] / N, 2)
+        stats["cluster_complete_n"] = len(set(L_comp.tolist()))
+        stats["cluster_complete_ari"] = _r(_ari(labels, L_comp), 2)
+        stats["cluster_complete_ami"] = _r(_ami(labels, L_comp), 2)
+        stats["cluster_complete_subgenre_ami"] = _r(_ami(L_comp, sub_lab), 2)
+        stats["cluster_ward_complete_ari"] = _r(_ari(L_ward, L_comp), 2)
+        # a cluster has a counterpart in another partition when its best match there reaches Jaccard 0.5 (below that,
+        # Hennig counts a cluster as dissolved)
+        stats["cluster_match_jaccard"] = 0.5
+        for nm_, L_ in (("ward", L_ward), ("complete", L_comp)):
+            stats[f"n_clusters_matched_{nm_}"] = sum(1 for v in _best_match(labels, L_).values() if v > stats["cluster_match_jaccard"])
+        # consensus across k (E27): how often two games share a cluster over every subsample and every k in the range,
+        # and the partition that co-association gives when cut at k
+        ck0, ck1 = (int(x) for x in cl.get("consensus_k", [k_chosen, k_chosen]))
+        ck0, ck1 = max(ck0, st_cfg["k_min"]), min(ck1, st_cfg["k_max"])
+        cons = np.zeros((N, N))
+        for bi, sb in enumerate(subs):
+            Lb = np.stack([sub_cuts[kk][bi] for kk in range(ck0, ck1 + 1)])
+            cons[np.ix_(sb, sb)] += (Lb[:, :, None] == Lb[:, None, :]).sum(0)
+        Cons = np.where(both > 0, cons / np.maximum(both * (ck1 - ck0 + 1), 1), 0.0)
+        np.fill_diagonal(Cons, 1.0)
+        L_cons = fcluster(linkage(squareform(1.0 - Cons, checks=False), method="average"), t=k_chosen, criterion="maxclust")
+        stats["cluster_consensus_k_min"], stats["cluster_consensus_k_max"] = ck0, ck1
+        stats["cluster_consensus_ari"] = _r(_ari(labels, L_cons), 2)
+
+        # sensitivity to the inputs (E32, D2, B2): the same method on changed mechanic sets or weights, cut at the same k
+        def _recluster(gm_, cw=cl["core_weight"], idf_on=bool(cl.get("idf"))):
+            Dv = _wj_distance(gm_, gids, cw, idf_on)
+            return fcluster(linkage(squareform(Dv, checks=False), method="average"), t=k_chosen, criterion="maxclust")
+        asserted = {m.id for m in mechs if m.data.get("status") == "asserted"}
+        gm_sourced = {g: {m: r for m, r in gm[g].items() if m not in asserted} for g in gids}
+        L_noass = _recluster(gm_sourced)
+        stats["cluster_n_asserted_mechanics"] = len(asserted & set(mids))
+        stats["cluster_pct_uses_asserted"] = _r(100 * sum(1 for g in gids for m in gm[g] if m in asserted) / max(sum(len(gm[g]) for g in gids), 1), 0)
+        stats["cluster_ari_no_asserted"] = _r(_ari(labels, L_noass), 2)
+        stats["cluster_subgenre_ami_no_asserted"] = _r(_ami(L_noass, sub_lab), 2)
+        # coarser vocabulary: each mechanic lumped with the mechanics it specializes or requires (union of the edges)
+        parent = {m: m for m in mids}
+        def _find(m):
+            while parent[m] != m:
+                parent[m] = parent[parent[m]]
+                m = parent[m]
+            return m
+        n_rel = 0
+        for ed in sorted(edges, key=lambda e: (e.type, e.source, e.target)):
+            if ed.type in ("specializes", "requires") and ed.source in parent and ed.target in parent:
+                n_rel += 1
+                a_, b_ = _find(ed.source), _find(ed.target)
+                if a_ != b_:
+                    parent[max(a_, b_)] = min(a_, b_)
+        root = {m: _find(m) for m in mids}
+        gm_merged = _merge_mechanics({g: gm[g] for g in gids}, root)
+        L_merged = _recluster(gm_merged)
+        stats["cluster_n_relation_edges"] = n_rel
+        stats["cluster_n_mechanics_merged"] = len(mids) - len(set(root.values()))
+        stats["cluster_ari_merged"] = _r(_ari(labels, L_merged), 2)
+        stats["cluster_subgenre_ami_merged"] = _r(_ami(L_merged, sub_lab), 2)
+        # random lumping: pair up rare mechanics at random within each family and merge each pair, several times
+        gran = cl.get("granularity") or {}
+        rare_max, reps = int(gran.get("rare_max_games", 5)), int(gran.get("random_merges", 0))
+        grng = np.random.default_rng(int(gran.get("seed", st_cfg["seed"])))
+        rare_by_fam = defaultdict(list)
+        for m in mids:
+            if prev[m] <= rare_max:
+                rare_by_fam[by_id[m].data.get("family")].append(m)
+        rand_aris, n_pairs = [], 0
+        for _ in range(reps):
+            rmap = {}
+            for f_ in sorted(rare_by_fam, key=str):
+                ms_ = [rare_by_fam[f_][i] for i in grng.permutation(len(rare_by_fam[f_]))]
+                for a_, b_ in zip(ms_[0::2], ms_[1::2]):
+                    rmap[b_] = a_
+            n_pairs = len(rmap)
+            rand_aris.append(_ari(labels, _recluster(_merge_mechanics({g: gm[g] for g in gids}, rmap))))
+        if rand_aris:
+            stats["cluster_rare_max_games"] = rare_max
+            stats["cluster_random_merges"] = reps
+            stats["cluster_random_merge_pairs"] = n_pairs
+            stats["cluster_ari_random_merge_mean"] = _r(float(np.mean(rand_aris)), 2)
+            stats["cluster_ari_random_merge_min"] = _r(float(np.min(rand_aris)), 2)
+            stats["cluster_ari_random_merge_max"] = _r(float(np.max(rand_aris)), 2)
+        for end, cw in (("lo", min(alts.get("core_weight", [cl["core_weight"]]))), ("hi", max(alts.get("core_weight", [cl["core_weight"]])))):
+            stats[f"cluster_core_weight_{end}"] = float(cw)
+            stats[f"cluster_ari_core_weight_{end}"] = _r(_ari(labels, _recluster(gm, cw=float(cw))), 2)
+        stats["cluster_core_weight"] = float(cl["core_weight"])
+        stats["cluster_ari_unweighted"] = _r(_ari(labels, _recluster(gm, idf_on=False)), 2)
+        # does the lumped vocabulary keep the prevalence head and the lift ranking (D2)? A mechanic maps to its lump.
+        pv_m = Counter(m for g in gids for m in gm_merged[g])
+        top_prev = [m for m in mids if derived[m]["prevalence_rank"] <= 10]
+        stats["granularity_top10_prevalence"] = len(top_prev)
+        stats["granularity_top10_prevalence_kept"] = sum(1 for m in top_prev if 1 + sum(1 for v in pv_m.values() if v > pv_m[root[m]]) <= 10)
+        cpair = Counter()
+        for g in gids:
+            for a_, b_ in combinations(sorted(gm_merged[g]), 2):
+                cpair[(a_, b_)] += 1
+        mrows = sorted(((c * N / (pv_m[a_] * pv_m[b_]), c, a_, b_) for (a_, b_), c in cpair.items() if c >= cfg["cooccurrence"]["min_support"]),
+                       key=lambda r: (-round(r[0], 2), -r[1], r[2], r[3]))
+        top_lift_m = {(a_, b_) for _, _, a_, b_ in mrows[: cfg["cooccurrence"]["top_n"]]}
+        top_lift = [(r["mechanic_a"], r["mechanic_b"]) for r in tables["cooccurrence-top"]["rows"]]
+        stats["granularity_top_lift"] = len(top_lift)
+        stats["granularity_top_lift_kept"] = sum(1 for a_, b_ in top_lift if tuple(sorted((root[a_], root[b_]))) in top_lift_m)
+
+        # the groupings the paper and the book name (report/analysis.yaml clustering.groupings): for each, the lowest
+        # co-clustering share of any two of its games, at k and across the consensus range, and which methods put all of
+        # them in one cluster (E10, E27). Listing a grouping changes no cluster.
+        def _one(L_, ix):
+            return len({int(L_[i]) for i in ix}) == 1
+        yn = lambda ok: "yes" if ok else "no"  # noqa: E731
+        grows = defaultdict(list)
+        for where, gdefs in sorted((cl.get("groupings") or {}).items()):
+            for slug, ids in (gdefs or {}).items():
+                if not ids or any(x not in gidx for x in ids):
+                    continue
+                ix = [gidx[x] for x in ids]
+                prs = list(combinations(ix, 2)) or [(ix[0], ix[0])]
+                mco = min(_r(float(C[a_, b_]), 3) for a_, b_ in prs)
+                mcons = min(_r(float(Cons[a_, b_]), 3) for a_, b_ in prs)
+                avg_ok = _one(labels, ix) and mco >= st_cfg["together"]
+                methods = int(avg_ok) + int(_one(L_ward, ix)) + int(_one(L_comp, ix))
+                key = "grouping_" + slug.replace("-", "_")
+                stats[key + "_min_cocluster"] = mco
+                stats[key + "_min_consensus"] = mcons
+                stats[key + "_methods"] = methods
+                # the paper's test for naming a family: average linkage keeps it together and another method agrees
+                stats[key + "_agreed"] = int(avg_ok and methods >= 2)
+                grows[where].append({"grouping": slug.replace("-", " "), "games": list(ids), "min_cocluster": mco, "min_consensus": mcons,
+                                     "average": yn(avg_ok), "ward": yn(_one(L_ward, ix)), "complete": yn(_one(L_comp, ix)), "methods": methods,
+                                     "without_asserted": yn(_one(L_noass, ix)), "lumped": yn(_one(L_merged, ix))})
+        for where, rows_g in grows.items():
+            stats[f"n_groupings_{where}"] = len(rows_g)
+            stats[f"n_groupings_{where}_agreed"] = sum(1 for r in rows_g if r["average"] == "yes" and r["methods"] >= 2)
+            stats[f"n_groupings_{where}_all_methods"] = sum(1 for r in rows_g if r["methods"] == 3)
+        if grows.get("paper"):
+            # the families section 5.4 names, then the links it names between neighbouring families (all their games together)
+            frows = [{"kind": "family", **r} for r in grows["paper"]] + [{"kind": "link", **r} for r in grows.get("links", [])]
+            tables["family-robustness"] = {"description": f"Each family of games that section 5.4 names, by the games it names, then each link it names between two families (the games of both), checked against other methods and inputs. min_cocluster: the lowest share of subsamples in which any two of the games share a cluster at k={k_chosen}; min_consensus: the same over every k from {ck0} to {ck1}. average: average linkage at k={k_chosen} puts them in one cluster and min_cocluster is at least {st_cfg['together']}; ward: Ward's method on a classical scaling of the same distances, cut at k={k_chosen}, puts them in one cluster; complete: complete linkage, cut at {stats['cluster_complete_n']} clusters, does; methods: how many of the three do. without_asserted: average linkage without the asserted mechanics puts them in one cluster; lumped: average linkage does with each mechanic merged with those it specializes or requires.",
+                                           "columns": ["kind", "grouping", "games", "min_cocluster", "min_consensus", "average", "ward", "complete", "methods", "without_asserted", "lumped"],
+                                           "rows": frows, "link_columns": ["games"]}
         shared["cocluster"] = cocluster
 
     # ---------------- family x subgenre
@@ -1379,18 +1626,9 @@ def _nmi(a, b) -> float:
     return mi / ((ha + hb) / 2) if ha + hb else 1.0
 
 
-def _ami(a, b) -> float:
-    """Adjusted mutual information (Vinh, Epps and Bailey 2010), arithmetic-mean normalization like _nmi:
-    (MI - E[MI]) / (mean entropy - E[MI]), with E[MI] taken over all labelings with the same cluster sizes."""
-    C = _contingency(a, b)
-    n = C.sum()
-    ra, cb = C.sum(1), C.sum(0)
-    P = C / n
-    pa, pb = ra / n, cb / n
-    nz = P > 0
-    mi = float((P[nz] * np.log(P[nz] / np.outer(pa, pb)[nz])).sum())
-    ha = float(-(pa[pa > 0] * np.log(pa[pa > 0])).sum())
-    hb = float(-(pb[pb > 0] * np.log(pb[pb > 0])).sum())
+def _emi(ra, cb, n) -> float:
+    """Expected mutual information of two labelings with cluster sizes ra and cb (hypergeometric model). It depends
+    only on the sizes, so every shuffle of one labeling has the same E[MI]."""
     emi = 0.0
     for ai in ra:
         for bj in cb:
@@ -1401,8 +1639,102 @@ def _ami(a, b) -> float:
             logp = (gammaln(ai + 1) + gammaln(bj + 1) + gammaln(n - ai + 1) + gammaln(n - bj + 1) - gammaln(n + 1)
                     - gammaln(nij + 1) - gammaln(ai - nij + 1) - gammaln(bj - nij + 1) - gammaln(n - ai - bj + nij + 1))
             emi += float((nij / n * np.log(n * nij / (ai * bj)) * np.exp(logp)).sum())
+    return emi
+
+
+def _ami(a, b, emi=None) -> float:
+    """Adjusted mutual information (Vinh, Epps and Bailey 2010), arithmetic-mean normalization like _nmi:
+    (MI - E[MI]) / (mean entropy - E[MI]), with E[MI] taken over all labelings with the same cluster sizes.
+    Pass `emi` to reuse E[MI] across shuffles of one labeling (same sizes, same E[MI])."""
+    C = _contingency(a, b)
+    n = C.sum()
+    ra, cb = C.sum(1), C.sum(0)
+    P = C / n
+    pa, pb = ra / n, cb / n
+    nz = P > 0
+    mi = float((P[nz] * np.log(P[nz] / np.outer(pa, pb)[nz])).sum())
+    ha = float(-(pa[pa > 0] * np.log(pa[pa > 0])).sum())
+    hb = float(-(pb[pb > 0] * np.log(pb[pb > 0])).sum())
+    if emi is None:
+        emi = _emi(ra, cb, n)
     den = (ha + hb) / 2 - emi
     return (mi - emi) / den if den else 1.0
+
+
+def _n_mixed(labels, codes, n_codes, share=1.0) -> int:
+    """Clusters whose largest subgenre holds less than `share` of their games (share 1: any second subgenre).
+    `codes` are integer subgenre codes, one per game, aligned with `labels`."""
+    a = np.asarray(labels) - np.min(labels)
+    C = np.bincount(a * n_codes + np.asarray(codes), minlength=(int(a.max()) + 1) * n_codes).reshape(-1, n_codes)
+    size = C.sum(1)
+    keep = size > 0
+    pct = int(round(100 * share))
+    return int(np.sum(C.max(1)[keep] * 100 < pct * size[keep]))
+
+
+def _cluster_jaccard(labels, subs, cuts, restrict=True) -> dict:
+    """Mean best-match Jaccard of each cluster of `labels` across subsample clusterings (Hennig's subsetting scheme).
+
+    restrict=True (the stability the paper reports): in each subsample S the full cluster A is restricted to the games
+    S keeps and compared with every cluster B of S's clustering, |A n S n B| / |(A n S) u B|; the best B counts, and
+    the mean runs over the subsamples that keep at least one game of A (a subsample keeping none is skipped; one
+    keeping a single game scores 1 only when that game is alone in its subsample cluster). restrict=False keeps the
+    whole of A, |A n B| / |A u B|, so even perfect recovery scores about the subsample fraction, and a subsample
+    keeping no game of A scores 0."""
+    nc = int(labels.max()) + 1
+    full = np.bincount(labels, minlength=nc).astype(float)
+    jac = defaultdict(list)
+    for sb, lb in zip(subs, cuts):
+        ct = np.zeros((nc, int(lb.max()) + 1))
+        np.add.at(ct, (labels[sb], lb), 1)
+        rows_, cols_ = ct.sum(1), ct.sum(0)
+        den = (rows_ if restrict else full)[:, None] + cols_[None, :] - ct
+        best = np.max(ct / np.where(den > 0, den, 1.0), axis=1)
+        for c in np.flatnonzero(rows_ > 0 if restrict else full > 0):
+            if c:
+                jac[int(c)].append(float(best[c]))
+    return {c: float(np.mean(v)) for c, v in sorted(jac.items())}
+
+
+def _best_match(labels, other) -> dict:
+    """For each cluster of `labels`, the Jaccard overlap with its best-matching cluster of another partition."""
+    a = np.asarray(labels) - np.min(labels)
+    b = np.asarray(other) - np.min(other)
+    nb = int(b.max()) + 1
+    ct = np.bincount(a * nb + b, minlength=(int(a.max()) + 1) * nb).reshape(-1, nb).astype(float)
+    ra, cb = ct.sum(1), ct.sum(0)
+    return {int(c) + int(np.min(labels)): float(np.max(ct[c] / (ra[c] + cb - ct[c]))) for c in range(ct.shape[0]) if ra[c] > 0}
+
+
+def _wj_distance(gm, gids, core_weight, idf=True):
+    """Weighted Jaccard distance between games, built as the clustering builds it (core weight times log(N / prevalence)),
+    from {game: {mechanic: role}}. Used for the sensitivity checks, which change the mechanic sets or the weights."""
+    n = len(gids)
+    pv = Counter(m for g in gids for m in gm[g])
+    col = {m: i for i, m in enumerate(sorted(pv))}
+    X = np.zeros((n, len(col)))
+    for i, g in enumerate(gids):
+        for m, role in gm[g].items():
+            X[i, col[m]] = (core_weight if role == "core" else 1.0) * (math.log(n / pv[m]) if idf else 1.0)
+    D = np.zeros((n, n))
+    for i in range(n):
+        mn = np.minimum(X[i], X).sum(1)
+        mx = np.maximum(X[i], X).sum(1)
+        D[i] = 1 - np.divide(mn, mx, out=np.zeros(n), where=mx > 0)
+    np.fill_diagonal(D, 0.0)
+    return D
+
+
+def _merge_mechanics(gm, root) -> dict:
+    """Relabel each game's mechanics by root[m] (a coarser vocabulary); a merged mechanic is core if any part was."""
+    out = {}
+    for g, ms in gm.items():
+        nm = {}
+        for m, role in ms.items():
+            r = root.get(m, m)
+            nm[r] = "core" if role == "core" or nm.get(r) == "core" else "supporting"
+        out[g] = nm
+    return out
 
 
 # ======================================================================= SVG

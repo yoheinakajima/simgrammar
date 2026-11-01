@@ -1,0 +1,50 @@
+id: 2026-10-31-cluster-robustness
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Check the game clusters and the families section 5.4 names against other k, other methods, and
+  other inputs, after the Explore Science review (B2, D2, E8, E9, E10, E27, E28, E32, E36, G5).
+method: >-
+  Read the Explore Science findings B2, D2, E8, E9, E10, E27, E28, E32, E36 and G5 and the clustering block of
+  scripts/analyze.py. E9: the stability code compares each full cluster, restricted to the games a subsample keeps, with
+  the subsample's clusters (Hennig's subsetting scheme), skips subsamples that keep none of its games, and scores a single
+  kept game 1 only when it is alone; the reviewer inferred this correctly, and section 5.4 and the table caption now state
+  it, with a full-membership version for comparison. Opened the fpc clusterboot help page (CRAN, fpc 2.2-15) for Hennig's
+  0.75, 0.6, 0.85 and 0.5 marks and added it as a source. Added to analyze.py, deterministic and seeded: a minimum size of 5
+  games before a cluster counts as stable; the headline readings (AMI with subgenres, clusters mixed at any second subgenre
+  and at 80 and 60 percent, stable clusters) for k = 8, 14, 18 to 22, 26 and 30 (table cluster-k-sensitivity); null means
+  of ARI, NMI, AMI and the mixed counts under the existing 999 label shuffles; AMI with subgenres of under 5 games pooled or
+  dropped; Ward's method on a classical MDS of the distances, and complete linkage, which ties at distance 1 and is cut at
+  its finest untied level, each with ARI to the configured partition; a consensus co-association over k = 14 to 30;
+  re-clustering without the asserted mechanics, with mechanics merged along specializes and requires edges, with 20 random
+  pairings of rare mechanics within family, at core weights 1 and 3, and without idf; prevalence-head and lift persistence
+  under the merge; and co-clustering and method agreement for the groupings the paper and the book name, listed in
+  report/analysis.yaml (table family-robustness). Added the ARI-by-k figure (viz cluster-k-curve) and a p90 column in
+  cluster-stability. clustering.k stays 22. Rewrote section 5.4: the 22-way cut is one admissible partition, families are
+  named only where every named pair co-clusters in 90 percent of subsamples and Ward or complete linkage agrees, the links
+  between families and the 1970s text sims (one pair at 0.87) are provisional, and the umbrella headings that joined
+  families sharing no cluster are gone. Updated book chapter 4 to match. No existing stat changed value except
+  n_stable_clusters (13 to 10, by the size rule). make check and make determinism pass. The abstract and every media voice
+  line are unedited; the episode 3 scene How many families now renders a different number.
+contract_version: '1.2'
+proposals:
+- kind: other
+  target: hamurabi
+  detail: Review finding E8 questions subgenre labels that fit lineage logic poorly. Hamurabi is labelled city-builder, and
+    Where Winds Meet is labelled rpg-sim with ai-native as secondary while it clusters with the AI-native titles. A catalog
+    run should re-check these labels against the vocabulary definitions.
+- kind: vocab-term
+  target: ai-native
+  detail: The ai-native subgenre is defined by a technology the game needs at runtime, while section 3.1 says subgenre labels
+    name design lineages. Consider an ADR that moves runtime AI dependence to its own field, so that cluster-subgenre
+    agreement compares like with like.
+- kind: rule
+  target: E029
+  detail: Pinning method agreement in prose needs the grouping listed in report/analysis.yaml (clustering.groupings). A
+    reference such as ward.<game>.<game> or complete.<game>.<game>, resolved like cocluster, would let any sentence pin
+    whether other methods keep two games together.

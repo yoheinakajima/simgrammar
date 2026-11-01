@@ -105,6 +105,8 @@ def build(shared, live, by_id, derived, tables, stats, vocabs, cfg) -> dict:
     out["matrix"] = matrix(shared, live, by_id, derived, tables, fam)
     out["strata"] = strata(shared, live, by_id, derived, fam)
     out["design-map"] = design_map(shared, live, by_id, derived, tables, sub, cfg)
+    if "cluster-stability" in tables:
+        out["cluster-k-curve"] = cluster_k_curve(tables, cfg)
     out["vacant-lots"] = vacant_lots(shared, live, by_id, derived, tables, fam, cfg)
     out["technique-flows"] = technique_flows(live, by_id, derived, vocabs, fam)
     out["layer-profile"] = layer_profile(tables, fam, sub, cfg)
@@ -1120,3 +1122,58 @@ def pipeline(live, stats):
     return _plain("From records to every product", "one dataset · five products", "".join(body),
                   "Records pass the validator and feed one deterministic analysis; the paper, the site, the wiki, the book, and the scripts all render from it, and every interpretive sentence in them carries an assertion the build checks.",
                   "scripts/build.py · CONTRACT.md", {"columns": ["stage", "what"], "rows": trows, "link_columns": [], "note": "The stages of the build."}, min_width=760)
+
+
+def cluster_k_curve(tables, cfg):
+    """How well subsample re-clusterings agree with the full clustering at each k, with the spread across subsamples
+    and the share of games in the largest cluster, marking the selection threshold and the configured k (review G5)."""
+    rows = tables["cluster-stability"]["rows"]
+    st = cfg["clustering"]["stability"]
+    thr, k_cfg = float(st["min_mean_ari"]), int(cfg["clustering"]["k"])
+    ks = [r["k"] for r in rows]
+    L, R, TOP, BOT, W, H = 56, 16, 22, 44, 680, 300
+    lo = min(0.0, math.floor(min(r["p10_ari"] for r in rows) * 10) / 10)
+    sx = lambda k: L + (k - ks[0]) / max(ks[-1] - ks[0], 1) * (W - L - R)  # noqa: E731
+    sy = lambda v: TOP + (1.0 - v) / (1.0 - lo) * (H - TOP - BOT)  # noqa: E731
+    body = [svg_open("cluster-k-curve", W, H, "Agreement under resampling, by number of clusters",
+                     "Mean adjusted Rand index between the full clustering and subsample re-clusterings for each k, with the 10th to 90th "
+                     "percentile band, the share of games in the largest cluster, the selection threshold, and the configured k.")]
+    for v in [x / 4 for x in range(int(math.ceil(lo * 4)), 5)]:
+        body.append(f'<line x1="{L}" y1="{f1(sy(v))}" x2="{W - R}" y2="{f1(sy(v))}" style="stroke:{T["rule"]};stroke-width:0.6"/>')
+        body.append(text(L - 8, sy(v) + 3, f"{v:g}", 9, "faint", "end"))
+    for k in ks:
+        if k % 2 == 0:
+            body.append(text(sx(k), H - BOT + 14, k, 9, "faint", "middle"))
+    band = [(sx(r["k"]), sy(r["p90_ari"])) for r in rows] + [(sx(r["k"]), sy(r["p10_ari"])) for r in reversed(rows)]
+    body.append(f'<polygon points="{" ".join(f"{f1(x)},{f1(y)}" for x, y in band)}" style="fill:{T["ink"]};fill-opacity:0.1;stroke:none"/>')
+    body.append(f'<line x1="{L}" y1="{f1(sy(thr))}" x2="{W - R}" y2="{f1(sy(thr))}" style="stroke:{T["accent"]};stroke-width:1;stroke-dasharray:4 3"/>')
+    body.append(text(L + 4, sy(thr) - 5, f"selection threshold {thr:g}", 9, "accent"))
+    if k_cfg in ks:
+        body.append(f'<line x1="{f1(sx(k_cfg))}" y1="{TOP}" x2="{f1(sx(k_cfg))}" y2="{H - BOT}" style="stroke:{T["ink2"]};stroke-width:0.8"/>')
+        body.append(text(sx(k_cfg) + 4, TOP + 10, f"configured k = {k_cfg}", 9, "ink2"))
+    share = " ".join(f"{f1(sx(r['k']))},{f1(sy(r['largest_cluster_share']))}" for r in rows)
+    body.append(f'<polyline points="{share}" style="fill:none;stroke:{T["open"]};stroke-width:1.2;stroke-dasharray:2 2"/>')
+    # label the dotted line in the plot itself, so the static figure reads without the site's legend
+    lab_r = min(rows, key=lambda r: (abs(r["k"] - (ks[0] + ks[-1]) / 3), r["k"]))
+    body.append(text(sx(lab_r["k"]), sy(lab_r["largest_cluster_share"]) - 6, "largest cluster's share of games", 9, "open"))
+    mean = " ".join(f"{f1(sx(r['k']))},{f1(sy(r['mean_ari']))}" for r in rows)
+    body.append(f'<polyline points="{mean}" style="fill:none;stroke:{T["ink"]};stroke-width:1.6"/>')
+    for r in rows:
+        body.append(f'<circle cx="{f1(sx(r["k"]))}" cy="{f1(sy(r["mean_ari"]))}" r="2.4" style="fill:{T["ink"]}">'
+                    f'<title>k = {r["k"]}: mean ARI {r["mean_ari"]}, 10th to 90th percentile {r["p10_ari"]} to {r["p90_ari"]}, '
+                    f'largest cluster {round(100 * r["largest_cluster_share"])}% of games</title></circle>')
+    body.append(text((L + W - R) / 2, H - 10, "number of clusters, k", 9, "muted", "middle"))
+    body.append(f'<text transform="translate(14,{f1((TOP + H - BOT) / 2)}) rotate(-90)" text-anchor="middle" style="fill:{T["muted"]};font-size:9px">'
+                f'adjusted Rand index, or share of games</text>')
+    body.append("</svg>")
+    key = _key([("mean ARI, subsample against full clustering", f'<path d="M0 5H10" style="stroke:{T["ink"]};stroke-width:1.6"/>'),
+                ("10th to 90th percentile across subsamples", f'<rect width="10" height="10" style="fill:{T["ink"]};fill-opacity:0.15"/>'),
+                ("share of games in the largest cluster", f'<path d="M0 5H10" style="stroke:{T["open"]};stroke-width:1.2;stroke-dasharray:2 2"/>'),
+                ("selection threshold", f'<path d="M0 5H10" style="stroke:{T["accent"]};stroke-width:1;stroke-dasharray:4 3"/>')])
+    return _plain("Agreement under resampling, by number of clusters", f"k = {ks[0]} to {ks[-1]} · {st['subsamples']} subsamples", "".join(body),
+                  f"For each number of clusters k, the adjusted Rand index between the full clustering and the re-clustering of each of {st['subsamples']} subsamples "
+                  f"of about {round(100 * float(st['fraction']))} percent of the games: the line is the mean, the band runs from the 10th to the 90th percentile. "
+                  f"The dotted line is the share of games in the largest cluster. The rule picks the smallest k whose mean reaches {thr:g} (dashed line); the vertical line marks the configured k.",
+                  "tables cluster-stability · dist/analysis/cluster-stability.csv · report/analysis.yaml (clustering)",
+                  {"table": "cluster-stability", "note": "Mean, 10th and 90th percentile ARI and the largest cluster's share of games, for every k."},
+                  min_width=640, legend_html=key)

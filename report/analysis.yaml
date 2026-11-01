@@ -36,13 +36,84 @@ clustering:
     min_mean_ari: 0.75     # selection threshold on mean adjusted Rand index between full and subsample clusterings (a convention adopted here; Hennig's 0.75 is for cluster-wise Jaccard)
     drift_tolerance: 0.02  # W107 fires only when the configured k misses the threshold, or a smaller k clears it, by more than this
     stable_cluster: 0.75   # a cluster whose mean best-match Jaccard across subsamples reaches this is stable (Hennig 2007 convention)
+    # ... and holds at least this many games. Fixed before looking at which clusters pass (Explore Science review E28):
+    # a pair or trio is described by how often its games co-cluster, which `together` and `apart` already govern, and
+    # five is also where the agreement check below starts treating a subgenre label as large.
+    min_family_size: 5
     together: 0.9          # an assertion that two games share a cluster needs co-clustering in at least this share of subsamples
     apart: 0.1             # an assertion that two games differ needs co-clustering in at most this share
     permutations_seed: 20261026
-    permutations: 999      # shuffles of subgenre labels for the ARI/NMI null
+    permutations: 999      # shuffles of subgenre labels for the ARI/NMI/AMI and mixed-cluster nulls
+    alternatives:          # sensitivity of the conventions above (review B2); reported, never used to pick anything
+      stable_cluster: [0.6, 0.85]   # Hennig's lower and upper marks for cluster-wise Jaccard
+      min_mean_ari: [0.7, 0.8]      # what the k-selection rule would pick at other thresholds
+      core_weight: [1.0, 3.0]       # re-cluster at k with other core weights and compare by ARI
   core_weight: 2.0         # weight of core vs supporting mechanics in game vectors
   idf: true                # weight each mechanic by log(N / prevalence) so ubiquitous mechanics (pause, placement) do not dominate
   top_mechanics_per_cluster: 5
+  # Robustness checks of the partition (review findings B2, D2, E8, E10, E27, E28, E32). None of them feeds back into k
+  # or the clusters; they are reported in section 5.4 and the tables cluster-k-sensitivity and family-robustness.
+  report_k: [8, 14, 18, 19, 20, 21, 22, 26, 30]   # rows of cluster-k-sensitivity (the configured k is always included)
+  mixed_shares: [0.8, 0.6]   # a cluster is also counted as mixed when its largest subgenre holds less than this share
+  small_subgenre_games: 5    # subgenre labels with fewer games are pooled, or their games left out, in a second agreement check
+  consensus_k: [14, 30]      # co-association over every subsample clustering at every k in this range
+  granularity:
+    rare_max_games: 5        # rare mechanics, paired at random within their family and merged
+    random_merges: 20        # how many random lumpings
+    seed: 20261031
+  # The groupings of games the prose names as families, by the games it names, so the build can say how each fares
+  # under other methods and inputs (stats grouping_<id>_*, table family-robustness for the paper's). Listing a
+  # grouping changes no cluster; a grouping whose games are no longer all in the catalog is skipped.
+  groupings:
+    paper:
+      life-sims: [the-sims, paralives, inzoi]
+      colony-sims: [rimworld, dwarf-fortress, oxygen-not-included]
+      virtual-pets: [creatures, tamagotchi, black-and-white]
+      tycoons: [theme-hospital, two-point-hospital, rollercoaster-tycoon]
+      sports-management: [football-manager, out-of-the-park-baseball]
+      settlement-builders: [anno-1800, manor-lords, banished]
+      factory-games: [factorio, satisfactory, shapez-2]
+      zoning-city-builders: [simcity-1989, cities-skylines]
+      grand-strategy: [europa-universalis-4, crusader-kings-3, stellaris, victoria-3]
+      political-city-builders: [tropico-6, frostpunk-2]
+      physics-sandboxes: [besiege, teardown, poly-bridge]
+      programming-puzzles: [spacechem, opus-magnum, the-farmer-was-replaced]
+      persistent-worlds: [eve-online, ultima-online]
+      job-sims: [powerwash-simulator, house-flipper]
+      flight-and-military-sims: [x-plane, dcs-world, microsoft-flight-simulator-2024]
+      driving-sims: [iracing, gran-turismo-7, beamng-drive]
+      survival-games: [dont-starve, subnautica, minecraft, valheim]
+      god-games: [simearth, populous, simlife]
+      inspection-games: [papers-please, contraband-police]
+      dilemma-games: [reigns, suzerain, this-war-of-mine]
+      text-sims: [hamurabi, oregon-trail, lemonade-stand]
+      ai-native: [ai-dungeon, infinite-craft, suck-up]
+    links:   # pairs of neighbouring paper families that section 5.4 says share a cluster in some resamplings
+      life-and-colony-sims: [the-sims, paralives, inzoi, rimworld, dwarf-fortress, oxygen-not-included]
+      tycoons-and-sports-management: [theme-hospital, two-point-hospital, rollercoaster-tycoon, football-manager, out-of-the-park-baseball]
+      settlement-and-factory-games: [anno-1800, manor-lords, banished, factorio, satisfactory, shapez-2]
+      grand-strategy-and-political-city-builders: [europa-universalis-4, crusader-kings-3, stellaris, victoria-3, tropico-6, frostpunk-2]
+      flight-and-driving-sims: [x-plane, dcs-world, microsoft-flight-simulator-2024, iracing, gran-turismo-7, beamng-drive]
+      inspection-and-dilemma-games: [papers-please, contraband-police, reigns, suzerain, this-war-of-mine]
+    book:
+      schedules-and-verdicts: [papers-please, princess-maker-2]
+      physics-you-build-with: [besiege, the-incredible-machine, garrys-mod, job-simulator, surgeon-simulator]
+      machines-under-your-hands: [farming-simulator-25, iracing, gran-turismo-7, euro-truck-simulator-2]
+      rulers-and-councils: [europa-universalis-4, civilization, stellaris, tropico-6]
+      creatures-you-raise: [little-computer-people, tamagotchi, creatures, black-and-white]
+      worlds-made-of-language: [ai-dungeon, infinite-craft, where-winds-meet, facade]
+      crowds-you-manage: [theme-hospital, rollercoaster-tycoon, game-dev-tycoon]
+      procedure: [dcs-world, x-plane, silent-hunter-3, command-modern-operations, arma-3]
+      worlds-that-keep-running: [eve-online, ultima-online, second-life, a-tale-in-the-desert]
+      planets-in-the-hand: [populous, simearth, from-dust, terra-nil, simlife, species-alre]
+      programs: [spacechem, opus-magnum, the-farmer-was-replaced, bitburner, autonauts]
+      rosters: [football-manager, out-of-the-park-baseball, motorsport-manager]
+      brushes: [townscaper, tiny-glade]
+      bodies-in-the-open: [zelda-breath-of-the-wild, subnautica, dont-starve, minecraft]
+      factory-family: [factorio, satisfactory, shapez-2, dyson-sphere-program, captain-of-industry]
+      settlement-family: [anno-1800, manor-lords, banished, caesar-3, pharaoh]
+      zoning-family: [simcity-1989, cities-skylines, pocket-city]
+      sims-and-inzoi: [inzoi, the-sims-4]
 viz:
   design_map:
     neighbors: 4              # each game links to its k most similar games (same distance as clustering)

@@ -1,0 +1,17 @@
+id: src-hennig-2026-fpc-clusterboot
+type: source
+name: 'clusterboot: Clusterwise cluster stability assessment by resampling'
+kind: docs
+authors:
+- Christian Hennig
+venue: CRAN, R package fpc 2.2-15 (reference manual)
+date: '2026-08-19'
+url: https://search.r-project.org/CRAN/refmans/fpc/html/clusterboot.html
+accessed: '2026-10-31'
+notes: 'Help page of clusterboot in fpc, by Christian Hennig. Resampling (bootstrap, subsetting, and others) compares each
+  original cluster with its most similar resampled cluster by Jaccard similarity; the mean indexes the cluster''s stability
+  (methods in Hennig 2007, Computational Statistics and Data Analysis 52). A stable cluster yields a mean of 0.75 or more;
+  0.6 to 0.75 indicates patterns with doubtful members; below 0.6, not to be trusted; 0.85 and above, highly stable; 0.5 or
+  less indicates a dissolved cluster. The page does not say whether a cluster is restricted to the subset''s points.'
+provenance:
+  created: 2026-10-31-cluster-robustness
