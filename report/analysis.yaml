@@ -40,6 +40,12 @@ viz:
     island_iterations: 300    # force-layout steps for cluster islands (positions rounded each step for determinism)
     island_unit: 1.0          # island radius scale
     min_bridge_links: 2       # draw a bridge between islands joined by at least this many nearest-neighbour links
+rubric_scores:
+  # Bootstrap intervals for the score correlations (score-correlations) and for rater agreement (rater-agreement), §5.6.
+  # Percentile intervals; the seed is fixed so the build is deterministic (rater agreement uses seed + 1).
+  bootstrap: 2000
+  seed: 20261031
+  interval: 0.95
 book:
   rare_max_games: 10     # a mechanic used by at most this many catalog games counts as rare in the book's prose (chapter 1)
   subgenre_min_games: 6  # subgenres with at least this many games get a row in the subgenre-spend table (chapter 2)

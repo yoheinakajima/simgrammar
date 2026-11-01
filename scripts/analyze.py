@@ -21,7 +21,7 @@ import numpy as np
 from scipy.cluster.hierarchy import fcluster, linkage
 from scipy.spatial.distance import squareform
 from scipy.special import gammaln
-from scipy.stats import spearmanr
+from scipy.stats import rankdata, spearmanr
 
 from lib import CALIBRATION_SCALES, ROOT, calibration_agreement, independent, load_calibration, load_registry, lower_median, read_yaml, vocab_terms
 
@@ -522,11 +522,75 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         r, p = spearmanr(xs, ys)
         return _r(r, 2), p
 
-    for a, b in [("legibility", "emergence_potential"), ("authoring_cost", "ai_leverage"), ("legibility", "compute_cost"),
-                 ("emergence_potential", "tuning_difficulty"), ("legibility", "ai_leverage")]:
+    score_pairs = [("legibility", "emergence_potential"), ("authoring_cost", "ai_leverage"), ("legibility", "compute_cost"),
+                   ("emergence_potential", "tuning_difficulty"), ("legibility", "ai_leverage")]
+    for a, b in score_pairs:
         r, p = corr(a, b)
         stats[f"rho_{a}_{b}"] = r
         stats[f"p_{a}_{b}"] = ("<0.001" if p is not None and p < 0.001 else (_r(p, 3) if p is not None else None))
+    # How far the score correlations can be trusted (§5.6, review findings D8, D10, E23, E26). The p-values above treat
+    # mechanics as independent draws, but mechanics in one family share the kind of state they own, and the interface
+    # families sit at the floor of emergence potential by construction. So, on the stored scores:
+    #  - a bootstrap over mechanics, and one over whole families (each drawn family brings all its mechanics), which keeps
+    #    the family structure and is the interval to read; percentile intervals, fixed seed;
+    #  - the correlation within families: ranks centred on each family's mean rank, so differences between families drop out;
+    #  - the correlation if the doubly rated fields stored the mean or the upper of their ratings instead of the lower median,
+    #    since with two raters the lower median is the lower score.
+    sc_cfg = cfg.get("rubric_scores") or {}
+    n_boot, boot_seed = int(sc_cfg.get("bootstrap", 2000)), int(sc_cfg.get("seed", 20261031))
+    q_lo, q_hi = 50 * (1 - float(sc_cfg.get("interval", 0.95))), 50 * (1 + float(sc_cfg.get("interval", 0.95)))
+    score_fields = [f for f in CALIBRATION_SCALES if all(isinstance(m.data.get(f), int) for m in mechs)]
+    sv = {f: np.array([m.data[f] for m in mechs], float) for f in score_fields}
+    alt = {"mean": {f: sv[f].copy() for f in score_fields}, "upper": {f: sv[f].copy() for f in score_fields}}
+    for i, m in enumerate(mechs):
+        for f in score_fields:
+            vals = [r["value"] for r in m.data.get("ratings") or [] if r["field"] == f]
+            if len(vals) > 1:
+                alt["mean"][f][i], alt["upper"][f][i] = float(np.mean(vals)), float(max(vals))
+    fam_of = np.array([m.data["family"] for m in mechs])
+    members = [np.flatnonzero(fam_of == f) for f in sorted(set(fam_of))]
+    rng = np.random.default_rng(boot_seed)
+    draw_mech = rng.integers(0, len(mechs), (n_boot, len(mechs))) if mechs else None
+    draw_fam = [np.concatenate([members[k] for k in pick]) for pick in rng.integers(0, len(members), (n_boot, len(members)))] if mechs else []
+    crows = []
+    for a, b in score_pairs:
+        if a not in sv or b not in sv or stats.get(f"rho_{a}_{b}") is None:
+            continue
+        x, y = sv[a], sv[b]
+        bm = _spearman_rows(x[draw_mech], y[draw_mech])
+        bf = np.array([_spearman(x[ii], y[ii]) for ii in draw_fam])
+        lab = lambda f: f.replace("_", " ").replace("ai leverage", "AI leverage")  # noqa: E731
+        row = {"pair": f"{lab(a)} × {lab(b)}", "rho": stats[f"rho_{a}_{b}"], "p": stats[f"p_{a}_{b}"],
+               "low": _r(np.nanpercentile(bm, q_lo), 2), "high": _r(np.nanpercentile(bm, q_hi), 2),
+               "family_low": _r(np.nanpercentile(bf, q_lo), 2), "family_high": _r(np.nanpercentile(bf, q_hi), 2),
+               "within_family": _r(_spearman_within(x, y, members), 2),
+               "mean_rule": _r(_spearman(alt["mean"][a], alt["mean"][b]), 2), "upper_rule": _r(_spearman(alt["upper"][a], alt["upper"][b]), 2)}
+        for k in ("low", "high", "family_low", "family_high", "within_family", "mean_rule", "upper_rule"):
+            stats[f"rho_{a}_{b}_{k}"] = row[k]
+        crows.append(row)
+    stats["n_bootstrap"], stats["pct_bootstrap_interval"] = n_boot, round(q_hi - q_lo)
+    rule_moves = [abs(r[k] - r["rho"]) for r in crows for k in ("mean_rule", "upper_rule") if r[k] is not None]
+    stats["max_rho_change_aggregation"] = _r(max(rule_moves), 2) if rule_moves else None
+    tables["score-correlations"] = {
+        "description": f"Spearman correlations between rubric scores across all mechanics, on the stored scores. p treats mechanics as independent and is "
+                       f"descriptive. Low and high bound a {round(q_hi - q_lo)}% bootstrap interval over mechanics, family low and high one over whole "
+                       f"families ({n_boot} resamples each); within family ranks each score against its family's mean, so differences between families "
+                       "drop out. Mean rule and upper rule store the mean or the higher of the two ratings on the doubly rated fields instead of the "
+                       "lower median. Every score comes mostly from one model rater.",
+        "columns": ["pair", "rho", "p", "low", "high", "family_low", "family_high", "within_family", "mean_rule", "upper_rule"], "rows": crows}
+    # family means (the ceilings figure, §6) under the same alternatives: how far a family's mean moves, and how many of the
+    # figure's marks change (the same rule as viz.constraint_profile: a cost at 3 or above, legibility below 3.3)
+    shift, marks = 0.0, {"mean": 0, "upper": 0}
+    for ii in members:
+        for f in score_fields:
+            shift = max(shift, abs(float(alt["upper"][f][ii].mean() - sv[f][ii].mean())))
+        for k in marks:
+            for f in ("authoring_cost", "compute_cost", "tuning_difficulty", "legibility"):
+                if f in sv:
+                    v0, v1 = sv[f][ii].mean(), alt[k][f][ii].mean()
+                    marks[k] += int((v0 < 3.3) != (v1 < 3.3) if f == "legibility" else (v0 >= 3) != (v1 >= 3))
+    stats["max_family_mean_shift_upper"] = _r(shift, 2)
+    stats["n_family_marks_changed_mean"], stats["n_family_marks_changed_upper"] = marks["mean"], marks["upper"]
     # robustness: interface families (legibility, time and pacing) are scored emergence 1 by rubric design
     iface = {"information-legibility", "time-pacing"}
     sub = [m for m in mechs if m.data["family"] not in iface]
@@ -869,7 +933,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
 
     # ---------------- raters: agreement between independent ratings, and calibration results
     runs = {r.id: r for r in ents.get("run", [])}
-    pair_stats = defaultdict(lambda: {"scores": 0, "pairs": 0, "exact": 0, "within_one": 0})
+    pair_stats = defaultdict(lambda: {"scores": 0, "pairs": 0, "exact": 0, "within_one": 0, "units": [], "ordered": []})
     n_ratings = 0
     rated_mechs: set[str] = set()
     for t in ("mechanic", "game", "technique", "opportunity"):
@@ -878,6 +942,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             for r in e.data.get("ratings") or []:
                 per[r["field"]].append(r)
                 n_ratings += 1
+            created_id = (e.data.get("provenance") or {}).get("created")
             for fld, rs in sorted(per.items()):
                 ps = [(x, y) for i, x in enumerate(rs) for y in rs[i + 1:] if independent(runs.get(x["run"]), runs.get(y["run"]))]
                 if ps:
@@ -888,10 +953,49 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
                     ag["pairs"] += len(ps)
                     ag["exact"] += sum(1 for x, y in ps if x["value"] == y["value"])
                     ag["within_one"] += sum(1 for x, y in ps if abs(x["value"] - y["value"]) <= 1)
-    tables["rater-agreement"] = {"description": "Agreement between ratings from independent runs (different operator, and different model for agent runs), per scored field. A field appears once a second rater has scored it (tasks/rate-scores.md).",
-                                 "columns": ["field", "scores", "pairs", "exact", "within_one"],
-                                 "rows": [{"field": f, "scores": v["scores"], "pairs": v["pairs"], "exact": _r(v["exact"] / v["pairs"], 2), "within_one": _r(v["within_one"] / v["pairs"], 2)} for f, v in sorted(pair_stats.items())]}
+                    ag["units"].append([r["value"] for r in rs])
+                    # each independent pair as (first, second): the creating run's original score first, else the earlier run's
+                    ag["ordered"] += [(x["value"], y["value"]) if x["run"] == created_id or (y["run"] != created_id and x["run"] <= y["run"])
+                                      else (y["value"], x["value"]) for x, y in ps]
+    # chance-corrected agreement (review findings D8, D16, E23): Krippendorff's alpha with the ordinal metric over every rating
+    # of a rated field, with a bootstrap over the rated records; quadratic-weighted kappa, as calibration-results reports; the
+    # rank correlation between first and second ratings; the second rater's mean shift; and how many second ratings sit below
+    # or above the first. Exact agreement and alpha can be low while the ranks agree: a rater who reads every anchor one level
+    # higher orders the records the same way and never picks the same anchor. A resample whose ratings all sit on one anchor
+    # has no alpha (nothing varies to agree on) and is left out of the interval. Ten records per field make wide intervals.
+    rrng = np.random.default_rng(boot_seed + 1)
+    agree_rows, confusion = [], []
+    for f, v in sorted(pair_stats.items()):
+        K = max(max(u) for u in v["units"])
+        Cu = np.array([_coincidence(u, K) for u in v["units"]])
+        draw = rrng.integers(0, len(Cu), (n_boot, len(Cu)))
+        W = np.zeros((n_boot, len(Cu)))
+        np.add.at(W, (np.arange(n_boot)[:, None], draw), 1)
+        ba = _alpha_ordinal(np.einsum("bu,ukl->bkl", W, Cu))
+        ba = ba[np.isfinite(ba)]
+        first, second = (np.array(c, float) for c in zip(*v["ordered"]))
+        row = {"field": f, "scores": v["scores"], "pairs": v["pairs"], "exact": _r(v["exact"] / v["pairs"], 2), "within_one": _r(v["within_one"] / v["pairs"], 2),
+               "kappa": _r(_kappa_quadratic(first, second, K), 2), "alpha": _r(_alpha_ordinal(Cu.sum(0)), 2),
+               "alpha_low": _r(np.percentile(ba, q_lo), 2) if len(ba) else None, "alpha_high": _r(np.percentile(ba, q_hi), 2) if len(ba) else None,
+               "rank_rho": _r(_spearman(first, second), 2), "shift": _r(float(np.mean(second - first)), 1)}
+        for k in ("kappa", "alpha", "alpha_low", "alpha_high", "shift"):
+            stats[f"{k}_rater_{f}"] = row[k]
+        stats[f"rho_raters_{f}"] = row["rank_rho"]
+        stats[f"n_rater_lower_{f}"] = int(np.sum(second < first))
+        stats[f"n_rater_higher_{f}"] = int(np.sum(second > first))
+        agree_rows.append(row)
+        for (x, y), n in sorted(Counter(v["ordered"]).items()):
+            confusion.append({"field": f, "first": x, "second": y, "scores": n})
+    mech_alpha = [r["alpha"] for r in agree_rows if (rub["scales"].get(r["field"]) or {}).get("applies_to") == "mechanic" and r["alpha"] is not None]
+    if mech_alpha:
+        stats["alpha_rater_min"], stats["alpha_rater_max"] = min(mech_alpha), max(mech_alpha)
+    tables["rater-confusion"] = {"description": "For each field with independent ratings, how often each pair of anchors was chosen: first is the original score "
+                                                "(the creating run's), second the independent rating. Rows with no scores are omitted.",
+                                 "columns": ["field", "first", "second", "scores"], "rows": confusion}
     stats["n_ratings"] = n_ratings
+    # how many raters stand behind the second ratings: distinct runs rating a record their own run did not create
+    stats["n_rating_runs"] = len({r["run"] for t in ("mechanic", "game", "technique", "opportunity") for e in live.get(t, [])
+                                  for r in e.data.get("ratings") or [] if r["run"] != (e.data.get("provenance") or {}).get("created")})
     # how far the second ratings reach, and how often independent raters agree on each scale (chapter 5)
     stats["n_mechanics_independently_rated"] = len(rated_mechs)
     for f, v in sorted(pair_stats.items()):
@@ -921,6 +1025,19 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             r, p = spearmanr([x[0] for x in sc], [x[1] for x in sc])
         stats[f"rho_legibility_emergence_potential_{key}"] = _r(r, 2)
         stats[f"p_legibility_emergence_potential_{key}"] = _r(p, 3)
+    # the same mechanics' stored legibility and emergence potential (the lower median), and the two other ways of combining
+    # two ratings that review finding D10 asks about: their mean, and the upper of the two
+    combos = {"stored": [], "mean": [], "upper": []}
+    for m in mechs:
+        rs = m.data.get("ratings") or []
+        v = {f: [r["value"] for r in rs if r["field"] == f] for f in pair_fields}
+        if all(len(v[f]) > 1 for f in pair_fields):
+            combos["stored"].append(tuple(m.data[f] for f in pair_fields))
+            combos["mean"].append(tuple(float(np.mean(v[f])) for f in pair_fields))
+            combos["upper"].append(tuple(max(v[f]) for f in pair_fields))
+    for key, sc in combos.items():
+        ok = len(sc) >= 5 and all(len({x[i] for x in sc}) > 1 for i in range(2))
+        stats[f"rho_legibility_emergence_potential_{key}_rated"] = _r(spearmanr([x[0] for x in sc], [x[1] for x in sc])[0], 2) if ok else None
     cal = load_calibration(load_registry())
     cal_rows = []
     for r in sorted(runs.values(), key=lambda r: r.id):
@@ -933,6 +1050,49 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
                                      "columns": ["run", "model", "operator", "scores", "exact", "within_one", "kappa"], "rows": cal_rows}
     stats["n_calibrated_runs"] = len(cal_rows)
     stats["n_calibration_mechanics"] = len((cal or {}).get("mechanics") or {})
+    # The calibration set as a second, larger comparison (§5.6): its frozen scores are the original rater's, and each calibrated
+    # run independent of a mechanic's creating run scored it blind from the sheet, by that run's own account (the frozen
+    # scores are public). Per scale, ordinal alpha over the frozen score and every such run's score, and the mean shift; then
+    # the legibility-emergence correlation under the frozen scores and under the independent runs' lower median. The set was
+    # chosen to span the anchors, which widens each scale's range, and a rater reaches it only by passing, so these numbers
+    # compare the two raters on the same mechanics and are not estimates for the full vocabulary.
+    cal_scores = {mid: [] for mid in (cal or {}).get("mechanics") or {}}
+    for r in sorted(runs.values(), key=lambda r: r.id):
+        for mid, sc in (((r.data.get("calibration") or {}).get("scores")) or {}).items():
+            m = by_id.get(mid)
+            if mid in cal_scores and m is not None and independent(r, runs.get((m.data.get("provenance") or {}).get("created"))):
+                cal_scores[mid].append(sc)
+    cal_rated = sorted(mid for mid, scs in cal_scores.items() if scs)
+    stats["n_calibration_mechanics_second_rated"] = len(cal_rated)
+    if len(cal_rated) >= 5:
+        gold = cal["mechanics"]
+        cal_alpha = {}
+        for f in CALIBRATION_SCALES:
+            units = [[gold[mid][f]] + [s[f] for s in cal_scores[mid] if isinstance(s.get(f), int)] for mid in cal_rated]
+            units = [u for u in units if len(u) > 1]
+            if units:
+                K = max(max(u) for u in units)
+                cal_alpha[f] = _r(_alpha_ordinal(sum(_coincidence(u, K) for u in units)), 2)
+                stats[f"alpha_calibration_{f}"] = cal_alpha[f]
+                stats[f"shift_calibration_{f}"] = _r(float(np.mean([x - u[0] for u in units for x in u[1:]])), 1)
+        for row in agree_rows:
+            row["calibration_alpha"] = cal_alpha.get(row["field"])
+        if cal_alpha:
+            stats["alpha_calibration_min"], stats["alpha_calibration_max"] = min(cal_alpha.values()), max(cal_alpha.values())
+        sec = {mid: tuple(lower_median([s.get(f) for s in cal_scores[mid]]) for f in pair_fields) for mid in cal_rated}
+        both = [mid for mid in cal_rated if None not in sec[mid]]
+        stats["rho_legibility_emergence_potential_calibration_original"] = _r(_spearman([gold[mid][pair_fields[0]] for mid in both], [gold[mid][pair_fields[1]] for mid in both]), 2)
+        stats["rho_legibility_emergence_potential_calibration_second"] = _r(_spearman([sec[mid][0] for mid in both], [sec[mid][1] for mid in both]), 2)
+    tables["rater-agreement"] = {
+        "description": "Agreement between ratings from independent runs (different operator, and different model for agent runs), per scored field. A field "
+                       "appears once a second rater has scored it (tasks/rate-scores.md). Exact and within one are shares of rating pairs; kappa is "
+                       "quadratic-weighted; alpha is Krippendorff's alpha with the ordinal metric, with alpha low and high bounding a "
+                       f"{round(q_hi - q_lo)}% bootstrap interval over the rated records ({n_boot} resamples); rank rho is the Spearman correlation "
+                       "between the original and the independent rating; shift is the independent rating minus the original, on average; calibration "
+                       "alpha is the same alpha on the calibration set, between its frozen scores and the independent raters who scored it from the score-free sheet. "
+                       "Counts per anchor pair are in rater-confusion.csv.",
+        "columns": ["field", "scores", "pairs", "exact", "within_one", "kappa", "alpha", "alpha_low", "alpha_high", "rank_rho", "shift", "calibration_alpha"],
+        "rows": [{**r, "calibration_alpha": r.get("calibration_alpha")} for r in agree_rows]}
 
     # ---------------- adoption over time
     by_decade = Counter()
@@ -977,6 +1137,73 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     return {"derived": {k: dict(sorted(v.items())) for k, v in sorted(derived.items())}, "stats": dict(sorted(stats.items())),
             "tables": tables, "figures": figures, "vizzes": vizzes, "byline": byline, "cocluster": shared.get("cocluster", {}),
             "pair_count": shared.get("pair_count", {}), "mechanic_ids": {m.id for m in mechs}}
+
+
+# ---------------- rubric-score statistics: rank correlations and agreement between raters
+
+def _spearman(x, y) -> float:
+    """Spearman's rho (average ranks for ties); nan when either variable is constant."""
+    rx, ry = rankdata(x), rankdata(y)
+    rx, ry = rx - rx.mean(), ry - ry.mean()
+    den = math.sqrt(float((rx * rx).sum() * (ry * ry).sum()))
+    return float((rx * ry).sum() / den) if den else float("nan")
+
+
+def _spearman_rows(X, Y) -> np.ndarray:
+    """Spearman's rho for each row of two equal-shape matrices (bootstrap resamples); nan for a constant row."""
+    rx, ry = rankdata(X, axis=1), rankdata(Y, axis=1)
+    rx, ry = rx - rx.mean(1, keepdims=True), ry - ry.mean(1, keepdims=True)
+    den = np.sqrt((rx * rx).sum(1) * (ry * ry).sum(1))
+    return np.divide((rx * ry).sum(1), den, out=np.full(len(den), np.nan), where=den > 0)
+
+
+def _spearman_within(x, y, groups) -> float:
+    """Rank correlation within groups: rank both variables over all items, subtract each group's mean rank, and correlate
+    what is left, so that differences between the groups' levels do not count."""
+    rx, ry = rankdata(x), rankdata(y)
+    for ii in groups:
+        rx[ii] -= rx[ii].mean()
+        ry[ii] -= ry[ii].mean()
+    den = math.sqrt(float((rx * rx).sum() * (ry * ry).sum()))
+    return float((rx * ry).sum() / den) if den else float("nan")
+
+
+def _coincidence(values, K: int) -> np.ndarray:
+    """Krippendorff's coincidence matrix for one record's ratings on a 1..K scale: every ordered pair of its ratings,
+    weighted 1/(m-1) for m ratings."""
+    C = np.zeros((K, K))
+    for i, x in enumerate(values):
+        for j, y in enumerate(values):
+            if i != j:
+                C[x - 1, y - 1] += 1 / (len(values) - 1)
+    return C
+
+
+def _alpha_ordinal(O) -> np.ndarray | float:
+    """Krippendorff's alpha with the ordinal metric (Krippendorff 2011) from a coincidence matrix, or a stack of them
+    (..., K, K). The ordinal distance between anchors c and k is (sum of n_g for g from c to k, minus (n_c + n_k) / 2) squared.
+    nan where every rating sits on one anchor. Reproduces the worked example in Krippendorff (2011): 0.815."""
+    O = np.asarray(O, float)
+    nc = O.sum(-1)
+    n = nc.sum(-1)
+    c = np.arange(O.shape[-1])
+    lo, hi = np.minimum.outer(c, c), np.maximum.outer(c, c)
+    cs = np.cumsum(nc, -1)
+    d2 = (cs[..., hi] - cs[..., lo] + (nc[..., lo] - nc[..., hi]) / 2) ** 2
+    do = (O * d2).sum((-1, -2)) / np.where(n > 0, n, 1)
+    de = (nc[..., :, None] * nc[..., None, :] * d2).sum((-1, -2)) / np.where(n > 1, n * (n - 1), 1)
+    a = np.where(de > 0, 1 - do / np.where(de > 0, de, 1), np.nan)
+    return float(a) if a.ndim == 0 else a
+
+
+def _kappa_quadratic(a, b, K: int) -> float:
+    """Cohen's quadratic-weighted kappa between two raters' ratings on a 1..K scale; nan when chance disagreement is zero."""
+    O = np.zeros((K, K))
+    np.add.at(O, (np.asarray(a, int) - 1, np.asarray(b, int) - 1), 1)
+    E = np.outer(O.sum(1), O.sum(0)) / O.sum()
+    w = (np.subtract.outer(np.arange(K), np.arange(K)) ** 2).astype(float)
+    de = float((w * E).sum())
+    return 1 - float((w * O).sum()) / de if de else float("nan")
 
 
 def _contingency(a, b):

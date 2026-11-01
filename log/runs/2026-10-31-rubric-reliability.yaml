@@ -1,0 +1,47 @@
+id: 2026-10-31-rubric-reliability
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Answer the Explore Science review's findings on rubric scores, rater reliability, score correlations,
+  the six layers and the five ceilings (D5, D8, D10, D16, E23, E26, E29, E33, E35, B4, A1) with new analyses
+  and recalibrated prose in paper sections 2.3, 2.6, 4.1, 5.6 and 6 and book chapters 2, 5 and 6.
+method: 'Read the findings, CONTRACT.md, AGENTS.md, vocab/rubrics.yaml, the second rater''s run (2026-10-29-shreyko-antim-rate-scores-19),
+  calibration/mechanics-v1.yaml, scripts/calibrate.py and scripts/make_tasks.py. Added to analyze.py: Krippendorff''s
+  ordinal alpha (checked against the worked example in Krippendorff 2011: 0.743 nominal, 0.815 ordinal, 0.849 interval),
+  quadratic kappa, rank correlation and mean shift between raters per field, with a bootstrap over rated records
+  (rater-agreement gains columns; new rater-confusion table); the same alpha on the calibration set, where the
+  second rater''s blind sheet scores meet the frozen original scores, and the legibility-emergence correlation
+  there under each rater (-0.71, -0.73); bootstrap intervals over mechanics and over whole families for the five
+  score correlations, within-family rank correlations, and the correlations if doubly rated fields stored the
+  mean or upper rating (new score-correlations table); family-mean shifts and constraint-figure marks under those
+  rules. Seeds and resample count are in report/analysis.yaml (rubric_scores). Findings: alpha on the ten doubly
+  rated mechanics runs 0.09 to 0.80 and every interval reaches below zero; emergence and tuning disagreement is a
+  shift (second rater never lower, rank rho 0.92 and 0.85); family-resampled intervals exclude zero for all five
+  pairs; within families legibility-emergence weakens to -0.29; aggregation moves no correlation by more than
+  0.02 and no constraint-figure mark. From the run record and make_tasks.py: the second rater saw score-free packets,
+  by its operator''s account, but read descriptions the original rater wrote, and the ten mechanics are the generator''s
+  first alphabetical batch. Rewrote 5.6 as rubric-consistency findings and a hypothesis, 2.3 (lower-anchor rule,
+  emergence vs emergence_potential), 2.6 (what the second rater saw, selection, upper bound), 4.1 (table captions,
+  hypotheses, synergy/tension from one pass, a family-layer-ceiling table labelled a proposal, the four uses of
+  legibility), 6 (hypotheses, E35, conservative family means). Book chapters 2, 5, 6 follow. Not done: disattenuation
+  (the disagreement is a shift, which rank correlations ignore, and alpha intervals reach zero, so corrected values
+  would be unbounded), partial correlations, a mixed model, and ratings on more mechanics (needs new raters).
+  No records changed; no voice lines edited.'
+contract_version: '1.2'
+proposals:
+- kind: rubric
+  target: emergence_potential
+  detail: 'The mechanic emergence_potential anchors condition on coupling ("when coupled with others", "wherever
+    it appears"), so the score rates a mechanic''s typical contribution in the games that use it. Paper 2.3 now
+    states that mapping. A maintainer could add it to the scale''s question by ADR, since changing anchor text
+    is a contract change.'
+- kind: rubric
+  target: tuning_difficulty
+  detail: 'Level 4 of emergence_potential ("chains of consequences across systems") and of tuning_difficulty ("runaway
+    loops") both describe coupled feedback, and the ai_leverage anchors name cost, variety and assets, which authoring_cost
+    measures. Paper 5.6 notes the overlap; separating the wording would need an ADR and a re-score.'
