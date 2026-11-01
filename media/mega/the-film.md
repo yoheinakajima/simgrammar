@@ -43,7 +43,7 @@ The film re-voices these episode scenes so their cross-references name the film'
 
 ### Episode 5, scene 6: What a player can follow
 
-**Voice.** The third ceiling was the last chapter. On the dataset's scores, the mechanics that produce the most variety are the hardest to read, so every system a game connects to the others needs a way to be understood: an overlay, a tooltip, an inspection panel. Each one costs design time and screen space.{{assert:rho_legibility_emergence_potential < -0.2}}
+**Voice.** The third ceiling was the last chapter. On the dataset's scores, the mechanics rated as producing the most variety are rated hardest to read. If players find the same, every system a game connects to the others needs a way to be understood: an overlay, a tooltip, an inspection panel. Each one costs design time and screen space.{{assert:rho_legibility_emergence_potential < -0.2}}
 
 ### Episode 5, scene 7: Same inputs, same world
 
@@ -95,7 +95,7 @@ The film re-voices these episode scenes so their cross-references name the film'
 
 **Voice.** The whole dataset is a folder of plain-text records. Everything else is built from it on every change: the paper, the website, the book, and the script for this film. Nothing computed is stored. A mechanic's prevalence, a game's cluster, a bet's priority: each is worked out again on every build, because a stored copy would drift.
 
-**Voice.** Sentences are the hard part, because they interpret numbers. So every number in this series is a token the build fills in, and every sentence that interprets one carries a check. When chapter 1 said four of the five most common parts don't simulate anything, the build checked all five ranks. If the data stops agreeing, the build fails until somebody rewrites the line.
+**Voice.** Sentences are the hard part, because they interpret numbers. So every number in this series is a token the build fills in, and every sentence that ranks, compares, or groups those numbers carries a check. The check confirms the sentence still matches the data; it can't tell whether the reading is right. When chapter 1 said four of the five most common parts don't simulate anything, the build checked all five ranks. If the data stops agreeing, the build fails until somebody rewrites the line.
 
 ### Episode 12, scene 5: The rules came from failures
 

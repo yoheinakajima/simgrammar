@@ -28,7 +28,7 @@ Target runtime about 12 minutes: about 1,250 words of narration at 135 words a m
 
 **Voice.** Placing buildings is in {{derived:free-placement.prevalence}} catalog games. Event chains, the machinery that lets Crusader Kings III follow a rival's illness with a succession crisis and then a war, are in {{derived:triggered-event-chains.prevalence}}. If the two were spread across games at random, several games would have both. Three do: Surviving Mars, whose Mysteries lay authored storylines like plagues and AI revolts over a colony you lay out yourself; Frostpunk, whose scenarios move through events and choices about the city's people; and Frostpunk 2, where leaving the generator off too long, or breaking promises to a faction, sets off a chain of consequences.{{assert:cooccur.free-placement.triggered-event-chains == 3}} In all three, the stories are about the colony or the city as a whole. Picture the other version: a tavern built next to the temple, or a mill whose pond floods a farmer's field, firing a short event about the people it affects, with a choice and a consequence the game keeps track of. Manor Lords and Islanders each do a piece of it too.
 
-**Voice.** Call those vacant lots: two mechanics, each common, from different corners of the design, that almost never share a game.
+**Voice.** Call those vacant lots: two mechanics, each common, from different corners of the design, that almost never share a catalog game.
 
 ## 4. Packages (2:08 to 3:27)
 
@@ -86,7 +86,7 @@ Target runtime about 12 minutes: about 1,250 words of narration at 135 words a m
 
 **Frame.** count at="Kerbal Space Program is the only one" kind=venn a=budget-treasury b=embodied-skill-control
 
-**Voice.** Some games already stand on lots nobody else has built. Prison Architect is the only catalog game that hires staff one by one and also wires a power grid.{{assert:cooccur.staff-hiring.power-grid == 1}} Kerbal Space Program is the only one that pairs a treasury with flying by hand: contracts pay for the rocket, and you still have to land it yourself.{{assert:cooccur.budget-treasury.embodied-skill-control == 1}} A lot with one building on it still counts as vacant here, and it might be the more useful kind, because somebody has already shown it can stand.
+**Voice.** Some games already stand on lots no other catalog game has built. Prison Architect is the only catalog game that hires staff one by one and also wires a power grid.{{assert:cooccur.staff-hiring.power-grid == 1}} Kerbal Space Program is the only one that pairs a treasury with flying by hand: contracts pay for the rocket, and you still have to land it yourself.{{assert:cooccur.budget-treasury.embodied-skill-control == 1}} A lot with one building on it still counts as vacant here, and it might be the more useful kind, because somebody has already shown it can stand.
 
 ## 10. Lots that might stay empty (9:32 to 10:40)
 
@@ -100,7 +100,7 @@ Target runtime about 12 minutes: about 1,250 words of narration at 135 words a m
 
 **Voice.** Hands-on skill, like flying and driving, and placing buildings share no game at all.{{assert:cooccur.embodied-skill-control.free-placement == 0}} Most flight and racing sims have no use for a town. The lot next door is built: Kerbal Space Program and Besiege have you assemble a machine from parts and then fly or drive it yourself.{{assert:cooccur.modular-assembly.embodied-skill-control >= 3}} What no catalog game does is the version where you build the place, the track or the airfield, and then drive it.
 
-**Voice.** Other empty pairs are two lineages that haven't met. Permanent death lives mostly in colony sims, survival games, and virtual pets; scenario goals live mostly in city builders, tycoons, and vehicle sims; the two share a single game, This War of Mine, whose scenarios end when the war does.{{assert:cooccur.permadeath.scenario-objectives == 1}} A treasury and crafting by hand never share one at all: the crafting games are mostly survival and sandbox games, run on inventories rather than ledgers.{{assert:cooccur.budget-treasury.hand-crafting == 0}}
+**Voice.** Other empty pairs are two lineages that haven't met in the catalog. Permanent death lives mostly in colony sims, survival games, and virtual pets; scenario goals live mostly in city builders, tycoons, and vehicle sims; the two share a single game, This War of Mine, whose scenarios end when the war does.{{assert:cooccur.permadeath.scenario-objectives == 1}} A treasury and crafting by hand never share one at all: the crafting games are mostly survival and sandbox games, run on inventories rather than ledgers.{{assert:cooccur.budget-treasury.hand-crafting == 0}}
 
 ## 11. How a lot closes (10:40 to 11:43)
 

@@ -1,0 +1,27 @@
+id: 2026-10-31-es-review-revoice
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: bring the episodes in line with the v0.4 revision that answered the Explore Science
+  review of v0.3, re-voicing what it made wrong or too strong.'
+method: >-
+  Changed no records or sources. The five revision runs reported narration their findings made wrong or too strong
+  without editing it. Wrong: episode 2 called a first catalog date a floor (it bounds the origin year from above) and
+  quoted the early-coverage null that favoured the early games, and episode 9's horizon counts moved when
+  learned-weather-layer's horizon did. Too strong: episode 4 and 5 lines that read rubric scores as measurements,
+  episode 7's "where the field is pointed" and "where research looks", episode 8's lots "nobody else has built" and
+  lineages that "haven't met" without "in the catalog", episode 11's refuted prediction counting against the thesis
+  outright, episode 12's "every sentence that interprets" carries a check, plus three softer wordings the operator
+  also chose (episode 5 scenes 3 and 5, episode 8 scene 3). The film's copies of two lines and the Japanese cues for
+  every changed line were rewritten to match, and episode 2 scene 4 is now headed "A date is an upper bound". Takes are
+  voiced per scene, so 17 scenes (13,468 characters) were re-voiced with Marcus on eleven_v4, two takes each, keeping
+  the take nearer the series' pace. All 24 videos were re-rendered from the merged main. The worktree first failed to
+  render because node_modules lives in the main checkout; a link fixed it. The narration check found 0 stale takes
+  against the new renders. Release videos-2026-10-31c holds the 60 files, every sha256 matching the staged copy.
+contract_version: '1.2'
+proposals: []

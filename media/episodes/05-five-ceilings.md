@@ -36,7 +36,7 @@ Target runtime about 12 minutes: about 1,260 words of narration at 135 words a m
 
 **Frame.** count kind=set ids=ceiling-authoring,ceiling-compute,ceiling-legibility,ceiling-determinism,ceiling-believability
 
-**Voice.** Authoring cost is one of five limits that have shaped what simulation mechanics can be. The others are the compute a machine can spend each tick, how much hidden state a player can follow, the need for the same inputs to produce the same world, and how believable a mind made of formulas can be.
+**Voice.** Authoring cost is one of five limits that, we'd argue, have shaped what simulation mechanics can be. The others are the compute a machine can spend each tick, how much hidden state a player can follow, the need for the same inputs to produce the same world, and how believable a mind made of formulas can be.
 
 ## 4. Content made by hand (2:36 to 4:24)
 
@@ -56,7 +56,7 @@ Target runtime about 12 minutes: about 1,260 words of narration at 135 words a m
 
 **Voice.** Open input hits the same ceiling. Façade, from 2005, let you type anything to a married couple at dinner. Behind the text box, each sentence was mapped to one of a small set of social moves, and a drama manager picked the next scene from a library its authors had written. One analysis counted 30 kinds of speech act and 27 story beats [@src-evans-2014-versu].
 
-**Voice.** The mechanics that cost the most to write by hand are also the ones judged most open to generative models.{{assert:rho_authoring_cost_ai_leverage > 0.2}}{{assert:mean_ai_leverage_authoring_4plus > mean_ai_leverage_authoring_2_or_less}}
+**Voice.** The mechanics the rater scored costliest to write by hand are the ones the same rater judged most open to generative models. That's two of one reader's judgments agreeing, and nobody has measured it.{{assert:rho_authoring_cost_ai_leverage > 0.2}}{{assert:mean_ai_leverage_authoring_4plus > mean_ai_leverage_authoring_2_or_less}}
 
 ## 5. Ticks per second (4:24 to 6:05)
 
@@ -80,7 +80,7 @@ Target runtime about 12 minutes: about 1,260 words of narration at 135 words a m
 
 **Frame.** chain at="Dwarf Fortress moves some of its cost" nodes="history-generation:Thousands of years simulated,save-file:A very large save" verbs="before you start" from=dwarf-fortress
 
-**Voice.** The ceiling explains city builders too. Most simulate their people as totals with a few visible faces. When SimCity in 2013 switched to agents that carry workers, water, and goods between buildings, its cities were smaller than earlier games' by design. Dwarf Fortress moves some of its cost to before you start: it can simulate thousands of years of a world's history while generating it, which takes a long time and leaves you with a very large save.
+**Voice.** The ceiling fits city builders too. Most simulate their people as totals with a few visible faces. When SimCity in 2013 switched to agents that carry workers, water, and goods between buildings, its cities were smaller than earlier games' by design. Dwarf Fortress moves some of its cost to before you start: it can simulate thousands of years of a world's history while generating it, which takes a long time and leaves you with a very large save.
 
 ## 6. What a player can follow (6:05 to 6:44)
 
@@ -88,7 +88,7 @@ Target runtime about 12 minutes: about 1,260 words of narration at 135 words a m
 
 **Frame.** count kind=set ids=data-overlays,causal-tooltips,agent-inspection
 
-**Voice.** The third ceiling was the last episode. On the dataset's scores, the mechanics that produce the most variety are the hardest to read, so every system a game connects to the others needs a way to be understood: an overlay, a tooltip, an inspection panel. Each one costs design time and screen space.{{assert:rho_legibility_emergence_potential < -0.2}}
+**Voice.** The third ceiling was the last episode. On the dataset's scores, the mechanics rated as producing the most variety are rated hardest to read. If players find the same, every system a game connects to the others needs a way to be understood: an overlay, a tooltip, an inspection panel. Each one costs design time and screen space.{{assert:rho_legibility_emergence_potential < -0.2}}
 
 ## 7. Same inputs, same world (6:44 to 8:04)
 

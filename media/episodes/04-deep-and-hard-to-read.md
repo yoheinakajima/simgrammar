@@ -50,7 +50,7 @@ Target runtime about 12 minutes: about 1,210 words of narration at 135 words a m
 
 **Picture.** The scatter of every mechanic, legibility across, emergence up, each dot sized by how many games use it. The dots settle into a cloud that leans down to the right.
 
-**Voice.** Plot all {{stat:n_mechanic}} mechanics and the cloud leans. The more variety a mechanic produces, the harder it's rated to read. The {{stat:n_mechanics_emergence_1}} mechanics at the bottom of the emergence scale average {{stat:mean_legibility_emergence_1}} for legibility. The {{stat:n_mechanics_emergence_4plus}} at 4 or 5 average {{stat:mean_legibility_emergence_4plus}}.{{assert:mean_legibility_emergence_1 > mean_legibility_emergence_4plus}}{{assert:rho_legibility_emergence_potential < -0.2}}
+**Voice.** Plot all {{stat:n_mechanic}} mechanics and the cloud leans: the more variety a mechanic is rated to produce, the harder it's rated to read. The {{stat:n_mechanics_emergence_1}} mechanics at the bottom of the emergence scale average {{stat:mean_legibility_emergence_1}} for legibility. The {{stat:n_mechanics_emergence_4plus}} at 4 or 5 average {{stat:mean_legibility_emergence_4plus}}.{{assert:mean_legibility_emergence_1 > mean_legibility_emergence_4plus}}{{assert:rho_legibility_emergence_potential < -0.2}}
 
 **Picture.** The interface mechanics, overlays, tooltips, speed controls, light up in the bottom right corner, then fade out of the plot. The cloud still leans.
 
@@ -78,7 +78,7 @@ Target runtime about 12 minutes: about 1,210 words of narration at 135 words a m
 
 **Frame.** scale at="The mechanic scores 2 for legibility" ids=adaptive-threat-scaling fields=legibility,tuning_difficulty
 
-**Voice.** Mechanics that produce more of it are rated harder to balance, and that's the strongest relationship among all six scales.{{assert:rho_emergence_potential_tuning_difficulty > 0.5}}
+**Voice.** Mechanics rated as producing more of it are also rated harder to balance. That's the strongest relationship among the six scales, and part of it may be in the wording, since both scales describe systems feeding back on each other.{{assert:rho_emergence_potential_tuning_difficulty > 0.5}}
 
 **On screen.** Raid points = (wealth points + colonist points) × threat scale × starting factor × adaptation factor. Capped at 10,000.
 
@@ -90,7 +90,7 @@ Target runtime about 12 minutes: about 1,210 words of narration at 135 words a m
 
 **Frame.** compare a="Without overlays" a_items="tile-cell:Tinted tiles" b="With an overlay" b_items="map-overlay:One field recoloured" from=oxygen-not-included:data-overlays
 
-**Voice.** Legibility also falls as compute cost rises.{{assert:rho_legibility_compute_cost < 0}} The expensive mechanics tend to be fields and crowds, and you can't watch a field the way you watch one colonist. In Oxygen Not Included every tile of the asteroid holds one element with a mass and a temperature, and gases spread and sort themselves cell by cell. Without overlays, all of that is tinted tiles.
+**Voice.** Legibility scores also fall as compute-cost scores rise.{{assert:rho_legibility_compute_cost < 0}} The expensive mechanics tend to be fields and crowds, and you can't watch a field the way you watch one colonist. In Oxygen Not Included every tile of the asteroid holds one element with a mass and a temperature, and gases spread and sort themselves cell by cell. Without overlays, all of that is tinted tiles.
 
 **Picture.** SimCity (1989), the traffic map: a heat map of density, no cars anywhere. Cut to Cities: Skylines, a jam forming at one intersection, cars stacked in one lane while the lane beside it is empty.
 

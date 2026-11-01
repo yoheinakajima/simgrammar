@@ -88,7 +88,7 @@ Target runtime about 11 minutes: about 1,180 words of narration at 135 words a m
 
 **Voice.** The build enforces the timing. You can't call a bet refuted before its date, and you can't withdraw it after. And the checker has to be someone else. Every prediction was written by one agent, running one model, working for the dataset's maintainer. So a resolution has to come from a different person and, if an agent does the work, a different model. Whoever made the bet doesn't get to settle it, and neither does another copy of the model that wrote it.
 
-**Voice.** A refuted prediction counts against the bet's argument as well as its timing. The rules ask that nobody rewrite the argument in the same change that records the loss, so the losing case stays readable next to the evidence.
+**Voice.** A refuted prediction says the bet didn't arrive by its date. That can mean the argument was wrong, or only that cost, schedules, or reception got in the way, and the resolver records which. The rules ask that nobody rewrite the argument in the same change that records the loss, so the losing case stays readable next to the evidence.
 
 **Voice.** Every time the dataset is built, a warning lists each prediction whose date has passed without a resolution, and it keeps appearing until someone checks. <!-- tells-ok: setup-sentence -->
 
