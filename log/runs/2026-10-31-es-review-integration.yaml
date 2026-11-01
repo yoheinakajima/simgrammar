@@ -1,0 +1,32 @@
+id: 2026-10-31-es-review-integration
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: release the revised paper as v0.4, and bring the abstract and the cross-section loose ends in line with the five runs that
+  answered the Explore Science review of v0.3 (review HhOzIouy5aL, 66 minor findings).'
+method: >-
+  Changed no records or sources. The five revision runs (es-review-growth-white-space, cluster-robustness,
+  rubric-reliability, es-review-techniques-opportunities, es-review-framing-pdf) each left the abstract alone and
+  proposed wording for it; this run rewrote it from those proposals against the merged build. Finding 1 now calls the
+  22-way cut one admissible partition and counts the named families that hold under resampling and a second method.
+  Finding 2 says later games are built from old parts as the catalog's makeup predicts, because the corrected,
+  use-matched null covers more mechanics than the early games and the 84 percent reuse share sits below the
+  shuffled-year null. Finding 3 frames the score correlations as exploratory rubric-consistency results and reports the
+  second rater's figures. Finding 4 is stated as a property of this atlas's recorded edges, with the core-use and
+  proposal-adjusted denominators. Finding 6 gives the top opportunity's share of perturbed re-scorings. Every new number
+  is a token and every comparison carries an assertion. The same pass made fixes the workers reported in files they
+  did not own: Forrester and Sterman cited where section 4.1 borrows stocks and feedback loops; the overlay claim in
+  4.1 qualified by the data-overlays prevalence; the 5.4 layer reading called a reading; "Section N" changed to the
+  section sign; a coding limitation added to 2.6; the about page and home page no longer say every interpreting
+  sentence is checked or that no one has built a combination; book chapter 12 qualifies what a refuted prediction
+  shows; the vacant-lots caption says pacing controls are left out; the opportunity figure orders by the ranking
+  instead of the rounded priority. Episode 3 scene 5 now reads n_stable_clusters_any_size, which still renders 13 as
+  the video says, since n_stable_clusters gained a minimum family size and fell to 10.
+  It also bumps the paper to version 0.4 for a tagged release (ADR-0008), since the six runs change its findings.
+contract_version: '1.2'
+proposals: []

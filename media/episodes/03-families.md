@@ -52,7 +52,7 @@ Target runtime about 12 minutes: about 1,280 words of narration at 135 words a m
 
 **Picture.** The catalog drops a fifth of its games at random, re-clusters, and compares the result with the full clustering. A score ticks up and down. The process repeats, fast, a thousand times. A curve of average agreement against the number of clusters draws itself, nearly flat on the right.
 
-**Voice.** The exact number of families is soft. Leave out a fifth of the games and the borders move, so this series only claims pairings that hold up when the catalog is reshuffled {{stat:cluster_subsamples}} times. {{stat:n_stable_clusters}} of the {{stat:n_clusters}} families keep their shape through all of it, and the rest shift as games come and go.{{assert:n_stable_clusters >= 10}}{{assert:n_stable_clusters < n_clusters}}
+**Voice.** The exact number of families is soft. Leave out a fifth of the games and the borders move, so this series only claims pairings that hold up when the catalog is reshuffled {{stat:cluster_subsamples}} times. {{stat:n_stable_clusters_any_size}} of the {{stat:n_clusters}} families keep their shape through all of it, and the rest shift as games come and go.{{assert:n_stable_clusters_any_size >= 10}}{{assert:n_stable_clusters < n_clusters}}
 
 ## 6. Odd couples (4:10 to 7:04)
 

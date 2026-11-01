@@ -43,7 +43,7 @@ UTILITY = [("find", "find", "find/"), ("source", "sources", "source/"), ("about"
 FAVICON = "free-placement"   # the icon the browser tab shows
 # The front page's lead, also its link-preview description: what the atlas is for a reader, where the paper's subtitle says it for a scholar.
 LEAD = ("Every simulation game is assembled from a shared set of parts: production chains, needs, markets, weather, raids. Naming the parts shows "
-        "why games feel alike, which combinations no one has built yet, and where AI can change how a game plays.")
+        "why games feel alike, which combinations the catalog has not seen yet, and where AI can change how a game plays.")
 # What the catalog admits as a simulation game, in the words of the game inclusion test's point (b) (AGENTS.md §3)
 SIM_GAME = ("Here a simulation game is one whose core loop is driven by a model of some system, such as an economy, an ecology, "
             "a body, or a machine, whose state changes without the player scripting each change.")
@@ -1533,7 +1533,7 @@ class Web:
         why = [("one set of records", "Every game, mechanic, technique, bet, and source is one plain-text record. The paper, the book, the videos, and this site "
                                       "are all built from those records, so they cannot drift apart: change a record and every page that uses it changes with it."),
                ("sources you can open", self.sources_line()),
-               ("sentences that fail loudly", "When a sentence in the paper or the book interprets the data, a check sits beside it. If new data makes the sentence "
+               ("sentences that fail loudly", "When a sentence in the paper or the book ranks, compares, or groups the data, a check sits beside it. If new data makes the sentence "
                                               "false, the build stops until someone rewrites it, so the text stays true as the catalog grows."),
                ("open to anyone", "People and AI agents add games, sources, and checks through pull requests, under written rules. Every change is logged as a run, "
                                   "and the contributors are credited in the paper.")]

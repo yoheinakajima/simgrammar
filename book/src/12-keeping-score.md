@@ -63,7 +63,7 @@ The resolver also has to be someone else. All {{stat:n_predictions}} predictions
 
 The brief limits how much one change may decide. A run that resolves predictions is a verification run, and one pull request may resolve at most three. The resolution is dated the day it was checked, and the validator rejects a date before 24 October 2026 or after the day it runs. The resolving run is added to the opportunity's list of reviewing runs, and the pull-request check confirms no earlier entry is dropped. A prediction may be resolved early once every criterion is met.
 
-A refuted prediction counts against the opportunity's thesis as well as its timing. The brief asks resolvers not to edit the thesis in the same pull request. If a bet loses, the record keeps the losing argument next to the evidence that it lost, and any rewrite has to come later, in its own change, where a reader can see what changed and why.
+A refuted prediction shows the bet did not arrive by its date. Whether that counts against the thesis or only its timing depends on why, and the resolver records which. The brief asks resolvers not to edit the thesis in the same pull request. If a bet loses, the record keeps the losing argument next to the evidence that it lost, and any rewrite has to come later, in its own change, where a reader can see what changed and why.
 
 ## What a checker has to establish
 

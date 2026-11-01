@@ -743,7 +743,7 @@ def vacant_lots(shared, live, by_id, derived, tables, fam, cfg):
         "title": "Built and vacant lots",
         "head": f"{n} common mechanics · {n * (n - 1) // 2} pairs · {n_vac} vacant",
         "svg": "".join(body),
-        "caption": f"Every pair of the {n} mechanics used by at least {ws['min_prevalence_games']} games, laid out like a plan: each lot is a pair. "
+        "caption": f"Every pair of the {n} mechanics used by at least {ws['min_prevalence_games']} games, pacing controls left out, laid out like a plan: each lot is a pair. "
                    "A built lot's shade is its lift, the number of catalog games that use both mechanics divided by the number expected if the two were tagged independently, "
                    "in four bands from under 0.5 to 2 or more. Dashed lots are white space (different families, no recorded tension, "
                    f"co-occurring at most {ws['max_observed']} time), and crossed lots are pairs recorded as being in design tension. "
@@ -1120,6 +1120,7 @@ def determinism_runtime(live, vocabs):
 
 def opportunity_priorities(live, tables):
     rows = {r["opportunity"]: r for r in tables["opportunities-ranked"]["rows"]}
+    order = {r["opportunity"]: i for i, r in enumerate(tables["opportunities-ranked"]["rows"])}  # ranked on the unrounded priority
     opps = [o for o in sorted(live["opportunity"], key=lambda o: o.id) if not o.data.get("deprecated") and o.id in rows]
     cells = defaultdict(list)
     for o in opps:
@@ -1127,13 +1128,13 @@ def opportunity_priorities(live, tables):
     imps = sorted({k[0] for k in cells}, reverse=True)
     feas = sorted({k[1] for k in cells})
     for k in cells:
-        cells[k].sort(key=lambda o: (-rows[o.id]["priority"], o.id))
+        cells[k].sort(key=lambda o: order[o.id])
     LBL, TOP, CWID, RH = 60, 40, 205, 13
     lines = {o.id: wrap(o.data["name"], 35) for o in opps}  # names in full; a long one wraps under itself
     hts = {i: max(sum(len(lines[o.id]) for o in cells.get((i, f), [])) for f in feas) for i in imps}
     W = LBL + CWID * len(feas) + 10
     H = TOP + sum(hts[i] * RH + 22 for i in imps) + 30
-    top8 = sorted(opps, key=lambda o: (-rows[o.id]["priority"], o.id))[:8]
+    top8 = sorted(opps, key=lambda o: order[o.id])[:8]
     body = [svg_open("opportunity-priorities", W, H, "Where the bets sit on impact and feasibility",
                      "Opportunities placed by their impact and feasibility scores; each cell lists its opportunities with their novelty score.")]
     for j, f in enumerate(feas):

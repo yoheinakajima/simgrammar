@@ -8,7 +8,7 @@ The corpus spans {{stat:year_min}} to {{stat:year_max}}. Its oldest entries are 
 
 {{table:games-by-subgenre}}
 
-Subgenre labels name design lineages, not markets. [[prison-architect]] is a management game by lineage whose inmates carry colony-sim needs and moods; [[kenshi]] is an RPG whose world runs on faction and economic simulation; [[zelda-breath-of-the-wild]] and [[noita]] are included as boundary cases because their material systems ([[material-interactions]], [[falling-sand-materials]]) influenced simulation design beyond their genres. Section 5 shows that clustering games by the mechanics they actually use cuts across these labels.
+Subgenre labels name design lineages, not markets. [[prison-architect]] is a management game by lineage whose inmates carry colony-sim needs and moods; [[kenshi]] is an RPG whose world runs on faction and economic simulation; [[zelda-breath-of-the-wild]] and [[noita]] are included as boundary cases because their material systems ([[material-interactions]], [[falling-sand-materials]]) influenced simulation design beyond their genres. §5 shows that clustering games by the mechanics they actually use cuts across these labels.
 
 ### 3.2 What is simulated
 

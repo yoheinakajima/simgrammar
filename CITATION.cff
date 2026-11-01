@@ -6,7 +6,7 @@ message: "If you use SimGrammar, cite it as below, with the dataset_sha256 from 
 type: dataset
 title: "The Grammar of Simulation: A machine-readable atlas of simulation game mechanics and the mathematical, AI, ML, and LLM results that change them"
 abstract: "A machine-readable atlas of simulation game mechanics and the mathematical, AI, ML, and LLM results that change them."
-version: "0.3"
+version: "0.4"
 date-released: "2026-10-31"
 authors:
   - given-names: "Yohei"
