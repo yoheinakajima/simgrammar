@@ -1,0 +1,19 @@
+id: src-forrester-1971-counterintuitive-behavior-social-systems
+type: source
+name: Counterintuitive Behavior of Social Systems
+kind: paper
+authors:
+- Jay W. Forrester
+venue: Technology Review 73(3), 52-68 (January 1971); author's updated text, MIT System Dynamics memo D-4468-2
+  (1995)
+date: '1971-01'
+url: https://ocw.mit.edu/courses/15-988-system-dynamics-self-study-fall-1998-spring-1999/65cdf0faf132dec7ec75e91f9651b31f_behavior.pdf
+accessed: '2026-10-31'
+archived: https://web.archive.org/web/20260828090524id_/https://ocw.mit.edu/courses/15-988-system-dynamics-self-study-fall-1998-spring-1999/65cdf0faf132dec7ec75e91f9651b31f_behavior.pdf
+notes: 'Read the full text of the author''s 1995 update (D-4468-2), an MIT OpenCourseWare reading; the
+  snapshot holds the same bytes. p. 3: "Social systems belong to the class called multi-loop nonlinear
+  feedback systems." p. 14: "Each level is caused to change by the rates of flow in and out, such as the birth
+  rate and death rate that increase and decrease population." System dynamics describes levels (stocks)
+  changed by rates (flows), joined by feedback loops.'
+provenance:
+  created: 2026-10-31-es-review-framing-pdf

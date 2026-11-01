@@ -1,0 +1,37 @@
+id: 2026-10-31-es-review-framing-pdf
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request, answer the Explore Science review of v0.3 on framing, related work, method
+  definitions, evidence totals, figure presentation and the PDF (findings A1, B3, C1, D3, D6, D12, D15, E34,
+  G1 to G4).'
+method: 'Searched data/sources and scripts/find.py for system dynamics, agent-based modelling and gaming simulation;
+  none existed. Opened and read, creating 5 sources: Forrester''s Counterintuitive Behavior of Social Systems
+  (MIT OpenCourseWare PDF of D-4468-2, full text); the McGraw-Hill page and contents of Sterman''s Business
+  Dynamics (book not read); Grimm et al. 2020 on the ODD protocol (JASSS, full text); the Brookings page for
+  Epstein and Axtell''s Growing Artificial Societies (book not read); ISAGA''s PDF of Duke and Kriz, Back to
+  the Future of Gaming. Archived snapshots predate my reading; I checked that each holds the cited text (the
+  two PDFs are byte-identical). The McGraw-Hill page has none, and I did not save one. PDFs were read with
+  a PDFKit script, since no PDF tool was installed. Computed in scripts/analyze.py: an evidence-by-type table
+  (status and citing per type; the 394/71 vs 395/70 gap is the one asserted mechanic, culture-religion-conversion,
+  that cites wiki sources, and Where Winds Meet is asserted but cites its Steam page); relation degree and
+  density among mechanics (1.34 edges per mechanic, 55 with none, 0.65 percent of pairs); the exposure weights
+  as rubrics.yaml states them; counts of sentences and assert tokens in report/src and book/src (221 assertions
+  on 80 of 543 paper sentences); a rank column on the white-space table. Wrote 1 (grammar defined as a vocabulary
+  with typed relations, a related-work paragraph on simulation modelling, tempered novelty, player actions
+  reconciled with the control family, affects edges named one way), 2.1 (test procedures and thresholds,
+  ordered family rules, unmeasured coder agreement), 2.4, 2.5 (what the build checks and does not), Appendix
+  C and a new Appendix E of definitions. scripts/viz.py: legends drawn inside the SVGs (profile shade scale,
+  matrix key and every cluster labelled, design-map edges and bridges, lift bands and a bolder tension cross,
+  glyph key on the technique landscape), names wrapped instead of cut, captions that define shading. scripts/paper_pdf.py:
+  tables inside list items nest as tables, figures numbered with a box that keeps caption and drawing together,
+  interaction hints dropped and the URL on its own line, prose links to #fig- anchors printed as Figure N,
+  curly quotes, Section N printed as §N, one heading form, tilde in URLs. Built the PDF with tectonic and
+  looked at every page as PNG. Book: preface, chapters 1, 9 and 13 match the new wording.'
+contract_version: '1.2'
+proposals: []

@@ -1,0 +1,38 @@
+id: src-grimm-2020-odd-protocol-second-update
+type: source
+name: 'The ODD Protocol for Describing Agent-Based and Other Simulation Models: A Second Update to Improve
+  Clarity, Replication, and Structural Realism'
+kind: paper
+authors:
+- Volker Grimm
+- Steven F. Railsback
+- Christian E. Vincenot
+- Uta Berger
+- Cara Gallagher
+- Donald L. DeAngelis
+- Bruce Edmonds
+- Jiaqi Ge
+- Jarl Giske
+- Jürgen Groeneveld
+- Alice S. A. Johnston
+- Alexander Milles
+- Jacob Nabe-Nielsen
+- J. Gareth Polhill
+- Viktoriia Radchuk
+- Marie-Sophie Rohwäder
+- Richard A. Stillman
+- Jan C. Thiele
+- Daniel Ayllón
+venue: Journal of Artificial Societies and Social Simulation 23(2), 7
+date: '2020-03-31'
+url: https://www.jasss.org/23/2/7.html
+doi: 10.18564/jasss.4259
+accessed: '2026-10-31'
+archived: https://web.archive.org/web/20260924184243/https://www.jasss.org/23/2/7.html
+notes: 'Read the full text. "ODD consists of seven elements": purpose and patterns; entities, state variables
+  and scales; process overview and scheduling; design concepts; initialization; input data; submodels. Element
+  2 "lists the different types of entities represented in the model"; element 3 says when state variables are
+  updated. Most elements apply to any simulation model, so ODD could provide "a lingua franca for simulation
+  modelling".'
+provenance:
+  created: 2026-10-31-es-review-framing-pdf

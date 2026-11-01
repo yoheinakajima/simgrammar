@@ -44,7 +44,14 @@ URL = re.compile(r"https?://[^\s<>()\[\]]*[^\s<>()\[\].,;:!?'\"]")
 WIKI = re.compile(r"^(?:\.\./)+wiki/(\w+)/([a-z0-9-]+)\.md$")
 TEX_ESC = {"\\": r"\textbackslash{}", "{": r"\{", "}": r"\}", "$": r"\$", "&": r"\&", "#": r"\#", "^": r"\^{}", "_": r"\_",
            "%": r"\%", "~": r"\textasciitilde{}", "<": r"\textless{}", ">": r"\textgreater{}", "|": r"\textbar{}",
-           "ρ": r"\ensuremath{\rho}"}
+           "ρ": r"\ensuremath{\rho}", "Σ": r"\ensuremath{\Sigma}", "−": r"\ensuremath{-}", "÷": r"\ensuremath{\div}",
+           "≤": r"\ensuremath{\leq}", "≥": r"\ensuremath{\geq}", "→": r"\ensuremath{\rightarrow}"}
+FIG_REF = re.compile(r"^#fig-([a-z0-9-]+)$")  # a prose link to a figure's anchor, which the PDF prints as "Figure N"
+# sentences of a web caption that tell a reader how to work the interactive figure; the PDF drops them (its figures are
+# static) and prints the interactive version's address on a line of its own
+INTERACTION = re.compile(r"\b(hover|tap|drag|click|reorder|swipe|switch the width|highlight a)\b", re.I)
+TABLE_DELIM = re.compile(r"^\|(\s*:?-+:?\s*\|)+\s*$")
+LIST_ITEM = re.compile(r"^(\s*)(\d+\.|[-*])\s+")
 # page geometry, in points: the table and figure sizing below assume it
 TEXT_W, TEXT_H = 469.75, 650.0
 TABLE_CH, TABLE_SEP = 4.3, 3.0  # width of a footnotesize character, with room for capitals; \tabcolsep
@@ -56,7 +63,54 @@ def esc(s: str, breaks: str = "") -> str:
 
 
 def esc_url(u: str) -> str:
-    return u.replace("\\", "/").replace("%", r"\%").replace("#", r"\#").replace("&", r"\&").replace("~", r"\~{}")
+    # `~` passes through: \url and \href print it as a tilde, where an escaped \~{} printed as "~{}"
+    return u.replace("\\", "/").replace("%", r"\%").replace("#", r"\#").replace("&", r"\&")
+
+
+def smart_quotes(s: str) -> str:
+    """Straight double quotes as typographic ones: TeX sets every " as a closing quote."""
+    return re.sub(r'(^|[\s(\[{/])"', "\\1\u201c", s).replace('"', "\u201d")
+
+
+def nest_tables(md: str) -> str:
+    """A table token written inside a numbered or bulleted item expands to lines the item does not own, so Markdown
+    reads the table as more of the item's paragraph and prints its pipes. Indent such a table under its item, set off by
+    blank lines, so it typesets as a table inside the list. A parenthesis opened just before the table and closed just
+    after it goes with it: "records this (" becomes "records this:"."""
+    lines, out, i = md.split("\n"), [], 0
+    while i < len(lines):
+        ln = lines[i]
+        if ln.startswith("|") and i + 1 < len(lines) and TABLE_DELIM.match(lines[i + 1]) and out and out[-1].strip():
+            k = len(out) - 1
+            while k > 0 and out[k].strip() and not LIST_ITEM.match(out[k]):
+                k -= 1
+            m = LIST_ITEM.match(out[k]) if out[k].strip() else None
+            if m:
+                pad = " " * len(m.group(0))
+                paren = out[-1].rstrip().endswith("(")
+                if paren:
+                    out[-1] = out[-1].rstrip()[:-1].rstrip() + ":"
+                out.append("")
+                j = i
+                while j < len(lines) and lines[j].startswith("|"):
+                    out.append(pad + lines[j])
+                    j += 1
+                out.append("")
+                if paren and j < len(lines) and lines[j].lstrip().startswith(")"):
+                    rest = lines[j].lstrip()[1:].lstrip(" .,;")
+                    if rest:
+                        out.append(pad + rest)
+                    j += 1
+                i = j
+                continue
+        out.append(ln)
+        i += 1
+    return "\n".join(out)
+
+
+def fig_key(src: str) -> str:
+    """The id a figure has on the site (fig-<key>): a viz SVG is named viz-<name>, a static figure by its name."""
+    return Path(src).stem.removeprefix("viz-")
 
 
 def num(x: float) -> str:
@@ -330,9 +384,11 @@ def plain(children) -> str:
 
 
 class Paper:
-    def __init__(self, site: str, figures: dict[str, tuple[float, float]]):
+    def __init__(self, site: str, figures: dict[str, tuple[float, float]], fig_no: dict[str, int]):
         self.site = site
         self.figures = figures  # name -> (width, height) of the SVG viewBox
+        self.fig_no = fig_no    # site id of each figure -> its number, in order of appearance (the site numbers them alike)
+        self.in_refs = False    # the reference list keeps its titles as written
 
     def href(self, h: str) -> str:
         m = WIKI.match(h)
@@ -342,17 +398,34 @@ class Paper:
             return h
         return f"{self.site}dist/paper/{h}"  # a path relative to paper.md, as published under /dist/
 
+    def prose(self, s: str) -> str:
+        """House typography for running text: curly quotes, and "Section 9" as "§9", the paper's form for a cross-reference."""
+        s = smart_quotes(s)
+        if not self.in_refs:
+            s = re.sub(r"\bSections (\d+(?:\.\d+)*)", "§§\\1", s)
+            s = re.sub(r"\bSection (\d+(?:\.\d+)*)", "§\\1", s)
+        return s
+
     def text(self, s: str, breaks: str = "") -> str:
         out, last = [], 0
         for m in URL.finditer(s):
-            out.append(esc(s[last:m.start()], breaks) + rf"\url{{{esc_url(m.group(0))}}}")
+            out.append(esc(self.prose(s[last:m.start()]), breaks) + rf"\url{{{esc_url(m.group(0))}}}")
             last = m.end()
-        return "".join(out) + esc(s[last:], breaks)
+        return "".join(out) + esc(self.prose(s[last:]), breaks)
 
     def inline(self, children, breaks: str = "") -> str:
         out = []
+        skip = False  # inside a figure link, whose words "Figure N" replaces
         for c in children or []:
             t = c.type
+            if skip:
+                skip = t != "link_close"
+                continue
+            if t == "link_open" and FIG_REF.match(c.attrGet("href") or "") and FIG_REF.match(c.attrGet("href")).group(1) in self.fig_no:
+                key = FIG_REF.match(c.attrGet("href")).group(1)
+                out.append(rf"\hyperlink{{fig-{key}}}{{Figure~{self.fig_no[key]}}}")
+                skip = True
+                continue
             if t == "text":
                 out.append(self.text(c.content, breaks))
             elif t == "softbreak":
@@ -383,6 +456,33 @@ class Paper:
         fit = r"{\linewidth}{!}" if h / w <= TEXT_H * 0.85 / TEXT_W else r"{!}{0.85\textheight}"
         return f"\n\\begin{{center}}\n\\resizebox{fit}{{\\input{{figures/{name}.tex}}}}\n\\end{{center}}\n"
 
+    def figure_block(self, src: str, caption: str) -> str:
+        """A figure with its numbered caption, set in one unbreakable box so the caption never starts or splits on the
+        next page. The web caption's directions for the interactive figure (hover, tap, drag) are dropped, and its
+        address goes on a line of its own."""
+        name, key = Path(src).stem, fig_key(src)
+        s = re.sub(r"^Figure:\s*", "", caption.strip())
+        url = None
+        m = re.search(r"\s*Interactive version:\s*(\S+?)\s*$", s)
+        if m:
+            url, s = m.group(1), s[:m.start()]
+        kept = [x for x in re.split(r"(?<=[.;])\s+(?=[A-Z])", s.strip()) if not INTERACTION.search(x)]
+        body = " ".join(kept)
+        if body and body[-1] not in ".;":
+            body += "."
+        cap = rf"\textbf{{Figure {self.fig_no[key]}.}} " + self.text(body.replace(";.", "."))
+        # the caption's height decides how tall the drawing may be: box and caption must fit one page
+        cap_h = (len(body) // 100 + 1 + (1 if url else 0)) * 11.5 + 18
+        w, h = self.figures[name]
+        max_h = TEXT_H - cap_h
+        fit = r"{\linewidth}{!}" if h / w * TEXT_W <= max_h else rf"{{!}}{{{num(max_h)}pt}}"
+        lines = [r"\par\medskip\noindent\begin{minipage}{\linewidth}", rf"\hypertarget{{fig-{key}}}{{}}",
+                 rf"{{\centering\resizebox{fit}{{\input{{figures/{name}.tex}}}}\par}}", r"\smallskip",
+                 rf"{{\small {cap}\par}}"]
+        if url:
+            lines.append(rf"{{\footnotesize Interactive version: \url{{{esc_url(url)}}}\par}}")
+        return "\n".join(lines + [r"\end{minipage}\par\medskip", "", ""])
+
     def table(self, toks) -> str:
         rows, cur = [], []
         for t in toks:
@@ -394,16 +494,20 @@ class Paper:
             elif t.type == "inline":
                 cur[-1]["tex"] = self.inline(t.children, "-/")
                 cur[-1]["plain"] = plain(t.children)
+                if cur[-1]["head"]:  # a generated column header spells a rubric field as written: ai leverage
+                    cur[-1]["tex"] = re.sub(r"\bai\b", "AI", cur[-1]["tex"])
             elif t.type == "tr_close":
                 rows.append(cur)
         n = len(rows[0])
         align = [c["align"] for c in rows[0]]
         # lengths in characters; header cells are bold, so they count wider
         size = lambda c, s: len(s) * (1.25 if c["head"] else 1)
-        nat = [max(size(r[i], r[i].get("plain", "")) for r in rows if i < len(r)) or 1 for i in range(n)]
+        full = [max(size(r[i], r[i].get("plain", "")) for r in rows if i < len(r)) or 1 for i in range(n)]
         word = [max((size(r[i], w) for r in rows if i < len(r) for w in re.split(r"[\s/-]+", r[i].get("plain", ""))), default=1) for i in range(n)]
+        # when the table must wrap, a header wraps at its words rather than widening a column of short values
+        nat = [max([size(r[i], r[i].get("plain", "")) for r in rows[1:] if i < len(r)] + [word[i] if rows[0][i]["head"] else 1]) or 1 for i in range(n)]
         budget = (TEXT_W - 2 * TABLE_SEP * n) / TABLE_CH
-        if sum(nat) <= budget:
+        if sum(full) <= budget:
             spec = "".join(align)
         else:
             low = [min(nat[i], max(3, min(word[i], 18))) for i in range(n)]
@@ -430,13 +534,27 @@ class Paper:
             t = toks[i]
             ty = t.type
             if ty == "heading_open":
+                self.in_refs = plain(toks[i + 1].children).strip() == "References"
                 title = self.inline(toks[i + 1].children)
+                # one form for every numbered heading, the number in a box of fixed width so titles align in the contents:
+                # "2 Method", "2.1 Corpus", "Appendix B Technique catalog"
+                box = "2.6em" if t.tag == "h3" else "1.7em"
+                title = re.sub(r"^(\d+(?:\.\d+)*)\.?\s+", lambda m: rf"\makebox[{box}][l]{{{m.group(1)}}}", title)
+                title = re.sub(r"^Appendix ([A-Z])\.\s+", r"Appendix \1\\enspace{}", title)
                 cmd, toc = {"h1": ("section", 1), "h2": ("section", 1), "h3": ("subsection", 2)}.get(t.tag, ("subsubsection", 3))
                 out.append(f"\\{cmd}*{{{title}}}\\phantomsection\\addcontentsline{{toc}}{{{cmd}}}{{{title}}}\n\n")
                 i += 3
                 continue
             if ty == "paragraph_open":
-                out.append(self.inline(toks[i + 1].children) + ("\n" if t.hidden else "\n\n"))
+                kids = toks[i + 1].children or []
+                imgs = [c for c in kids if c.type == "image"]
+                lone = len(imgs) == 1 and all(c.type in ("image", "softbreak") or (c.type == "text" and not c.content.strip()) for c in kids)
+                nxt = toks[i + 4].children if lone and i + 4 < len(toks) and toks[i + 3].type == "paragraph_open" else None
+                if lone and nxt and nxt[0].type == "em_open" and plain(nxt).startswith("Figure:"):
+                    out.append(self.figure_block(imgs[0].attrGet("src") or "", plain(nxt)))
+                    i += 6
+                    continue
+                out.append(self.inline(kids) + ("\n" if t.hidden else "\n\n"))
                 i += 3
                 continue
             if ty == "table_open":
@@ -474,7 +592,13 @@ def latex(paper_md: str, meta: dict, manifest: dict, figures: dict) -> str:
     fm = yaml.safe_load(fm)
     md = MarkdownIt("commonmark", {"html": True}).enable("table")  # as scripts/web.py renders it
     site = meta["site"]["url"]
-    tex_body = Paper(site, figures).blocks(md.parse(body))
+    toks = md.parse(nest_tables(body))
+    # figures are numbered in order of appearance, as the site numbers them, so a reference can point forward
+    srcs = [c.attrGet("src") or "" for t in toks if t.type == "inline" for c in (t.children or []) if c.type == "image"]
+    fig_no = {}
+    for s in srcs:
+        fig_no.setdefault(fig_key(s), len(fig_no) + 1)
+    tex_body = Paper(site, figures, fig_no).blocks(toks)
     authors = [esc(a) for a in fm["author"]]
     short = fm["dataset_sha256"][:8]   # the short form the site and the book use
     pdfmeta = ", ".join([f"pdftitle={{{esc(fm['title'])}: {esc(fm['subtitle'])}}}", f"pdfauthor={{{', '.join(authors)}}}",

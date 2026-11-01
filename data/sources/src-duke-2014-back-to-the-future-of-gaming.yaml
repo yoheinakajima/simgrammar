@@ -1,0 +1,20 @@
+id: src-duke-2014-back-to-the-future-of-gaming
+type: source
+name: Back to the Future of Gaming
+kind: book
+authors:
+- Richard D. Duke
+- Willy C. Kriz
+venue: W. Bertelsmann Verlag, Bielefeld (for ISAGA, the International Simulation and Gaming Association)
+date: '2014'
+url: https://isaga.com/wp-content/uploads/2023/07/back-to-the-future-of-gaming-DRUCK.pdf
+isbn: 978-3-7639-5425-4
+accessed: '2026-10-31'
+archived: https://web.archive.org/web/20231023073635id_/https://isaga.com/wp-content/uploads/2023/07/back-to-the-future-of-gaming-DRUCK.pdf
+notes: 'Read the PDF ISAGA serves (the snapshot holds the same bytes), a volume marking forty years of Duke''s
+  Gaming: The Future''s Language (Sage, 1974). Lukosch and Bekebrede (p. 145): simulation games "combine the
+  representation of a reference system" with "competition, rules, roles and scoring", and, "Constructed out of
+  roles, rules and resources, they have the ability to emulate real complex systems". Geurts et al. (p. 135)
+  quote Duke: "a gaming/simulation is a model of a model".'
+provenance:
+  created: 2026-10-31-es-review-framing-pdf

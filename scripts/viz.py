@@ -67,6 +67,50 @@ def spread(targets, gap, lo, hi):
     return ys
 
 
+def spread_blocks(targets, heights, gap, lo, hi):
+    """spread() for labels of more than one line: each label's centre keeps `gap` plus half of its own and its
+    neighbour's extra height (lines beyond the first) from the next. Deterministic."""
+    order = sorted(range(len(targets)), key=lambda i: (targets[i], i))
+    ys = [0.0] * len(targets)
+    prev = None
+    for i in order:
+        floor = lo + heights[i] / 2 if prev is None else ys[prev] + gap + (heights[prev] + heights[i]) / 2
+        ys[i] = max(targets[i], floor)
+        prev = i
+    nxt = None
+    for i in reversed(order):
+        ceil = hi - heights[i] / 2 if nxt is None else ys[nxt] - gap - (heights[nxt] + heights[i]) / 2
+        ys[i] = min(ys[i], ceil)
+        nxt = i
+    return ys
+
+
+def wrap(s, n: int) -> list[str]:
+    """Greedy word wrap at n characters. SVG text does not wrap, and a figure label is wrapped rather than cut short,
+    so every name reads in full in the static figure (the paper and the PDF) as it does on the site."""
+    lines, cur = [], ""
+    for w in str(s).split():
+        if cur and len(cur) + 1 + len(w) > n:
+            lines.append(cur)
+            cur = w
+        else:
+            cur = f"{cur} {w}" if cur else w
+    return lines + [cur] if cur else (lines or [""])
+
+
+def svg_key(x, y, items, size=8.5, gap=16):
+    """A legend drawn inside the figure, so the static SVG (paper.md, the PDF) explains its own marks as the site's
+    HTML legend does. items: (svg mark drawn in a 10 x 10 box at the origin, label). Returns (svg, width)."""
+    out, cx = [], x
+    for mark, label in items:
+        off = 14 if mark else 0
+        if mark:
+            out.append(f'<g transform="translate({f1(cx)},{f1(y - 8)})">{mark}</g>')
+        out.append(text(cx + off, y, label, size, "muted"))
+        cx += off + len(label) * size * CW + gap
+    return "".join(out), cx - x - gap
+
+
 def legend(items):
     """items: (label, kind, opacity). kind: square | dashed | slash | outline | outline-dashed | line."""
     out = []
@@ -79,7 +123,7 @@ def legend(items):
             st = f"background:transparent;border:1px dashed {T['open']}"
         elif kind == "slash":
             out.append(f'<span><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><rect width="10" height="10" style="fill:{T["paper3"]}"/>'
-                       f'<path d="M1.5 8.5L8.5 1.5" style="stroke:{T["stop"]};stroke-width:1.4"/></svg>{esc(label)}</span>')
+                       f'<path d="M1.5 8.5L8.5 1.5M1.5 1.5L8.5 8.5" style="stroke:{T["stop"]};stroke-width:1.8"/></svg>{esc(label)}</span>')
             continue
         elif kind == "outline":
             st = f"background:{T['paper2']};border:1px solid {T['rule2']}"
@@ -175,20 +219,30 @@ def matrix(shared, live, by_id, derived, tables, fam):
     cx["first"], cspans["first"], wfi = lay(cols_by_first, ci, LM, G)
     RM = 6
     W = int(max(wf, wfi) + RM)
-    H = int(max(hc, hy) + 8)
+    HG = int(max(hc, hy) + 8)  # the grid; a key to its marks sits below it
+    H = HG + 26
 
     body = [svg_open("matrix", W, H, "Every mechanic use in the catalog",
                      f"A grid of {counted(len(row_ids), 'game')} by {counted(len(col_ids), 'mechanic')}. Filled squares are core uses, light squares supporting uses. "
                      "Rows are grouped by cluster, columns by mechanic family.")]
-    # band shading for alternate row groups
+    # a key to the marks under the grid; what the rows are follows the row order the reader picks
+    sq = lambda op: f'<rect x="2" y="2" width="6" height="6" style="fill:{T["ink"]}" fill-opacity="{op}"/>'
+    key, kw = svg_key(LM - 4, HG + 16, [(sq("1"), "core use"), (sq("0.32"), "supporting use")])
+    body.append(key)
+    rows_key = {"cluster": "rows: the clusters of §5.4, whose members its table lists", "year": "rows: decade of release"}
+    # band shading for alternate row groups; every group is labelled, small ones through a short leader
     for mode, spans in rspans.items():
         hide = "" if mode == "cluster" else ' display="none"'
         body.append(f'<g data-layer="rows-{mode}"{hide}>')
-        for k, (label, y0, y1) in enumerate(spans):
+        mids = [(y0 + y1) / 2 for _, y0, y1 in spans]
+        ys = spread([max(y0 + 7, m + 3) if y1 - y0 >= 9 else m + 3 for (_, y0, y1), m in zip(spans, mids)], 9.5, TM + 3, HG - 2)
+        for k, ((label, y0, y1), m, ly) in enumerate(zip(spans, mids, ys)):
             if k % 2 == 0:
                 body.append(f'<rect x="{LM - 4}" y="{f1(y0 - 1)}" width="{W - LM + 2}" height="{f1(y1 - y0 + 2)}" style="fill:{T["paper2"]}"/>')
-            if y1 - y0 >= 9:
-                body.append(text(LM - 8, y0 + 7, label, 9, "muted", "end"))
+            body.append(text(LM - 9, ly, label, 9, "muted", "end"))
+            if abs(ly - 3 - m) > 2.5 and y1 - y0 < 9:
+                body.append(f'<line x1="{LM - 8}" y1="{f1(ly - 3)}" x2="{LM - 5}" y2="{f1(m)}" style="stroke:{T["rule2"]};stroke-width:0.6"/>')
+        body.append(text(LM - 4 + kw + 18, HG + 16, rows_key[mode], 8.5, "muted"))
         body.append("</g>")
     for mode, spans in cspans.items():
         hide = "" if mode == "family" else ' display="none"'
@@ -211,7 +265,7 @@ def matrix(shared, live, by_id, derived, tables, fam):
                 body.append(f'<rect x="{f1(cx["family"][c])}" y="{f1(ry["cluster"][r])}" width="{S}" height="{S}" data-r="{r}" data-c="{c}"/>')
         body.append("</g>")
     body.append(f'<rect data-hl="row" x="{LM - 4}" y="0" width="{W - LM + 2}" height="{P}" style="fill:{T["accent"]}" fill-opacity="0.16" display="none"/>')
-    body.append(f'<rect data-hl="col" x="0" y="{TM - 4}" width="{P}" height="{H - TM}" style="fill:{T["accent"]}" fill-opacity="0.16" display="none"/>')
+    body.append(f'<rect data-hl="col" x="0" y="{TM - 4}" width="{P}" height="{HG - TM}" style="fill:{T["accent"]}" fill-opacity="0.16" display="none"/>')
     body.append("</svg>")
 
     data = {
@@ -237,7 +291,8 @@ def matrix(shared, live, by_id, derived, tables, fam):
         "head": f"{counted(len(row_ids), 'game')} × {counted(len(col_ids), 'mechanic')} · {counted(len(cells), 'use')}",
         "svg": "".join(body),
         "caption": f"Each square is one game using one mechanic: {n_core} core uses (dark) and {len(cells) - n_core} supporting uses (light). "
-                   "Rows are grouped into the clusters of §5.4 and columns into mechanic families. Hover or tap to read a cell; reorder rows by release year or columns by first use.",
+                   "Rows are grouped into the clusters of §5.4 and columns into mechanic families; the cluster table in §5.4 names each cluster's games, and Appendix A gives every game's cluster. "
+                   "Hover or tap to read a cell; reorder rows by release year or columns by first use.",
         "source": "dist/tables/game_mechanic_matrix.csv · clusters from dist/analysis/game-clusters.csv",
         "controls": controls,
         "legend": legend([("core use", "square", "1"), ("supporting use", "square", "0.32")]),
@@ -459,7 +514,8 @@ def design_map(shared, live, by_id, derived, tables, sub, cfg):
     allp = np.vstack([pos, cpos + np.array(radii)[:, None], cpos - np.array(radii)[:, None]])
     mn, mx = allp.min(0), allp.max(0)
     sc = min((MW - 2 * pad) / (mx[0] - mn[0]), (Hmax - 2 * pad - 16) / (mx[1] - mn[1]))
-    H = int(math.ceil((mx[1] - mn[1]) * sc + 2 * pad + 30))  # crop to the islands so narrow screens waste no height
+    HM = int(math.ceil((mx[1] - mn[1]) * sc + 2 * pad + 30))  # crop to the islands so narrow screens waste no height
+    H = HM + 36  # two lines of key under the map
     ox = (MW - (mx[0] - mn[0]) * sc) / 2
     oy = pad + 16
     tx = lambda p: (round((p[0] - mn[0]) * sc + ox, 1), round((p[1] - mn[1]) * sc + oy, 1))
@@ -516,6 +572,18 @@ def design_map(shared, live, by_id, derived, tables, sub, cfg):
         body.append(f'<text x="{f1(lx)}" y="{f1(ly)}" text-anchor="middle" data-cluster="{row["cluster"]}" style="fill:{T["ink"]};font-size:9px;font-weight:600;{halo}">'
                     f'{esc(row["cluster"].lower())}</text>')
     body.append("</g>")
+    # key: the marks, and bridge widths at the smallest, middle, and largest link counts drawn
+    shown = sorted(c for c in bridges.values() if c >= min_b)
+    samples = sorted({shown[0], shown[len(shown) // 2], shown[-1]}) if shown else []
+    isl = lambda dash: (f'<rect x="0.5" y="1.5" width="9" height="7" rx="3" style="fill:{T["paper2"]};stroke:{T["rule2"]};stroke-width:1'
+                        + (";stroke-dasharray:2 1.5" if dash else "") + '"/>')
+    k1, _ = svg_key(pad, HM + 12, [(f'<rect x="2" y="2" width="6" height="6" style="fill:{T["ink"]}"/>', "game"),
+                                   (isl(False), "island: one cluster"), (isl(True), f"island that regroups when resampled (stability below {stable})")])
+    k2, _ = svg_key(pad, HM + 28, [(f'<line x1="0" y1="5" x2="10" y2="5" style="stroke:{T["rule2"]};stroke-width:0.7"/>', "nearest-neighbour link")]
+                    + [(f'<line x1="0" y1="5" x2="10" y2="5" style="stroke:{T["rule2"]};stroke-width:{f1(0.5 * c)}"/>',
+                        f"bridge of {counted(c, 'link')} between islands" if i == 0 else counted(c, "link"))
+                       for i, c in enumerate(samples)])
+    body.append(k1 + k2)
     body.append(f'<rect data-hl="node" x="0" y="0" width="12" height="12" style="fill:none;stroke:{T["accent"]};stroke-width:1.5" display="none"/>')
     body.append("</svg>")
     gcl = {gid: derived[gid].get("cluster") for gid in ids}
@@ -541,6 +609,7 @@ def design_map(shared, live, by_id, derived, tables, sub, cfg):
         "caption": f"One island per cluster ({n_mixed} of {C} mix subgenres). Inside an island, lines join games to their nearest neighbours by shared mechanics "
                    "(inverse-prevalence weighted Jaccard, the measure behind the clustering); bridges join islands whose games are each other's nearest neighbours, wider for more links. "
                    f"Islands sit near the islands they most resemble. A dashed outline marks an island whose games regroup when subsets of the catalog are re-clustered (stability below {stable}). "
+                   "The cluster table of §5.4 names each island's games, and Appendix A gives every game's cluster. "
                    "Hover or tap a game to see its neighbours; highlight a subgenre to see it spread across islands.",
         "source": "derived.cluster · report/analysis.yaml (clustering, viz.design_map)",
         "controls": controls,
@@ -589,6 +658,8 @@ def vacant_lots(shared, live, by_id, derived, tables, fam, cfg):
     ms.sort(key=lambda m: (fam_order.index(by_id[m].data["family"]), -prev[m], m))
     vac_all = {(r["mechanic_a"], r["mechanic_b"]): r for r in shared["whitespace_all"]}
     rank = {(r["mechanic_a"], r["mechanic_b"]): i + 1 for i, r in enumerate(shared["whitespace_all"])}
+    # the numbered lots are the white-space table's first ten rows, under the rank that table prints
+    numbered = {(r["mechanic_a"], r["mechanic_b"]): r.get("rank", i + 1) for i, r in enumerate(tables["whitespace"]["rows"]) if r.get("rank", i + 1) <= 10}
     P, S, AV = 15, 13, 5
     L, TOP = 10, 30
     pos = []
@@ -619,12 +690,13 @@ def vacant_lots(shared, live, by_id, derived, tables, fam, cfg):
             if vac:
                 lots.append(f'<rect x="{f1(x + 0.5)}" y="{f1(y + 0.5)}" width="{S - 1}" height="{S - 1}" data-k="{key}" '
                             f'style="fill:{T["paper"]};stroke:{T["open"]};stroke-width:1;stroke-dasharray:2 1.5"/>')
-                rk = rank[(a, b)]
-                if rk <= 10:
-                    lots.append(text(x + S / 2, y + S / 2 + 3, rk, 8, "open", "middle", 600, ' pointer-events="none"'))
+                if (a, b) in numbered:
+                    lots.append(text(x + S / 2, y + S / 2 + 3, numbered[(a, b)], 8, "open", "middle", 600, ' pointer-events="none"'))
             elif (a, b) in tension:
+                # a cross in the stop colour, heavy enough to read when the figure is scaled to a printed page
                 lots.append(f'<rect x="{f1(x)}" y="{f1(y)}" width="{S}" height="{S}" data-k="{key}" style="fill:{T["paper3"]}"/>'
-                            f'<path d="M{f1(x + 2)},{f1(y + S - 2)}L{f1(x + S - 2)},{f1(y + 2)}" pointer-events="none" style="stroke:{T["stop"]};stroke-width:1.2"/>')
+                            f'<path d="M{f1(x + 2)},{f1(y + S - 2)}L{f1(x + S - 2)},{f1(y + 2)}M{f1(x + 2)},{f1(y + 2)}L{f1(x + S - 2)},{f1(y + S - 2)}" '
+                            f'pointer-events="none" style="stroke:{T["stop"]};stroke-width:1.8"/>')
             else:
                 op = 0.1 if lift < 0.5 else 0.28 if lift < 1 else 0.55 if lift < 2 else 0.9
                 lots.append(f'<rect x="{f1(x)}" y="{f1(y)}" width="{S}" height="{S}" data-k="{key}" style="fill:{T["ink"]}" fill-opacity="{op}"/>')
@@ -641,6 +713,22 @@ def vacant_lots(shared, live, by_id, derived, tables, fam, cfg):
         if not spans or spans[-1][0] != f:
             spans.append([f, i, i])
         spans[-1][2] = i
+    # key in the empty corner above the staircase: what the shade measures, and the other marks
+    kx, ky = L + pos[-1] * 0.5 + 60, TOP + 4
+    body.append(text(kx, ky, "shade: lift, observed ÷ expected co-occurrence", 8.5, "ink2", weight="600"))
+    sw = lambda op: f'<rect x="0" y="0" width="10" height="10" style="fill:{T["ink"]}" fill-opacity="{op}"/>'
+    keys = [(sw("0.9"), "built 2× chance or more"), (sw("0.55"), "built 1 to 2× chance"), (sw("0.28"), "built 0.5 to 1× chance"),
+            (sw("0.1"), "built under 0.5× chance"),
+            (f'<rect x="0.5" y="0.5" width="9" height="9" style="fill:{T["paper"]};stroke:{T["open"]};stroke-width:1;stroke-dasharray:2 1.5"/>',
+             "vacant: white space"),
+            (f'<rect x="0" y="0" width="10" height="10" style="fill:{T["paper3"]}"/><path d="M1.5,8.5L8.5,1.5M1.5,1.5L8.5,8.5" style="stroke:{T["stop"]};stroke-width:1.8"/>',
+             "pair recorded as in design tension"),
+            (f'<rect x="0.5" y="0.5" width="9" height="9" style="fill:{T["paper"]};stroke:{T["open"]};stroke-width:1;stroke-dasharray:2 1.5"/>',
+             "1 to 10: rank in the white-space table")]
+    for k, (mark, label) in enumerate(keys):
+        yy = ky + 16 + k * 14
+        body.append(f'<g transform="translate({f1(kx)},{f1(yy - 8)})">{mark}</g>' + text(kx + 16, yy, label, 8.5, "muted"))
+    body.append(f'<text x="{f1(kx + 5)}" y="{f1(ky + 16 + 6 * 14)}" text-anchor="middle" style="fill:{T["open"]};font-size:7px;font-weight:600">1</text>')
     body.append(f'<rect data-hl="lot" x="0" y="0" width="{S + 4}" height="{S + 4}" style="fill:none;stroke:{T["accent"]};stroke-width:1.5" display="none"/>')
     body.append("</svg>")
     data = {"m": [[m, by_id[m].data["name"], fam[by_id[m].data["family"]]["label"], prev[m]] for m in ms], "pairs": pairs, "N": N,
@@ -655,10 +743,11 @@ def vacant_lots(shared, live, by_id, derived, tables, fam, cfg):
         "title": "Built and vacant lots",
         "head": f"{n} common mechanics · {n * (n - 1) // 2} pairs · {n_vac} vacant",
         "svg": "".join(body),
-        "caption": f"Every pair of the {n} mechanics used by at least {ws['min_prevalence_games']} games, laid out like a plan: each lot is a pair, "
-                   "darker lots are built more often than chance would predict, dashed lots are white space (different families, no recorded tension, "
-                   f"co-occurring at most {ws['max_observed']} time), and slashed lots are pairs recorded as being in design tension. "
-                   "Numbers mark the ten largest gaps in the white-space table. Names sit on the diagonal: read a lot by following its row and its column back to the staircase.",
+        "caption": f"Every pair of the {n} mechanics used by at least {ws['min_prevalence_games']} games, laid out like a plan: each lot is a pair. "
+                   "A built lot's shade is its lift, the number of catalog games that use both mechanics divided by the number expected if the two were tagged independently, "
+                   "in four bands from under 0.5 to 2 or more. Dashed lots are white space (different families, no recorded tension, "
+                   f"co-occurring at most {ws['max_observed']} time), and crossed lots are pairs recorded as being in design tension. "
+                   "The numbers 1 to 10 are the rank column of the white-space table. Names sit on the diagonal: read a lot by following its row and its column back to the staircase.",
         "source": "dist/analysis/whitespace.csv · dist/analysis/cooccurrence-all.csv · report/analysis.yaml (whitespace)",
         "controls": controls,
         "legend": leg,
@@ -703,7 +792,7 @@ def technique_flows(live, by_id, derived, vocabs, fam):
         e_tot[e] += v
     e_ids = sorted(eff_order, key=lambda e: (-e_tot[e], eff_order.index(e)))
 
-    W, H = 880, 820
+    W, H = 880, 856
     XL, XM, XR, NW = 214, 444, 662, 8
     TOP, BOT = 30, 800
     gaps = {"t": 2.5, "e": 10, "f": 5}
@@ -787,12 +876,16 @@ def technique_flows(live, by_id, derived, vocabs, fam):
     body.append("</g>")
     # labels
     body.append('<g data-layer="labels">')
-    ty = spread([nt[t][0] + nt[t][1] / 2 for t in t_ids], 10, TOP, BOT)
-    ty2 = spread([nt2[t][0] + nt2[t][1] / 2 for t in t_ids], 10, TOP, BOT)
+    # technique names in full, wrapped onto a second line where they are long
+    LH = 8.5
+    tlines = {t: wrap(by_id[t].data["name"], 40) for t in t_ids}
+    hts = [LH * (len(tlines[t]) - 1) for t in t_ids]
+    ty = spread_blocks([nt[t][0] + nt[t][1] / 2 for t in t_ids], hts, 10, TOP, BOT)
+    ty2 = spread_blocks([nt2[t][0] + nt2[t][1] / 2 for t in t_ids], hts, 10, TOP, BOT)
     for t, a, b in zip(t_ids, ty, ty2):
-        nm = by_id[t].data["name"]
-        nm = nm if len(nm) <= 40 else nm[:39].rstrip() + "…"
-        body.append(f'<text x="{XL - 6}" y="{f1(a + 3)}" data-y2="{f1(b + 3)}" data-node="t:{t}" text-anchor="end" style="fill:{T["ink2"]};font-size:8.5px">{esc(nm)}</text>')
+        for k, line in enumerate(tlines[t]):
+            dy = (k - (len(tlines[t]) - 1) / 2) * LH + 3
+            body.append(f'<text x="{XL - 6}" y="{f1(a + dy)}" data-y2="{f1(b + dy)}" data-node="t:{t}" text-anchor="end" style="fill:{T["ink2"]};font-size:8.5px">{esc(line)}</text>')
     for e in e_ids:
         (y, h), (y2, h2) = ne[e], ne2[e]
         body.append(f'<text x="{XM + NW / 2}" y="{f1(y - 4)}" data-y2="{f1(y2 - 4)}" data-node="e:{e}" text-anchor="middle" '
@@ -804,6 +897,9 @@ def technique_flows(live, by_id, derived, vocabs, fam):
         body.append(f'<text x="{XR + NW + 6}" y="{f1(a + 3)}" data-y2="{f1(b + 3)}" data-node="f:{f}" data-v="{v}" data-v2="{v2}" style="fill:{T["ink2"]};font-size:9px">'
                     f'{esc(fam[f]["label"].lower())} · <tspan style="fill:{T["faint"]}">{v}</tspan></text>')
     body.append("</g>")
+    rib = lambda o: f'<rect x="0" y="1" width="10" height="8" style="fill:{T["s1"]}" fill-opacity="{o}"/>'
+    key, _ = svg_key(8, H - 24, [("", "ribbon shade, the technique's maturity in games:")] + [(rib(op[m]), mat_label[m]["label"].lower()) for m in mat_order])
+    body.append(key + text(8, H - 8, "ribbon width and the number after a family: affects edges", 8.5, "muted"))
     body.append("</svg>")
     data = {
         "t": {t: [by_id[t].data["name"], mat_label[tmat[t]]["label"], int(tot_t[t]), round(tot_t2[t], 2)] for t in t_ids},
@@ -837,11 +933,6 @@ def technique_flows(live, by_id, derived, vocabs, fam):
 # ======================================================================= book figures (chapters 2, 6, 7, 10, 11, 12, 13)
 # Static figures: every value is printed or carried in a <title> tooltip, so they need no site script.
 
-def short(name: str, n: int = 40) -> str:
-    s = name.split(" (")[0]
-    return s if len(s) <= n else s[: n - 1].rstrip() + "…"
-
-
 def _plain(title, head, svg, caption, source, twin, min_width=640, legend_html=""):
     return {"title": title, "head": head, "svg": svg, "caption": caption, "source": source, "controls": "", "legend": legend_html,
             "min_width": min_width, "data": "", "twin": twin}
@@ -872,7 +963,7 @@ def layer_profile(tables, fam, sub, cfg):
     vmax = max((r.get(f, 0) or 0) for r in rows for f in fams)
     LBL, TOP, CW_, RH = 190, 150, 31, 24
     W = LBL + CW_ * len(fams) + 150
-    H = TOP + RH * len(rows) + 30
+    H = TOP + RH * len(rows) + 50
     body = [svg_open("layer-profile", W, H, "Where each subgenre spends its mechanics",
                      "Grid of subgenres by mechanic family; shading is the share of the subgenre's mechanic uses in that family.")]
     for j, f in enumerate(fams):
@@ -892,11 +983,17 @@ def layer_profile(tables, fam, sub, cfg):
             if v >= 0.10:
                 fill = "paper" if v / vmax > 0.55 else "ink"
                 body.append(text(x + CW_ / 2, y + RH / 2 + 3, round(100 * v), 9, fill, "middle"))
-    body.append(text(LBL, H - 10, "printed: share of uses, in percent, where 10 or more", 9, "faint"))
+    # key: the shade as a stepped bar, so cells too light to carry a printed share can still be read
+    ticks = [v for v in (0.05, 0.1, 0.2, 0.3, 0.4, 0.5) if v < vmax - 0.02] + [vmax]
+    sw = lambda v: (f'<rect x="0" y="0" width="10" height="10" style="fill:{T["ink"]};fill-opacity:{0.04 + 0.86 * v / vmax:.3f};'
+                    f'stroke:{T["rule"]};stroke-width:0.5"/>')
+    key, _ = svg_key(LBL, H - 24, [("", "shade, share of the subgenre's mechanic uses:")] + [(sw(v), f"{round(100 * v)}%") for v in ticks])
+    body.append(key + text(LBL, H - 8, "number in a cell: that share in percent, printed where 10 or more · number after a subgenre: its catalog games", 8.5, "faint"))
     body.append("</svg>")
     return _plain("Where each subgenre spends its mechanics", f"{counted(len(rows), 'subgenre')} · {counted(len(fams), 'family')}", "".join(body),
-                  f"Share of each subgenre's mechanic uses that falls in each mechanic family, for subgenres with at least {smin} catalog games. "
-                  "Darker cells take a larger share; shares of 10 percent or more are printed. Families are ordered by their average share.",
+                  f"Share of each subgenre's mechanic uses that falls in each mechanic family, for subgenres with at least {smin} catalog games; the number after a subgenre is its number of catalog games. "
+                  "A cell's shade is that share, on the stepped scale under the grid, and shares of 10 percent or more are printed. "
+                  "Families are ordered by their average share, and every share is in family-by-subgenre.csv.",
                   "tables family-by-subgenre · dist/analysis/family-by-subgenre.csv",
                   {"table": "subgenre-spend", "note": "The three families that take the largest share of each subgenre's mechanic uses. Every share is in family-by-subgenre.csv."},
                   min_width=720)
@@ -950,29 +1047,37 @@ def technique_landscape(live, vocabs):
     grp = lambda t: "shipped" if t.data["maturity"].startswith("shipped") else t.data["maturity"]
     cols = {m: sorted((t for t in techs if grp(t) == m), key=lambda t: (t.data.get("year") or 0, t.id)) for m in order}
     mat_label = {**mat_label, "shipped": {"label": "Shipped in games"}}
-    CWID, TOP, RH = 296, 46, 15
+    CWID, TOP, RH, LH = 296, 46, 15, 10
     W = CWID * len(order) + 10
-    H = TOP + RH * max(len(v) for v in cols.values()) + 16
+    # names in full, wrapped at the column's width; each row is as tall as its lines
+    lines = {t.id: wrap(f'{t.data.get("year")} {t.data["name"]}{" · norm" if t.data["maturity"] == "shipped-mainstream" else ""}', 52) for t in techs}
+    HK = TOP + max(sum(RH + LH * (len(lines[t.id]) - 1) for t in v) for v in cols.values()) + 6
+    H = HK + 22
     body = [svg_open("technique-landscape", W, H, "Techniques by maturity in games",
                      "Every technique in the dataset listed under how far it has got in games, oldest result first, marked by its effect on reproducibility.")]
     for k, m in enumerate(order):
         x0 = 8 + k * CWID
         body.append(text(x0, 18, f'{mat_label.get(m, {}).get("label", m).lower()} · {len(cols[m])}', 9, "ink2", weight="600"))
         body.append(f'<line x1="{x0}" y1="26" x2="{x0 + CWID - 14}" y2="26" style="stroke:{T["rule2"]}"/>')
-        for i, t in enumerate(cols[m]):
-            y = TOP + i * RH
+        y = TOP
+        for t in cols[m]:
             det = t.data.get("determinism_impact", "preserves")
             body.append(DET_MARK[det](x0 + 4, y - 3))
-            body.append(f'<text x="{x0 + 12}" y="{y}" style="fill:{T["ink2"] if m.startswith("shipped") else T["muted"]};font-size:8.5px">'
-                        f'<title>{esc(t.data["name"])} ({t.data.get("year")}, {t.data["maturity"]}): {DET_LABEL[det]}</title>{esc(t.data.get("year"))} {esc(short(t.data["name"], 44))}'
-                        f'{" · norm" if t.data["maturity"] == "shipped-mainstream" else ""}</text>')
+            for j, line in enumerate(lines[t.id]):
+                tip = f'<title>{esc(t.data["name"])} ({t.data.get("year")}, {t.data["maturity"]}): {DET_LABEL[det]}</title>' if j == 0 else ""
+                body.append(f'<text x="{x0 + 12}" y="{y + j * LH}" style="fill:{T["ink2"] if m.startswith("shipped") else T["muted"]};font-size:8.5px">{tip}{esc(line)}</text>')
+            y += RH + LH * (len(lines[t.id]) - 1)
+    # the key to the marks sits inside the figure, so the static figure explains them as the site's legend does
+    key, _ = svg_key(8, HK + 12, [(DET_MARK[d](5, 5), DET_LABEL[d]) for d in ("preserves", "mitigable", "breaks")]
+                     + [("", "· norm: shipped, and a norm across studios")])
+    body.append(key)
     body.append("</svg>")
     trows = [{"technique": t.id, "year": t.data.get("year"), "maturity": t.data["maturity"], "determinism": t.data.get("determinism_impact")} for m in order for t in cols[m]]
     n_ship = len(cols["shipped"])
     key = _key([(DET_LABEL[d], DET_MARK[d](5, 5)) for d in ("preserves", "mitigable", "breaks")])
     return _plain("Techniques by maturity in games", f"{counted(len(techs), 'technique')} · {n_ship} shipped", "".join(body),
                   "Every technique in the dataset under how far it has got in games, each with the year of the result the dataset cites, oldest first; the one shipped technique that is a norm across studios is marked. "
-                  "The mark shows what the technique does to reproducibility when it runs.",
+                  "The mark before each name shows what the technique does to reproducibility when it runs, as the key under the columns gives.",
                   "technique records · dist/entities/techniques.json", {"columns": ["technique", "year", "maturity", "determinism"], "rows": trows,
                                                                         "link_columns": ["technique"], "note": "Every technique with its maturity in games and its effect on reproducibility."},
                   min_width=860, legend_html=key)
@@ -984,9 +1089,10 @@ def determinism_runtime(live, vocabs):
     mat_rank = {"shipped-mainstream": 0, "shipped-niche": 1, "prototype": 2, "research": 3}
     order = ["preserves", "mitigable", "breaks"]
     cols = {d: sorted((t for t in techs if t.data.get("determinism_impact") == d), key=lambda t: (mat_rank[t.data["maturity"]], t.id)) for d in order}
-    CWID, TOP, RH = 290, 46, 15
+    CWID, TOP, RH, LH = 290, 46, 15, 10
     W = CWID * 3 + 10
-    H = TOP + RH * max(len(v) for v in cols.values()) + 16
+    lines = {t.id: wrap(t.data["name"], 52) for t in techs}  # names in full, wrapped at the column's width
+    H = TOP + max(sum(RH + LH * (len(lines[t.id]) - 1) for t in v) for v in cols.values()) + 16
     body = [svg_open("determinism-runtime", W, H, "What runtime techniques do to reproducibility",
                      "Techniques that can run during play, grouped by their effect on reproducibility; shipped ones first and in dark text.")]
     for k, d in enumerate(order):
@@ -994,12 +1100,15 @@ def determinism_runtime(live, vocabs):
         body.append(DET_MARK[d](x0 + 4, 15))
         body.append(text(x0 + 12, 18, f"{DET_LABEL[d]} · {len(cols[d])}", 9, "ink2", weight="600"))
         body.append(f'<line x1="{x0}" y1="26" x2="{x0 + CWID - 14}" y2="26" style="stroke:{T["rule2"]}"/>')
-        for i, t in enumerate(cols[d]):
-            y = TOP + i * RH
+        y = TOP
+        for t in cols[d]:
             shipped = t.data["maturity"].startswith("shipped")
             tag = "shipped" if shipped else t.data["maturity"]
-            body.append(f'<text x="{x0}" y="{y}" style="fill:{T["ink"] if shipped else T["muted"]};font-size:8.5px{";font-weight:600" if shipped else ""}">'
-                        f'<title>{esc(t.data["name"])}: {tag}</title>{esc(short(t.data["name"], 44))}</text>')
+            for j, line in enumerate(lines[t.id]):
+                tip = f'<title>{esc(t.data["name"])}: {tag}</title>' if j == 0 else ""
+                body.append(f'<text x="{x0}" y="{y + j * LH}" style="fill:{T["ink"] if shipped else T["muted"]};font-size:8.5px{";font-weight:600" if shipped else ""}">'
+                            f'{tip}{esc(line)}</text>')
+            y += RH + LH * (len(lines[t.id]) - 1)
     body.append("</svg>")
     trows = [{"technique": t.id, "determinism": d, "maturity": t.data["maturity"]} for d in order for t in cols[d]]
     return _plain("What runtime techniques do to reproducibility", f"{counted(len(techs), 'technique')} that run during play", "".join(body),
@@ -1020,7 +1129,8 @@ def opportunity_priorities(live, tables):
     for k in cells:
         cells[k].sort(key=lambda o: (-rows[o.id]["priority"], o.id))
     LBL, TOP, CWID, RH = 60, 40, 205, 13
-    hts = {i: max(len(cells.get((i, f), [])) for f in feas) for i in imps}
+    lines = {o.id: wrap(o.data["name"], 35) for o in opps}  # names in full; a long one wraps under itself
+    hts = {i: max(sum(len(lines[o.id]) for o in cells.get((i, f), [])) for f in feas) for i in imps}
     W = LBL + CWID * len(feas) + 10
     H = TOP + sum(hts[i] * RH + 22 for i in imps) + 30
     top8 = sorted(opps, key=lambda o: (-rows[o.id]["priority"], o.id))[:8]
@@ -1035,11 +1145,15 @@ def opportunity_priorities(live, tables):
         for j, f in enumerate(feas):
             x = LBL + j * CWID
             body.append(f'<rect x="{x + 2}" y="{y}" width="{CWID - 4}" height="{h - 4}" style="fill:{T["paper2"]};stroke:{T["rule"]};stroke-width:0.6"/>')
-            for k, o in enumerate(cells.get((i, f), [])):
+            k = 0
+            for o in cells.get((i, f), []):
                 lead = o in top8
-                body.append(f'<text x="{x + 8}" y="{f1(y + 14 + k * RH)}" style="fill:{T["accent"] if lead else T["ink2"]};font-size:8.5px{";font-weight:600" if lead else ""}">'
-                            f'<title>{esc(o.data["name"])}: priority {rows[o.id]["priority"]}, novelty {o.data["novelty"]}, horizon {o.data["horizon"]}</title>'
-                            f'{o.data["novelty"]} {esc(short(o.data["name"], 33))}</text>')
+                st = f'fill:{T["accent"] if lead else T["ink2"]};font-size:8.5px{";font-weight:600" if lead else ""}'
+                for j, line in enumerate(lines[o.id]):
+                    head = (f'<title>{esc(o.data["name"])}: priority {rows[o.id]["priority"]}, novelty {o.data["novelty"]}, horizon {o.data["horizon"]}</title>'
+                            f'{o.data["novelty"]} ') if j == 0 else ""
+                    body.append(f'<text x="{f1(x + 8 + (0 if j == 0 else 2 * 8.5 * CW))}" y="{f1(y + 14 + k * RH)}" style="{st}">{head}{esc(line)}</text>')
+                    k += 1
         y += h
     body.append(text(LBL, H - 10, "number before each name: novelty score · blue: the eight highest priorities", 9, "faint"))
     body.append("</svg>")
@@ -1061,7 +1175,8 @@ def prediction_timeline(live):
     CWID, TOP, RH, PER = 292, 52, 14, 3
     W = CWID * PER + 10
     bands = [dates[i:i + PER] for i in range(0, len(dates), PER)]
-    band_h = [TOP + RH * max(len(by[d]) for d in b) + 10 for b in bands]
+    lines = {o.id: wrap(o.data["name"], 52) for o in opps}  # names in full, wrapped at the column's width
+    band_h = [TOP + RH * max(sum(len(lines[o.id]) for o in by[d]) for d in b) + 10 for b in bands]
     H = sum(band_h) + 10
     body = [svg_open("prediction-timeline", W, H, "When the predictions come due",
                      "Every opportunity's prediction placed under its resolve-by date.")]
@@ -1072,10 +1187,13 @@ def prediction_timeline(live):
             body.append(text(x0, y0 + 18, d, 9, "ink2", weight="600"))
             body.append(text(x0, y0 + 31, f"{len(by[d])} due", 8, "faint"))
             body.append(f'<line x1="{x0}" y1="{y0 + 38}" x2="{x0 + CWID - 14}" y2="{y0 + 38}" style="stroke:{T["rule2"]}"/>')
-            for i, o in enumerate(by[d]):
+            i = 0
+            for o in by[d]:
                 out = (o.data.get("falsifiable_signal", {}).get("resolution") or {}).get("outcome", "open")
-                body.append(f'<text x="{x0}" y="{y0 + TOP + i * RH}" style="fill:{T["ink2"]};font-size:8.5px"><title>{esc(o.data["name"])}: '
-                            f'{esc(o.data["falsifiable_signal"]["prediction"])} ({out})</title>{esc(short(o.data["name"], 46))}</text>')
+                for j, line in enumerate(lines[o.id]):
+                    tip = f'<title>{esc(o.data["name"])}: {esc(o.data["falsifiable_signal"]["prediction"])} ({out})</title>' if j == 0 else ""
+                    body.append(f'<text x="{x0 + (0 if j == 0 else 10)}" y="{y0 + TOP + i * RH}" style="fill:{T["ink2"]};font-size:8.5px">{tip}{esc(line)}</text>')
+                    i += 1
         y0 += bh
     body.append("</svg>")
     trows = [{"resolve_by": d, "opportunity": o.id} for d in dates for o in by[d]]
@@ -1104,7 +1222,7 @@ def pipeline(live, stats):
     body.append(box(10, 175, 180, 70, "run log", ["who operated each change", "model, harness, method", "append-only"]))
     body.append(box(240, 40, 170, 95, "validator", ["schemas and vocabularies", "provenance and independence", "sources and quotes", "fails the build"]))
     body.append(box(460, 40, 170, 95, "analysis", ["prevalence, clusters", "white space, exposure", "priorities, figures", "deterministic"]))
-    body.append(box(460, 175, 170, 70, "assertions", ["every interpretive sentence", "checked against the data", "fails the build"], True))
+    body.append(box(460, 175, 170, 70, "assertions", ["rankings, signs, groupings", "checked against the records", "fails the build"], True))
     outs = ["paper", "site and wiki", "book", "episode scripts", "shorts and film"]
     for i, o in enumerate(outs):
         y = 22 + i * 52
@@ -1117,10 +1235,14 @@ def pipeline(live, stats):
     body.append(text(240, 280, "every edition names the dataset version it was built from", 9, "faint"))
     body.append("</svg>")
     trows = [{"stage": "records", "what": ", ".join(counted(v, k) for k, v in n.items())}, {"stage": "validator", "what": "schemas, vocabularies, provenance, sources"},
-             {"stage": "analysis", "what": "derived values, tables, figures"}, {"stage": "assertions", "what": "prose checked against the data on every build"},
+             {"stage": "analysis", "what": "derived values, tables, figures"}, {"stage": "assertions", "what": "rankings, signs, and groupings in the prose checked against the records on every build"},
              {"stage": "outputs", "what": ", ".join(outs)}]
+    n_a = stats.get("n_report_assertions")
     return _plain("From records to every product", "one dataset · five products", "".join(body),
-                  "Records pass the validator and feed one deterministic analysis; the paper, the site, the wiki, the book, and the scripts all render from it, and every interpretive sentence in them carries an assertion the build checks.",
+                  "Records pass the validator and feed one deterministic analysis; the paper, the site, the wiki, the book, and the scripts all render from it. "
+                  "Numbers reach the prose only through tokens the build fills in, and sentences that state a ranking, sign, threshold, or grouping carry assertions"
+                  + (f" ({n_a} in the paper)" if n_a else "") + " that fail the build when the records stop supporting them. "
+                  "The build checks that the prose agrees with the records, not whether an interpretation is valid.",
                   "scripts/build.py · CONTRACT.md", {"columns": ["stage", "what"], "rows": trows, "link_columns": [], "note": "The stages of the build."}, min_width=760)
 
 
