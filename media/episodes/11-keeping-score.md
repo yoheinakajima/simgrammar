@@ -102,7 +102,7 @@ Target runtime about 11 minutes: about 1,180 words of narration at 135 words a m
 
 **Voice.** Once results come in, the scoreboard also tests the rankings. If the scores behind the table mean anything, confirmations should gather near the top. A run of refutations among the explanation bets would mean this series was wrong about what studios would build, even if it was right about what players need.
 
-**Voice.** It also tests the dataset's maturity scores. Every technique is rated research, prototype, shipped in a niche, or shipped as a norm. If a bet that depends on a research-stage technique comes true on time, that's evidence the scale was running behind the field.
+**Voice.** It also tests the dataset's maturity scores, through the bets that only the technique itself can win. Every technique is rated research, prototype, shipped in a niche, or shipped as a norm. If one of those bets depends on a research-stage technique and comes true on time, that's evidence the scale was running behind the field.
 
 ## 10. Try one (9:57 to 10:49)
 
