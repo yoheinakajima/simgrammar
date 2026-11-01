@@ -1,0 +1,20 @@
+id: 2026-10-31-es-review-formula
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: check the v0.4 PDF before tagging it and sending it back to Explore Science.'
+method: >-
+  Changed no records or sources. Built the v0.4 PDF from main at 4df350c (90 pages) and rendered the title page, the
+  abstract, the cluster table and its caption, the technique-flow figure and Appendices C to E to images with PDFKit.
+  All laid out cleanly except one caption: the cluster-stability formula, which answers review finding E9, printed as
+  "|A n S n B| / |(A n S) u B|" because the source wrote the set signs as the letters n and u. The caption in
+  scripts/analyze.py now says the overlap is a Jaccard index, the games in both divided by the games in either, so it
+  reads the same on the site and in the PDF without symbols the text font may lack. The docstring keeps its ASCII
+  formula, which only programmers read.
+contract_version: '1.2'
+proposals: []
