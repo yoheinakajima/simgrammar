@@ -31,11 +31,13 @@ precedent:
 novelty: 3
 feasibility: 4
 impact: 3
-horizon: 1-2y
+horizon: 3-5y
 key_risks:
 - Global models are too large for clients; distillation to regional scale may lose coherence.
 - Realistic weather can be less fun than authored seasons.
 - Licensing of model weights and training data.
+- Both techniques it applies are research results for games with a 3 to 5 year horizon and no game deployment,
+  so the 2028 prediction tests an early arrival.
 validation_experiment: 'Distill a public ML weather model''s outputs into a sub-100 MB regional emulator
   for one biome; compare statistics (drought frequency, storm clustering) against reanalysis data and
   run it inside a farming prototype at under 1 ms per in-game day. Success: matched variability statistics
@@ -48,8 +50,14 @@ falsifiable_signal:
     a console release; documentation or a developer statement describes a machine-learned weather emulator
     running in the shipped game.
 sources: []
+assertions:
+- field.ml-weather-models.horizon == 3-5y
+- field.ml-weather-models.maturity == research
+- field.graph-network-simulators.horizon == 3-5y
+- field.graph-network-simulators.maturity == research
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-techniques-opportunities

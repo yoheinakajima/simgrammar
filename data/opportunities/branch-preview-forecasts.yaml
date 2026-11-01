@@ -43,12 +43,14 @@ falsifiable_signal:
   prediction: A city builder, colony sim, or grand strategy game will show players several simulated stochastic
     futures of their current game state before a decision.
   resolve_by: '2028-06-30'
-  criteria: Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews;
+  criteria: 'Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews;
     store page, patch notes, or a developer talk describes multiple forward runs from the live save state,
-    shown to the player. A single deterministic projection does not count.
+    shown to the player. A single deterministic projection does not count. Technique class: forked runs
+    of the game''s own simulation count, with or without a learned surrogate, so this is a feature test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-techniques-opportunities

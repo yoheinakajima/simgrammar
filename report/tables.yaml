@@ -138,10 +138,15 @@ tables:
   - trl
   - horizon
   - determinism_impact
+  - path: _derived.window
+    label: window
   sort:
   - category
   - -year
   - name
+  caption: The set covers techniques whose key result falls in 2019 or later. An older technique is kept as a historical
+    exception only when an in-window technique builds on it, a catalog game released in the window deploys it, or it
+    cites later work from the window; the window column names which (report/analysis.yaml, techniques.window_start).
 - name: opportunity-catalog
   kind: rows
   entity: opportunity
@@ -565,8 +570,10 @@ tables:
   sort:
   - falsifiable_signal.resolve_by
   - name
-  caption: Each prediction has resolution criteria on its wiki page. A prediction that fails is evidence against the opportunity
-    thesis, not only against its timing.
+  caption: Each prediction has resolution criteria on its record page. A refuted prediction says the opportunity did not
+    arrive by its date in a qualifying title, which can reflect cost, studio schedules, or reception as well as a wrong
+    thesis; a confirmed one can come from general adoption of AI, so it supports the thesis only as far as the criteria
+    require the opportunity's own mechanism.
 
 # Book back matter (book/src/90-glossary.md and 91-catalog.md): one glossary table per mechanic family, and the catalog.
 - name: book-glossary-resources-production

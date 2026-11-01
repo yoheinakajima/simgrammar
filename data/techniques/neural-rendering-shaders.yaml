@@ -72,19 +72,23 @@ risks:
 affects:
 - id: embodied-skill-control
   effect: accelerates
-  note: Upscaling and frame generation raise displayed frame rates in GPU-heavy flight and driving sims
-    for the same render cost; generated frames do not sample new input, so frame generation adds latency
-    that hurts precise hand-flying or driving.
+  note: 'Presentation path only: super resolution renders each frame at lower resolution and reconstructs
+    it, so a GPU-bound flight or driving sim draws more real frames per second on the same hardware and
+    a skill flown or driven by eye gets more frequent visual feedback. The vehicle model and its update
+    rule are unchanged, and frame generation does not help: generated frames sample no new input and add
+    latency that hurts precise hand-flying or driving.'
 - id: day-night-cycle
   effect: deepens
-  note: Neural denoising and the neural radiance cache make dynamic multi-bounce lighting affordable,
-    so player-built interiors and towns can be lit correctly across a full diurnal cycle where baked lighting
-    cannot follow player construction.
+  note: 'Presentation path only: neural denoising and the neural radiance cache make dynamic multi-bounce
+    lighting affordable, so player-built interiors and towns are lit correctly at every hour of the cycle,
+    where baked lighting cannot follow player construction. The cycle''s clock, and whatever the simulation
+    reads from it, such as schedules or visibility values, are unchanged.'
 - id: decoration-beauty
   effect: deepens
-  note: Up to 7x VRAM savings from neural texture compression and cheaper layered materials let more distinct
-    high-detail decor assets be resident at once, raising the variety a beauty-driven builder can show
-    on screen.
+  note: 'Changes the asset budget the mechanic draws on, not its scoring: up to 7x VRAM savings from neural
+    texture compression and cheaper layered materials let more distinct high-detail decor assets be resident
+    at once, so a beauty-driven builder can offer and show more variety. Beauty values and the rules that
+    read them are unchanged.'
 deployed_in:
 - microsoft-flight-simulator-2020
 - cities-skylines-2
@@ -106,3 +110,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-world-models
+  reviewed:
+  - 2026-10-31-es-review-techniques-opportunities

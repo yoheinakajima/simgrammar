@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import math
+import re
 from collections import Counter, defaultdict
 from datetime import date
 from itertools import combinations
@@ -1430,6 +1431,336 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     for k in ("breaks", "mitigable", "preserves"):
         stats[f"n_technique_runtime_{k}"] = sum(1 for t in rt if t.data["determinism_impact"] == k)
 
+    # ---------------- techniques: the 2019-2026 window, and whether TRL and maturity tell the same story (§7.1)
+    tcfg = cfg.get("techniques") or {}
+    w0 = int(tcfg.get("window_start", 2019))
+    in_window = {t.id for t in techs if isinstance(t.data.get("year"), int) and t.data["year"] >= w0}
+    built_on_by = defaultdict(set)
+    for t in techs:
+        for b in t.data.get("builds_on") or []:
+            built_on_by[b].add(t.id)
+    def _src_year(sid):
+        s = by_id.get(sid)
+        try:
+            return int(str((s.data.get("date") if s else "") or "")[:4])
+        except ValueError:
+            return None
+    pre_rows = []
+    for t in techs:
+        if t.id in in_window:
+            derived[t.id]["window"] = f"{w0} on"
+            continue
+        # an older technique stays only for a reason the records show; the first that holds is named, with its evidence
+        why, ev = "", []
+        late_src = sorted({x for x in outgoing.get(t.id, {}).get("cites", []) if x in by_id and (_src_year(x) or 0) >= w0
+                           and by_id[x].data.get("kind") != "encyclopedia"})
+        if built_on_by[t.id] & in_window:
+            why, ev = "built on by", sorted(built_on_by[t.id] & in_window)
+        elif any(isinstance(year.get(g), int) and year[g] >= w0 for g in t.data.get("deployed_in") or []):
+            why, ev = "deployed in", sorted(g for g in t.data["deployed_in"] if isinstance(year.get(g), int) and year[g] >= w0)
+        elif late_src:
+            why, ev = f"cites later work, from {w0} on", late_src
+        derived[t.id]["window"] = f"historical exception ({why})" if why else f"before {w0}, no reason recorded"
+        pre_rows.append({"technique": t.id, "year": t.data["year"], "maturity": t.data["maturity"], "reason": why or "none recorded", "evidence": ev})
+    stats["technique_window_start"] = w0
+    stats["n_technique_in_window"] = len(in_window)
+    stats["n_technique_pre_window"] = len(pre_rows)
+    stats["n_technique_pre_window_unexplained"] = sum(1 for r in pre_rows if r["reason"] == "none recorded")
+    stats["n_technique_pre_window_shipped"] = sum(1 for r in pre_rows if r["maturity"].startswith("shipped"))
+    for k in MATURITY_ORDER:
+        stats[f"n_technique_in_window_{k.replace('-', '_')}"] = sum(1 for t in techs if t.id in in_window and t.data["maturity"] == k)
+    stats["n_technique_in_window_shipped"] = sum(1 for t in techs if t.id in in_window and t.data["maturity"].startswith("shipped"))
+    tables["techniques-before-window"] = {"description": f"Techniques whose key result predates {w0}, kept as historical exceptions, with the reason the records give (report/analysis.yaml, techniques.window_start).",
+                                          "columns": ["technique", "year", "maturity", "reason", "evidence"], "rows": sorted(pre_rows, key=lambda r: (r["year"], r["technique"])),
+                                          "link_columns": ["technique", "evidence"], "max_links": 3}
+    mat_terms = vocab_terms(vocabs, "technique_maturity")
+    trl_rng = tcfg.get("trl_by_maturity") or {}
+    trl_text = rub["scales"]["trl"]["levels"]
+    anchor_rows, outside = [], []
+    for k in MATURITY_ORDER:
+        lo, hi = trl_rng.get(k, [1, 9])
+        ts = [t for t in techs if t.data["maturity"] == k]
+        off = sorted(t.id for t in ts if not lo <= t.data["trl"] <= hi)
+        outside += off
+        seen = sorted({t.data["trl"] for t in ts})
+        anchor_rows.append({"maturity": k, "definition": mat_terms[k]["definition"],
+                            "trl_by_anchor": f"{lo}" if lo == hi else f"{lo} to {hi}",
+                            "trl_anchor": f"{lo}: {str(trl_text[lo]).rstrip('.')}" + (f"; {hi}: {str(trl_text[hi]).rstrip('.')}" if hi != lo else ""),
+                            "techniques": len(ts), "trl_recorded": (f"{seen[0]}" if len(seen) == 1 else f"{seen[0]} to {seen[-1]}") if seen else "",
+                            "trl_outside_range": off})
+    tables["technique-maturity-anchors"] = {"description": "Each deployment-maturity level with its definition (vocab/technique_maturity.yaml), the TRL levels whose anchors describe the same evidence (vocab/rubrics.yaml; mapping in report/analysis.yaml), the techniques at that level, the TRLs they carry, and any whose TRL falls outside the range.",
+                                            "columns": ["maturity", "definition", "trl_by_anchor", "trl_anchor", "techniques", "trl_recorded", "trl_outside_range"],
+                                            "rows": anchor_rows, "link_columns": ["trl_outside_range"]}
+    stats["n_technique_trl_outside_maturity"] = len(outside)
+    stats["n_technique_trl_outside_maturity_prototype"] = sum(1 for x in outside if by_id[x].data["maturity"] == "prototype")
+    # what "shipped" rests on: the anchor needs one commercial game, so count the catalog deployments behind each rating
+    shipped_t = [t for t in techs if t.data["maturity"].startswith("shipped")]
+    ndep = {t.id: len([g for g in t.data.get("deployed_in") or [] if g in by_id]) for t in shipped_t}
+    stats["n_technique_shipped_no_catalog_game"] = sum(1 for v in ndep.values() if v == 0)
+    stats["n_technique_shipped_one_catalog_game"] = sum(1 for v in ndep.values() if v == 1)
+    stats["n_technique_shipped_two_plus_catalog_games"] = sum(1 for v in ndep.values() if v >= 2)
+    stats["n_technique_research_horizon_now"] = sum(1 for t in techs if t.data["maturity"] == "research" and t.data["horizon"] == "now")
+    stats["n_technique_horizon_now"] = sum(1 for t in techs if t.data["horizon"] == "now")
+    now_trl = sorted(t.data["trl"] for t in techs if t.data["horizon"] == "now")
+    stats["min_trl_horizon_now"] = now_trl[0] if now_trl else None
+    stats["max_trl_horizon_now"] = now_trl[-1] if now_trl else None
+    # who wrote the technique and opportunity records (and so their edges, maturity judgments, and ratings): models and
+    # operators of the creating runs, for the single-rater limitation in §8 and §9
+    run_by = {r.id: r for r in ents.get("run", [])}
+    for t_, lst_ in (("technique", techs), ("opportunity", opps)):
+        made = [run_by.get((e.data.get("provenance") or {}).get("created")) for e in lst_]
+        stats[f"n_models_{t_}_records"] = len({str((r.data.get("agent") or {}).get("model", "")).strip().lower() for r in made if r is not None})
+        stats[f"n_operators_{t_}_records"] = len({str(r.data.get("operator", "")).strip().lower() for r in made if r is not None})
+
+    # ---------------- exposure: the weights in print, and how far the §8 readings depend on them (review E6, E12,
+    # E14, E20, E21, E22, E30). Exposure is a deployment-weighted heuristic: these checks recompute it under other
+    # weights, other technique sets, other mechanic sets, and perturbed inputs. Parameters: report/analysis.yaml.
+    xcfg = cfg.get("exposure") or {}
+    pcfg = cfg.get("perturbation") or {}
+    mat_w, eff_w = comp["maturity_weights"], comp["effect_weights"]
+    eff_terms = vocab_terms(vocabs, "effect")
+    wrows = [{"factor": "maturity in games", "level": mat_terms[k]["label"], "weight": mat_w[k], "count": mat_counts.get(k, 0)} for k in MATURITY_ORDER]
+    wrows += [{"factor": "effect", "level": eff_terms[k]["label"], "weight": eff_w[k], "count": eff.get(k, 0)}
+              for k in sorted(eff_w, key=lambda k: (-eff_w[k], k))]
+    tables["exposure-weights"] = {"description": "The weights behind technique exposure, read from vocab/rubrics.yaml (composites.technique_exposure). Count is techniques for a maturity level and affects edges for an effect. A mechanic's exposure is the sum, over the techniques with an edge to it, of maturity weight times effect weight.",
+                                  "columns": ["factor", "level", "weight", "count"], "rows": wrows}
+    stats["w_exposure_maturity_min"], stats["w_exposure_maturity_max"] = min(mat_w.values()), max(mat_w.values())
+    stats["w_exposure_effect_min"], stats["w_exposure_effect_max"] = min(eff_w.values()), max(eff_w.values())
+    mech_ids = [m.id for m in mechs]
+    fam_of_m = {m.id: m.data["family"] for m in mechs}
+    fams_used = [f for f in fam_ids if any(fam_of_m[x] == f for x in mech_ids)]
+    edges_tm = [(t.id, t.data["maturity"], a["id"], a["effect"]) for t in techs for a in t.data.get("affects", []) if a["id"] in fam_of_m]
+
+    def _mexp(mw, ew, skip=frozenset(), merge=frozenset()):
+        """Exposure per mechanic under maturity weights mw (by technique id) and effect weights ew (by effect); techniques
+        in `merge` count once per mechanic, at the largest member's weight."""
+        per = defaultdict(lambda: defaultdict(float))
+        for tid, _, mid, e in edges_tm:
+            if tid not in skip:
+                per[mid][tid] += mw[tid] * ew[e]
+        out = {}
+        for mid in mech_ids:
+            p = per.get(mid, {})
+            grp = [v for k, v in p.items() if k in merge]
+            out[mid] = sum(v for k, v in p.items() if k not in merge) + (max(grp) if grp else 0.0)
+        return out
+
+    def _franks(mx, drop=frozenset()):
+        """Family ranks (1 = most exposed) by summed exposure and by exposure per mechanic, ties broken by family id."""
+        tot, mean = {}, {}
+        for f in fams_used:
+            ms = [x for x in mech_ids if fam_of_m[x] == f and x not in drop]
+            if ms:
+                tot[f] = sum(mx[x] for x in ms)
+                mean[f] = tot[f] / len(ms)
+        rk = lambda v: {f: i + 1 for i, f in enumerate(sorted(v, key=lambda f: (-round(v[f], 9), f)))}  # noqa: E731
+        return rk(tot), rk(mean)
+
+    def _rho(a, b):
+        ks = sorted(set(a) & set(b))
+        return _r(spearmanr([a[k] for k in ks], [b[k] for k in ks])[0], 2) if len(ks) > 2 else None
+
+    tmat = {t.id: t.data["maturity"] for t in techs}
+    base_mw = {t: mat_w[m] for t, m in tmat.items()}
+    one_mw = {t: 1.0 for t in tmat}
+    one_ew = {e: 1.0 for e in eff_w}
+    # technique-native mechanics: most of their catalog games are AI-native titles or deploy a technique that affects them
+    ai_sub = xcfg.get("ai_native_subgenre", "ai-native")
+    dep_on = defaultdict(set)
+    for t in techs:
+        for g in t.data.get("deployed_in") or []:
+            dep_on[g].update(a["id"] for a in t.data.get("affects", []))
+    native = set()
+    for m in mechs:
+        us = mech_games.get(m.id, [])
+        n_ai = sum(1 for g in us if by_id[g].data.get("subgenre") == ai_sub or m.id in dep_on.get(g, ()))
+        derived[m.id]["technique_native"] = bool(us) and n_ai / len(us) > float(xcfg.get("technique_native_share", 0.5))
+        if derived[m.id]["technique_native"]:
+            native.add(m.id)
+    stats["n_mechanics_technique_native"] = len(native)
+    stats["technique_native_share_pct"] = _r(100 * float(xcfg.get("technique_native_share", 0.5)), 0)
+    # collapsed effects (review D4): deepens, enables-new and cuts-authoring-cost read as one effect at their edge-weighted mean
+    overl = ("deepens", "enables-new", "cuts-authoring-cost")
+    n_ov = sum(eff.get(k, 0) for k in overl) or 1
+    col_ew = dict(eff_w)
+    for k in overl:
+        col_ew[k] = sum(eff_w[x] * eff.get(x, 0) for x in overl) / n_ov
+    eff_col = Counter()
+    for k, v in eff.items():
+        eff_col["overlapping" if k in overl else k] += v
+    rare_col = min(eff_col.items(), key=lambda x: (x[1], x[0]))[0]
+    stats["rarest_effect_collapsed"] = eff_terms[rare_col]["label"] if rare_col in eff_terms else rare_col
+    stats["n_effect_overlapping_collapsed"] = eff_col.get("overlapping", 0)
+    base_mx = _mexp(base_mw, eff_w)
+    base_tot, base_mean = _franks(base_mx)
+    variants = {
+        "equal": (_mexp(one_mw, one_ew), frozenset()),
+        "maturity_only": (_mexp(base_mw, one_ew), frozenset()),
+        "effect_only": (_mexp(one_mw, eff_w), frozenset()),
+        "collapsed_effects": (_mexp(base_mw, col_ew), frozenset()),
+        "merged_world_models": (_mexp(base_mw, eff_w, merge=frozenset(xcfg.get("merge_world_models") or [])), frozenset()),
+        "no_presentation": (_mexp(base_mw, eff_w, skip=frozenset(xcfg.get("presentation_only") or [])), frozenset()),
+        "classical": (base_mx, frozenset(native)),
+    }
+    core_f = list(xcfg.get("economic_core") or [])
+    core_min = int(xcfg.get("economic_core_min_rank", 16))
+    ntop = int(xcfg.get("top_families", 4))
+    top_base = {f for f, r in base_tot.items() if r <= ntop}
+    vr = {}
+    for name, (mx, drop) in variants.items():
+        tr, mr = _franks(mx, drop)
+        vr[name] = (tr, mr)
+        stats[f"rho_family_exposure_{name}"] = _rho(base_tot, tr)
+        stats[f"rho_family_mean_exposure_{name}"] = _rho(base_mean, mr)
+        stats[f"n_top_families_kept_{name}"] = len(top_base & {f for f, r in tr.items() if r <= ntop})
+        stats[f"economic_core_bottom_{name}"] = int(all(mr.get(f, 0) >= core_min for f in core_f))
+        stats[f"top_exposed_family_{name}"] = fam_terms[min(tr, key=tr.get)]["label"]
+        stats[f"top_mean_exposed_family_{name}"] = fam_terms[min(mr, key=mr.get)]["label"]
+        gone = sorted(top_base - {f for f, r in tr.items() if r <= ntop})
+        stats[f"dropped_top_family_{name}"] = ", ".join(fam_terms[f]["label"] for f in gone)
+    for f in core_f:
+        k_ = f.replace("-", "_")
+        stats[f"rank_mean_exposure_{k_}_classical"] = vr["classical"][1].get(f)
+    schemes3 = ("equal", "maturity_only", "effect_only")
+    stats["min_rho_family_exposure_weights"] = min(stats[f"rho_family_exposure_{s}"] for s in schemes3)
+    stats["max_rho_family_exposure_weights"] = max(stats[f"rho_family_exposure_{s}"] for s in schemes3)
+    stats["min_rho_family_mean_exposure_weights"] = min(stats[f"rho_family_mean_exposure_{s}"] for s in schemes3)
+    stats["max_rho_family_mean_exposure_weights"] = max(stats[f"rho_family_mean_exposure_{s}"] for s in schemes3)
+    others = [s_ for s_ in variants if s_ not in schemes3]
+    stats["min_rho_family_exposure_other_variants"] = min(stats[f"rho_family_exposure_{s_}"] for s_ in others)
+    stats["min_rho_family_mean_exposure_other_variants"] = min(stats[f"rho_family_mean_exposure_{s_}"] for s_ in others)
+    stats["n_exposure_variants"] = len(variants)
+    stats["n_exposure_variants_economic_core_bottom"] = sum(stats[f"economic_core_bottom_{s}"] for s in variants)
+    stats["min_top_families_kept"] = min(stats[f"n_top_families_kept_{s}"] for s in variants)
+    stats["n_top_families"] = ntop
+
+    # perturbation: every maturity level moves by up to one step and every weight by up to +/- spread, per draw
+    rng = np.random.default_rng(int(pcfg.get("seed", 20261031)))
+    R = int(pcfg.get("draws", 1000))
+    sp = float(pcfg.get("weight_spread", 0.2))
+    qlo, qhi = (pcfg.get("interval") or [0.05, 0.95])
+    tid_sorted = sorted(tmat)
+    mat_keys = list(MATURITY_ORDER)
+    eff_keys = sorted(eff_w)
+    lev_ids = [m.id for m in mechs]
+    lev0 = np.array([m.data["ai_leverage"] for m in mechs], dtype=float)
+    prev_v = np.array([derived[x]["prevalence"] for x in lev_ids], dtype=float)
+    gap_top = [r["mechanic"] for r in gap_rows[:25]]
+    tot_draws, mean_draws, gap_draws = defaultdict(list), defaultdict(list), defaultdict(list)
+    kept_top_fam = kept_top4 = kept_core = 0
+    top_fam0 = min(base_tot, key=base_tot.get)
+    for _ in range(R):
+        mwp = {k: mat_w[k] * rng.uniform(1 - sp, 1 + sp) for k in mat_keys}
+        ewp = {k: eff_w[k] * rng.uniform(1 - sp, 1 + sp) for k in eff_keys}
+        shift = rng.integers(-1, 2, size=len(tid_sorted))
+        tw = {t: mwp[mat_keys[min(max(mat_keys.index(tmat[t]) + int(s), 0), len(mat_keys) - 1)]] for t, s in zip(tid_sorted, shift)}
+        mx = _mexp(tw, ewp)
+        tr, mr = _franks(mx)
+        for f in fams_used:
+            tot_draws[f].append(tr[f])
+            mean_draws[f].append(mr[f])
+        kept_top_fam += min(tr, key=tr.get) == top_fam0
+        kept_top4 += {f for f, r in tr.items() if r <= ntop} == top_base
+        kept_core += all(mr.get(f, 0) >= core_min for f in core_f)
+        lev = np.clip(lev0 + rng.integers(-1, 2, size=len(lev0)), 1, 5)
+        ev = np.array([mx[x] for x in lev_ids])
+        gp = lev / 5 - ev / (ev.max() or 1)
+        order = sorted(range(len(lev_ids)), key=lambda i: (-round(gp[i], 9), -prev_v[i], lev_ids[i]))
+        pos = {lev_ids[i]: j + 1 for j, i in enumerate(order)}
+        for x in gap_top:
+            gap_draws[x].append(pos[x])
+    q = lambda v: (int(np.quantile(v, qlo, method="lower")), int(np.quantile(v, qhi, method="higher")))  # noqa: E731
+    span = lambda a, b: f"{a}" if a == b else f"{a} to {b}"  # noqa: E731
+    stats["perturbation_draws"] = R
+    stats["perturbation_weight_spread_pct"] = _r(100 * sp, 0)
+    stats["perturbation_interval_pct"] = _r(100 * (qhi - qlo), 0)
+    stats["pct_draws_top_exposed_family_kept"] = _r(100 * kept_top_fam / R, 0)
+    stats["pct_draws_top_families_kept"] = _r(100 * kept_top4 / R, 0)
+    stats["pct_draws_economic_core_bottom"] = _r(100 * kept_core / R, 0)
+    fe_rows = []
+    edge_n = Counter(fam_of_m[mid] for _, _, mid, _ in edges_tm)
+    for f in sorted(fams_used, key=lambda f: base_tot[f]):
+        tr_all = [vr[s][0][f] for s in variants if f in vr[s][0]] + [base_tot[f]]
+        mr_all = [vr[s][1][f] for s in variants if f in vr[s][1]] + [base_mean[f]]
+        fe_rows.append({"family": f, "edges": edge_n.get(f, 0), "rank": base_tot[f], "rank_by_edges": vr["equal"][0][f],
+                        "rank_across_variants": span(min(tr_all), max(tr_all)), "rank_interval": span(*q(tot_draws[f])),
+                        "mean_rank": base_mean[f], "mean_rank_across_variants": span(min(mr_all), max(mr_all)),
+                        "mean_rank_interval": span(*q(mean_draws[f]))})
+    tables["family-exposure-sensitivity"] = {
+        "description": "Family exposure ranks (1 = most exposed) under the stated weights, by unweighted affects edges, across seven variants (equal weights, maturity only, effect only, the three overlapping effects collapsed, related world models merged, presentation-only techniques removed, technique-native mechanics removed), and as the "
+                       f"{_r(100 * qlo, 0):g}th to {_r(100 * qhi, 0):g}th percentile over {R} seeded draws that move every maturity level by up to one step and every weight by up to {_r(100 * sp, 0):g} percent. Rank is by summed exposure; mean rank by exposure per mechanic.",
+        "columns": ["family", "edges", "rank", "rank_by_edges", "rank_across_variants", "rank_interval", "mean_rank", "mean_rank_across_variants", "mean_rank_interval"],
+        "rows": fe_rows}
+
+    # where the techniques reach: the share of uses left unreached under other denominators (review E12, E14)
+    def _pct(ms, w):
+        tot_ = sum(w(x) for x in ms) or 1
+        return _r(100 * sum(w(x) for x in ms if base_mx[x] == 0) / tot_, 0)
+    core_n = Counter(mid for g in games for mid, r in gm[g.id].items() if r == "core")
+    use_w = lambda x: derived[x]["prevalence"]  # noqa: E731
+    iface_f = set(xcfg.get("interface_families") or [])
+    stats["pct_mechanics_zero_exposure"] = _r(100 * stats["n_mechanics_zero_exposure"] / max(len(mechs), 1), 0)
+    stats["pct_core_uses_on_zero_exposure"] = _pct(mech_ids, lambda x: core_n.get(x, 0))
+    stats["pct_supporting_uses_on_zero_exposure"] = _pct(mech_ids, lambda x: use_w(x) - core_n.get(x, 0))
+    stats["n_core_uses"] = sum(core_n.values())
+    non_if = [x for x in mech_ids if fam_of_m[x] not in iface_f]
+    stats["pct_uses_on_zero_exposure_excl_interface"] = _pct(non_if, use_w)
+    stats["pct_core_uses_on_zero_exposure_excl_interface"] = _pct(non_if, lambda x: core_n.get(x, 0))
+    stats["n_mechanics_zero_exposure_excl_interface"] = sum(1 for x in non_if if base_mx[x] == 0)
+    stats["n_mechanics_excl_interface"] = len(non_if)
+    stats["n_interface_families"] = len(iface_f)
+    top10_ids = {m.id for m in top10}
+    stats["pct_uses_on_zero_exposure_excl_top10"] = _pct([x for x in mech_ids if x not in top10_ids], use_w)
+    stats["pct_uses_on_zero_exposure_classical"] = _pct([x for x in mech_ids if x not in native], use_w)
+    un_rows = []
+    for f in fams_used:
+        ms = [x for x in mech_ids if fam_of_m[x] == f]
+        un_rows.append({"family": f, "mechanics": len(ms), "unreached": sum(1 for x in ms if base_mx[x] == 0),
+                        "uses": sum(use_w(x) for x in ms), "pct_uses_unreached": _pct(ms, use_w),
+                        "core_uses": sum(core_n.get(x, 0) for x in ms), "pct_core_unreached": _pct(ms, lambda x: core_n.get(x, 0))})
+    un_rows.sort(key=lambda r: (-r["pct_uses_unreached"], -r["uses"], r["family"]))
+    tables["family-unreached"] = {"description": "Per mechanic family: mechanics with no affects edge from any technique in the set (unreached), and the share of the family's game uses, and of its core uses, that fall on them. Sorted by the share of uses unreached.",
+                                  "columns": ["family", "mechanics", "unreached", "uses", "pct_uses_unreached", "core_uses", "pct_core_unreached"], "rows": un_rows}
+    # the most exposed mechanics with and without the technique-native ones
+    cl_rank = {r["mechanic"]: i + 1 for i, r in enumerate(x for x in exp_rows if x["mechanic"] not in native)}
+    for r in tables["most-exposed-mechanics"]["rows"]:
+        r["technique_native"] = "yes" if r["mechanic"] in native else ""
+        r["rank_without_native"] = cl_rank.get(r["mechanic"], "")
+        r["technique_exposure"] = _r(r["technique_exposure"], 1)
+    tables["most-exposed-mechanics"]["columns"] = ["mechanic", "family", "technique_exposure", "technique_count", "prevalence", "technique_native", "rank_without_native"]
+    tables["most-exposed-mechanics"]["description"] = (f"Mechanics most affected by the technique set, exposure shown to one decimal. Technique-native: more than {_r(100 * float(xcfg.get('technique_native_share', 0.5)), 0):g} percent of the catalog games that use it are AI-native titles or deploy a technique that affects it. "
+                                                       "Rank without native: the order once technique-native mechanics are set aside.")
+    for x in ("utility-action-selection", "rigid-body-physics", "direct-avatar", "procedural-terrain"):
+        if x in cl_rank:
+            stats[f"rank_without_native_{x.replace('-', '_')}"] = cl_rank[x]
+    # leverage gap: shown to one decimal, with how many rows tie and where each row lands under perturbed inputs
+    if gap_rows:
+        stats["n_leverage_gap_tied_top"] = sum(1 for r in gap_rows if r["gap"] == gap_rows[0]["gap"])
+        stats["n_leverage_gap_tied_top_shown"] = sum(1 for r in gap_rows if _r(r["gap"], 1) == _r(gap_rows[0]["gap"], 1))
+    for r in tables["leverage-gap"]["rows"]:
+        r["rank_interval"] = span(*q(gap_draws[r["mechanic"]])) if r["mechanic"] in gap_draws else ""
+        r["gap"] = _r(r["gap"], 1)
+        r["technique_exposure"] = _r(r["technique_exposure"], 1)
+    tables["leverage-gap"]["columns"] = ["mechanic", "family", "ai_leverage", "technique_exposure", "prevalence", "gap", "rank_interval"]
+    tables["leverage-gap"]["description"] += (f" Gap and exposure are shown to one decimal; rank interval is the {_r(100 * qlo, 0):g}th to {_r(100 * qhi, 0):g}th percentile of the row's place over {R} seeded draws that move each AI leverage score and each technique's maturity by up to one step and every weight by up to {_r(100 * sp, 0):g} percent.")
+    for tbl in ("family-summary", "family-mean-exposure"):
+        for r in tables[tbl]["rows"]:
+            r["technique_exposure"] = _r(r["technique_exposure"], 1)
+        tables[tbl]["description"] += " Summed exposure is shown to one decimal and exposure per mechanic to two, so a small nonzero mean stays distinct from none; rows are ordered by the unrounded values."
+    # explanation edges, by technique (review E4)
+    ex_by = defaultdict(list)
+    for t in techs:
+        for a in t.data.get("affects", []):
+            if a["effect"] == "explains":
+                ex_by[t.id].append(a["id"])
+    ex_rows = sorted(({"technique": k, "maturity": tmat[k], "edges": len(v), "mechanics": sorted(v)} for k, v in ex_by.items()),
+                     key=lambda r: (-r["edges"], r["technique"]))
+    tables["explains-edges"] = {"description": "Every affects edge coded as explains, by technique.", "columns": ["technique", "maturity", "edges", "mechanics"],
+                                "rows": ex_rows, "link_columns": ["technique", "mechanics"]}
+    if ex_rows:
+        stats["n_effect_explains_top_technique"] = ex_rows[0]["edges"]
+        stats["explains_top_technique"] = ex_rows[0]["technique"]
+
     # ---------------- opportunities ranked
     orows = sorted(({"opportunity": o.id, "type": o.data["opportunity_type"], "priority": derived[o.id]["priority"], "impact": o.data["impact"],
                      "feasibility": o.data["feasibility"], "novelty": o.data["novelty"], "horizon": o.data["horizon"]} for o in opps),
@@ -1438,6 +1769,118 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
                                       "columns": ["opportunity", "type", "priority", "impact", "feasibility", "novelty", "horizon"], "rows": orows, "link_columns": ["opportunity"]}
     if orows:
         stats["top_opportunity"] = by_id[orows[0]["opportunity"]].data["name"]
+    # ---------------- opportunity priority in print, its ties, its stability, and the evidence behind each rating
+    # (review E16, E19, E22, E24, E25, E31). Ratings are one rater's; these checks say how much the order depends on them.
+    ocfg = cfg.get("opportunities") or {}
+    pc = rub["composites"]["opportunity_priority"]
+    pw = pc["weights"]
+    rated = [k.removeprefix("w_") for k in pw]
+    tables["priority-weights"] = {"description": f"The weights of the priority composite, read from vocab/rubrics.yaml (composites.opportunity_priority): priority = {pc['formula']}, a weighted geometric mean on the 1 to 5 scale of the three ratings.",
+                                  "columns": ["rating", "weight", "question"],
+                                  "rows": [{"rating": k, "weight": pw["w_" + k], "question": rub["scales"][k]["question"]} for k in rated]}
+    for k in rated:
+        stats[f"w_priority_{k}"] = pw["w_" + k]
+    pv = Counter(r["priority"] for r in orows)
+    stats["n_opportunity_priority_values"] = len(pv)
+    stats["n_opportunity_priority_tied"] = sum(n for n in pv.values() if n > 1)
+    topn = int(pcfg.get("top_n", 8))
+    stats["opportunity_top_n"] = topn
+    top_ids = [r["opportunity"] for r in orows[:topn]]
+    rng_o = np.random.default_rng(int(pcfg.get("seed", 20261031)) + 1)
+    oids = [r["opportunity"] for r in orows]
+    sc0 = np.array([[by_id[x].data[k] for k in rated] for x in oids], dtype=float)
+    wv0 = np.array([pw["w_" + k] for k in rated], dtype=float)
+    o_ranks, overlap, first_kept = defaultdict(list), [], 0
+    for _ in range(R):
+        sc = np.clip(sc0 + rng_o.integers(-1, 2, size=sc0.shape), 1, 5)
+        wv = wv0 * rng_o.uniform(1 - sp, 1 + sp, size=len(wv0))
+        pr = np.exp(np.log(sc) @ (wv / wv.sum()))
+        order = sorted(range(len(oids)), key=lambda i: (-round(pr[i], 9), oids[i]))
+        for j, i in enumerate(order):
+            o_ranks[oids[i]].append(j + 1)
+        overlap.append(len(set(top_ids) & {oids[i] for i in order[:topn]}))
+        first_kept += oids[order[0]] == oids[0]
+    for r in orows:
+        rk_ = o_ranks[r["opportunity"]]
+        r["rank_interval"] = span(*q(rk_))
+        r["top_share"] = _r(100 * sum(1 for v in rk_ if v <= topn) / R, 0)
+        derived[r["opportunity"]]["top_share"] = r["top_share"]
+    stats["pct_draws_top_opportunity_first"] = _r(100 * first_kept / R, 0)
+    stats["mean_top_opportunities_kept"] = _r(float(np.mean(overlap)), 1) if overlap else None
+    stats["n_top_opportunities_majority"] = sum(1 for r in orows[:topn] if r["top_share"] >= 50)
+    stats["n_opportunities_outside_top_majority"] = sum(1 for r in orows[topn:] if r["top_share"] >= 50)
+    # what each opportunity's techniques have shown in games: the weakest and the best maturity it lists, whether any
+    # of them has a published edge to the mechanics it involves, and whether its horizon is earlier than all of theirs
+    hz_order = list(vocab_terms(vocabs, "horizon"))
+    caps = ocfg.get("feasibility_cap_by_best_maturity") or {}
+    ev_rows = []
+    budget_re = re.compile(str(ocfg.get("budget_pattern", r"tokens? per|\bms\b|first token|VRAM|frame-time|player-hour")), re.I)
+    for r in orows:
+        o = by_id[r["opportunity"]]
+        ts = [by_id[t] for t in o.data.get("applies") or [] if t in by_id]
+        mi = lambda t: MATURITY_ORDER.index(t.data["maturity"])  # noqa: E731
+        weak = min(ts, key=lambda t: (mi(t), t.data["trl"], t.id)) if ts else None
+        best = max(ts, key=lambda t: (mi(t), t.data["trl"], t.id)) if ts else None
+        inv = o.data.get("involves") or []
+        linked = sum(1 for m in inv if any(m in reach.get(t.id, ()) for t in ts))
+        early = bool(ts) and hz_order.index(o.data["horizon"]) < min(hz_order.index(t.data["horizon"]) for t in ts)
+        flags = (["no published edge"] if ts and linked == 0 else []) + (["dated before every listed technique"] if early else [])
+        cap = caps.get(best.data["maturity"], 5) if best else 5
+        rt_model = any({"client-realtime", "server-realtime"} & set(t.data["runtime"]) and {"compute-cost", "latency"} & set(t.data.get("risks") or []) for t in ts)
+        derived[o.id].update({"weakest_technique": weak.id if weak else None, "mechanics_reached": linked,
+                              "horizon_before_techniques": early, "feasibility_cap": cap, "runtime_model": rt_model,
+                              "states_compute_budget": bool(budget_re.search(o.data.get("validation_experiment", "")))})
+        ev_rows.append({"opportunity": o.id, "horizon": o.data["horizon"], "feasibility": o.data["feasibility"],
+                        "weakest_technique": weak.id if weak else "", "weakest_maturity": mat_terms[weak.data["maturity"]]["label"] if weak else "",
+                        "weakest_trl": weak.data["trl"] if weak else "", "best_maturity": mat_terms[best.data["maturity"]]["label"] if best else "",
+                        "mechanics_reached": f"{linked} of {len(inv)}", "flags": "; ".join(flags)})
+    tables["opportunity-evidence"] = {"description": "For each opportunity, in priority order: the least mature technique it applies (maturity in games and TRL), the most mature one, how many of the mechanics it involves have an affects edge from any of its techniques, and flags for an opportunity none of whose mechanics has such an edge, or whose horizon is earlier than every technique it lists.",
+                                      "columns": ["opportunity", "horizon", "feasibility", "weakest_technique", "weakest_maturity", "weakest_trl", "best_maturity", "mechanics_reached", "flags"],
+                                      "rows": ev_rows, "link_columns": ["opportunity", "weakest_technique"]}
+    stats["n_opportunity_no_published_edge"] = sum(1 for o in opps if derived[o.id]["mechanics_reached"] == 0)
+    stats["n_opportunity_horizon_before_techniques"] = sum(1 for o in opps if derived[o.id]["horizon_before_techniques"])
+    stats["n_opportunity_best_research"] = sum(1 for r in ev_rows if r["best_maturity"] == mat_terms["research"]["label"])
+    stats["n_opportunity_weakest_research"] = sum(1 for r in ev_rows if r["weakest_maturity"] == mat_terms["research"]["label"])
+    # feasibility read against the best technique's maturity in games (anchor 4 asks for known techniques): cap it and re-rank
+    capped = {o.id: min(o.data["feasibility"], derived[o.id]["feasibility_cap"]) for o in opps}
+    stats["n_opportunity_feasibility_capped"] = sum(1 for o in opps if capped[o.id] < o.data["feasibility"])
+    for k_ in ("research", "prototype"):
+        stats[f"feasibility_cap_{k_}"] = caps.get(k_)
+    if len(orows) > 1:   # the leader's margin: its priority one feasibility point lower, beside the runner-up's (both to one decimal)
+        o1 = by_id[orows[0]["opportunity"]].data
+        stats["priority_top_opportunity_feasibility_minus_one"] = _r((o1["impact"] ** pw["w_impact"]) * (max(o1["feasibility"] - 1, 1) ** pw["w_feasibility"])
+                                                                     * (o1["novelty"] ** pw["w_novelty"]), 1)
+        stats["priority_second_opportunity"] = _r(orows[1]["priority"], 1)
+    cap_pr = {o.id: (o.data["impact"] ** pw["w_impact"]) * (capped[o.id] ** pw["w_feasibility"]) * (o.data["novelty"] ** pw["w_novelty"]) for o in opps}
+    cap_order = sorted(cap_pr, key=lambda x: (-round(cap_pr[x], 9), x))
+    for i, x in enumerate(cap_order):
+        derived[x]["rank_feasibility_capped"] = i + 1
+    stats["n_top_opportunities_kept_feasibility_capped"] = len(set(top_ids) & set(cap_order[:topn]))
+    stats["n_top_opportunities_feasibility_capped"] = sum(1 for x in top_ids if capped[x] < by_id[x].data["feasibility"])
+    # §9.1's reading of the top of the list, checked: how many apply a frame-generating world model, and how many list a
+    # technique that has shipped in a game
+    wm_set = set(xcfg.get("merge_world_models") or [])
+    stats["n_top_opportunities_world_model"] = sum(1 for x in top_ids if wm_set & set(by_id[x].data.get("applies") or []))
+    stats["n_opportunities_world_model"] = sum(1 for o in opps if wm_set & set(o.data.get("applies") or []))
+    stats["n_top_opportunities_best_shipped"] = sum(1 for x in top_ids if any(str(by_id[t].data.get("maturity", "")).startswith("shipped")
+                                                                              for t in by_id[x].data.get("applies") or [] if t in by_id))
+    # runtime cost (review E25): Now-horizon opportunities that call a model during play, and whether their records state a budget
+    now_rt = [o for o in opps if o.data["horizon"] == "now" and derived[o.id]["runtime_model"]]
+    stats["n_opportunity_now_runtime_model"] = len(now_rt)
+    stats["n_opportunity_now_runtime_model_budget"] = sum(1 for o in now_rt if derived[o.id]["states_compute_budget"])
+    # predictions whose criteria say what technique class counts, or that any method counts (review F1)
+    crit_t = [str(o.data["falsifiable_signal"].get("criteria", "")) for o in opps]
+    stats["n_predictions_feature_test"] = sum(1 for c in crit_t if "feature test" in c)
+    stats["n_predictions_technique_class"] = sum(1 for c in crit_t if "technique class" in c.lower())
+    # displayed to one decimal: three ordinal ratings do not support more (review E22); rows keep their unrounded order
+    for r in orows:
+        r["priority"] = _r(r["priority"], 1)
+        derived[r["opportunity"]]["priority_shown"] = r["priority"]
+    tables["opportunities-ranked"]["columns"] = ["opportunity", "type", "priority", "impact", "feasibility", "novelty", "horizon", "rank_interval", "top_share"]
+    tables["opportunities-ranked"]["description"] = (
+        "Opportunities by composite priority (weighted geometric mean of impact, feasibility, and novelty; weights in vocab/rubrics.yaml), shown to one decimal; rows are ordered by the unrounded value. "
+        f"Rank interval: the {_r(100 * qlo, 0):g}th to {_r(100 * qhi, 0):g}th percentile of the opportunity's rank over {R} seeded draws that move each rating by up to one anchor and each weight by up to {_r(100 * sp, 0):g} percent. "
+        f"Top share: the percentage of those draws in which it ranks in the top {topn}.")
     stats["n_predictions"] = len(opps)
     res = sorted(o.data["falsifiable_signal"]["resolve_by"] for o in opps)
     stats["first_prediction_resolves"] = res[0] if res else None

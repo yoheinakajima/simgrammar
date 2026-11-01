@@ -9,7 +9,9 @@ thesis: 'The strongest constraint on simulation depth has been legibility: playe
   not with histories (''why did the hospital close?''). If the simulation records an event log with causes,
   a language model can retrieve the relevant chain and narrate it with citations to specific events, and
   a constrained output format can force every claim to point at a logged record. This turns the event
-  log, which many engines already keep for replays and debugging, into a player-facing explanation layer.'
+  log, which many engines already keep for replays and debugging, into a player-facing explanation layer.
+  It needs only a log of the game''s own events with parent causes, plus the player''s save; it does not
+  wait for the event-sourced runtime with model-call logging proposed separately.'
 design_sketch: A query box and a right-click 'why?' on any entity. The answer is three to six sentences,
   each linked to log events the player can jump to on the timeline, plus a small causal graph. Answers
   that cannot be grounded say so. Advisors use the same pipeline proactively when a key indicator crosses
@@ -37,6 +39,9 @@ key_risks:
 - Ungrounded but fluent answers teach players wrong models of the system.
 - Event logs in shipped engines often lack cause links; instrumenting them is real work.
 - Explanations can make optimal play too easy, flattening difficulty.
+- Feasibility 4 rates shipping the query box on a cause-linked log. The techniques it applies are a prototype
+  and a research result in games, and answering at the validation experiment's 95 percent supported-sentence
+  bar is an open problem; the score assumes that bar can be met.
 validation_experiment: 'Instrument an open-source simulation (a city or colony sim) to log events with
   parent-cause ids. Give two player groups the same failing save; one gets the why-query. Measure time
   to correct diagnosis and the share of answer sentences whose cited events actually support them (human
@@ -45,12 +50,18 @@ falsifiable_signal:
   prediction: A widely played simulation or strategy game will let players ask in natural language why
     something happened in their own game and answer from game state.
   resolve_by: '2027-12-31'
-  criteria: Feature first shipped after 2026-10-24 in a title with at least 10,000 Steam user reviews;
-    release notes or the store page describe free-text causal questions answered from the player's own
-    save state, not from a wiki or general help text.
+  criteria: 'Feature first shipped after 2026-10-24 in a title with at least 10,000 Steam user reviews;
+    release notes or the store page describe free-text causal questions answered from the player''s own
+    save state, not from a wiki or general help text. Technique class: any method that answers free text
+    from save state counts, so this is a feature test; it shows language-model explanation landed only
+    if the notes say a language model writes the answers.'
 sources: []
+assertions:
+- field.llm-explanation-of-state.maturity == prototype
+- field.constrained-decoding.maturity == research
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-techniques-opportunities
