@@ -9,3 +9,5 @@ dist/
 video-out/
 # The paper's LaTeX source and PDF (make pdf, scripts/paper_pdf.py); kept out of dist/ for the same reason.
 pdf-out/
+# Second-coder sheets (python scripts/coding.py packet); kept out of dist/ for the same reason, and out of commits.
+coding-out/

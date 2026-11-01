@@ -2057,6 +2057,9 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         "columns": ["field", "scores", "pairs", "exact", "within_one", "kappa", "alpha", "alpha_low", "alpha_high", "rank_rho", "shift", "calibration_alpha"],
         "rows": [{**r, "calibration_alpha": r.get("calibration_alpha")} for r in agree_rows]}
 
+    # ---------------- second coder: agreement on family, admission, and effect codes (review D3, D4, D6; _second_coding)
+    _second_coding(ents, vocabs, cfg, stats, tables)
+
     # ---------------- adoption over time
     by_decade = Counter()
     for m in mechs:
@@ -2491,6 +2494,145 @@ def _merge_mechanics(gm, root) -> dict:
             nm[r] = "core" if role == "core" or nm.get(r) == "core" else "supporting"
         out[g] = nm
     return out
+
+
+# ---------------- second coder: agreement on three coding decisions (review findings D3, D4, D6)
+
+def _alpha_nominal(O) -> np.ndarray | float:
+    """Krippendorff's alpha with the nominal metric from a coincidence matrix (_coincidence), or a stack of them
+    (..., K, K): one minus (n - 1) times the off-diagonal coincidences over the pairs of values that differ by chance.
+    nan where every value is the same. Reproduces the worked example in Krippendorff (2011): 0.743 (0.815 ordinal)."""
+    O = np.asarray(O, float)
+    nc = O.sum(-1)
+    n = nc.sum(-1)
+    de = n * n - (nc * nc).sum(-1)
+    a = np.where(de > 0, 1 - (n - 1) * (n - np.trace(O, axis1=-2, axis2=-1)) / np.where(de > 0, de, 1), np.nan)
+    return float(a) if a.ndim == 0 else a
+
+
+def _kappa_nominal(O) -> np.ndarray | float:
+    """Cohen's kappa from a confusion matrix of two coders' codes (rows the first coder's), or a stack of them; nan when
+    chance agreement is one. With two categories it equals _kappa_quadratic."""
+    O = np.asarray(O, float)
+    n = O.sum((-1, -2))
+    po = np.trace(O, axis1=-2, axis2=-1) / np.where(n > 0, n, 1)
+    pe = (O.sum(-1) * O.sum(-2)).sum(-1) / np.where(n > 0, n * n, 1)
+    k = np.where(pe < 1, (po - pe) / np.where(pe < 1, 1 - pe, 1), np.nan)
+    return float(k) if k.ndim == 0 else k
+
+
+def _second_coding(ents, vocabs, cfg, stats, tables):
+    """Agreement between the codes each record carries and a second coder's, on the sample in report/analysis.yaml
+    (second_coding), from the codes files in report/coding/ (scripts/coding.py checks them, and the build fails on a
+    coder who is not independent of the runs that created, reviewed, or proposed a coded record). The sample's size is
+    always stated; agreement only once codes exist, so before then there is nothing else to report.
+
+    For each decision, the first code is the record's: a mechanic's family, an edge's effect, and for admission whether
+    the vocabulary admits the item (every sampled mechanic does; the candidates are proposals no run took up, which the
+    dataset leaves out without a recorded reason, so this compares a coder with the dataset's boundary). A coder admits
+    an item that passes all four tests. Cohen's kappa pools every (first, coder) pair; Krippendorff's alpha (nominal)
+    takes each item's first code and every coder's as one unit. Intervals resample the coded items within each stratum
+    of the draw (the first code), as the sample was drawn. Per category, kappa is that category against the rest."""
+    import coding  # local import: scripts/coding.py owns the sample and the codes format
+    sc = cfg.get("second_coding") or {}
+    sp = sc.get("sample") or {}
+    items = coding.sample_items(ents, sc)
+    stats["n_second_coding_mechanics"] = len(items["family"])
+    stats["n_second_coding_families"] = len(set(items["family"].values()))
+    stats["n_second_coding_candidates"] = sum(1 for i in sp.get("candidates") or [] if i in items["admission"])
+    stats["n_second_coding_edges"] = len(items["effect"])
+    stats["n_second_coding_effects"] = len(set(items["effect"].values()))
+    stats["n_second_coding_techniques"] = len({i.split("/")[0] for i in items["effect"]})
+    stats["n_family_terms"] = len(vocab_terms(vocabs, "mechanic_family"))  # so the prose can say the sample covers them all
+    stats["n_effect_terms"] = len(vocab_terms(vocabs, "effect"))
+    codings = coding.load_codings(ents, vocabs, sc)
+    stats["n_second_coding_runs"] = len(codings)
+    if not codings:
+        return
+    n_boot = int(sc.get("bootstrap", 2000))
+    q = 100 * (1 - float(sc.get("interval", 0.95))) / 2
+    rng = np.random.default_rng(int(sc.get("seed", 0)) + 1)
+    fam, eff = vocab_terms(vocabs, "mechanic_family"), vocab_terms(vocabs, "effect")
+    labels = {"family": {k: t["label"] for k, t in fam.items()}, "effect": {k: t["label"] for k, t in eff.items()},
+              "admission": {"admit": "admitted", "reject": "left as a proposal"}}
+
+    def code(d, v):
+        return ("admit" if all(v[t] == "pass" for t in coding.TESTS) else "reject") if d == "admission" else v
+
+    agree_rows, cat_rows, test_rows = [], [], []
+    for d in coding.DECISIONS:
+        cats = list(labels[d])
+        ix = {c: i for i, c in enumerate(cats)}
+        K = len(cats)
+        units = [(item, first, [c["codes"][d][item] for c in codings if item in c["codes"][d]]) for item, first in sorted(items[d].items())]
+        units = [u for u in units if u[2]]
+        if not units:
+            continue
+        P, C = np.zeros((len(units), K, K)), np.zeros((len(units), K, K))
+        for u, (_, first, vals) in enumerate(units):
+            for v in vals:
+                P[u, ix[first], ix[code(d, v)]] += 1
+            C[u] = _coincidence([ix[first] + 1] + [ix[code(d, v)] + 1 for v in vals], K)
+        strata = defaultdict(list)
+        for u, (_, first, _vals) in enumerate(units):
+            strata[first].append(u)
+        W = np.zeros((n_boot, len(units)))
+        for _, us in sorted(strata.items()):
+            np.add.at(W, (np.arange(n_boot)[:, None], np.asarray(us)[rng.integers(0, len(us), (n_boot, len(us)))]), 1)
+        bk = _kappa_nominal(np.einsum("bu,ukl->bkl", W, P))
+        ba = _alpha_nominal(np.einsum("bu,ukl->bkl", W, C))
+        bk, ba = bk[np.isfinite(bk)], ba[np.isfinite(ba)]
+        Ps = P.sum(0)
+        row = {"decision": d, "coders": sum(1 for c in codings if c["codes"][d]), "items": len(units), "pairs": int(Ps.sum()),
+               "agree": _r(np.trace(Ps) / Ps.sum(), 2), "kappa": _r(_kappa_nominal(Ps), 2),
+               "kappa_low": _r(np.percentile(bk, q), 2) if len(bk) else None, "kappa_high": _r(np.percentile(bk, 100 - q), 2) if len(bk) else None,
+               "alpha": _r(_alpha_nominal(C.sum(0)), 2),
+               "alpha_low": _r(np.percentile(ba, q), 2) if len(ba) else None, "alpha_high": _r(np.percentile(ba, 100 - q), 2) if len(ba) else None}
+        agree_rows.append(row)
+        for k in ("kappa", "kappa_low", "kappa_high", "alpha", "alpha_low", "alpha_high"):
+            base, _, bound = k.partition("_")  # kappa_second_coding_family, kappa_second_coding_family_low, ...
+            stats[f"{base}_second_coding_{d}" + (f"_{bound}" if bound else "")] = row[k]
+        stats[f"pct_second_coding_agree_{d}"] = int(round(100 * np.trace(Ps) / Ps.sum()))
+        stats[f"n_second_coded_{d}"] = len(units)
+        stats[f"n_second_coding_pairs_{d}"] = int(Ps.sum())
+        n = Ps.sum()
+        for c in cats:
+            i = ix[c]
+            both, first, second = Ps[i, i], Ps[i].sum(), Ps[:, i].sum()
+            if first or second:
+                T = np.array([[both, first - both], [second - both, n - first - second + both]])
+                cat_rows.append({"decision": d, "category": labels[d][c], "first": int(first), "second": int(second), "both": int(both),
+                                 "kappa": _r(_kappa_nominal(T), 2)})
+        if d == "admission":
+            # how often the coder upholds each test on the admitted mechanics, and passes it on the candidates
+            by = {s: [v for _, first, vals in units if first == s for v in vals] for s in ("admit", "reject")}
+            for t in coding.TESTS:
+                test_rows.append({"test": t, "admitted": len(by["admit"]), "admitted_pass": sum(v[t] == "pass" for v in by["admit"]),
+                                  "candidates": len(by["reject"]), "candidates_pass": sum(v[t] == "pass" for v in by["reject"])})
+                if by["admit"]:
+                    stats[f"pct_second_coding_upheld_{t}"] = int(round(100 * test_rows[-1]["admitted_pass"] / len(by["admit"])))
+            if by["admit"]:
+                stats["pct_second_coding_upheld"] = int(round(100 * sum(code(d, v) == "admit" for v in by["admit"]) / len(by["admit"])))
+            stats["n_second_coding_candidates_admitted"] = sum(code(d, v) == "admit" for v in by["reject"])
+    desc = (f"{round(100 - 2 * q)}% interval over {n_boot} resamples of the coded items within each stratum of the draw (report/analysis.yaml "
+            "second_coding)")
+    tables["second-coding-agreement"] = {
+        "description": "Agreement between the code a record carries and a second coder's, per decision, on the seeded stratified sample "
+                       "(scripts/coding.py). First codes: the mechanic's family, the edge's effect, and for admission whether the vocabulary "
+                       "admits the item; the coder admits an item that passes all four tests. Agree is the share of pairs that match; kappa is "
+                       f"Cohen's (unweighted) and alpha Krippendorff's with the nominal metric, each low and high bounding a {desc}. The sample "
+                       "allocates every category equally, so these values describe it, not the catalog's unequal mix.",
+        "columns": ["decision", "coders", "items", "pairs", "agree", "kappa", "kappa_low", "kappa_high", "alpha", "alpha_low", "alpha_high"],
+        "rows": agree_rows}
+    tables["second-coding-categories"] = {
+        "description": "Per category of each coding decision: how many pairs the record's code (first) and the second coder (second) put in "
+                       "it, how many both did, and Cohen's kappa for that category against the rest.",
+        "columns": ["decision", "category", "first", "second", "both", "kappa"], "rows": cat_rows}
+    if test_rows:
+        tables["second-coding-tests"] = {
+            "description": "The four admission tests as the second coder applied them: on the sampled mechanics the vocabulary admits, how many "
+                           "codes pass each test, and the same on the candidates it left as proposals.",
+            "columns": ["test", "admitted", "admitted_pass", "candidates", "candidates_pass"], "rows": test_rows}
 
 
 # ======================================================================= SVG

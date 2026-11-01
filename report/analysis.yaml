@@ -126,6 +126,60 @@ rubric_scores:
   bootstrap: 2000
   seed: 20261031
   interval: 0.95
+second_coding:
+  # Review findings D3, D6, D4: each mechanic's family, its admission, and each affects edge's effect type were coded
+  # by the run that created the record, so agreement on them is unmeasured (§2.6). A second coder, independent of
+  # every run that made or reviewed a coded record, codes this sample from sheets that give the written rules and
+  # each item's description but not its code (scripts/coding.py, tasks/second-coding.md); analyze.py reports
+  # agreement once codes exist in report/coding/, and nothing before.
+  # The sample is stratified by the current code, with equal allocation so every family and effect is present and
+  # per-category agreement is defined: per_family mechanics from each family and per_effect edges from each effect,
+  # each stratum ordered by sha256(seed:id), and within an effect, edges of techniques not yet drawn first. The
+  # mechanics serve both the family and the admission sheet, which also mixes in n_candidates new-mechanic proposals
+  # the vocabulary has not taken up. Left out of the draw: the mechanics §2.1 names, since its rules use them as
+  # worked examples, and items whose own text names their code. A balanced sample's kappa is not the catalog's,
+  # whose categories are unequal. The lists below are the sample, drawn once on the date given by
+  # `python scripts/coding.py draw`, so a later data change does not move it; `draw --check` redraws and compares.
+  seed: 20261101
+  bootstrap: 2000          # resamples of the coded items within each stratum, for the kappa and alpha intervals
+  interval: 0.95
+  sample:
+    id: second-coding-v1
+    drawn: '2026-10-31'
+    per_family: 2
+    per_effect: 6
+    n_candidates: 12
+    mechanics: [adjacency-scoring, async-shared-region, attribute-match-engine, causal-tooltips, contracts-orders,
+      creature-care, day-night-cycle, diagnose-repair, faction-diplomacy, flight-aerodynamics, habitat-suitability,
+      injury-body-model, interest-groups, lifecycle-aging, megaproject-sink, memories-thoughts, opinion-modifiers,
+      periodic-ticks, permadeath, player-programming, procedural-characters, procedural-terrain, production-chain,
+      random-disasters, request-provider-logistics, rival-firms, room-recognition, scouting-knowledge,
+      seasonal-world-reset, signal-circuits, spoilage, stability-unrest, stat-combat-resolution, surface-work-tools,
+      tech-tree, terrain-deformation, trait-inheritance, travel-mode-choice, triggered-event-chains, turn-structure,
+      villager-requests, war-score-peace]
+    candidates: [character-initiated-contact, deity-favor, heat-wanted-level, housing-population-growth,
+      imagined-world-view, journey-pacing, land-expansion, moral-alignment, physical-carry-capacity, prestige-reset,
+      skill-rating-matchmaking, worked-tile-yields]
+    edges: [automated-playtesting/agent-pathfinding, automated-rule-generation/scenario-objectives,
+      cicero-strategic-dialogue/natural-language-interaction, cicero-strategic-dialogue/reputation,
+      constrained-decoding/dilemma-cards, continuous-alife-and-asal/trait-inheritance,
+      differentiable-simulation/design-performance-rating, diffusion-game-engines/rigid-body-physics,
+      gaussian-splatting/decoration-beauty, generalist-game-agents/tech-tree, generated-3d-worlds/rigid-body-physics,
+      generative-agents/agent-inspection, genie-world-models/rigid-body-physics,
+      graph-network-simulators/fluid-gas-simulation, graph-network-simulators/hydrology,
+      imperfect-information-solvers/auctions, llm-agent-societies/offscreen-life-progression,
+      llm-explanation-of-state/agent-inspection, llm-explanation-of-state/causal-tooltips,
+      llm-explanation-of-state/stats-dashboards, llm-game-master/triggered-event-chains,
+      llm-rule-adjudication/combination-discovery, llm-rule-adjudication/material-interactions,
+      massively-parallel-simulation/traffic-congestion, mean-field-games/agent-pathfinding,
+      ml-weather-models/forecasting, model-based-planning-muzero/policy-toggles,
+      model-based-planning-muzero/tech-tree, monte-carlo-tree-search/rival-firms, muse-wham/generative-content,
+      neural-rendering-shaders/embodied-skill-control, open-ended-environment-generation/adaptive-threat-scaling,
+      open-interactive-video-models/vehicle-dynamics, quality-diversity-search/scenario-objectives,
+      realtime-voice-models/social-exchanges, simulation-based-inference/supply-demand-pricing,
+      simulation-based-inference/traffic-congestion, story-sifting/triggered-event-chains,
+      subspace-neural-physics/soft-body-deformation, voyager-skill-libraries/agent-skills,
+      voyager-skill-libraries/delegation-to-ai, wave-function-collapse/zoning]
 book:
   rare_max_games: 10     # a mechanic used by at most this many catalog games counts as rare in the book's prose (chapter 1)
   subgenre_min_games: 6  # subgenres with at least this many games get a row in the subgenre-spend table (chapter 2)
