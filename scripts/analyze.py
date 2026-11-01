@@ -200,6 +200,45 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         stats["most_prevalent_mechanic_share_pct"] = _r(100 * derived[top.id]["prevalence"] / max(N, 1), 0)
         stats["n_mechanics_single_game"] = sum(1 for m in mechs if derived[m.id]["prevalence"] == 1)
         stats["n_mechanics_unused"] = sum(1 for m in mechs if derived[m.id]["prevalence"] == 0)
+        # §5.1: how far the head of the prevalence distribution rests on tags a rule sets, on unsourced mechanics, and on
+        # interface and structure. A tag is rule-set when the game's time_model or modding term requires the mechanic
+        # (E033), so the tag restates the field; tags on games whose term only allows the mechanic were coded one by one.
+        # The state-owning variant drops whole families as a proxy for a per-mechanic classification nobody has coded.
+        req_by = defaultdict(set)  # mechanic -> {(field, term)} whose term requires it
+        for fld in ("time_model", "modding"):
+            for term, t in vocab_terms(vocabs, fld).items():
+                if t.get("requires_mechanic"):
+                    req_by[t["requires_mechanic"]].add((fld, str(term)))
+        rule_set = Counter(mid for g in games for mid in gm[g.id] if any(str(g.data.get(f)) == v for f, v in req_by.get(mid, ())))
+        for mid in sorted(req_by):
+            key = mid.replace("-", "_")
+            stats[f"n_{key}_rule_tags"] = rule_set.get(mid, 0)
+            stats[f"n_{key}_coded_tags"] = derived[mid]["prevalence"] - rule_set.get(mid, 0) if mid in derived else 0
+        nonstate_fams = ("time-pacing", "information-legibility", "control-automation", "progression-goals")
+        asserted_m = {m.id for m in mechs if m.data.get("status") == "asserted"}
+        prev_rows = []
+        for variant, key, keep, count in (
+                ("all tags", "", lambda m: True, lambda m: derived[m.id]["prevalence"]),
+                ("rule-set tags (E033) left out", "coded", lambda m: True, lambda m: derived[m.id]["prevalence"] - rule_set.get(m.id, 0)),
+                ("asserted mechanics left out", "sourced", lambda m: m.id not in asserted_m, lambda m: derived[m.id]["prevalence"]),
+                ("state-owning families only", "state", lambda m: m.data.get("family") not in nonstate_fams, lambda m: derived[m.id]["prevalence"])):
+            ms_ = sorted((m for m in mechs if keep(m)), key=lambda m: (-count(m), m.id))
+            prev_rows.append({"variant": variant, "mechanics": len(ms_), "uses": sum(count(m) for m in ms_),
+                              "most_used": ", ".join(f"{m.data['name']} ({count(m)})" for m in ms_[:6])})
+            if key and ms_:
+                stats[f"most_prevalent_{key}_mechanic"] = ms_[0].data["name"]
+                stats[f"most_prevalent_{key}_mechanic_share_pct"] = _r(100 * count(ms_[0]) / max(N, 1), 0)
+                stats[f"n_mechanics_{key}_variant"] = len(ms_)
+        tables["prevalence-sensitivity"] = {
+            "description": "The six most used mechanics, with the number of games tagging each, under four readings: every tag; tags that a "
+                           "game's time model or modding field requires (rule E033) left out, so pause and modding count only where a "
+                           "contributor coded them; mechanics still asserted (no source) left out; and mechanics in the time-and-pacing, "
+                           "information, control, and progression families left out, a family-level proxy for mechanics that own "
+                           "simulation state.",
+            "columns": ["variant", "mechanics", "uses", "most_used"], "rows": prev_rows}
+        stats["n_mechanics_asserted_uses"] = sum(derived[m]["prevalence"] for m in asserted_m if m in derived)
+        stats["pct_uses_on_asserted_mechanics"] = _r(100 * stats["n_mechanics_asserted_uses"] / max(sum(len(v) for v in gm.values()), 1), 0)
+        stats["n_mechanics_nonstate_families"] = sum(1 for m in mechs if m.data.get("family") in nonstate_fams)
         # book chapter 1: the parts a game marks as core are rarer across the catalog than the parts it marks as supporting
         core_p, sup_p, rare_core = [], [], 0
         rare_max = (cfg.get("book") or {}).get("rare_max_games", 10)
@@ -245,7 +284,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             rng = _random.Random(20261026)
             sizes = [len(used_by_game[x]) for x in early_ids]
             pool = sorted(used_by_game)
-            null = []
+            null, kept = [], 0
             for _ in range(2000):
                 pick = rng.sample(pool, len(early_ids))
                 rng.shuffle(sizes)
@@ -253,10 +292,88 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
                 for gid, k in zip(pick, sizes):
                     ms = used_by_game[gid]
                     seen.update(rng.sample(ms, min(k, len(ms))))
+                    kept += min(k, len(ms))
                 null.append(len(seen))
+            stats["pct_uses_null_kept"] = _r(100 * kept / 2000 / max(sum(sizes), 1), 0)
             stats["n_mechanics_seen_null_mean"] = _r(float(np.mean(null)), 0)
             stats["pct_mechanics_seen_null_mean"] = _r(100 * float(np.mean(null)) / max(len(mechs), 1), 0)
             stats["p_mechanics_seen_by_2000"] = _r(sum(1 for v in null if v >= len(early_seen)) / len(null), 2)
+            # The test above is the v0.3 one, kept because episode 2 narrates it. Its pool holds the early games themselves,
+            # and a drawn game smaller than the size it is matched to keeps all its mechanics, so its sets carry fewer uses
+            # than the early games do and cover less. The paper reports two nulls drawn only from games released after the
+            # cutoff. "trim": as above, each drawn game cut to a random early game's size by a uniform random subset of its
+            # mechanics. "uses": whole games in random order until their uses reach the early games' total, the last game cut
+            # to fit, so a set carries exactly the early games' uses. Two-sided p doubles the smaller tail, each counted with +1.
+            def _rarefy(cut, mode, draws=2000):
+                early_ = [g.id for g in games if isinstance(year.get(g.id), int) and year[g.id] <= cut]
+                late_ = [g.id for g in games if isinstance(year.get(g.id), int) and year[g.id] > cut]
+                seen_ = len(set().union(*[set(used_by_game[x]) for x in early_]))
+                sizes_ = [len(used_by_game[x]) for x in early_]
+                total_ = sum(sizes_)
+                rng_ = _random.Random(f"rarefy:{cut}:{mode}")
+                cov_, kept_ = [], []
+                for _ in range(draws):
+                    s_, u_ = set(), 0
+                    if mode == "trim":
+                        rng_.shuffle(sizes_)
+                        for gid, k in zip(rng_.sample(late_, len(early_)), sizes_):
+                            part = rng_.sample(used_by_game[gid], min(k, len(used_by_game[gid])))
+                            s_.update(part)
+                            u_ += len(part)
+                    else:
+                        for gid in rng_.sample(late_, len(late_)):
+                            ms = used_by_game[gid]
+                            part = ms if u_ + len(ms) <= total_ else rng_.sample(ms, total_ - u_)
+                            s_.update(part)
+                            u_ += len(part)
+                            if u_ >= total_:
+                                break
+                    cov_.append(len(s_))
+                    kept_.append(u_)
+                a_ = np.array(cov_, dtype=float)
+                lo_, hi_ = (float(x) for x in np.percentile(a_, [2.5, 97.5]))
+                tails = ((1 + int((a_ >= seen_).sum())) / (draws + 1), (1 + int((a_ <= seen_).sum())) / (draws + 1))
+                return {"early": len(early_), "late": len(late_), "uses": total_, "seen": seen_, "mean": float(a_.mean()),
+                        "sd": float(a_.std(ddof=1)), "lo": lo_, "hi": hi_, "p": min(1.0, 2 * min(tails)), "kept": float(np.mean(kept_))}
+            rare_cuts = (1995, 1997, 2000, 2003, 2005)
+            rare = {(c, mode): _rarefy(c, mode) for c in rare_cuts for mode in ("trim", "uses")}
+            stats["rarefaction_draws"] = 2000
+            stats["n_games_after_2000"] = rare[(2000, "uses")]["late"]
+            stats["n_uses_by_2000"] = rare[(2000, "uses")]["uses"]
+            for mode in ("trim", "uses"):
+                r_ = rare[(2000, mode)]
+                stats[f"n_mechanics_seen_null_{mode}_mean"] = _r(r_["mean"], 1)
+                stats[f"n_mechanics_seen_null_{mode}_sd"] = _r(r_["sd"], 1)
+                stats[f"n_mechanics_seen_null_{mode}_lo"] = _r(r_["lo"], 0)
+                stats[f"n_mechanics_seen_null_{mode}_hi"] = _r(r_["hi"], 0)
+                stats[f"p_mechanics_seen_{mode}"] = _r(r_["p"], 2)
+                # the early games' excess over chance at the null's 97.5th and 2.5th percentiles, and the excess a set
+                # would need to reach the upper 2.5% tail (the smallest early advantage this test can detect)
+                stats[f"n_mechanics_seen_excess_{mode}_max"] = _r(r_["seen"] - r_["lo"], 0)
+                stats[f"n_mechanics_seen_excess_{mode}_min"] = _r(r_["seen"] - r_["hi"], 0)
+                stats[f"n_mechanics_seen_shortfall_{mode}"] = _r(r_["mean"] - r_["seen"], 1)
+                stats[f"n_mechanics_seen_shortfall_{mode}_max"] = _r(r_["hi"] - r_["seen"], 0)
+                stats[f"n_mechanics_detectable_{mode}"] = _r(r_["hi"] - r_["mean"], 0)
+                stats[f"pct_mechanics_detectable_{mode}"] = _r(100 * (r_["hi"] - r_["mean"]) / max(len(mechs), 1), 0)
+            stats["n_mechanics_seen_null_uses_round"] = int(round(rare[(2000, "uses")]["mean"]))  # a whole number for narration
+            stats["n_uses_null_trim_mean"] = _r(rare[(2000, "trim")]["kept"], 0)
+            stats["pct_uses_null_trim_kept"] = _r(100 * rare[(2000, "trim")]["kept"] / max(rare[(2000, "trim")]["uses"], 1), 0)
+            stats["n_rarefaction_cutoffs_p05"] = sum(1 for c in rare_cuts for mode in ("trim", "uses") if rare[(c, mode)]["p"] <= 0.05)
+            stats["n_rarefaction_cutoffs_uses_above_mean"] = sum(1 for c in rare_cuts if rare[(c, "uses")]["seen"] > rare[(c, "uses")]["mean"])
+            stats["n_rarefaction_cutoffs"] = len(rare_cuts)
+            tables["rarefaction-sensitivity"] = {
+                "description": "Mechanics shown by the catalog games released in or before each cutoff year, against random sets drawn from the "
+                               f"games released after it ({stats['rarefaction_draws']} sets each). Trimmed: as many games as the early set, each "
+                               "cut to an early game's size by a random subset of its mechanics (a game smaller than its target keeps all of "
+                               "them, so these sets carry fewer uses). Use-matched: whole games until the sets carry exactly the early games' "
+                               "uses, the last game cut to fit. Intervals hold 95% of the random sets; p is two-sided.",
+                "columns": ["cutoff", "early_games", "early_uses", "mechanics_seen", "trimmed_mean", "trimmed_p", "use_matched_mean",
+                            "use_matched_interval", "use_matched_p"],
+                "rows": [{"cutoff": c, "early_games": rare[(c, "uses")]["early"], "early_uses": rare[(c, "uses")]["uses"],
+                          "mechanics_seen": rare[(c, "uses")]["seen"], "trimmed_mean": _r(rare[(c, "trim")]["mean"], 1),
+                          "trimmed_p": _r(rare[(c, "trim")]["p"], 2), "use_matched_mean": _r(rare[(c, "uses")]["mean"], 1),
+                          "use_matched_interval": f"{int(round(rare[(c, 'uses')]['lo']))}-{int(round(rare[(c, 'uses')]['hi']))}",
+                          "use_matched_p": _r(rare[(c, "uses")]["p"], 2)} for c in rare_cuts]}
         # book expansion: chapters 7-9
         # how many city builders use each mechanic that splits the genre in chapter 9 (treasury against stores, goods against needs)
         city_ids = [g.id for g in games if g.data.get("subgenre") == "city-builder"]
@@ -380,6 +497,62 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         stats["n_games_since_2010"] = len(late_ids)
         stats["n_games_since_2010_only_pre2001"] = sum(1 for x in late_ids if used_by_game[x] and set(used_by_game[x]) <= old_mechs)
         stats["pct_uses_since_2010_on_pre2001"] = _r(100 * sum(1 for x in late_ids for mid in used_by_game[x] if mid in old_mechs) / max(late_uses, 1), 0)
+        # The reuse share against the catalog's composition: shuffle release years across games, each game keeping its
+        # mechanics (so every game keeps its size and every mechanic its prevalence), re-date every mechanic by its earliest
+        # game, and recompute the share. A mechanic many games use lands before 2001 under almost any dating, so the
+        # shuffled share is what composition alone gives. Subsets: every mechanic, the ten most used left out, and thirds by
+        # prevalence (ranked by games, ties by id). Seeded; p is two-sided, each tail counted with +1.
+        dated_g = [g.id for g in games if isinstance(year.get(g.id), int)]
+        m_index = {m.id: i for i, m in enumerate(mechs)}
+        use_g = np.array([gi for gi, gid in enumerate(dated_g) for _ in used_by_game[gid]], dtype=int)
+        use_m = np.array([m_index[mid] for gid in dated_g for mid in used_by_game[gid]], dtype=int)
+        yrs_arr = np.array([year[gid] for gid in dated_g], dtype=int)
+        by_prev = sorted((m for m in mechs if derived[m.id]["prevalence"] > 0), key=lambda m: (derived[m.id]["prevalence"], m.id))
+        third = len(by_prev) // 3
+        top10_ids = {m.id for m in sorted(mechs, key=lambda m: (-derived[m.id]["prevalence"], m.id))[:10]}
+        reuse_sets = [("every mechanic", {m.id for m in by_prev}), ("the 10 most used left out", {m.id for m in by_prev} - top10_ids),
+                      ("least used third", {m.id for m in by_prev[:third]}), ("middle third", {m.id for m in by_prev[third:2 * third]}),
+                      ("most used third", {m.id for m in by_prev[2 * third:]})]
+        masks = [np.array([m.id in s for m in mechs]) for _, s in reuse_sets]
+
+        def _reuse_shares(yv):
+            first = np.full(len(mechs), 9999)
+            np.minimum.at(first, use_m, yv[use_g])
+            old_u = (first <= 2000)[use_m]
+            late_u = yv[use_g] >= 2010
+            return [100 * float((old_u & late_u & mk[use_m]).sum()) / max(int((late_u & mk[use_m]).sum()), 1) for mk in masks]
+        reuse_obs = _reuse_shares(yrs_arr)
+        prng_reuse = np.random.default_rng(20261027)
+        reuse_null = np.array([_reuse_shares(prng_reuse.permutation(yrs_arr)) for _ in range(999)])
+        reuse_rows = []
+        for i, (label, s) in enumerate(reuse_sets):
+            col = reuse_null[:, i]
+            lo_, hi_ = np.percentile(col, [2.5, 97.5])
+            p_ = min(1.0, 2 * min((1 + int((col >= reuse_obs[i]).sum())) / 1000, (1 + int((col <= reuse_obs[i]).sum())) / 1000))
+            prevs = [derived[m]["prevalence"] for m in s]
+            reuse_rows.append({"mechanics": label, "count": len(s), "games_per_mechanic": f"{min(prevs)}-{max(prevs)}",
+                               "uses_since_2010": int(sum(1 for x in late_ids for mid in used_by_game[x] if mid in s)),
+                               "pct_on_pre2001": _r(reuse_obs[i], 1), "null_mean": _r(float(col.mean()), 1),
+                               "null_interval": f"{lo_:.1f}-{hi_:.1f}", "p": _r(p_, 3)})
+            if i == 0:
+                stats["pct_uses_since_2010_on_pre2001_null_mean"] = _r(float(col.mean()), 0)
+                stats["pct_uses_since_2010_on_pre2001_null_lo"] = _r(float(lo_), 0)
+                stats["pct_uses_since_2010_on_pre2001_null_hi"] = _r(float(hi_), 0)
+                stats["p_uses_since_2010_on_pre2001"] = _r(p_, 2)
+                stats["pct_uses_since_2010_on_pre2001_vs_null"] = _r(reuse_obs[i] - float(col.mean()), 1)
+            if i == 1:
+                stats["pct_uses_since_2010_on_pre2001_excl_top10"] = _r(reuse_obs[i], 0)
+                stats["pct_uses_since_2010_on_pre2001_excl_top10_null_mean"] = _r(float(col.mean()), 0)
+        stats["n_reuse_subsets"] = len(reuse_rows)
+        stats["n_reuse_subsets_above_null"] = sum(1 for r in reuse_rows if r["pct_on_pre2001"] > r["null_mean"])
+        stats["reuse_permutations"] = 999
+        tables["reuse-null"] = {
+            "description": "Share of the mechanic uses in games released since 2010 that fall on mechanics already in a catalog game by 2000, "
+                           "for every mechanic and for subsets by how many games use them, against 999 shuffles of release years across "
+                           "games (each game keeps its mechanics; every mechanic is re-dated by its earliest game). The interval holds "
+                           "95% of the shuffles; p is two-sided.",
+            "columns": ["mechanics", "count", "games_per_mechanic", "uses_since_2010", "pct_on_pre2001", "null_mean", "null_interval", "p"],
+            "rows": reuse_rows}
         for dec in range(1960, 2030, 10):
             stats[f"n_mechanics_first_{dec}s"] = sum(1 for m in mechs if (derived[m.id].get("earliest_year") or 0) // 10 * 10 == dec)
         intro = Counter(derived[m.id]["earliest_game"] for m in mechs if derived[m.id].get("earliest_game"))
@@ -566,12 +739,79 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     stats["n_cooccurring_pairs"] = len(pair_count)
     stats["n_possible_pairs"] = len(mids) * (len(mids) - 1) // 2
     stats["pair_coverage_pct"] = _r(100 * len(pair_count) / max(stats["n_possible_pairs"], 1), 1)
+    # A baseline for pair coverage and for white space: a fixed-margin null that keeps every game's size and every
+    # mechanic's prevalence and scatters the rest. Curveball trades (Strona et al. 2014): two games swap a random part of
+    # the mechanics only one of them has. After a burn-in, every `null_thin` trades give one null catalog. Seeded and
+    # sorted, so the build is deterministic. Each null catalog keeps its coverage, its coverage among mechanics in at
+    # least `restricted_min_games` games, and the co-occurrence counts among the mechanics white space screens.
+    cc = cfg["cooccurrence"]
+    m_pos = {m: i for i, m in enumerate(mids)}
+    cb_rows = [sorted(m_pos[m] for m in gm[g.id] if m in m_pos) for g in games]
+    ws_thr = cfg["whitespace"]["min_prevalence_games"]
+    ws_common = [m_pos[m] for m in mids if prev[m] >= ws_thr]
+    iu = np.triu_indices(len(mids), 1)
+    rmin = cc["restricted_min_games"]
+    elig = np.array([prev[m] >= rmin for m in mids])
+    in_restricted = elig[iu[0]] & elig[iu[1]]
+    import random as _cb_random
+    cb_rng = _cb_random.Random(cc["null_seed"])
+
+    def _trade(k):
+        for _ in range(k):
+            i, j = cb_rng.sample(range(len(cb_rows)), 2)
+            a_, b_ = set(cb_rows[i]), set(cb_rows[j])
+            only_a, only_b = sorted(a_ - b_), sorted(b_ - a_)
+            if not only_a or not only_b:
+                continue
+            pool_ = only_a + only_b
+            cb_rng.shuffle(pool_)
+            cb_rows[i] = sorted((a_ & b_) | set(pool_[: len(only_a)]))
+            cb_rows[j] = sorted((a_ & b_) | set(pool_[len(only_a):]))
+    null_cov, null_cov_r, null_ws = [], [], []
+    if len(cb_rows) > 1 and mids:
+        _trade(cc["null_burnin"])
+        for _ in range(cc["null_samples"]):
+            _trade(cc["null_thin"])
+            Xn = np.zeros((len(cb_rows), len(mids)), dtype=np.int32)
+            for r_, cols in enumerate(cb_rows):
+                Xn[r_, cols] = 1
+            Cn = Xn.T @ Xn
+            up = Cn[iu]
+            null_cov.append(100 * float((up > 0).mean()))
+            null_cov_r.append(100 * float((up[in_restricted] > 0).mean()) if in_restricted.any() else 0.0)
+            null_ws.append(Cn[np.ix_(ws_common, ws_common)].astype(np.int16))
+    shared["cooccurrence_null"] = {"common": [mids[i] for i in ws_common], "counts": np.array(null_ws)}
+    if null_cov:
+        S_ = len(null_cov)
+        nc, ncr = np.array(null_cov), np.array(null_cov_r)
+        stats["cooccurrence_null_samples"] = S_
+        stats["pair_coverage_null_mean_pct"] = _r(float(nc.mean()), 1)
+        stats["pair_coverage_null_lo_pct"] = _r(float(np.percentile(nc, 2.5)), 1)
+        stats["pair_coverage_null_hi_pct"] = _r(float(np.percentile(nc, 97.5)), 1)
+        obs_cov = 100 * len(pair_count) / max(stats["n_possible_pairs"], 1)
+        stats["p_pair_coverage"] = _r(min(1.0, 2 * min((1 + int((nc <= obs_cov).sum())) / (S_ + 1), (1 + int((nc >= obs_cov).sum())) / (S_ + 1))), 3)
+        stats["n_pairs_short_of_null"] = int(round((float(nc.mean()) - obs_cov) / 100 * stats["n_possible_pairs"]))
+        n_r = int(in_restricted.sum())
+        obs_r = 100 * sum(1 for (a, b) in pair_count if prev[a] >= rmin and prev[b] >= rmin) / max(n_r, 1)
+        stats["restricted_min_games"] = rmin
+        stats["n_mechanics_restricted"] = int(elig.sum())
+        stats["n_possible_pairs_restricted"] = n_r
+        stats["pair_coverage_restricted_pct"] = _r(obs_r, 1)
+        stats["pair_coverage_restricted_null_mean_pct"] = _r(float(ncr.mean()), 1)
+        stats["pair_coverage_restricted_null_lo_pct"] = _r(float(np.percentile(ncr, 2.5)), 1)
+        stats["pair_coverage_restricted_null_hi_pct"] = _r(float(np.percentile(ncr, 97.5)), 1)
 
     # ---------------- white space: common mechanics that rarely meet
     ws = cfg["whitespace"]
     thr = ws["min_prevalence_games"]
     common = [m for m in mids if prev[m] >= thr]
     wrows = []
+    # the selection and the ranking by gap are unchanged; the fixed-margin null (co-occurrence block) adds, per pair, the
+    # mean count over the null catalogs and the share of them with a count at or below the observed one (+1 counted)
+    cn = shared["cooccurrence_null"]
+    cn_pos = {m: i for i, m in enumerate(cn["common"])}
+    S_ws = len(cn["counts"])
+    candidates = []
     for a, b in combinations(sorted(common), 2):
         if ws["exclude_same_family"] and by_id[a].data["family"] == by_id[b].data["family"]:
             continue
@@ -579,19 +819,52 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             continue
         if (a, b) in tension_pairs:
             continue
+        candidates.append((a, b))
         obs = pair_count.get((a, b), 0)
         if obs > ws["max_observed"]:
             continue
         expected = prev[a] * prev[b] / N
-        wrows.append({"mechanic_a": a, "mechanic_b": b, "family_a": by_id[a].data["family"], "family_b": by_id[b].data["family"],
-                      "observed": obs, "expected": _r(expected, 2), "gap": _r(expected - obs, 2)})
+        row = {"mechanic_a": a, "mechanic_b": b, "family_a": by_id[a].data["family"], "family_b": by_id[b].data["family"],
+               "observed": obs, "expected": _r(expected, 2), "gap": _r(expected - obs, 2)}
+        if S_ws:
+            nd = cn["counts"][:, cn_pos[a], cn_pos[b]]
+            row["null_expected"] = _r(float(nd.mean()), 2)
+            row["null_p"] = _r((1 + int((nd <= obs).sum())) / (S_ws + 1), 3)
+        wrows.append(row)
     wrows.sort(key=lambda r: (-r["gap"], r["mechanic_a"], r["mechanic_b"]))
     shared.update({"common": common, "whitespace_all": wrows})
-    tables["whitespace"] = {"description": f"Pairs of common mechanics (each in >= {ws['min_prevalence_games']} games, different families, not marked as tension{', excluding ' + ', '.join(fam_terms[f]['label'] for f in ws.get('exclude_families', [])) if ws.get('exclude_families') else ''}) that co-occur at most {ws['max_observed']} time(s). Gap = expected - observed co-occurrence under independence.",
-                            "columns": ["mechanic_a", "mechanic_b", "family_a", "family_b", "observed", "expected", "gap"], "rows": wrows[: ws["top_n"]], "link_columns": ["mechanic_a", "mechanic_b"]}
+    ws_cols = ["mechanic_a", "mechanic_b", "family_a", "family_b", "observed", "expected", "gap"] + (["null_expected", "null_p"] if S_ws else [])
+    tables["whitespace"] = {"description": f"Pairs of common mechanics (each in >= {ws['min_prevalence_games']} games, different families, not marked as tension{', excluding ' + ', '.join(fam_terms[f]['label'] for f in ws.get('exclude_families', [])) if ws.get('exclude_families') else ''}) that co-occur at most {ws['max_observed']} time(s). Gap = expected - observed co-occurrence under independence."
+                                           + (f" Null expected = mean co-occurrence over {S_ws} null catalogs that keep every game's size and every mechanic's prevalence; null p = share of them with a count at or below the observed one, uncorrected for the pairs screened." if S_ws else ""),
+                            "columns": ws_cols, "rows": wrows[: ws["top_n"]], "link_columns": ["mechanic_a", "mechanic_b"]}
     stats["n_whitespace_pairs"] = len(wrows)
     stats["n_common_mechanics"] = len(common)
     stats["whitespace_min_games"] = ws["min_prevalence_games"]
+    stats["whitespace_top_n"] = min(ws["top_n"], len(wrows))
+    stats["n_whitespace_candidates"] = len(candidates)
+    stats["n_whitespace_observed_0"] = sum(1 for r in wrows if r["observed"] == 0)
+    stats["n_whitespace_observed_1"] = sum(1 for r in wrows if r["observed"] == 1)
+    # unsourced mechanics (E32) and rule-set tags (E033): how much of the list rests on them. Dropping a mechanic leaves the
+    # other pairs' counts and order unchanged, so the list without them is the list minus the pairs they are in.
+    asserted_ids = {m.id for m in mechs if m.data.get("status") == "asserted"}
+    in_asserted = [r for r in wrows if r["mechanic_a"] in asserted_ids or r["mechanic_b"] in asserted_ids]
+    stats["n_whitespace_pairs_asserted"] = len(in_asserted)
+    stats["n_whitespace_top10_asserted"] = sum(1 for r in wrows[:10] if r["mechanic_a"] in asserted_ids or r["mechanic_b"] in asserted_ids)
+    stats["n_whitespace_pairs_sourced"] = len(wrows) - len(in_asserted)
+    stats["n_whitespace_pairs_modding_api"] = sum(1 for r in wrows if "modding-api" in (r["mechanic_a"], r["mechanic_b"]))
+    if S_ws and wrows:
+        stats["n_whitespace_null_p05"] = sum(1 for r in wrows if r["null_p"] <= 0.05)
+        stats["n_whitespace_top_null_p05"] = sum(1 for r in wrows[: ws["top_n"]] if r["null_p"] <= 0.05)
+        stats["n_whitespace_null_above_independence"] = sum(1 for r in wrows if r["null_expected"] > r["expected"])
+        stats["whitespace_null_to_independence"] = _r(float(np.mean([r["null_expected"] / r["expected"] for r in wrows if r["expected"]])), 2)
+        # the list as a whole: how many screened pairs would co-occur at most max_observed times in a null catalog
+        ia_ = [cn_pos[a] for a, _ in candidates]
+        ib_ = [cn_pos[b] for _, b in candidates]
+        n_null = (cn["counts"][:, ia_, ib_] <= ws["max_observed"]).sum(axis=1) if candidates else np.zeros(S_ws)
+        stats["n_whitespace_pairs_null_mean"] = _r(float(n_null.mean()), 0)
+        stats["n_whitespace_pairs_null_lo"] = _r(float(np.percentile(n_null, 2.5)), 0)
+        stats["n_whitespace_pairs_null_hi"] = _r(float(np.percentile(n_null, 97.5)), 0)
+        stats["p_n_whitespace_pairs"] = _r((1 + int((n_null >= len(wrows)).sum())) / (S_ws + 1), 3)
 
     # ---------------- clustering games by weighted mechanic sets (weighted Jaccard)
     cl = cfg["clustering"]
@@ -940,22 +1213,106 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         y = derived[m.id]["earliest_year"]
         if y:
             by_decade[f"{(y // 10) * 10}s"] += 1
-    tables["mechanic-origins-by-decade"] = {"description": "Mechanics by decade of earliest appearance in the dataset (a lower bound on true origin; dataset is a sample).",
+    tables["mechanic-origins-by-decade"] = {"description": "Mechanics by decade of earliest appearance in the dataset. The catalog is a sample, so that year is an upper bound on when a mechanic originated: it is at least that old.",
                                             "columns": ["decade", "mechanics"], "rows": [{"decade": k, "mechanics": v} for k, v in sorted(by_decade.items())]}
     late = sorted((m for m in mechs if (derived[m.id]["earliest_year"] or 0) >= 2010),
                   key=lambda m: (m.data["family"], derived[m.id]["earliest_year"], m.id))
-    tables["mechanics-since-2010"] = {"description": "Mechanics whose earliest appearance in the dataset is 2010 or later, grouped by family.",
-                                      "columns": ["family", "mechanic", "earliest_year", "earliest_game"],
+    # where a lineage enters the catalog late, its first catalog game takes the credit for parts its unsampled ancestors
+    # may have had: each row names the subgenre of the first game and the year the catalog's first game of that subgenre came out
+    sub_first = {}
+    for g in games:
+        if isinstance(year.get(g.id), int):
+            s_ = g.data.get("subgenre")
+            sub_first[s_] = min(sub_first.get(s_, 9999), year[g.id])
+    late_sub = {m.id: by_id[derived[m.id]["earliest_game"]].data.get("subgenre") for m in late}
+    tables["mechanics-since-2010"] = {"description": "Mechanics whose earliest appearance in the dataset is 2010 or later, grouped by family. "
+                                                     "Subgenre is the earliest game's; sampled from is the release year of the catalog's first game in that subgenre.",
+                                      "columns": ["family", "mechanic", "earliest_year", "earliest_game", "subgenre", "sampled_from"],
                                       "rows": [{"family": fam_terms[m.data["family"]]["label"], "mechanic": m.id,
-                                                "earliest_year": derived[m.id]["earliest_year"], "earliest_game": derived[m.id]["earliest_game"]} for m in late],
+                                                "earliest_year": derived[m.id]["earliest_year"], "earliest_game": derived[m.id]["earliest_game"],
+                                                "subgenre": sub_terms.get(late_sub[m.id], {}).get("label", late_sub[m.id]),
+                                                "sampled_from": sub_first.get(late_sub[m.id])} for m in late],
                                       "link_columns": ["mechanic", "earliest_game"]}
     stats["n_mechanics_since_2010"] = len(late)
+    stats["n_mechanics_since_2010_late_subgenre"] = sum(1 for m in late if sub_first.get(late_sub[m.id], 0) >= 2010)
+    stats["year_first_grand_strategy"] = sub_first.get("grand-strategy")
+    stats["n_mechanics_since_2010_grand_strategy"] = sum(1 for m in late if late_sub[m.id] == "grand-strategy")
+    stats["n_subgenres_sampled_from_2010"] = sum(1 for y in sub_first.values() if y >= 2010)
     total_dated = sum(by_decade.values())
     stats["pct_mechanics_first_seen_1980_1999"] = _r(100 * (by_decade.get("1980s", 0) + by_decade.get("1990s", 0)) / total_dated, 0) if total_dated else None
     stats["peak_origin_decade"] = max(by_decade.items(), key=lambda x: (x[1], x[0]))[0] if by_decade else None
     games_by_decade = Counter(f"{(y // 10) * 10}s" for y in yrs)
     tables["games-by-decade"] = {"description": "Games in the dataset by decade of first release.", "columns": ["decade", "games"],
                                  "rows": [{"decade": k, "games": v} for k, v in sorted(games_by_decade.items())]}
+    # Dating exposure (§2.2, §5.2). A game is dated by its first public release, early access included, and decomposed at
+    # the feature set its sources describe, which for a game changed after release can include later features. Found from
+    # the records: early-access titles (year_full_release set, or design notes that say early access), persistent online
+    # worlds (multiplayer persistent-mmo), and games whose use notes date part of a mechanic to a later update, expansion,
+    # DLC, or version. The §5.2 counts are recomputed without each kind; a mechanic only exposed games use goes undated.
+    import re as _re
+    later_a = _re.compile(r"\b(?:update|expansion|dlc|patch|version \d[\d.]*)\b", _re.I)
+    later_b = _re.compile(r"\b(?:add(?:s|ed)?|introduc\w*|split|let)\b", _re.I)
+    later_c = _re.compile(r"\badded in\b|\bsince version\b", _re.I)
+    exposed = {}
+    for g in games:
+        why = []
+        if g.data.get("year_full_release") or _re.search(r"early access", str(g.data.get("design_notes") or ""), _re.I):
+            why.append("early access")
+        if "persistent-mmo" in (g.data.get("multiplayer") or []):
+            why.append("persistent online world")
+        later = [u["id"] for u in g.data.get("mechanics", []) if (later_a.search(str(u.get("note") or "")) and later_b.search(str(u.get("note") or "")))
+                 or later_c.search(str(u.get("note") or ""))]
+        if later:
+            why.append("later feature: " + ", ".join(later))
+        if why:
+            exposed[g.id] = why
+
+    def _dating(drop):
+        keep_ = [g.id for g in games if isinstance(year.get(g.id), int) and g.id not in drop]
+        first_ = {}
+        for gid in keep_:
+            for mid in used_by_game[gid]:
+                first_[mid] = min(first_.get(mid, 9999), year[gid])
+        old_ = {m for m, y in first_.items() if y <= 2000}
+        late_ = [gid for gid in keep_ if year[gid] >= 2010]
+        uses_ = [mid for gid in late_ for mid in used_by_game[gid]]
+        moved_ = sum(1 for m in mechs if derived[m.id].get("earliest_year") and first_.get(m.id) != derived[m.id]["earliest_year"])
+        return {"games": len(keep_), "dated": len(first_), "undated": sum(1 for m in mechs if derived[m.id]["prevalence"] > 0 and m.id not in first_),
+                "moved": moved_, "pct_by_2000": _r(100 * len(old_) / max(len(first_), 1), 0),
+                "since_2010": sum(1 for y in first_.values() if y >= 2010), "first_2020s": sum(1 for y in first_.values() if y >= 2020),
+                "pct_reuse": _r(100 * sum(1 for mid in uses_ if mid in old_) / max(len(uses_), 1), 0),
+                "games_since_2010": len(late_), "only_pre2001": sum(1 for gid in late_ if used_by_game[gid] and set(used_by_game[gid]) <= old_)}
+    kinds = (("early access", lambda w: any(x == "early access" for x in w)), ("persistent online world", lambda w: "persistent online world" in w),
+             ("later feature", lambda w: any(x.startswith("later feature") for x in w)))
+    date_rows = []
+    for label, drop in [("every game", set())] + [(f"without {k} titles", {g for g, w in exposed.items() if f(w)}) for k, f in kinds] + [("without any of these", set(exposed))]:
+        d_ = _dating(drop)
+        date_rows.append({"games": label, "count": d_["games"], "mechanics_dated": d_["dated"], "first_year_moved": d_["moved"],
+                          "pct_seen_by_2000": d_["pct_by_2000"], "first_since_2010": d_["since_2010"], "first_2020s": d_["first_2020s"],
+                          "pct_uses_since_2010_on_pre2001": d_["pct_reuse"], "games_since_2010": d_["games_since_2010"],
+                          "using_only_pre2001": d_["only_pre2001"]})
+    tables["dating-sensitivity"] = {
+        "description": "The §5.2 counts with the games whose dating may predate their decomposed features left out: early-access titles, "
+                       "persistent online worlds, and games whose use notes date part of a mechanic to a later update, expansion, DLC, or "
+                       "version (dating-exposed-games.csv lists them). A mechanic used only by left-out games goes undated, and its "
+                       "first year moves when its earliest game is left out.",
+        "columns": ["games", "count", "mechanics_dated", "first_year_moved", "pct_seen_by_2000", "first_since_2010", "first_2020s",
+                    "pct_uses_since_2010_on_pre2001", "games_since_2010", "using_only_pre2001"],
+        "rows": date_rows}
+    tables["dating-exposed-games"] = {
+        "description": "Games whose release year may predate part of the feature set their record decomposes, and why.",
+        "columns": ["game", "year", "year_full_release", "reason"],
+        "rows": [{"game": gid, "year": year.get(gid), "year_full_release": by_id[gid].data.get("year_full_release"), "reason": "; ".join(w)}
+                 for gid, w in sorted(exposed.items())], "link_columns": ["game"]}
+    stats["n_games_dating_exposed"] = len(exposed)
+    for k, f in kinds:
+        stats["n_games_dating_" + k.replace(" ", "_")] = sum(1 for w in exposed.values() if f(w))
+    all_out = date_rows[-1]
+    stats["pct_mechanics_seen_by_2000_excl_exposed"] = all_out["pct_seen_by_2000"]
+    stats["n_mechanics_since_2010_excl_exposed"] = all_out["first_since_2010"]
+    stats["pct_uses_since_2010_on_pre2001_excl_exposed"] = all_out["pct_uses_since_2010_on_pre2001"]
+    stats["n_mechanics_undated_excl_exposed"] = sum(1 for m in mechs if derived[m.id]["prevalence"] > 0) - all_out["mechanics_dated"]
+    stats["n_mechanics_first_year_moved_excl_exposed"] = all_out["first_year_moved"]
 
     # ---------------- verification queue
     q = []

@@ -1,0 +1,42 @@
+id: 2026-10-31-es-review-growth-white-space
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Answer the Explore Science review on vocabulary growth, co-occurrence, white space, and game
+  dating with null models and corrected wording.
+method: 'Computed in scripts/analyze.py, all seeded. Rarefaction: early games against sets drawn only
+  from later games, use-matched (whole games to the early total of uses) and trimmed, at cutoffs 1995
+  to 2005, with SD, 95% interval, two-sided p and the detectable excess. The v0.3 trimmed null loses about
+  a fifth of the uses, which made the early games look ahead; it stays because episode 2 narrates it.
+  Reuse: release years shuffled 999 times across games, each keeping its mechanics, for every mechanic,
+  without the ten most used, and by prevalence third. Pair coverage and white space: a curveball fixed-margin
+  null (499 catalogs; a second seed and lag-1 checks in scratch agreed), restricted coverage, per-pair null
+  mean and p, and the null count of screened pairs. Prevalence with E033 rule-set tags, asserted mechanics,
+  and the time, information, control and progression families left out. Dating exposure from the records
+  (year_full_release or early access in design notes, persistent-mmo, use notes dating a feature to a later
+  update) and the section 5.2 counts without those games; the subgenre start year for each post-2010 mechanic.
+  Rewrote paper 2.2, 5.1 to 5.3 and 5.5 and book chapters 1, 3 and 9 to match: origin years as upper bounds,
+  reuse as what composition implies, uncovered pairs as unobserved in this sample, tension as unmeasured. Where
+  Winds Meet: opened its Wikipedia article and the Wayback snapshot of 2026-09-18 (both show the China open
+  beta of 2024-12-27) and its Steam page (release 2025-11-14 and the AI disclosure); kept year 2024 as first
+  public release, added a quoted claim and a design note, and marked it reviewed. Did not search for earlier
+  games holding each post-2010 mechanic; the paper says so.'
+contract_version: '1.2'
+proposals:
+- kind: schema
+  target: game.decomposed_version
+  detail: 'Live-service and early-access games are decomposed at the feature set their sources describe but
+    dated by first public release. A game field naming the version or year the decomposition describes, and a
+    use-level field for the year a mechanic arrived where a source dates it, would let analyze.py re-date
+    mechanics instead of dropping exposed games, which today it can only infer from free-text use notes.'
+- kind: other
+  target: media/episodes/02-old-parts.md
+  detail: 'Scene 6 narrates the v0.3 rarefaction null (sets from every era, trimmed), whose sets carry fewer
+    uses than the early games; scene 4 calls a first catalog year a floor, which reverses the bound. Both
+    want re-voicing; the stats they read (n_mechanics_seen_null_mean, p_mechanics_seen_by_2000) are kept
+    unchanged until then.'

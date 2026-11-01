@@ -2,6 +2,15 @@
 cooccurrence:
   min_support: 3          # pair must co-occur in at least this many games to be ranked by lift
   top_n: 30
+  # Fixed-margin null for pair coverage and white space (§5.3, §5.5): curveball trades keep every game's size and every
+  # mechanic's prevalence. 499 null catalogs give p-values in steps of 0.002. A burn-in of about 110 trades per game and
+  # 1,000 trades between catalogs left the coverage of successive catalogs uncorrelated (lag-1 r about 0.01) when set on
+  # 2026-10-31, and a chain from another seed gave the same mean coverage.
+  null_samples: 499
+  null_burnin: 20000
+  null_thin: 1000
+  null_seed: 20261028
+  restricted_min_games: 3   # the restricted coverage counts only pairs whose mechanics each appear in at least this many games
 whitespace:
   # Both mechanics used by at least this many games. A count, not a share of the catalog: with a share, adding games
   # with neither mechanic pushed one under the bar, so a catalog PR could break §5.5 without changing any finding
