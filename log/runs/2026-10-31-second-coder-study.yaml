@@ -1,0 +1,50 @@
+id: 2026-10-31-second-coder-study
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Build what an independent second coder needs to measure agreement on mechanic families, the admission
+  tests, and affects-edge effect types (review findings D3, D6, D4), without collecting any codes.
+method: 'Read the review findings D3, D4, D6, AGENTS.md, CONTRACT.md, tasks/README.md, tasks/rate-scores.md,
+  scripts/make_tasks.py, scripts/calibrate.py, scripts/pr_scope.py, the E035 and E037 checks in validate.py, the
+  rater-agreement block of analyze.py, §2.1, §2.6, §8.1 and §11.1, and every run proposal of kind new-mechanic.
+  Added scripts/coding.py: draw (a seeded sample stratified by the current code, two mechanics per family, six
+  edges per effect preferring techniques not yet drawn, twelve open new-mechanic proposals; it leaves out the
+  mechanics §2.1 names and items whose text names their code), packet and sheet (score-free sheets with the rules
+  as the paper renders them, written to the new gitignored coding-out/, since make build prunes dist/), and record
+  (writes report/coding/<run-id>.yaml after checking it). The sample is recorded in report/analysis.yaml
+  second_coding; draw --check reproduces it. A candidate is a proposal no live mechanic matches (up to plurals) and
+  no taxonomy run names; of 44 proposed targets with no mechanic of their id, 4 were renamed or merged at triage
+  and aspirations-wants duplicates aspiration-wants, which leaves 39. analyze.py gains a block: sample sizes always, and once codes exist Cohen''s kappa
+  and nominal Krippendorff''s alpha per decision with stratified bootstrap intervals, per-category kappa, and
+  per-test pass rates. New helpers _alpha_nominal and _kappa_nominal reproduce Krippendorff (2011) (nominal 0.743;
+  the existing ordinal helper gives 0.815) and equal _kappa_quadratic on two categories. The build fails on a
+  codes file whose verification run is not independent of every run that created, reviewed, or proposed a coded
+  record; that is a build check, not a validator rule, because a rule needs an ADR (see proposals). Tested end to
+  end with a synthetic coder run and codes file, removed before commit: record, the three tables, the expected
+  E029 on §2.6, a build failure for a non-independent coder, and ten malformed-file cases. Rewrote the §2.6 coding
+  bullet (sample sizes by token, asserts that no codes exist yet) and the second-coder sentence of agenda item 6;
+  added tasks/second-coding.md. Found that run 2026-10-29-shreyko-antim-rate-scores-19 reviewed two sampled
+  mechanics, so that operator could code all but those two (packet --run leaves them out). Ran make check and make
+  determinism.'
+contract_version: '1.2'
+proposals:
+- kind: rule
+  target: E035
+  detail: Second-coder codes (report/coding/<run-id>.yaml, scripts/coding.py) are checked for independence by the
+    build, which raises during analysis. Extending E035's text to a run that codes a record's family, admission, or
+    effect type, and checking the file's shape in validate.py beside E037, needs an ADR; until then the check lives
+    in scripts/coding.py. CONTRACT.md I1 should also list report/coding/*.yaml as canonical state.
+- kind: other
+  target: scripts/make_tasks.py
+  detail: tasks/second-coding.md has no make_tasks.py brief or tasks.yml label, so the tasks workflow will not open
+    an issue for it; the operator invites the coder directly. Adding both would let the workflow open one.
+- kind: vocab-term
+  target: mechanic kind
+  detail: Review D6 also asks to classify every mechanic as simulation-state, presentation, control, or
+    meta-structure and report coder agreement. No field or vocabulary holds that class, so it is not in the sheets;
+    it would need a vocabulary and an ADR, and a first coding before a second coder could be compared.

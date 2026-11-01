@@ -25,6 +25,7 @@ The operator is the accountable human. An agent never verifies, rates, or resolv
 | [verify-record.md](verify-record.md): check a sourced record and mark it verified | `verification` | 5 to 10 records |
 | [rate-scores.md](rate-scores.md): calibrate, then add independent ratings | `verification` | 10 mechanics |
 | [resolve-prediction.md](resolve-prediction.md): resolve a falsifiable prediction | `verification` | 1 to 3 opportunities |
+| [second-coding.md](second-coding.md): code families, admission tests, and effect types a second time | `verification` | one sample, no records changed |
 | [propose-mechanic.md](propose-mechanic.md): propose a missing mechanic | any (a proposal) | 1 proposal |
 
 Taxonomy work (creating mechanics), synthesis (opportunities, report prose), and anything under `vocab/`, `schema/`, `scripts/`, `calibration/`, or `report/` is maintainer-reviewed (`.github/CODEOWNERS`). Propose it; do not do it in a task PR.
