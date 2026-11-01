@@ -565,12 +565,16 @@ tables:
   - name
   - path: falsifiable_signal.prediction
     label: prediction
+  - path: _derived.prediction_test
+    label: test
   - path: _derived.prediction_status
     label: status
   sort:
   - falsifiable_signal.resolve_by
   - name
-  caption: Each prediction has resolution criteria on its record page. A refuted prediction says the opportunity did not
+  caption: Each prediction has resolution criteria on its record page. Test says what a confirmation would show, technique
+    when only the technique class the opportunity applies can meet the criteria, feature when classical, symbolic, or
+    operations-research methods can meet them too. A refuted prediction says the opportunity did not
     arrive by its date in a qualifying title, which can reflect cost, studio schedules, or reception as well as a wrong
     thesis; a confirmed one can come from general adoption of AI, so it supports the thesis only as far as the criteria
     require the opportunity's own mechanism.

@@ -41,12 +41,15 @@ falsifiable_signal:
   prediction: A playable serious-game or educational simulation will publish posterior-calibrated parameters
     with fit metrics as part of its release.
   resolve_by: '2028-12-31'
-  criteria: Released after 2026-10-24; release notes, documentation, or an accompanying paper report the
-    calibration method (Bayesian or simulation-based inference), the data it was fitted to, and at least
-    one goodness-of-fit metric.
+  criteria: 'Released after 2026-10-24; release notes, documentation, or an accompanying paper report
+    the calibration method (Bayesian or simulation-based inference), the data it was fitted to, and at
+    least one goodness-of-fit metric. Technique class: classical Bayesian calibration, such as Markov
+    chain Monte Carlo or approximate Bayesian computation, counts as well as neural simulation-based inference,
+    so this is a feature test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

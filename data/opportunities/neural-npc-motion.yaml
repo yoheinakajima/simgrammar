@@ -39,12 +39,14 @@ validation_experiment: 'Drive 200 agents with a learned controller conditioned o
 falsifiable_signal:
   prediction: A management or colony sim will ship learned physics-based motion for its simulated population.
   resolve_by: '2029-06-30'
-  criteria: Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews;
+  criteria: 'Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews;
     developer documentation names learned motion control (a trained policy driving a physics character)
-    for population agents, not only motion-matched animation.
+    for population agents, not only motion-matched animation. Technique class: trained control policies
+    only, so this is a technique test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

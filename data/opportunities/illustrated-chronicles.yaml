@@ -41,12 +41,15 @@ falsifiable_signal:
   prediction: A systemic simulation game will ship an automatic, shareable narrative summary of a run's
     history generated from its event log.
   resolve_by: '2027-12-31'
-  criteria: Feature first shipped after 2026-10-24 in a released title or official expansion with at least
-    1,000 Steam user reviews; patch notes or store text describe an automatically written run history
-    the player can export or share.
+  criteria: 'Feature first shipped after 2026-10-24 in a released title or official expansion with at
+    least 1,000 Steam user reviews; patch notes or store text describe an automatically written run history
+    the player can export or share. Technique class: any automatic writer counts, templates filled from
+    the event log included, so this is a feature test; it shows language models landed only if the notes
+    say one writes the history.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

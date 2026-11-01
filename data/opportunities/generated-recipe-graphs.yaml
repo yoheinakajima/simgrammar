@@ -41,9 +41,10 @@ falsifiable_signal:
   prediction: A factory or crafting game or overhaul mod will credit algorithmic or model-based generation
     for its recipe graph or tech tree.
   resolve_by: '2028-12-31'
-  criteria: Released after 2026-10-24; a game with at least 1,000 Steam user reviews, or a mod with at
+  criteria: 'Released after 2026-10-24; a game with at least 1,000 Steam user reviews, or a mod with at
     least 10,000 downloads on its official mod portal; the developer or mod author states that the shipped
-    recipe graph was produced or substantially shaped by a generative tool.
+    recipe graph was produced or substantially shaped by a generative tool. Technique class: any generative
+    tool counts, classical procedural generators and search included, so this is a feature test.'
 sources: []
 assertions:
 - 'derived.production-chain.prevalence_rank <= 10'
@@ -54,3 +55,4 @@ provenance:
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-25-contributor-readiness
+  - 2026-10-31-es-review-v2-fixes

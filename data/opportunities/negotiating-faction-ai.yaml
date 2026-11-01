@@ -44,12 +44,15 @@ falsifiable_signal:
   prediction: A grand strategy or 4X game will ship AI opponents that negotiate in free-text or generated-language
     diplomacy backed by a planner.
   resolve_by: '2029-06-30'
-  criteria: Feature first shipped after 2026-10-24 in a grand strategy or 4X title with at least 5,000
+  criteria: 'Feature first shipped after 2026-10-24 in a grand strategy or 4X title with at least 5,000
     Steam user reviews; developer statement or documentation describes language-based AI diplomacy whose
-    offers are chosen by a planner or game-state evaluation.
+    offers are chosen by a planner or game-state evaluation. Technique class: any generator of diplomatic
+    language counts, templates included, with any planner or evaluation, so this is a feature test; it
+    shows dialogue models landed only if the material says a language model writes the messages.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

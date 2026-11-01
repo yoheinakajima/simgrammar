@@ -54,9 +54,10 @@ falsifiable_signal:
   prediction: At least three colony or life sims with over 1,000 Steam user reviews will call a language
     model for agents only on salient events rather than per decision.
   resolve_by: '2028-12-31'
-  criteria: Count titles released or patched after 2026-10-24 with more than 1,000 Steam user reviews;
+  criteria: 'Count titles released or patched after 2026-10-24 with more than 1,000 Steam user reviews;
     developer documentation, postmortems, or mod-verified behavior show model calls triggered by discrete
-    events while routine behavior runs on non-model systems.
+    events while routine behavior runs on non-model systems. Technique class: language models only, called
+    on events, so this is a technique test.'
 sources: []
 status: asserted
 provenance:
@@ -64,3 +65,4 @@ provenance:
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-review-corrections
+  - 2026-10-31-es-review-v2-fixes

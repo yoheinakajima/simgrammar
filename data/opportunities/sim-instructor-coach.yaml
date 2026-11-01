@@ -42,12 +42,15 @@ validation_experiment: 'Add a telemetry-grounded voice instructor to a flight si
 falsifiable_signal:
   prediction: A flight or racing simulator will ship an AI voice instructor that comments on live telemetry.
   resolve_by: '2027-12-31'
-  criteria: Official feature first shipped after 2026-10-24 in a flight or racing simulator with at least
+  criteria: 'Official feature first shipped after 2026-10-24 in a flight or racing simulator with at least
     5,000 Steam user reviews or a console release; the instructor speaks generated feedback based on the
-    player's live inputs. Third-party apps do not count.
+    player''s live inputs. Third-party apps do not count. Technique class: any generator counts, rule-based
+    templates read by a speech synthesizer included, so this is a feature test; it shows voice models
+    landed only if the material says one writes or speaks the feedback.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

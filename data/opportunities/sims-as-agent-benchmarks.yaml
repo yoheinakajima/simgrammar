@@ -43,9 +43,10 @@ falsifiable_signal:
   prediction: A simulation game developer or publisher will officially release a headless research API
     or benchmark for AI agents.
   resolve_by: '2027-12-31'
-  criteria: Released after 2026-10-24 by the developer or publisher of a title with at least 1,000 Steam
+  criteria: 'Released after 2026-10-24 by the developer or publisher of a title with at least 1,000 Steam
     user reviews, as an official announcement or repository; community wrappers and academic forks do
-    not count.
+    not count. Technique class: any method counts, a conventional software interface included, so this
+    is a feature test.'
 sources: []
 status: asserted
 provenance:
@@ -53,3 +54,4 @@ provenance:
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-techniques-opportunities
+  - 2026-10-31-es-review-v2-fixes

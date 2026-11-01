@@ -49,9 +49,10 @@ falsifiable_signal:
   prediction: A factory or automation game in which workers age, train, and are replaced by a simulated
     next generation will reach 1,000 Steam user reviews.
   resolve_by: '2029-12-31'
-  criteria: Title released after 2026-10-24; its Steam page describes generational workforce mechanics
+  criteria: 'Title released after 2026-10-24; its Steam page describes generational workforce mechanics
     (aging, training, succession) in a factory or automation game, and it has at least 1,000 Steam user
-    reviews by the resolve date.
+    reviews by the resolve date. Technique class: any method counts, conventional agent simulation included,
+    so this is a feature test.'
 sources: []
 assertions:
 - 'cooccur.lifecycle-aging.production-chain <= 3'
@@ -64,3 +65,4 @@ provenance:
   - 2026-10-25-contributor-readiness
   - 2026-10-31-tag-audit
   - 2026-10-31-tag-audit-follow-up
+  - 2026-10-31-es-review-v2-fixes

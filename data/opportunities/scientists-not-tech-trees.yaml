@@ -41,9 +41,10 @@ falsifiable_signal:
   prediction: A strategy or management game will ship research performed by a simulated population of
     named researchers whose relationships affect outcomes.
   resolve_by: '2029-06-30'
-  criteria: Title or expansion released after 2026-10-24 with at least 1,000 Steam user reviews; documentation
+  criteria: 'Title or expansion released after 2026-10-24 with at least 1,000 Steam user reviews; documentation
     describes research progress that depends on relationships between named researcher characters, not
-    only on their individual stats.
+    only on their individual stats. Technique class: any method counts, conventional agent simulation
+    included, so this is a feature test.'
 sources: []
 assertions:
 - 'derived.tech-tree.prevalence_rank <= 5'
@@ -56,3 +57,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-25-contributor-readiness
   - 2026-10-31-tag-audit
+  - 2026-10-31-es-review-v2-fixes

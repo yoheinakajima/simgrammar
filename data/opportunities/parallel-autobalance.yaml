@@ -43,12 +43,14 @@ falsifiable_signal:
   prediction: At least two studios will publicly describe using large-scale agent search to balance a
     simulation or strategy game's economy before release.
   resolve_by: '2027-12-31'
-  criteria: Talks, technical blogs, or papers published after 2026-10-24 by staff of two different studios,
+  criteria: 'Talks, technical blogs, or papers published after 2026-10-24 by staff of two different studios,
     each naming a commercial title with at least 1,000 Steam user reviews and describing automated agent
-    play at scale used for economy balance.
+    play at scale used for economy balance. Technique class: any automated agents count, scripted bots
+    included, so this is a feature test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

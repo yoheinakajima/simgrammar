@@ -44,12 +44,13 @@ falsifiable_signal:
   prediction: A game built on a continuous artificial-life substrate (Lenia family or neural cellular
     automata) will reach 1,000 Steam user reviews.
   resolve_by: '2029-12-31'
-  criteria: Title released after 2026-10-24; its Steam page or developer documentation describes a Lenia-family
+  criteria: 'Title released after 2026-10-24; its Steam page or developer documentation describes a Lenia-family
     or neural cellular automaton substrate, and it has at least 1,000 Steam user reviews by the resolve
-    date.
+    date. Technique class: Lenia-family or neural cellular automata only, so this is a technique test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

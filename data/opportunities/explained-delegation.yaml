@@ -41,12 +41,15 @@ falsifiable_signal:
   prediction: A grand strategy or management game will ship AI managers that learn delegation policy from
     the individual player's own past decisions.
   resolve_by: '2028-12-31'
-  criteria: Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews;
-    developer documentation states that delegated subsystems adapt to the specific player's recorded choices.
-    Fixed presets or global difficulty settings do not count.
+  criteria: 'Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews;
+    developer documentation states that delegated subsystems adapt to the specific player''s recorded
+    choices. Fixed presets or global difficulty settings do not count. Technique class: any adaptation
+    counts, tallies of the player''s past choices or hand-written rules included, so this is a feature
+    test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

@@ -43,12 +43,15 @@ falsifiable_signal:
   prediction: A grand strategy, life sim, or narrative management game will ship runtime-generated events
     constrained by an event schema.
   resolve_by: '2027-12-31'
-  criteria: Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews;
+  criteria: 'Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews;
     the Steam AI disclosure or developer documentation states that events are generated during play and
-    must conform to a fixed structure of triggers, options, and effects.
+    must conform to a fixed structure of triggers, options, and effects. Technique class: any runtime
+    generator counts, template or grammar-based ones included, so this is a feature test; it shows language
+    models landed only if the disclosure or documentation says one writes the events.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

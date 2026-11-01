@@ -41,12 +41,15 @@ falsifiable_signal:
   prediction: A life or management sim other than inZOI will let players generate new placeable 3D objects
     from text or images.
   resolve_by: '2027-12-31'
-  criteria: Feature first shipped after 2026-10-24 in a life or management sim other than inZOI with at
-    least 5,000 Steam user reviews or a console release; store page or patch notes describe player-facing
-    text-to-3D or image-to-3D object generation inside the game.
+  criteria: 'Feature first shipped after 2026-10-24 in a life or management sim other than inZOI with
+    at least 5,000 Steam user reviews or a console release; store page or patch notes describe player-facing
+    text-to-3D or image-to-3D object generation inside the game. Technique class: text-to-3D or image-to-3D
+    generation by any method counts, classical photogrammetry from a player''s photos included, so this
+    is a feature test; it shows a learned model landed only if the material says one makes the objects.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

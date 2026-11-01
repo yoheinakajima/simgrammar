@@ -198,6 +198,11 @@ techniques:
     prototype: [6, 6]
     shipped-niche: [7, 8]
     shipped-mainstream: [9, 9]
+# Families whose mechanics are interface, pacing, control channels, or goal structure rather than modelled systems: their
+# state is what the player is shown, the clock, a standing order, or unlocks and goals (the family rules of §2.1). §5.1 leaves them out of the
+# head of the prevalence distribution (prevalence-sensitivity, "state-owning families only") and §8.2 out of the
+# unreached share, both from this one list, so the two checks cannot drift apart (review E12, E37).
+nonstate_families: [information-legibility, time-pacing, control-automation, progression-goals]
 exposure:
   # §8.2 robustness. The exposure weights are a deployment-weighted heuristic (vocab/rubrics.yaml composites); these
   # settings test how far the family ranking and the unreached share depend on them.
@@ -207,8 +212,6 @@ exposure:
   # Techniques whose own records say they change what is drawn and not simulation state ("all without touching
   # simulation state"; "the game's systems cannot read the new look"). The schema has no field for this yet.
   presentation_only: [neural-rendering-shaders, real-time-video-restyling]
-  # Families whose mechanics are interface, pacing, or goal structure rather than modelled systems (review E12).
-  interface_families: [information-legibility, time-pacing, progression-goals]
   # A mechanic is technique-native when more than this share of the catalog games that use it are AI-native titles
   # (subgenre below) or deploy a technique in the set that affects it: its catalog evidence comes mostly from the
   # techniques themselves, so its exposure is close to definitional (review E20).

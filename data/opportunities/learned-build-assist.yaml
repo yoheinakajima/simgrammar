@@ -41,12 +41,14 @@ falsifiable_signal:
   prediction: A city builder will ship a machine-learned layout generator that turns player strokes into
     detailed streets or districts.
   resolve_by: '2028-06-30'
-  criteria: Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews;
+  criteria: 'Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews;
     developer documentation states that a model trained on layout data, as opposed to hand-written procedural
-    rules, generates the layout from player brushes or strokes.
+    rules, generates the layout from player brushes or strokes. Technique class: models trained on layout
+    data only, so this is a technique test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

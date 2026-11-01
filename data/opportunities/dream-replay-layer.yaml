@@ -43,9 +43,11 @@ falsifiable_signal:
   prediction: A game will use a generative video or world model to show character memories or in-world
     histories drawn from the simulation's own event log.
   resolve_by: '2028-12-31'
-  criteria: Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews or
-    a console release; store page, trailer, or patch notes describe generated visuals of past in-game
-    events specific to the player's run. Pre-rendered cutscenes do not count.
+  criteria: 'Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews
+    or a console release; store page, trailer, or patch notes describe generated visuals of past in-game
+    events specific to the player''s run. Pre-rendered cutscenes do not count. Technique class: any method
+    counts, the game''s own renderer drawing past events from its log included, so this is a feature test;
+    it shows a world model landed only if the material says one draws the visuals.'
 sources: []
 assertions:
 - field.genie-world-models.horizon == 3-5y
@@ -57,3 +59,4 @@ provenance:
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-techniques-opportunities
+  - 2026-10-31-es-review-v2-fixes
