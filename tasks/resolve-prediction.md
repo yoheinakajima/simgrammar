@@ -18,4 +18,4 @@ Every opportunity carries a prediction with a `resolve_by` date and criteria. `W
      note: Which title met which criterion, or which criterion failed, and how you checked.
    ```
 4. Append your run to the opportunity's `provenance.reviewed` (E039). `refuted` is only for after the resolve-by date and `withdrawn` only for before it (E038).
-5. Your run must be independent of the run that created the opportunity (E035). A refuted prediction is evidence against the thesis; do not edit the thesis in the same PR.
+5. Your run must be independent of the run that created the opportunity (E035). A refuted prediction shows the bet did not arrive by its date: say in the note whether that counts against the thesis or only its timing (cost, schedules, reception). For a confirmed one, say beside the evidence how often comparable features shipped without the opportunity's technique, the generic-diffusion baseline of §11, and whether the prediction was a technique test or a feature test. Do not edit the thesis in the same PR.

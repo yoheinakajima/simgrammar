@@ -23,7 +23,8 @@ def main():
     ap.add_argument('--from', dest='src', type=Path, help='copy from this folder instead of downloading the release')
     a = ap.parse_args()
     pub = yaml.safe_load((ROOT / 'media' / 'published.yaml').read_text(encoding='utf-8'))
-    repo = yaml.safe_load((ROOT / 'report' / 'meta.yaml').read_text(encoding='utf-8'))['site']['repo']
+    # the release may live in another repository (repo: in published.yaml), because Zenodo archives every release of this one
+    repo = pub.get('repo') or yaml.safe_load((ROOT / 'report' / 'meta.yaml').read_text(encoding='utf-8'))['site']['repo']
     bad, n = [], 0
     for group in ('shorts', 'episodes'):
         out = a.site / 'media' / group

@@ -1,0 +1,27 @@
+id: 2026-10-31-video-repo-and-docs
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'At the operator''s request: keep video releases from becoming Zenodo versions of the paper, and write down three
+  rules the v0.4.1 revision introduced.'
+method: >-
+  Changed no records, sources, or report text. Zenodo archived release videos-2026-10-31c as version 10.5281/zenodo.23851374
+  of the paper, because its GitHub integration archives every release of a switched-on repository. The receiver in
+  inveniosoftware/invenio-github (invenio_github/receivers.py) accepts the published, released, and created actions
+  and skips only drafts, and zenodo/zenodo-rdm adds no filter, so marking video releases as pre-releases would not
+  help; drafts would, but scripts/video/fetch_published.py downloads release assets without a token, and draft
+  assets are not public. So media/published.yaml may now name the repository whose release holds the files (repo:),
+  publish.py writes it with --repo, and fetch_published.py downloads from it, falling back to site.repo; a dry run
+  wrote repo: and resolved the download URL to the other repository, and media/published.yaml was restored. AGENTS.md
+  says video releases go in a repository Zenodo does not watch. Three rules from the revision are written down: the
+  opportunity test requires the technique-class sentence the build counts (AGENTS.md); tasks/resolve-prediction.md
+  no longer reads a refuted prediction as evidence against the thesis outright and asks resolvers for the generic-
+  diffusion baseline and the test kind; tasks/README.md names the second-coding codes file as the one task file under
+  report/.
+contract_version: '1.2'
+proposals: []

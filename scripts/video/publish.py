@@ -3,6 +3,12 @@
     make build && python scripts/video/assemble.py all        (the renders in video-out/final, their states in video-out/out)
     python scripts/video/publish.py --release videos-2026-10-27
     gh release create videos-2026-10-27 video-out/publish/*    (the files are not committed; the release holds them)
+    python scripts/video/publish.py --release videos-2026-11-02 --repo https://github.com/<owner>/<media-repo>
+        then: gh release create videos-2026-11-02 video-out/publish/* --repo <owner>/<media-repo>
+
+Zenodo archives every release of this repository as a version of the paper, so video releases belong in a separate
+repository that Zenodo does not archive; --repo records it in media/published.yaml (repo:), and the Pages workflow
+downloads from there.
 
 The shorts and the episodes are published; the film stays off the site. Each entry names the video file and its sha256,
 its length, a poster frame and its sha256, and the records the video shows: the frame elements and cards in its rendered
@@ -106,6 +112,7 @@ def frame(mp4, at, out, width):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--release', required=True, help='GitHub release tag that will hold the files')
+    ap.add_argument('--repo', help='https URL of the repository whose release holds the files, when it is not this one')
     a = ap.parse_args()
     recs = records()
     stage = V / 'publish'
@@ -142,7 +149,7 @@ def main():
             '# Written by scripts/video/publish.py from the renders in video-out; shows lists the records each video puts on screen.\n'
             '# An episode\'s scenes give each scene\'s start in seconds, the records it shows with when each first appears, and said,\n'
             '# a digest of its narration as rendered (lib.narration_digest).\n')
-    body = f'release: {a.release}\nshorts:\n' + ''.join(
+    body = f'release: {a.release}\n' + (f'repo: {a.repo.rstrip("/")}\n' if a.repo else '') + 'shorts:\n' + ''.join(
         f'  - {{key: {r["key"]}, script: {r["script"]}, file: {r["file"]}, seconds: {r["seconds"]},\n'
         f'     sha256: {r["sha256"]},\n     poster: {r["poster"]}, poster_sha256: {r["poster_sha256"]},\n'
         f'     shows: [{", ".join(r["shows"])}]}}\n' for r in rows)

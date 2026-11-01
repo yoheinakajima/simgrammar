@@ -28,4 +28,4 @@ The operator is the accountable human. An agent never verifies, rates, or resolv
 | [second-coding.md](second-coding.md): code families, admission tests, and effect types a second time | `verification` | one sample, no records changed |
 | [propose-mechanic.md](propose-mechanic.md): propose a missing mechanic | any (a proposal) | 1 proposal |
 
-Taxonomy work (creating mechanics), synthesis (opportunities, report prose), and anything under `vocab/`, `schema/`, `scripts/`, `calibration/`, or `report/` is maintainer-reviewed (`.github/CODEOWNERS`). Propose it; do not do it in a task PR.
+Taxonomy work (creating mechanics), synthesis (opportunities, report prose), and anything under `vocab/`, `schema/`, `scripts/`, `calibration/`, or `report/` is maintainer-reviewed (`.github/CODEOWNERS`). Propose it; do not do it in a task PR. The one exception is the codes file a second-coding task adds under `report/coding/` (`tasks/second-coding.md`).
