@@ -46,12 +46,14 @@ falsifiable_signal:
   prediction: A game will render its primary view with a generative model conditioned on an explicit symbolic
     game state.
   resolve_by: '2029-12-31'
-  criteria: Title released after 2026-10-24 with at least 1,000 Steam user reviews or a console release;
+  criteria: 'Title released after 2026-10-24 with at least 1,000 Steam user reviews or a console release;
     developer documentation shows that gameplay state is symbolic and that the main viewport is produced
-    frame by frame by a learned generative renderer.
+    frame by frame by a learned generative renderer. Technique class: learned generative renderers only,
+    so this is a technique test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

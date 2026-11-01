@@ -43,12 +43,15 @@ falsifiable_signal:
   prediction: A colony or management sim will let players issue standing natural-language orders that
     compile into its job and priority systems.
   resolve_by: '2028-06-30'
-  criteria: Feature first shipped after 2026-10-24 in a title or official expansion with at least 1,000
+  criteria: 'Feature first shipped after 2026-10-24 in a title or official expansion with at least 1,000
     Steam user reviews; patch notes, store page, or developer statement describe free-text standing orders
-    translated into the game's existing work or priority settings.
+    translated into the game''s existing work or priority settings. Technique class: any parser counts,
+    a keyword or grammar-based one included, so this is a feature test; it shows language models landed
+    only if the material says one translates the orders.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

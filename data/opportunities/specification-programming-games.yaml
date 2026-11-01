@@ -40,11 +40,14 @@ validation_experiment: 'Ship a 10-puzzle web prototype where a model generates c
 falsifiable_signal:
   prediction: A programming game will make specifying or testing AI-written code its core loop.
   resolve_by: '2028-06-30'
-  criteria: Title released after 2026-10-24 with at least 1,000 Steam user reviews; its Steam page describes
-    players specifying, testing, or verifying AI-generated code as the main mechanic.
+  criteria: 'Title released after 2026-10-24 with at least 1,000 Steam user reviews; its Steam page describes
+    players specifying, testing, or verifying AI-generated code as the main mechanic. Technique class:
+    any code generator counts, classical program synthesis included, so this is a feature test; it shows
+    language models landed only if the page says one writes the code.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

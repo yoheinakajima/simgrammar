@@ -41,12 +41,16 @@ falsifiable_signal:
   prediction: A game will let each player's AI representative trade or negotiate with other players' worlds
     while those players are offline.
   resolve_by: '2029-06-30'
-  criteria: Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews or
-    a console release; developer material (store page, patch notes, documentation, or talk) states that
-    an AI agent acts for an absent player in trades or negotiations with other players.
+  criteria: 'Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews
+    or a console release; developer material (store page, patch notes, documentation, or talk) states
+    that an AI agent acts for an absent player in trades or negotiations with other players. Technique
+    class: any agent that acts for the absent player counts, a scripted or rule-based trader included,
+    so this is a feature test; it shows language agents landed only if the material says a language model
+    negotiates.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

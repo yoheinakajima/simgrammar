@@ -151,6 +151,8 @@ def build(shared, live, by_id, derived, tables, stats, vocabs, cfg) -> dict:
     out["design-map"] = design_map(shared, live, by_id, derived, tables, sub, cfg)
     if "cluster-stability" in tables:
         out["cluster-k-curve"] = cluster_k_curve(tables, cfg)
+    if (tables.get("rater-confusion") or {}).get("rows"):
+        out["rater-confusion"] = rater_confusion(tables, vocabs)
     out["vacant-lots"] = vacant_lots(shared, live, by_id, derived, tables, fam, cfg)
     out["technique-flows"] = technique_flows(live, by_id, derived, vocabs, fam)
     out["layer-profile"] = layer_profile(tables, fam, sub, cfg)
@@ -1300,3 +1302,64 @@ def cluster_k_curve(tables, cfg):
                   "tables cluster-stability · dist/analysis/cluster-stability.csv · report/analysis.yaml (clustering)",
                   {"table": "cluster-stability", "note": "Mean, 10th and 90th percentile ARI and the largest cluster's share of games, for every k."},
                   min_width=640, legend_html=key)
+
+
+def rater_confusion(tables, vocabs):
+    """Original against independent second ratings, one small confusion grid per mechanic scale, from the anchor-pair counts
+    of the rater-confusion table (review G5). Rows are the original rater's anchor, columns the second rater's; the outlined
+    diagonal is agreement, and cells right of it are scores the second rater put higher."""
+    scales = vocabs["rubrics"]["scales"]
+    rows = tables["rater-confusion"]["rows"]
+    fields = [f for f, sc in scales.items() if sc.get("applies_to") == "mechanic" and any(r["field"] == f for r in rows)]
+    cnt = {(r["field"], int(r["first"]), int(r["second"])): int(r["scores"]) for r in rows}
+    vmax = max(cnt.values())
+    COLS, C, PW, PH, GX, GY, TOP = 3, 22, 226, 172, 40, 36, 6
+    W = COLS * PW
+    H = TOP + math.ceil(len(fields) / COLS) * PH + 46
+    body = [svg_open("rater-confusion", W, H, "Original against second ratings, by scale",
+                     "For each mechanic scale with independent second ratings, a grid of anchor pairs: rows are the original rating, columns the "
+                     "second rating, and each cell's shade and number count the scores with that pair.")]
+    trows = []
+    for k, f in enumerate(fields):
+        levels = sorted(int(x) for x in scales[f]["levels"])
+        px, py = (k % COLS) * PW, TOP + (k // COLS) * PH
+        gx, gy = px + GX, py + GY
+        pairs = sum(n for (ff, _, _), n in cnt.items() if ff == f)
+        same = sum(n for (ff, a, b), n in cnt.items() if ff == f and a == b)
+        higher = sum(n for (ff, a, b), n in cnt.items() if ff == f and b > a)
+        lower = pairs - same - higher
+        name = f.replace("_", " ")
+        body.append(text(gx, py + 12, name, 9.5, "ink2", weight="600"))
+        body.append(text(gx, py + 25, f"{counted(pairs, 'score')} · {round(100 * same / pairs)}% same anchor", 8, "faint"))
+        for i, a in enumerate(levels):
+            body.append(text(gx - 6, gy + i * C + C / 2 + 3, a, 8, "faint", "end"))
+            for j, b in enumerate(levels):
+                n = cnt.get((f, a, b), 0)
+                x, y = gx + j * C, gy + i * C
+                op = 0.08 + 0.82 * n / vmax if n else 0
+                edge = f'stroke:{T["accent"]};stroke-width:1.2' if a == b else f'stroke:{T["rule"]};stroke-width:0.5'
+                tip = f"{name}: original {a}, second {b}: {counted(n, 'score')}"
+                body.append(f'<rect x="{f1(x + 0.5)}" y="{f1(y + 0.5)}" width="{C - 1}" height="{C - 1}" data-field="{f}" data-first="{a}" data-second="{b}" '
+                            f'style="fill:{T["ink"]};fill-opacity:{op:.3f};{edge}"><title>{esc(tip)}</title></rect>')
+                if n:
+                    body.append(text(x + C / 2, y + C / 2 + 3, n, 8.5, "paper" if n / vmax > 0.55 else "ink", "middle"))
+        for j, b in enumerate(levels):
+            body.append(text(gx + j * C + C / 2, gy + len(levels) * C + 11, b, 8, "faint", "middle"))
+        side = gx + len(levels) * C + 8
+        body.append(text(side, gy + 10, f"higher {higher}", 8, "muted"))
+        body.append(text(side, gy + 22, f"same {same}", 8, "accent"))
+        body.append(text(side, gy + 34, f"lower {lower}", 8, "muted"))
+        trows.append({"field": f, "scores": pairs, "same_anchor": same, "second_higher": higher, "second_lower": lower})
+    diag = f'<rect x="0.5" y="0.5" width="9" height="9" style="fill:{T["paper"]};stroke:{T["accent"]};stroke-width:1.2"/>'
+    key, _ = svg_key(GX, H - 34, [(diag, "same anchor from both raters"), ("", "higher, same, lower: the second rating against the original")])
+    body.append(key + text(GX, H - 14, "rows: original rating · columns: second rating · number in a cell: scores with that pair", 8.5, "faint"))
+    body.append("</svg>")
+    return _plain("Original against second ratings, by scale", f"{counted(len(fields), 'scale')} · {counted(sum(r['scores'] for r in trows), 'score')}",
+                  "".join(body),
+                  "For each mechanic scale that an independent second rater scored, how often each pair of anchors was chosen: rows are the original "
+                  "rater's score and columns the second rater's, from 1 to 5, and a cell's shade and number count the scores with that pair. "
+                  "The outlined diagonal is the same anchor; cells right of it are scores the second rater put higher, and the counts beside each grid "
+                  "sum them. Agreement statistics per scale are in the rater-agreement table.",
+                  "tables rater-confusion · dist/analysis/rater-confusion.csv",
+                  {"table": "rater-confusion", "note": "Scores for every pair of an original and a second rating, per scale."},
+                  min_width=640)

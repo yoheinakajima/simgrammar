@@ -37,12 +37,13 @@ falsifiable_signal:
   prediction: At least five games with over 1,000 Steam user reviews will use an on-device language model
     at runtime without requiring an internet connection.
   resolve_by: '2027-12-31'
-  criteria: Count titles whose local-model feature first shipped after 2026-10-24; store pages or documentation
+  criteria: 'Count titles whose local-model feature first shipped after 2026-10-24; store pages or documentation
     confirm local inference for runtime features, and each title has more than 1,000 Steam user reviews
-    by the resolve date.
+    by the resolve date. Technique class: on-device language models only, so this is a technique test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

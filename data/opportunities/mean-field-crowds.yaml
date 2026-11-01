@@ -41,12 +41,14 @@ falsifiable_signal:
   prediction: A city builder will document a mean-field or continuum crowd model as its primary traffic
     or population simulation.
   resolve_by: '2029-12-31'
-  criteria: Released or patched after 2026-10-24 in a title with at least 1,000 Steam user reviews; developer
+  criteria: 'Released or patched after 2026-10-24 in a title with at least 1,000 Steam user reviews; developer
     documentation names a mean-field, continuum, or equilibrium-field method used at runtime for the main
-    traffic or population model.
+    traffic or population model. Technique class: classical continuum and equilibrium-field crowd models
+    count, not only learned mean-field solvers, so this is a feature test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

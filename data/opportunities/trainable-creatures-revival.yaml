@@ -44,13 +44,16 @@ falsifiable_signal:
   prediction: A virtual-pet or god game will ship a creature controlled by a learned neural or reinforcement-learning
     policy that player feedback updates during play.
   resolve_by: '2029-06-30'
-  criteria: Title released after 2026-10-24 with at least 1,000 Steam user reviews or a console release;
-    developer documentation states that the creature's behavior comes from a deep neural network (more
+  criteria: 'Title released after 2026-10-24 with at least 1,000 Steam user reviews or a console release;
+    developer documentation states that the creature''s behavior comes from a deep neural network (more
     than one hidden layer), a language model, or a deep RL policy whose parameters change in response
-    to that player's feedback. Single-layer learners such as Black & White's perceptrons do not count.
+    to that player''s feedback. Single-layer learners such as Black & White''s perceptrons do not count.
+    Technique class: deep networks, language models, or deep RL policies only, so this is a technique
+    test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

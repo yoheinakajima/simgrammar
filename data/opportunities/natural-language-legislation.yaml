@@ -47,12 +47,14 @@ falsifiable_signal:
   prediction: A political or city-building game will let players enact free-text laws that change simulation
     parameters.
   resolve_by: '2028-12-31'
-  criteria: Feature first shipped after 2026-10-24 (early access counts) in a title with at least 1,000
+  criteria: 'Feature first shipped after 2026-10-24 (early access counts) in a title with at least 1,000
     Steam user reviews; documentation shows free-text law input mapped to changes in simulation rules
-    or parameters.
+    or parameters. Technique class: any parser counts, a keyword or grammar-based one included, so this
+    is a feature test; it shows language models landed only if the documentation says one maps the laws.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

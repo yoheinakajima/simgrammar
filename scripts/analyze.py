@@ -215,7 +215,11 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             key = mid.replace("-", "_")
             stats[f"n_{key}_rule_tags"] = rule_set.get(mid, 0)
             stats[f"n_{key}_coded_tags"] = derived[mid]["prevalence"] - rule_set.get(mid, 0) if mid in derived else 0
-        nonstate_fams = ("time-pacing", "information-legibility", "control-automation", "progression-goals")
+        # one list for this check and §8.2's unreached share, so the two leave out the same families (review E37)
+        nonstate_fams = tuple(cfg.get("nonstate_families") or ())
+        ns_words = [str(fam_terms.get(f, {}).get("label", f)).replace("&", "and").lower() for f in nonstate_fams]
+        stats["nonstate_family_names"] = ", ".join(ns_words[:-1]) + ", and " + ns_words[-1] if len(ns_words) > 2 else " and ".join(ns_words)
+        stats["n_nonstate_families"] = len(nonstate_fams)
         asserted_m = {m.id for m in mechs if m.data.get("status") == "asserted"}
         prev_rows = []
         for variant, key, keep, count in (
@@ -233,9 +237,9 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         tables["prevalence-sensitivity"] = {
             "description": "The six most used mechanics, with the number of games tagging each, under four readings: every tag; tags that a "
                            "game's time model or modding field requires (rule E033) left out, so pause and modding count only where a "
-                           "contributor coded them; mechanics still asserted (no source) left out; and mechanics in the time-and-pacing, "
-                           "information, control, and progression families left out, a family-level proxy for mechanics that own "
-                           "simulation state.",
+                           "contributor coded them; mechanics still asserted (no source) left out; and mechanics in the "
+                           f"{stats['nonstate_family_names']} families left out, a family-level proxy for mechanics that own "
+                           "simulation state (the families §8.2 leaves out of the unreached share).",
             "columns": ["variant", "mechanics", "uses", "most_used"], "rows": prev_rows}
         stats["n_mechanics_asserted_uses"] = sum(derived[m]["prevalence"] for m in asserted_m if m in derived)
         stats["pct_uses_on_asserted_mechanics"] = _r(100 * stats["n_mechanics_asserted_uses"] / max(sum(len(v) for v in gm.values()), 1), 0)
@@ -1698,7 +1702,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         return _r(100 * sum(w(x) for x in ms if base_mx[x] == 0) / tot_, 0)
     core_n = Counter(mid for g in games for mid, r in gm[g.id].items() if r == "core")
     use_w = lambda x: derived[x]["prevalence"]  # noqa: E731
-    iface_f = set(xcfg.get("interface_families") or [])
+    iface_f = set(cfg.get("nonstate_families") or [])  # the families §5.1 leaves out of the head of the distribution (review E37)
     stats["pct_mechanics_zero_exposure"] = _r(100 * stats["n_mechanics_zero_exposure"] / max(len(mechs), 1), 0)
     stats["pct_core_uses_on_zero_exposure"] = _pct(mech_ids, lambda x: core_n.get(x, 0))
     stats["pct_supporting_uses_on_zero_exposure"] = _pct(mech_ids, lambda x: use_w(x) - core_n.get(x, 0))
@@ -1868,10 +1872,22 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     now_rt = [o for o in opps if o.data["horizon"] == "now" and derived[o.id]["runtime_model"]]
     stats["n_opportunity_now_runtime_model"] = len(now_rt)
     stats["n_opportunity_now_runtime_model_budget"] = sum(1 for o in now_rt if derived[o.id]["states_compute_budget"])
-    # predictions whose criteria say what technique class counts, or that any method counts (review F1)
-    crit_t = [str(o.data["falsifiable_signal"].get("criteria", "")) for o in opps]
-    stats["n_predictions_feature_test"] = sum(1 for c in crit_t if "feature test" in c)
-    stats["n_predictions_technique_class"] = sum(1 for c in crit_t if "technique class" in c.lower())
+    # what a resolution would show (review F1, F4): each prediction's criteria end in one sentence "Technique class: ..., so
+    # this is a technique test" or "... a feature test". A technique test is one that only the technique class the
+    # opportunity applies can meet; a feature test is one that classical, symbolic, or operations-research methods can meet
+    # too, so its confirmation shows the feature shipped. A criterion with no such sentence, or more than one, is counted
+    # unclassified, and section 11 asserts there are none, so a new prediction must say which kind it is.
+    test_re = re.compile(r"Technique class: [^.]*?\bso this is an? (technique|feature) test\b")
+    kinds = Counter()
+    for o in opps:
+        c = str(o.data["falsifiable_signal"].get("criteria", ""))
+        found = test_re.findall(c)
+        kind = found[0] if len(found) == 1 and c.count("Technique class:") == 1 else "unclassified"
+        derived[o.id]["prediction_test"] = kind
+        kinds[kind] += 1
+    stats["n_predictions_technique_test"] = kinds["technique"]
+    stats["n_predictions_feature_test"] = kinds["feature"]
+    stats["n_predictions_unclassified"] = kinds["unclassified"]
     # displayed to one decimal: three ordinal ratings do not support more (review E22); rows keep their unrounded order
     for r in orows:
         r["priority"] = _r(r["priority"], 1)

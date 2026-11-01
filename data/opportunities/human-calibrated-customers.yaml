@@ -43,12 +43,14 @@ falsifiable_signal:
   prediction: A management or tycoon game will state that its customer or citizen preferences come from
     a model of human behavior learned from data.
   resolve_by: '2028-12-31'
-  criteria: Released or patched after 2026-10-24 in a title with at least 1,000 Steam user reviews; developer
+  criteria: 'Released or patched after 2026-10-24 in a title with at least 1,000 Steam user reviews; developer
     blog, talk, or store text attributes in-game demand or preference parameters to a behavioral, survey-fitted,
-    or language model.
+    or language model. Technique class: classical behavioral or survey-fitted models, such as discrete-choice
+    models, count as well as language models, so this is a feature test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

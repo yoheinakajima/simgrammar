@@ -28,7 +28,7 @@ contributors:
 # Bump both for a release, then tag it v<version> (decisions/ADR-0008). Once Zenodo mints the concept DOI for the
 # repository, add it here as `doi: "10.5281/zenodo.<n>"`; the build then puts it in CITATION.cff and the paper's BibTeX.
 date: "2026-10-31"
-version: "0.4"
+version: "0.4.1"
 doi: "10.5281/zenodo.23846209"
 # The website projection (scripts/web.py -> dist/web). Changing these changes generated pages.
 site:

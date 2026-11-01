@@ -41,12 +41,14 @@ falsifiable_signal:
   prediction: An engine, middleware vendor, or open-source project will ship an event-log replay and determinism
     layer designed for games with generative AI components.
   resolve_by: '2028-12-31'
-  criteria: Released after 2026-10-24 by any engine or middleware vendor or as an open-source project;
+  criteria: 'Released after 2026-10-24 by any engine or middleware vendor or as an open-source project;
     documentation describes recording model outputs into a replayable log, and at least one shipped title
-    with at least 1,000 Steam user reviews uses it.
+    with at least 1,000 Steam user reviews uses it. Technique class: a conventional event log counts,
+    so this is a feature test of infrastructure for model outputs, not of a learned technique.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

@@ -38,12 +38,14 @@ falsifiable_signal:
   prediction: An inspection or bureaucracy job sim will generate documents or applicants at runtime and
     score the player against an answer key derived from formal rules.
   resolve_by: '2027-12-31'
-  criteria: Released after 2026-10-24 with at least 1,000 Steam user reviews; store page or developer
-    statement describes runtime-generated cases whose correct outcome is computed from the game's rules,
-    not authored per case.
+  criteria: 'Released after 2026-10-24 with at least 1,000 Steam user reviews; store page or developer
+    statement describes runtime-generated cases whose correct outcome is computed from the game''s rules,
+    not authored per case. Technique class: classical procedural generation checked by a rule engine counts,
+    so this is a feature test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

@@ -43,11 +43,14 @@ falsifiable_signal:
   prediction: A city government will use a game-style calibrated simulation with simulated resident feedback
     in a formal planning consultation.
   resolve_by: '2029-12-31'
-  criteria: Public planning document or press release dated after 2026-10-24 that names the tool, states
-    that it simulates resident responses, and records its use in an official consultation.
+  criteria: 'Public planning document or press release dated after 2026-10-24 that names the tool, states
+    that it simulates resident responses, and records its use in an official consultation. Technique class:
+    any simulation of resident responses counts, classical agent-based models included, so this is a feature
+    test.'
 sources: []
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-v2-fixes

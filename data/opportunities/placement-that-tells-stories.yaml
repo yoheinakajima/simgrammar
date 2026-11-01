@@ -43,9 +43,10 @@ falsifiable_signal:
   prediction: A city builder will advertise placement-triggered narrative events tied to named inhabitants
     as a core feature.
   resolve_by: '2028-12-31'
-  criteria: Title or expansion released after 2026-10-24 with at least 1,000 Steam user reviews; store
+  criteria: 'Title or expansion released after 2026-10-24 with at least 1,000 Steam user reviews; store
     page or developer material lists events triggered by player placement decisions that affect specific
-    named inhabitants.
+    named inhabitants. Technique class: any event system counts, authored triggers included, so this is
+    a feature test.'
 sources: []
 assertions:
 - 'cooccur.free-placement.triggered-event-chains <= 3'
@@ -59,3 +60,4 @@ provenance:
   - 2026-10-25-review-round
   - 2026-10-31-tag-audit
   - 2026-10-31-tag-audit-follow-up
+  - 2026-10-31-es-review-v2-fixes

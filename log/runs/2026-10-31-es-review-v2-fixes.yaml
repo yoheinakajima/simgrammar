@@ -1,0 +1,61 @@
+id: 2026-10-31-es-review-v2-fixes
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'Fix the Explore Science v0.4 re-review findings that need no new raters: one shared exclusion
+  list for the head-of-distribution and unreached-share checks (E37), every prediction classified as a
+  technique or a feature test and counted by the build (F1, F2, F4), and a rater-agreement figure in section
+  5.6 (G5).'
+method: >-
+  E37: section 5.1 dropped four families (a tuple in analyze.py) and section 8.2 three (exposure.interface_families).
+  Both now read one list, nonstate_families in report/analysis.yaml, with control and automation in it. The 8.2 share
+  of uses unreached outside those families went from 52 to 54 percent (core uses 45 to 48); section 5.1 is unchanged.
+  New stats name and count the families, so the prose and the prevalence-sensitivity description cannot drift from
+  the list. Book chapter 8 restates it. It also bumps the paper to version 0.4.1 for the resubmission (ADR-0008).
+
+  F1, F2, F4: read the prediction and criteria of all 42 live opportunities and the summaries of the techniques each
+  applies, and classified each by its criteria read literally (tasks/resolve-prediction.md). Technique test: only the
+  technique class the opportunity applies can meet them. Feature test: a classical, symbolic or operations-research
+  method can, and the sentence names one. Appended that sentence to 39 criteria, and reworded the sentence of
+  branch-preview-forecasts and causal-why-query to name a classical method (F4); bottleneck-explainer already named
+  one. A script checked that each record's only changes are the criteria text and this run in provenance.reviewed,
+  that no date, threshold or event changed, and that every criteria stays under the 500-character schema limit.
+  Result: 13 technique tests, 29 feature tests. The records have no sources, so reviewed here means the run read and
+  classified the criteria; no claim was re-checked. Judgment calls: generative-decoration-catalogs is a feature test
+  because classical photogrammetry can meet image-to-3D; dream-replay-layer, because its criteria name no method;
+  mean-field-crowds, because classical continuum crowd models count. local-first-ai-sims and
+  salience-gated-llm-agents read their "local model" and "model calls" as the language model the prediction names.
+  qd-scenario-libraries, open-ended-evolution-sandbox and mechanic-discovery-search are technique tests whose class
+  is search or a cellular substrate, not a learned model. analyze.py parses the sentence (prediction_test, three
+  counts) and the predictions table shows it. Sections 1.1, 9.1, 11 and book chapter 12 now say only technique tests
+  score where techniques land, and assert none is unclassified. Section 11 says why no probabilities or higher
+  thresholds were added and leaves a generic-diffusion baseline to resolvers.
+
+  G5: viz rater-confusion draws six grids from the rater-confusion table, placed in section 5.6. Checked it with
+  Quick Look and with paper_pdf.py --tex-only, which numbers it Figure 8.
+
+  Failed: the first check stopped on an unquoted colon in a tables.yaml caption. Built scripts in media differ from
+  main only in the dataset hash; no Voice token changed value and no scene is marked reworded. Frames that show
+  criteria were not re-rendered.
+contract_version: '1.2'
+proposals:
+- kind: rule
+  target: AGENTS.md section 3, Opportunity test
+  detail: Every prediction's criteria must now end with one sentence of the form "Technique class ..., so this is a
+    technique test" or "... a feature test". Only an assertion in report section 11 (n_predictions_unclassified == 0)
+    enforces it, so a contributor who adds an opportunity without it meets E029 with no procedure telling them why.
+    The opportunity test in AGENTS.md, or a validator rule by ADR, should state the requirement.
+- kind: other
+  target: tasks/resolve-prediction.md
+  detail: Ask resolvers to record a generic-diffusion baseline beside each confirmation (how many comparable titles
+    shipped the same feature by other means by the same date), and to say in the note whether the evidence names the
+    technique when the prediction is a feature test. Section 11 of the report leaves both to resolvers.
+- kind: other
+  target: data/opportunities/*.yaml falsifiable_signal.criteria
+  detail: One model wrote the predictions and the same model classified them. A reader independent of both runs
+    should check the classification, starting with the judgment calls named in this run's method (agenda item 7).
