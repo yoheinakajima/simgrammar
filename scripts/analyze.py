@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import math
+import re
 from collections import Counter, defaultdict
 from datetime import date
 from itertools import combinations
@@ -964,6 +965,92 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             if e.data.get("status") == "asserted":
                 q.append({"type": t, "id": e.id, "name": e.data.get("name")})
     tables["verification-queue"] = {"description": "Asserted entities awaiting sources, in triage order.", "columns": ["type", "id", "name"], "rows": q}
+
+    # ---------------- method and definitions (sections 1 and 2, Appendix E). Everything here is read from the structures
+    # the analysis above uses or from the files that parameterize it, so the paper's definitions cannot drift from the
+    # computation they describe.
+    # Evidence by entity type. Status and citing are different counts: an asserted record may already cite a source in a
+    # claim without having been promoted, and a contested record cites both sides, so the paper gives both per type.
+    ev_rows = []
+    for t, label in (("game", "games"), ("mechanic", "mechanics"), ("technique", "techniques"), ("opportunity", "opportunities")):
+        es = live.get(t, [])
+        st = Counter(e.data.get("status") for e in es)
+        cite = [e for e in es if outgoing.get(e.id, {}).get("cites")]
+        ev_rows.append({"type": label, "records": len(es), "sourced": st.get("sourced", 0), "verified": st.get("verified", 0),
+                        "contested": st.get("contested", 0), "asserted": st.get("asserted", 0), "cite_a_source": len(cite),
+                        "asserted_but_citing": sum(1 for e in cite if e.data.get("status") == "asserted")})
+        stats[f"n_{t}_sourced_or_verified"] = st.get("sourced", 0) + st.get("verified", 0)
+        stats[f"n_{t}_contested"] = st.get("contested", 0)
+    ev_rows.append({k: ("all" if k == "type" else sum(r[k] for r in ev_rows)) for k in ev_rows[0]})
+    tables["evidence-by-type"] = {"description": "Records by type and evidence status. Status partitions each type; a record cites a source when it or one of its claims names one, so the cite column also counts contested records and asserted records whose sources have not yet been checked for promotion.",
+                                  "columns": ["type", "records", "sourced", "verified", "contested", "asserted", "cite_a_source", "asserted_but_citing"], "rows": ev_rows}
+    # Relations among mechanics (requires, specializes, synergy, tension): how sparse the vocabulary's typed relations are.
+    # A mechanic's relation degree counts every such edge that touches it; density is the share of possible mechanic
+    # pairs joined by at least one relation of any type.
+    mech_ids = {m.id for m in mechs}
+    rel_types = ("requires", "specializes", "synergy", "tension")
+    rel_deg, rel_pairs, n_rel = Counter(), set(), 0
+    for ed in edges:
+        if ed.type in rel_types and ed.source in mech_ids and ed.target in mech_ids:
+            n_rel += 1
+            rel_deg[ed.source] += 1
+            rel_deg[ed.target] += 1
+            rel_pairs.add(tuple(sorted((ed.source, ed.target))))
+    degs = [rel_deg.get(m.id, 0) for m in mechs] or [0]
+    stats["n_relation_edges"] = n_rel
+    stats["relation_edges_per_mechanic"] = _r(float(np.mean(degs)), 2)
+    stats["median_relation_edges_per_mechanic"] = _r(float(np.median(degs)), 1)
+    stats["max_relation_edges_per_mechanic"] = max(degs)
+    stats["n_mechanics_no_relation"] = sum(1 for d in degs if d == 0)
+    stats["pct_mechanics_no_relation"] = _r(100 * stats["n_mechanics_no_relation"] / max(len(mechs), 1), 0)
+    stats["relation_pair_density_pct"] = _r(100 * len(rel_pairs) / max(len(mechs) * (len(mechs) - 1) / 2, 1), 2)
+    # The weights behind technique exposure and opportunity priority, as vocab/rubrics.yaml states them.
+    mat_terms, eff_terms = vocab_terms(vocabs, "technique_maturity"), vocab_terms(vocabs, "effect")
+    tables["exposure-weights"] = {"description": "The weights technique exposure multiplies for each affects edge, from vocab/rubrics.yaml (composites.technique_exposure): one for the technique's maturity in games and one for the edge's effect type, with the effect vocabulary's definition.",
+                                  "columns": ["factor", "term", "weight", "definition"],
+                                  "rows": [{"factor": "maturity", "term": mat_terms.get(k, {}).get("label", k), "weight": v, "definition": mat_terms.get(k, {}).get("definition", "")}
+                                           for k, v in comp["maturity_weights"].items()]
+                                  + [{"factor": "effect", "term": eff_terms.get(k, {}).get("label", k), "weight": v, "definition": eff_terms.get(k, {}).get("definition", "")}
+                                     for k, v in comp["effect_weights"].items()]}
+    for k, v in rub["composites"]["opportunity_priority"]["weights"].items():
+        stats[f"priority_{k}"] = v
+    stats["clustering_core_weight"] = cl["core_weight"]
+    stats["whitespace_max_observed"] = ws["max_observed"]
+    # The white-space table numbers its rows, so a reader can match them to the numbered lots of the vacant-lots figure.
+    if "whitespace" in tables:
+        tables["whitespace"] = {**tables["whitespace"], "columns": ["rank"] + [c for c in tables["whitespace"]["columns"] if c != "rank"],
+                                "rows": [{"rank": i + 1, **r} for i, r in enumerate(tables["whitespace"]["rows"])]}
+    # How much of the paper's prose the build checks. Numbers reach the prose only through tokens; a sentence that reads
+    # a ranking, sign, threshold, or grouping carries {{assert:...}} tokens. Counted per sentence of report/src, split at
+    # sentence-ending punctuation (an assertion written after a full stop belongs to the sentence before it), leaving out
+    # headings, tables, and lines that hold only a table or figure token.
+    # The book (book/src) is counted the same way for its chapter on checks.
+    for prefix, folder in (("report", ROOT / "report" / "src"), ("book", ROOT / "book" / "src")):
+        n_sent = n_sent_num = n_sent_assert = n_assert = 0
+        for p in sorted(folder.glob("*.md")):
+            for line in p.read_text(encoding="utf-8").splitlines():
+                s = line.strip()
+                if not s or s.startswith(("#", "|", "<")) or re.fullmatch(r"(\{\{(table|figure|viz):[^}]+\}\}\s*)+", s):
+                    continue
+                s = re.sub(r"^(?:[-*]|\d+\.)\s+", "", s)
+                n_assert += len(re.findall(r"\{\{assert:", s))
+                s = re.sub(r"\{\{assert:[^}]*\}\}", "\x00", s)
+                for sent in re.split(r"(?<=[.!?\x00])\s+(?=[A-Z0-9*\[(`\"“_{])", s):
+                    if not re.search(r"[A-Za-z]{2}", sent.replace("\x00", "")):
+                        continue
+                    n_sent += 1
+                    n_sent_assert += "\x00" in sent
+                    n_sent_num += bool(re.search(r"\{\{(stat|count|derived|rank):", sent))
+        stats[f"n_{prefix}_sentences"] = n_sent
+        stats[f"n_{prefix}_sentences_with_numbers"] = n_sent_num
+        stats[f"n_{prefix}_sentences_asserted"] = n_sent_assert
+        stats[f"n_{prefix}_assertions"] = n_assert
+    stats["n_record_assertions"] = sum(len(e.data.get("assertions") or []) for lst in live.values() for e in lst)
+    stats["n_records_with_assertions"] = sum(1 for lst in live.values() for e in lst if e.data.get("assertions"))
+    # What the admission tests leave checkable: the build can count games and levers, not judge atomicity.
+    stats["n_mechanics_one_game"] = sum(1 for m in mechs if derived[m.id]["prevalence"] == 1)
+    stats["min_design_levers"] = min((len(m.data.get("design_levers") or []) for m in mechs), default=0)
+    stats["median_design_levers"] = _r(float(np.median([len(m.data.get("design_levers") or []) for m in mechs])), 1) if mechs else 0
 
     # ---------------- figures
     figures.update(_figures(mechs, derived, fam_terms, famrows, by_id, games, year))

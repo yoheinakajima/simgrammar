@@ -1,0 +1,18 @@
+id: src-sterman-2000-business-dynamics
+type: source
+name: 'Business Dynamics: Systems Thinking and Modeling for a Complex World'
+kind: book
+authors:
+- John D. Sterman
+venue: Irwin/McGraw-Hill
+date: '2000-02-23'
+url: https://mea.magento.intl.prod.mheducation.com/business-dynamics-systems-thinking-and-modeling-for-a-complex-world-int-l-ed-9780071179898-mea
+isbn: 978-0-07-117989-8
+accessed: '2026-10-31'
+notes: 'Publisher page with description and contents; the book was not read. Part II, Tools for Systems
+  Thinking, lists "5. Causal Loop Diagrams", "6. Stocks and Flows", "7. Dynamics of Stocks and Flows" and "8.
+  Closing the Loop: Dynamics of Simple Structures"; chapter 10 is "Path Dependence and Positive Feedback". The
+  description calls system dynamics "a field of study in business, engineering, and social and physical
+  sciences".'
+provenance:
+  created: 2026-10-31-es-review-framing-pdf
