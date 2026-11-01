@@ -7,7 +7,9 @@ opportunity_type: mechanic-upgrade
 thesis: Player-driven economies need large populations; EVE Online works because it has them, and smaller
   persistent worlds stagnate. Agents calibrated to human trading behavior, and analyzed with mean-field
   methods for stability, can supply liquidity and price discovery without dominating. Mechanism design
-  keeps them from front-running humans.
+  keeps them from front-running humans. Its prediction accepts any traders fitted to player trade data,
+  which classical calibration can produce, so its horizon is judged on that route; the techniques it lists
+  are research routes to better fits, each further off in games.
 design_sketch: Each market has a population of agent traders with budgets, risk profiles, and information
   limits matching human traders, operating under the same order-book rules. Their share of volume is capped
   and published. Designers tune agent populations to target liquidity and volatility bands.
@@ -44,8 +46,13 @@ falsifiable_signal:
     developer material states that AI market participants were trained or calibrated on player trade data.
     NPC vendors with fixed prices do not count.
 sources: []
+assertions:
+- field.human-behavior-simulation-models.horizon == 3-5y
+- field.mean-field-games.horizon == 3-5y
+- field.llm-agent-societies.horizon == 3-5y
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-techniques-opportunities

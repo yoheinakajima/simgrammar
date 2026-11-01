@@ -43,3 +43,60 @@ viz:
 book:
   rare_max_games: 10     # a mechanic used by at most this many catalog games counts as rare in the book's prose (chapter 1)
   subgenre_min_games: 6  # subgenres with at least this many games get a row in the subgenre-spend table (chapter 2)
+techniques:
+  # §7: techniques are collected for 2019 to 2026. One whose key result is older is kept as a historical exception
+  # only when an in-window technique builds on it, a catalog game released in the window deploys it, or it cites a
+  # non-encyclopedia source dated in the window (later work that extends or applies it); analyze.py names the reason.
+  window_start: 2019
+  # The TRL anchors (vocab/rubrics.yaml) and the maturity definitions (vocab/technique_maturity.yaml) describe the same
+  # evidence: TRL 6 is a public playable demo or tech preview, which is the prototype definition; TRL 7 and 8 are a
+  # commercial game, which is shipped (niche); TRL 9 is standard practice across titles, which is shipped (mainstream).
+  # A technique whose TRL falls outside its maturity's range is listed in §7.1, not silently corrected: TRL is a rubric
+  # score and changes only through an independent rating (AGENTS.md, ordinal scores).
+  trl_by_maturity:
+    research: [1, 5]
+    prototype: [6, 6]
+    shipped-niche: [7, 8]
+    shipped-mainstream: [9, 9]
+exposure:
+  # §8.2 robustness. The exposure weights are a deployment-weighted heuristic (vocab/rubrics.yaml composites); these
+  # settings test how far the family ranking and the unreached share depend on them.
+  # Frame-generating and video world models: separate records that make overlapping claims about the same mechanics.
+  # The merged variant counts the group once per mechanic, at its largest member's weight.
+  merge_world_models: [diffusion-game-engines, genie-world-models, muse-wham, open-interactive-video-models, physical-world-foundation-models]
+  # Techniques whose own records say they change what is drawn and not simulation state ("all without touching
+  # simulation state"; "the game's systems cannot read the new look"). The schema has no field for this yet.
+  presentation_only: [neural-rendering-shaders, real-time-video-restyling]
+  # Families whose mechanics are interface, pacing, or goal structure rather than modelled systems (review E12).
+  interface_families: [information-legibility, time-pacing, progression-goals]
+  # A mechanic is technique-native when more than this share of the catalog games that use it are AI-native titles
+  # (subgenre below) or deploy a technique in the set that affects it: its catalog evidence comes mostly from the
+  # techniques themselves, so its exposure is close to definitional (review E20).
+  technique_native_share: 0.5
+  ai_native_subgenre: ai-native
+  # The paper's claim about the economic core: these families rank at or below this place per mechanic.
+  economic_core: [resources-production, logistics-networks]
+  economic_core_min_rank: 16
+  top_families: 4             # §8.2 names the top four families by summed exposure
+perturbation:
+  # Rater noise (review E22): each draw moves every ordinal input (a technique's maturity level, a mechanic's AI
+  # leverage, an opportunity's impact, feasibility, and novelty) by -1, 0, or +1 anchor with equal chance, clipped to
+  # the scale, and multiplies every weight by a factor drawn uniformly within +/- weight_spread. Where independent
+  # raters scored the same mechanics, almost every disagreement was within one anchor (rater-agreement table).
+  draws: 1000
+  seed: 20261031
+  weight_spread: 0.2
+  interval: [0.05, 0.95]      # rank intervals report these quantiles of the perturbed ranks
+  top_n: 8                    # §9 discusses the top eight opportunities
+opportunities:
+  # Review E19: feasibility 4 reads "feasible with known techniques and normal risk". As a sensitivity check (no
+  # record changes), cap each opportunity's feasibility by the maturity in games of the most mature technique it
+  # applies, and re-rank. A rating stays the rater's; changing one takes an independent verification run.
+  feasibility_cap_by_best_maturity:
+    research: 3
+    prototype: 4
+    shipped-niche: 5
+    shipped-mainstream: 5
+  # Review E25: a validation experiment states a compute budget when it names one of these (tokens per hour, a
+  # latency in ms, first-token time, VRAM, frame time, or a per-player-hour figure).
+  budget_pattern: 'tokens? per|\bms\b|first token|VRAM|frame-time|player-hour'

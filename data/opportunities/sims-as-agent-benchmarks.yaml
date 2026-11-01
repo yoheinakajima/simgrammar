@@ -8,7 +8,8 @@ thesis: AI agents now need environments that test planning over thousands of ste
   and recovery from compounding errors. Simulation games are exactly that, with measurable outcomes (throughput,
   survival, profit). Minecraft became a research environment through MineDojo and Voyager, and factory
   games have been proposed as agent benchmarks. Games with headless modes and clean observation APIs can
-  become a licensed research category.
+  become a licensed research category. Its techniques are the agents under test, not features a game ships,
+  so their horizons in games do not bound this one; it needs only a headless build and an API.
 design_sketch: A studio ships a headless build with a typed observation and action API, standard scenarios,
   and leaderboards for agents. Researchers measure long-horizon performance; players watch agent runs
   as content.
@@ -51,3 +52,4 @@ provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-techniques-opportunities

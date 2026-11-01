@@ -44,9 +44,11 @@ falsifiable_signal:
   prediction: A factory or city-building game will ship a feature that names the binding constraint in
     the player's production network by testing the simulation, not by displaying static ratios.
   resolve_by: '2028-06-30'
-  criteria: Feature first shipped after 2026-10-24 in a released title or official mod tool with at least
-    1,000 Steam user reviews; patch notes or a developer blog state that it perturbs or re-runs the player's
-    network to identify the limiting resource, machine, or link.
+  criteria: 'Feature first shipped after 2026-10-24 in a released title or official mod tool with at least
+    1,000 Steam user reviews; patch notes or a developer blog state that it perturbs or re-runs the player''s
+    network to identify the limiting resource, machine, or link. Technique class: any method that perturbs
+    or re-runs the network counts, classical sensitivity analysis included, so this is a feature test,
+    not evidence that a learned technique landed.'
 sources: []
 assertions:
 - 'derived.production-chain.technique_count == 1'
@@ -57,3 +59,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-25-contributor-readiness
   - 2026-10-31-tag-audit
+  - 2026-10-31-es-review-techniques-opportunities

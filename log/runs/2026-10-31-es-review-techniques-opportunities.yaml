@@ -1,0 +1,68 @@
+id: 2026-10-31-es-review-techniques-opportunities
+type: run
+kind: maintenance
+date: '2026-10-31'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'Revise the paper''s sections 7 to 11 after the Explore Science review: print the exposure and
+  priority weights, test how far the exposure, unreached-share, and opportunity readings depend on them,
+  and reconcile technique and opportunity records with their own maturity evidence.'
+method: 'Read Explore Science findings D4, D11, E2, E4, E6, E11, E12, E14, E16, E17, E19-E22, E24, E25,
+  E30, E31, F1-F3 and paper sections 7 to 11. Computed in scripts/analyze.py (parameters in report/analysis.yaml:
+  techniques, exposure, perturbation, opportunities): the exposure and priority weights as tables read
+  from vocab/rubrics.yaml; family exposure ranks under equal, maturity-only, effect-only, collapsed-effect,
+  merged-world-model, no-presentation and no-technique-native variants (Spearman against the weighted
+  ranks, rho 0.96 to 1.0); 1000 seeded draws moving each maturity level, AI leverage score and opportunity
+  rating by -1, 0 or +1 anchor and each weight by up to 20 percent, giving rank intervals for families,
+  the leverage gap and opportunities and top-8 shares (why-query 93 percent, branch preview 70, the rest
+  53 or less); the unreached share by core uses (44 percent), outside interface families (52), without
+  the ten most-used mechanics (47) and per family; technique-native mechanics (3); the 2019 window with
+  reasons for the 5 older techniques; a TRL-maturity correspondence read from the anchors (3 prototypes
+  at TRL 5 fall outside it); catalog deployments behind each shipped rating; each opportunity''s weakest
+  and best technique, mechanics reached, and a feasibility cap by best technique maturity as a sensitivity
+  check; Now-horizon opportunities with a runtime model and a stated compute budget (2 of 16). Displayed
+  composites rounded to one decimal; rows keep their unrounded order. Records: rewrote neural-rendering-shaders''
+  three affects notes to state the presentation path (effects kept; key results and sources not touched
+  or reopened); learned-weather-layer horizon 1-2y to 3-5y, the horizon of both its techniques; added
+  technique-class and feature-test text to the criteria of causal-why-query, bottleneck-explainer and
+  branch-preview-forecasts without changing what resolves them; recorded on causal-why-query what its
+  feasibility 4 assumes and that it needs only a game''s own event log; justified on ai-liquidity-in-player-markets,
+  dream-replay-layer and sims-as-agent-benchmarks why their horizon precedes their techniques''. No rubric
+  score was changed: TRL and feasibility re-ratings need an independent verification run. Rewrote report
+  sections 7 to 11, book chapters 7, 8, 10 and 11, and the technique-catalog and predictions table entries
+  in report/tables.yaml. Not done: recall audit of edges, second ratings of effects, maturity and opportunities,
+  a search for game explainability work, per-player-hour cost figures (none in the sources), and probabilities
+  for predictions.'
+contract_version: '1.2'
+proposals:
+- kind: vocab-term
+  target: prediction_outcome
+  detail: Add an 'undetermined' outcome for a prediction whose criteria no public evidence can decide
+    either way (for example a learned weather emulator or salience-gated model calls inside a shipped
+    game). 'ambiguous' needs evidence that a criterion cannot be checked, and 'refuted' a criterion shown
+    unmet, so an unverifiable outcome is now forced into one of them (review F3; paper section 11).
+- kind: schema
+  target: technique.presentation_only
+  detail: Add a boolean field marking techniques that change what is drawn and not simulation state. report/analysis.yaml
+    exposure.presentation_only lists neural-rendering-shaders and real-time-video-restyling from their
+    own record text until a field exists (review E6).
+- kind: other
+  target: trl-rerating
+  detail: automated-rule-generation, llm-explanation-of-state and story-sifting are prototypes rated TRL
+    5, below the TRL 6 that the prototype definition implies; each record cites a public playable sample,
+    tech preview or engine release. A verification run by another operator and model should re-rate their
+    TRL (paper section 7.1, review E17).
+- kind: other
+  target: causal-why-query.feasibility
+  detail: Feasibility 4 assumes the validation experiment's 95 percent supported-sentence bar can be met,
+    while the techniques applied are a prototype and a research result in games and faithful log-grounded
+    explanation is an open problem. An independent rating may put it at 3, which would tie the why-query
+    with branch preview at priority 4.0 (paper section 9.1, review E16).
+- kind: other
+  target: prediction-classification
+  detail: Classify the remaining 39 predictions as technique tests or feature tests by naming the technique
+    class that counts in their criteria, as done here for causal-why-query, bottleneck-explainer and branch-preview-forecasts
+    (review F1).

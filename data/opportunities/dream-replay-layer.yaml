@@ -7,7 +7,9 @@ opportunity_type: new-mechanic
 thesis: 'The weaknesses of generative world models (short consistency horizon, no exact state) disqualify
   them as engines but suit a different role: showing things that are supposed to be subjective. A colonist''s
   memory, a rumor that changed in the telling, a forecast that might not happen, or the history of a ruin
-  are views where approximation reads as character rather than bug.'
+  are views where approximation reads as character rather than bug. The world models it applies are rated
+  further off for games because they lack exact persistent state and long memory; this layer shows only
+  subjective views, which need neither, so its horizon rests on generation cost and latency.'
 design_sketch: Clicking a memory in a colonist's inspector plays a few seconds of generated footage conditioned
   on the logged event and the colonist's mood. Rumors render with distortions proportional to how many
   retellings they passed through. Ruins found in worldgen offer a short generated vision of their past
@@ -45,8 +47,13 @@ falsifiable_signal:
     a console release; store page, trailer, or patch notes describe generated visuals of past in-game
     events specific to the player's run. Pre-rendered cutscenes do not count.
 sources: []
+assertions:
+- field.genie-world-models.horizon == 3-5y
+- field.diffusion-game-engines.horizon == 3-5y
+- field.open-interactive-video-models.horizon == 3-5y
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-10-31-es-review-techniques-opportunities
