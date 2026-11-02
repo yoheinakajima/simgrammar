@@ -1,6 +1,6 @@
 """House-style lint for the book and the videos (book/STYLE.md).
 
-Checks book/src, media/episodes, media/shorts, media/mega, and the files in EXTRA against the patterns in book/tells.yaml, and checks
+Checks book/src, media/episodes, media/shorts, media/mega, media/intro, and the files in EXTRA against the patterns in book/tells.yaml, and checks
 that no episode or short ends its narration on a question. Exits 1 on any error.
 
     python scripts/style_check.py            # all prose
@@ -14,7 +14,7 @@ from pathlib import Path
 
 from lib import ROOT, read_yaml
 
-DIRS = ["book/src", "media/episodes", "media/shorts", "media/mega"]
+DIRS = ["book/src", "media/episodes", "media/shorts", "media/mega", "media/intro"]
 EXTRA: list[str] = ["decisions/ADR-0006-visual-vocabulary.md", "media/visual/README.md"]
 TOKEN = re.compile(r"\{\{[a-z_]+:[^}]+\}\}")
 LINK = re.compile(r"\[\[[a-z0-9-]+\|([^\]]+)\]\]|\[\[([a-z0-9-]+)\]\]")

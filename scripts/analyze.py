@@ -1902,6 +1902,10 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     stats["first_prediction_resolves"] = res[0] if res else None
     if res:
         stats["first_prediction_resolves_long"], stats["first_prediction_resolves_spoken"] = written_dates(res[0])
+        # whole calendar years from the paper's release (report/meta.yaml date) to the first and the last resolve-by date
+        year0 = int(str(read_yaml(ROOT / "report" / "meta.yaml")["date"])[:4])
+        stats["years_to_first_prediction"] = int(str(res[0])[:4]) - year0
+        stats["years_to_last_prediction"] = int(str(res[-1])[:4]) - year0
     outcomes = Counter()
     for o in opps:
         r = o.data["falsifiable_signal"].get("resolution")
