@@ -67,7 +67,7 @@ affects:
   note: Bespoke scenario maps can be produced from a reference image or description and exported with
     collider meshes, reducing hand modeling per scenario; objectives and rules still need authoring.
 - id: procedural-build-assist
-  effect: enables-new
+  effect: replaces-substrate
   note: Chisel turns a coarse blockout into a detailed styled scene, the same rough-input to detailed-output
     contract as Townscaper-style build assist but with a learned generator; today it is an editor mode,
     not a runtime player tool.
@@ -95,3 +95,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-world-models
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

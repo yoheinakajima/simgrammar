@@ -76,7 +76,7 @@ affects:
   note: Collision, gravity, and jumping are learned statistically from pixels rather than integrated;
     rules the data rarely violates can still be broken, as with DIAMOND's repeated mid-air jumps in CS:GO.
 - id: procedural-terrain
-  effect: enables-new
+  effect: replaces-substrate
   note: 'Terrain is invented on demand from the learned distribution of the training game with no seed
     or noise function (Oasis), but it is not persistent: regions that leave the short context window are
     regenerated differently on return.'
@@ -114,3 +114,4 @@ provenance:
   created: 2026-10-24-techniques-world-models
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-11-01-es-v3-edge-audits

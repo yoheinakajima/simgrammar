@@ -90,7 +90,7 @@ affects:
   note: Story continuation from Do, Say, Story, and See inputs makes the whole narrative generated content;
     grounded engines turn it into typed state changes.
 - id: natural-language-interaction
-  effect: deepens
+  effect: enables-new
   note: Any typed action is adjudicated for plausibility and consequence rather than matched against a
     parser's verb list, so unanticipated approaches produce new narrative paths (53 emergent nodes in
     one 28-player study).
@@ -159,3 +159,4 @@ provenance:
   created: 2026-10-24-techniques-llm-agents
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-11-01-es-v3-edge-audits

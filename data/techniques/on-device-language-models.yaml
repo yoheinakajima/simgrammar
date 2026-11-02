@@ -80,7 +80,7 @@ affects:
   note: Smart Zois pick actions with a small model that reads needs, surroundings, and inner thoughts
     rather than only scored need curves, while the game's action set stays the same.
 - id: memories-thoughts
-  effect: deepens
+  effect: enables-new
   note: Characters generate text thoughts about events and reflect on past decisions, giving each agent
     a running inner monologue rather than a list of authored mood modifiers.
 - id: advisors
@@ -118,3 +118,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-llm-agents
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

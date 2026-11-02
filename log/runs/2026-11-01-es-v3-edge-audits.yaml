@@ -1,0 +1,46 @@
+id: 2026-11-01-es-v3-edge-audits
+type: run
+kind: maintenance
+date: '2026-11-01'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Bound false negatives behind the unreached-mechanics figures with a keyword sweep of technique
+  sources, and audit every affects edge label against the section 8.1 precedence rules (review E2, D4).
+method: 'Sweep (E2). Took the 11 mechanics with no affects edge and the most catalog games (top ten,
+  ties at the tenth) and wrote 132 keyword patterns for them before searching. Fetched every source a
+  live technique cites (239): arXiv HTML, else the PDF read with PDFKit, else the cited page, its Wayback
+  copy, or an author or repository copy of the same paper (Libratus, Pluribus, CICERO, UCT, MCTS survey).
+  231 read in full, 1 abstract only (Nature, paywalled), 7 not read: Browne 2010, Gudmundsson 2018 and
+  Lasry 2007 paywalled with no open copy, Liu 2025 refused (403), Sony GT Sophy 2.1 gone (404), Blackshark
+  and the Valve announcement drawn by script. Texts cached in the session scratchpad, not the repo. Read
+  all 2130 hits in context: 1374 false hits, 747 mentions, 9 missing-edge hits in AgentSociety and Concordia,
+  so llm-agent-societies gains an edge to needs-decay. Factory-agent hits on mining, power, and placement
+  were judged covered by the production-chain edge. Log in report/audits/edge-sweep.yaml. Audit (D4). Read
+  all 225 edge notes against the 8.1 order: 172 compliant as coded; corrected 15 (6 deepens to enables-new,
+  3 to explains, 4 enables-new to replaces-substrate whose notes claim no new form, 1 to cuts-authoring-cost,
+  1 to tunes); left 38. Applying the order to the letter first moved 37 labels and flipped the top effect,
+  the rarest effect and the top-exposed family, claims that voice lines repeat. Those edges share one
+  pattern (a named rule replaced by an engine that also makes the mechanic richer, coded deepens or
+  accelerates), so they are reported as a boundary for a second rater, with replaces-substrate as the
+  label ahead, not corrected. Log in report/audits/effect-audit.yaml. Changed records: 14 techniques,
+  affects edges only, run appended to reviewed; key results and their quotes were not re-checked. analyze.py
+  _edge_audits checks both files against the data and reports the stats; prose in 8.1, 8.2, 8.4, book
+  chapters 7 and 8.'
+contract_version: '1.2'
+proposals:
+- kind: rule
+  target: section 8.1 effect precedence
+  detail: 'Decide the replaces-substrate boundary. 37 edges have notes that name a rule the technique replaces
+    and also say the mechanic gets richer or cheaper; they are coded deepens or accelerates, while the written
+    order puts replaces-substrate first. Either qualify replaces-substrate (the mechanic keeps the same behavior
+    with a new engine) or relabel those edges; report/audits/effect-audit.yaml lists them with ahead: replaces-substrate.
+    An independent coder should settle it, since the rater who wrote the order also coded the edges.'
+- kind: other
+  target: report/src/02-method.md section 2.6
+  detail: 'The Coding bullet says the technique layer has had no recall audit. It now has a keyword sweep of
+    the cited sources (8.2) and a same-rater precedence audit of every effect label (8.1); neither is independent.
+    Suggested: "the technique layer has had no independent recall audit; a keyword sweep of the cited sources
+    and a same-rater audit of the effect labels are its only checks (8.1, 8.2)".'

@@ -243,3 +243,12 @@ opportunities:
   # Review E25: a validation experiment states a compute budget when it names one of these (tokens per hour, a
   # latency in ms, first-token time, VRAM, frame time, or a per-player-hour figure).
   budget_pattern: 'tokens? per|\bms\b|first token|VRAM|frame-time|player-hour'
+edge_audits:
+  # Review E2 and D4: two judgments about the affects edges that are not record fields, each a file under
+  # report/audits/ whose header states its rules and its rater. edge-sweep.yaml is a keyword sweep of every source a
+  # live technique cites for the most-used mechanics that had no edge (selection.top in the file), with a verdict on
+  # every hit; effect-audit.yaml checks every edge's label against the §8.1 precedence order and records secondary
+  # labels. analyze.py (_edge_audits) fails the build when either file names something that does not exist or no
+  # longer matches the records.
+  sweep: report/audits/edge-sweep.yaml
+  effects: report/audits/effect-audit.yaml
