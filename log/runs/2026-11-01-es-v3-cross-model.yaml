@@ -1,0 +1,13 @@
+id: 2026-11-01-es-v3-cross-model
+type: run
+kind: maintenance
+date: '2026-11-01'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: gpt-6-sol
+  harness: Codex CLI 0.164 (codex exec), driven by Claude Code
+purpose: 'Cross-model check: another model codes and rates the panel''s blind sheets; no record changes.'
+method: 'The operator approved running Codex under their ChatGPT plan. Claude Code (claude-opus-5-5) built the packet with `python scripts/panel.py packet --run 2026-11-01-es-v3-cross-model --cross-model` from the data after the v0.5 workers'' branches (prediction baselines, family sensitivity, rating noise, state classes, edge audits, prior art) were merged in a scratch branch, before two later changes: the second round of prior-art searches (one novelty score and some prior-art claims) and the relabelling of 41 effect labels by the written order, so the sheets show the texts before them; no item was left out (the model differs from every run that made or re-read an item; gpt-6.1-sol would have lost 11 items to an earlier rater''s run). Each sheet kind was filled in its own folder holding INSTRUCTIONS.md and only that kind''s files (recall with its technique reference), so no session could read a later sheet: admission, family, state, recall, effect, maturity, calibration then rubric, opportunity; four folders at a time. Each was one `codex exec` session with model gpt-6-sol, reasoning effort high, the user config ignored, plugins, apps, browser, computer use, image generation, multi-agent and hooks disabled, web search disabled, an ephemeral session, and a workspace-write sandbox rooted at the folder. The prompt said to fill the folder''s sheets in order as INSTRUCTIONS.md says, to judge every item itself and not write a program that produces answers, and to use no other directory, the network, or the web. Every shell command and file change in the event logs was then read: the sessions ran cat and sed on their own files, wrote answers as file edits, and checked YAML with one-line python or ruby parses; none opened a path outside its folder, used the network, or generated values by script (two `rg --files` listings of the folder itself matched the audit''s git pattern through a `.git` exclusion glob). Sessions took 108 to 431 seconds. The filled sheets were recorded with `panel.py record --cross-model` (298 codes, 412 ratings, and the calibration) into report/cross-model/2026-11-01-es-v3-cross-model.yaml. No record was changed. The operator, the record maker and this run share one operator, so the check measures whether another model reading the same written rules and texts reaches the same codes, not whether another person would (E035).'
+contract_version: '1.2'
+proposals: []
