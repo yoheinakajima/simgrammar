@@ -503,7 +503,9 @@ class Paper:
         # lengths in characters; header cells are bold, so they count wider
         size = lambda c, s: len(s) * (1.25 if c["head"] else 1)
         full = [max(size(r[i], r[i].get("plain", "")) for r in rows if i < len(r)) or 1 for i in range(n)]
-        word = [max((size(r[i], w) for r in rows if i < len(r) for w in re.split(r"[\s/-]+", r[i].get("plain", ""))), default=1) for i in range(n)]
+        # a short value (a rank span such as "11 to 17") stays on one line, so it counts as one word
+        words = lambda c: [c.get("plain", "")] if not c["head"] and len(c.get("plain", "")) <= 8 else re.split(r"[\s/-]+", c.get("plain", ""))  # noqa: E731
+        word = [max((size(r[i], w) for r in rows if i < len(r) for w in words(r[i])), default=1) for i in range(n)]
         # when the table must wrap, a header wraps at its words rather than widening a column of short values
         nat = [max([size(r[i], r[i].get("plain", "")) for r in rows[1:] if i < len(r)] + [word[i] if rows[0][i]["head"] else 1]) or 1 for i in range(n)]
         budget = (TEXT_W - 2 * TABLE_SEP * n) / TABLE_CH

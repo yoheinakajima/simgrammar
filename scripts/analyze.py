@@ -4014,12 +4014,14 @@ def _panel_agreement(ents, vocabs, cfg, raters, stats, tables, p: str, t: str, w
         low = {o: pri({f: lower_median([first[f][o]] + [r["ratings"][f][o] for r in raters if o in (r.get("ratings") or {}).get(f, {})])
                        for f in panel.OPP_SCALES}) for o in opps}
 
-        def ranks(d):
-            order = sorted(d, key=lambda o: (-round(d[o], 9), o))
-            return {o: k + 1 for k, o in enumerate(order)}
-        r1, rs, r2, rl = ranks(orig), ranks(stored), ranks(sec), ranks(low)
+        def places(d):   # the first and last place an opportunity shares with every other at its priority: ties count, never break by id (E31)
+            v = {o: round(d[o], 9) for o in d}
+            return {o: (1 + sum(x > v[o] for x in v.values()), sum(x >= v[o] for x in v.values())) for o in d}
+        span = lambda pl: str(pl[0]) if pl[0] == pl[1] else f"{pl[0]} to {pl[1]}"  # noqa: E731
+        p1, ps, p2, pl_ = places(orig), places(stored), places(sec), places(low)
+        r1, rs, r2, rl = ({o: v[0] for o, v in d.items()} for d in (p1, ps, p2, pl_))
         n_top = int(pc.get("top_n", 15))
-        top = lambda rk: {o for o, k in rk.items() if k <= n_top}  # noqa: E731
+        top = lambda rk: {o for o, k in rk.items() if k <= n_top}  # noqa: E731   # in the top n, or tied into it
         x, y, z = (np.array([d[o] for o in opps]) for d in (orig, sec, low))
         Wo = _xm_weights(len(opps), [list(range(len(opps)))], rng(stream("opportunity:priority")), n_boot).astype(int)
         draws = np.array([np.repeat(np.arange(len(opps)), wv) for wv in Wo])
@@ -4031,20 +4033,28 @@ def _panel_agreement(ents, vocabs, cfg, raters, stats, tables, p: str, t: str, w
         stats[f"{p}rho_priority_lower_median"] = _r(_spearman(x, z), 2)
         stats[f"{p}n_top_overlap"] = len(top(r1) & top(r2))
         stats[f"{p}n_top_overlap_lower_median"] = len(top(r1) & top(rl))
-        stats[f"{p}top_opportunity_second"] = min(r2, key=r2.get)
-        stats[f"{p}top_opportunity_lower_median"] = min(rl, key=rl.get)
-        top1 = min(r1, key=r1.get)   # where the second and combined readings put the original rater's first opportunity
-        stats[f"{p}rank_second_top_opportunity"], stats[f"{p}rank_lower_median_top_opportunity"] = r2[top1], rl[top1]
+        stats[f"{p}top_opportunity_second"] = min(sorted(r2), key=r2.get)
+        stats[f"{p}top_opportunity_lower_median"] = min(sorted(rl), key=rl.get)
+        top1 = min(sorted(r1), key=r1.get)   # where the second and combined readings put the original rater's first opportunity
+        for k, pl in (("second", p2), ("lower_median", pl_)):
+            stats[f"{p}rank_{k}_top_opportunity"], stats[f"{p}rank_{k}_top_opportunity_last"] = pl[top1]
+            stats[f"{p}n_tied_with_{k}_top_opportunity"] = pl[top1][1] - pl[top1][0]   # the others it shares those places with
+        cols = ["opportunity", "first_priority", "first_rank", "second_priority", "second_rank", "lower_median_priority", "lower_median_rank"]
+        if ps != p1:
+            cols.insert(1, "stored_rank")
         tables[f"{t}-opportunity-ranking"] = {
             "description": f"The opportunity ranking of §9.1 under three readings of the scores: first (the original rater's, which stays the stored "
                            f"ranking until a second rating is recorded in the record), second ({who}'s alone), and lower median (the original score and "
-                           "every second reading combined as a field with ratings stores them); stored rank is the rank §9.1 shows. Priority is the "
-                           "weighted geometric mean of vocab/rubrics.yaml; ranks break ties by id. " +
+                           "every second reading combined as a field with ratings stores them)" +
+                           ("; stored rank is the place §9.1 shows. " if ps != p1 else ", in the order of §9.1. ") +
+                           "Priority is the weighted geometric mean of vocab/rubrics.yaml, and a rank shared by tied opportunities shows the places they "
+                           "share. " +
                            ("The lower-median ranking is a sensitivity reading from a cross-model check by the records' own operator, never the stored "
                             "ranking: no record changes." if p == "xm_" else "Once these ratings are in the records, the lower-median ranking is the stored one."),
-            "columns": ["opportunity", "stored_rank", "first_priority", "first_rank", "second_priority", "second_rank", "lower_median_priority", "lower_median_rank"],
-            "rows": [{"opportunity": o, "stored_rank": rs[o], "first_priority": _r(orig[o], 2), "first_rank": r1[o], "second_priority": _r(sec[o], 2),
-                      "second_rank": r2[o], "lower_median_priority": _r(low[o], 2), "lower_median_rank": rl[o]} for o in sorted(opps, key=lambda o: r1[o])],
+            "columns": cols,
+            "rows": [{c: v for c, v in {"opportunity": o, "stored_rank": span(ps[o]), "first_priority": _r(orig[o], 2), "first_rank": span(p1[o]),
+                                        "second_priority": _r(sec[o], 2), "second_rank": span(p2[o]), "lower_median_priority": _r(low[o], 2),
+                                        "lower_median_rank": span(pl_[o])}.items() if c in cols} for o in sorted(opps, key=lambda o: (rs[o], o))],
             "link_columns": ["opportunity"]}
 
 
@@ -4085,6 +4095,15 @@ def _cross_model(ents, vocabs, cfg, stats, tables):
             stats["xm_n_effect_sample_relabelled"] = len(changed)
             stats["xm_n_effect_relabelled_as_second"] = sum(1 for i, v in changed if v[0] == now[i])   # the second reading already had the new label
             stats["xm_pct_effect_relabelled_as_second"] = round(100 * stats["xm_n_effect_relabelled_as_second"] / len(changed)) if changed else 0
+        # §9.1's table shows, beside the stored order, the places each opportunity shares on the cross-model reader's scores (E31)
+        xr = {r["opportunity"]: r["second_rank"] for r in (tables.get("cross-model-opportunity-ranking") or {}).get("rows") or []}
+        ranked = tables.get("opportunities-ranked")
+        if xr and ranked:
+            for r in ranked["rows"]:
+                r["cross_model_rank"] = xr.get(r["opportunity"])
+            ranked["columns"].append("cross_model_rank")
+            ranked["description"] += (" Cross-model rank: the places the opportunity shares on a second model's blind scores, a check across models by "
+                                      "the records' own operator and not a second rating, so the order stays the stored one.")
 
 
 def _panel_independent(ents, vocabs, cfg, stats, tables):
