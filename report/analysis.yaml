@@ -221,6 +221,24 @@ exposure:
   economic_core: [resources-production, logistics-networks]
   economic_core_min_rank: 16
   top_families: 4             # §8.2 names the top four families by summed exposure
+family_sensitivity:
+  # Review D3: a mechanic's family is one rater's assignment (§2.1, §2.6), and the §5.5 white-space screen and the
+  # §8.2 family ranks depend on it, most in the families of four to six mechanics. These checks add no judgment
+  # (analyze.py, _family_sensitivity). Each mechanic's runner-up family is computed from the records: by wording (the
+  # other family whose mechanics' name, aliases, summary, and definition are most alike in tf-idf cosine) and by use
+  # (the other family whose mechanics share the most games with it). A mechanic is on a boundary when its wording is at
+  # least as close to its runner-up as to its own family, and on a named boundary when its family or its runner-up is
+  # one of the families below, the ones the review names. No runner-up was named by hand.
+  boundary_families: [resources-production, economy-finance, agents-behavior, social-relations, control-automation]
+  # A boundary mechanic's wording does not tell its two families apart, so each draw moves it to its wording runner-up
+  # on a fair coin: the most uncertain a two-way choice can be. Fixed before the draws were looked at.
+  move_probability: 0.5
+  draws: 1000
+  seed: 20261101
+  # Percentile bootstrap over the mechanics within each family (exposure per mechanic in §8.2, the ceilings figure in §6)
+  bootstrap: 2000
+  interval: 0.95
+  small_family: 6   # the review's families of four to six mechanics; §6 counts the figure's marks in families this size or smaller
 perturbation:
   # Rater noise (review E22): each draw moves every ordinal input (a technique's maturity level, a mechanic's AI
   # leverage, an opportunity's impact, feasibility, and novelty) by -1, 0, or +1 anchor with equal chance, clipped to
