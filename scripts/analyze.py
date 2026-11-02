@@ -2072,6 +2072,10 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
                        "Counts per anchor pair are in rater-confusion.csv.",
         "columns": ["field", "scores", "pairs", "exact", "within_one", "kappa", "alpha", "alpha_low", "alpha_high", "rank_rho", "shift", "calibration_alpha"],
         "rows": [{**r, "calibration_alpha": r.get("calibration_alpha")} for r in agree_rows]}
+    # what the doubly rated mechanics can say (review D8, §5.6 and §2.6): how many a reliable alpha would need, how random
+    # rating noise at the observed agreement moves the score correlations, and which families the rated mechanics come from
+    _rating_noise(mechs, by_id, {r["field"]: r["alpha"] for r in agree_rows if (rub["scales"].get(r["field"]) or {}).get("applies_to") == "mechanic"},
+                  score_pairs, sorted(rated_mechs), set((cal or {}).get("mechanics") or {}), rub, cfg, n_boot, q_lo, q_hi, stats, tables)
 
     # ---------------- second coder: agreement on family, admission, and effect codes (review D3, D4, D6; _second_coding)
     _second_coding(ents, vocabs, cfg, stats, tables)
@@ -2356,6 +2360,265 @@ def _kappa_quadratic(a, b, K: int) -> float:
     w = (np.subtract.outer(np.arange(K), np.arange(K)) ** 2).astype(float)
     de = float((w * E).sum())
     return 1 - float((w * O).sum()) / de if de else float("nan")
+
+
+# ---------------- rating noise (review D8): sample size for a reliable alpha, and how random noise moves the correlations
+
+def _anchor_pairs(K: int) -> list[tuple[int, int]]:
+    """The unordered pairs of anchors (0-based, lower first) that two ratings of one record can take on a 1..K scale."""
+    return [(i, j) for i in range(K) for j in range(i, K)]
+
+
+def _alpha_two(X, K: int) -> np.ndarray:
+    """Ordinal alpha, as _alpha_ordinal computes it, for records with two ratings each, from counts X (..., T) of records
+    per unordered anchor pair (in _anchor_pairs order). It works on stacks of resamples without forming their coincidence
+    matrices: with two ratings a record, alpha = 1 - (N - 1) * (sum over records of d(pair)^2) / (sum over anchors c < k
+    of n_c n_k d(c, k)^2), for N ratings, n_c of them at anchor c, and d the distance between the anchors' mid-ranks
+    (the ratings below an anchor plus half of its own). nan where every rating sits on one anchor."""
+    pairs = _anchor_pairs(K)
+    M = np.zeros((len(pairs), K))
+    for t, (i, j) in enumerate(pairs):
+        M[t, i] += 1
+        M[t, j] += 1
+    X = np.asarray(X, float)
+    nc = X @ M
+    mid = np.cumsum(nc, -1) - nc / 2
+    num, den = np.zeros(X.shape[:-1]), np.zeros(X.shape[:-1])
+    for t, (i, j) in enumerate(pairs):
+        if i < j:
+            d2 = (mid[..., j] - mid[..., i]) ** 2
+            num += X[..., t] * d2
+            den += nc[..., i] * nc[..., j] * d2
+    a = np.full(den.shape, np.nan)
+    ok = den > 0
+    a[ok] = 1 - (nc.sum(-1)[ok] - 1) * num[ok] / den[ok]
+    return a
+
+
+_GAUSS_LEGENDRE = np.polynomial.legendre.leggauss(64)  # quadrature nodes and weights on (-1, 1) for _latent_joint
+
+
+def _latent_joint(cum, rho: float) -> np.ndarray:
+    """Joint distribution (K x K) of two readings of one record on a 1..K scale. Each reading is a standard normal latent
+    value cut at the cumulative shares `cum` of a scale's stored scores, so each has the stored distribution, and the two
+    latent values correlate rho. For each anchor of the first reading, Gauss-Legendre quadrature over its latent values
+    of the second reading's conditional anchor probabilities: deterministic, no sampling."""
+    from scipy.special import ndtr, ndtri  # local import: only the rating-noise models need normal quantiles
+    K = len(cum)
+    lo = np.concatenate([[0.0], cum[:-1]])
+    t = ndtri(cum)  # the anchors' upper thresholds in latent units; +inf for the top anchor
+    s = math.sqrt(max(1.0 - rho * rho, 1e-12))
+    x, w = _GAUSS_LEGENDRE
+    P = np.zeros((K, K))
+    for k in range(K):
+        if cum[k] > lo[k]:
+            z = ndtri(lo[k] + (cum[k] - lo[k]) * (x + 1) / 2)
+            F = np.concatenate([np.zeros((len(z), 1)), ndtr((t[None, :] - rho * z[:, None]) / s)], 1)
+            P[k] = (w[:, None] * np.diff(F, axis=1)).sum(0) * (cum[k] - lo[k]) / 2
+    return P
+
+
+def _latent_rho(cum, alpha: float) -> float:
+    """The latent correlation at which two readings (_latent_joint) of a scale with cumulative shares `cum` have population
+    ordinal alpha `alpha` (the coincidence matrix of the joint distribution, scaled up so that alpha's n - 1 is n). Alpha
+    rises with the correlation, from 0 for unrelated readings to 1 for identical ones, so bisection finds it; alpha at or
+    below 0 gives unrelated readings."""
+    if alpha <= 0:
+        return 0.0
+    lo, hi = 0.0, 1.0
+    for _ in range(40):
+        mid = (lo + hi) / 2
+        P = _latent_joint(cum, mid)
+        lo, hi = (mid, hi) if _alpha_ordinal((P + P.T) * 1e9) < alpha else (lo, mid)
+    return (lo + hi) / 2
+
+
+def _rating_noise(mechs, by_id, alphas, score_pairs, rated, cal_ids, rub, cfg, n_boot, q_lo, q_hi, stats, tables):
+    """Review finding D8: what the doubly rated mechanics can and cannot say about the score correlations of §5.6, with
+    no new rater. report/analysis.yaml `rating_noise` states the model and its parameters. Three parts:
+      - sample size: per scale, the fewest doubly rated mechanics at which the paper's bootstrap interval for ordinal alpha
+        clears a lower bound in a given share of simulated samples, if the raters' true agreement were a given alpha;
+      - perturbation: the correlations of score-correlations recomputed on stored scores redrawn with random noise at the
+        observed agreement, beside Spearman's correction for attenuation with alpha as each scale's reliability;
+      - selection: the rated mechanics' families against the live vocabulary's and the calibration set's, and how widely
+        their stored scores spread against the vocabulary's, since for the same disagreements alpha is lower when the
+        ratings crowd onto few anchors."""
+    from scipy.special import ndtr, ndtri  # local import: only the rating-noise models need normal quantiles
+    rn = cfg.get("rating_noise") or {}
+    seed = int(rn.get("seed", 20261101))
+    fields = [f for f in CALIBRATION_SCALES if alphas.get(f) is not None and all(isinstance(m.data.get(f), int) for m in mechs)]
+    if len(mechs) < 10 or len(fields) < 2 or not rated:
+        return
+    lab = lambda f: f.replace("_", " ").replace("ai leverage", "AI leverage")  # noqa: E731
+    K = {f: max(int(x) for x in rub["scales"][f]["levels"]) for f in fields}
+    sc = {f: np.array([m.data[f] for m in mechs]) for f in fields}
+    cum = {}
+    for f in fields:
+        cum[f] = np.cumsum(np.bincount(sc[f] - 1, minlength=K[f])) / len(mechs)
+        cum[f][-1] = 1.0
+    lo_c = {f: np.concatenate([[0.0], cum[f][:-1]]) for f in fields}
+    pidx = {}
+    for f in fields:
+        pidx[f] = np.zeros((K[f], K[f]), int)
+        for t, (i, j) in enumerate(_anchor_pairs(K[f])):
+            pidx[f][i, j] = pidx[f][j, i] = t
+    a_min, a_max = min(alphas[f] for f in fields), max(alphas[f] for f in fields)
+
+    # sample size. Each simulated sample draws n mechanics' latent pairs, cuts them into two raters' anchors, and takes the
+    # paper's interval: n_boot resamples of the n records with replacement (one set of resampling weights for every sample
+    # of one n, drawn once), alpha on each, the q_lo percentile of those with an alpha. Resampling records that carry two
+    # ratings each is resampling their anchor pairs, so a resample is the weights times the samples' pair indicators.
+    ss = rn.get("sample_size") or {}
+    bound, share, S = float(ss.get("lower_bound", 0.67)), float(ss.get("share", 0.8)), int(ss.get("simulations", 200))
+    grid = sorted(int(n) for n in ss.get("grid", [10, 20, 40, 80, 160, 320]))
+    levels = [("best", a_max) if a == "observed_max" else (f"a{round(100 * float(a))}", float(a)) for a in ss.get("true_alpha", ["observed_max"])]
+    draws = {}
+
+    def draw(n):
+        if n not in draws:
+            g = np.random.default_rng([seed, n])
+            pick = g.integers(0, n, (n_boot, n)) + n * np.arange(n_boot)[:, None]
+            draws[n] = (g.standard_normal((S, n, 2)), np.bincount(pick.ravel(), minlength=n_boot * n).reshape(n_boot, n).astype(float))
+        return draws[n]
+
+    rhos = {}
+
+    def rho_at(f, a):  # the latent correlation for scale f at alpha a, solved once
+        if (f, a) not in rhos:
+            rhos[f, a] = _latent_rho(cum[f], a)
+        return rhos[f, a]
+
+    need = {}
+    for f in fields:
+        start, T = 0, len(_anchor_pairs(K[f]))
+        # from the highest level down, each scan starts at the n the level above needed: less agreement never needs fewer
+        for key, val in sorted(levels, key=lambda kv: -kv[1]):
+            need[f, key] = None
+            if val > bound:
+                rho = rho_at(f, val)
+                for i in range(start, len(grid)):
+                    z, W = draw(grid[i])
+                    r1 = np.minimum(np.searchsorted(cum[f], ndtr(z[..., 0]), side="right"), K[f] - 1)
+                    r2 = np.minimum(np.searchsorted(cum[f], ndtr(rho * z[..., 0] + math.sqrt(1 - rho * rho) * z[..., 1]), side="right"), K[f] - 1)
+                    onehot = (pidx[f][r1, r2][..., None] == np.arange(T)).astype(float)
+                    ba = _alpha_two(np.matmul(W, onehot), K[f])
+                    low = np.nanpercentile(ba, q_lo, axis=1) if np.isnan(ba).any() else np.percentile(ba, q_lo, axis=1)
+                    if np.mean(low > bound) >= share:
+                        need[f, key], start = grid[i], i
+                        break
+            if need[f, key] is None:
+                start = len(grid)
+            stats[f"n_alpha_sample_{f}_{key}"] = need[f, key]
+    for key, val in levels:
+        reached = [need[f, key] for f in fields if need[f, key] is not None]
+        stats[f"alpha_sample_level_{key}"] = _r(val, 2)
+        stats[f"n_alpha_sample_min_{key}"] = min(reached) if reached else None
+        stats[f"n_alpha_sample_max_{key}"] = max(reached) if reached else None
+        stats[f"n_scales_alpha_sample_unreached_{key}"] = len(fields) - len(reached)
+    stats["alpha_sample_lower_bound"], stats["pct_alpha_sample_share"] = bound, round(100 * share)
+    stats["n_alpha_sample_simulations"], stats["n_alpha_sample_grid_max"] = S, max(grid)
+    stats["n_scales_alpha_below_bound"] = sum(1 for f in fields if alphas[f] <= bound)
+    cols = {key: f"n_at_{val:.2f}" for key, val in levels}
+    tables["rating-sample-size"] = {
+        "description": f"How many doubly rated mechanics a scale's ordinal alpha needs before the lower bound of its {round(q_hi - q_lo)}% bootstrap interval "
+                       f"clears {bound:g}, by simulation (report/analysis.yaml rating_noise). n at a is the smallest n in the grid ({', '.join(str(n) for n in grid)}; "
+                       "each level's scan starts at the n the next higher level needs) "
+                       f"at which at least {round(100 * share)}% of {S} simulated samples clear it, if two raters' true agreement on the scale were alpha a; the "
+                       f"simulated ratings follow the scale's stored distribution over the live mechanics, and each sample takes the paper's interval ({n_boot} "
+                       "resamples). Blank where no n in the grid clears. Alpha is the scale's observed agreement on the doubly rated mechanics; were a scale's true "
+                       f"alpha {bound:g} or less, no n would clear.",
+        "columns": ["scale", "alpha"] + [cols[k] for k, _ in levels],
+        "rows": [{"scale": lab(f), "alpha": alphas[f], **{cols[k]: need[f, k] for k, _ in levels}} for f in fields]}
+
+    # perturbation. Each replicate redraws each stored score as a second reading: a latent value drawn uniformly within the
+    # stored anchor's latent interval (so it is a standard normal given the anchor), mixed with fresh noise at the latent
+    # correlation that gives the level's alpha against the stored scores, and cut again; then every correlation is
+    # recomputed. Spearman's correction divides the stored correlation by the root of the two scales' alphas, capped at 1.
+    pt = rn.get("perturbation") or {}
+    R, n = int(pt.get("replicates", 1000)), len(mechs)
+    g = np.random.default_rng([seed, 0])
+    U, E = g.random((len(fields), R, n)), g.standard_normal((len(fields), R, n))
+    Z = {f: ndtri(np.clip(lo_c[f][sc[f] - 1] + (cum[f][sc[f] - 1] - lo_c[f][sc[f] - 1]) * U[i], 1e-12, 1 - 1e-12)) for i, f in enumerate(fields)}
+    plevels = list(pt.get("levels", ["min", "own", "max"]))
+    pert, lv, gaps = {}, {}, []
+    for level in plevels:
+        lv[level] = {f: a_min if level == "min" else a_max if level == "max" else alphas[f] for f in fields}
+        for i, f in enumerate(fields):
+            rho = rho_at(f, lv[level][f])
+            p = np.minimum(np.searchsorted(cum[f], ndtr(rho * Z[f] + math.sqrt(1 - rho * rho) * E[i]), side="right"), K[f] - 1) + 1
+            pert[level, f] = p.astype(float)
+            # the redrawn scores' alpha against the stored scores, averaged over replicates, should be the level's alpha
+            T = len(_anchor_pairs(K[f]))
+            X = np.bincount((pidx[f][sc[f] - 1, p - 1] + T * np.arange(R)[:, None]).ravel(), minlength=R * T).reshape(R, T)
+            gaps.append(abs(float(np.nanmean(_alpha_two(X, K[f]))) - max(lv[level][f], 0.0)))
+    stats["max_rating_noise_alpha_gap"] = _r(max(gaps), 3)
+    noise_rows = []
+    for a, b in score_pairs:
+        if a not in fields or b not in fields or stats.get(f"rho_{a}_{b}") is None:
+            continue
+        rho0 = _spearman(sc[a], sc[b])
+        for level in plevels:
+            rr = _spearman_rows(pert[level, a], pert[level, b])
+            la, lb = lv[level][a], lv[level][b]
+            corr = max(-1.0, min(1.0, rho0 / math.sqrt(la * lb))) if la > 0 and lb > 0 else None
+            r2 = lambda v: None if _r(v, 2) is None else _r(v, 2) + 0.0  # noqa: E731  (no negative zero in the table)
+            row = {"pair": f"{lab(a)} × {lab(b)}", "level": level, "alpha_x": _r(la, 2), "alpha_y": _r(lb, 2), "rho": stats[f"rho_{a}_{b}"],
+                   "median": r2(np.nanmedian(rr)), "low": r2(np.nanpercentile(rr, q_lo)), "high": r2(np.nanpercentile(rr, q_hi)), "corrected": r2(corr)}
+            for k in ("median", "low", "high", "corrected"):
+                stats[f"rho_{a}_{b}_noise_{level}_{k}"] = row[k]
+            noise_rows.append(row)
+    for level in plevels:
+        rs = [r for r in noise_rows if r["level"] == level]
+        stats[f"n_pairs_noise_{level}_excl_zero"] = sum(1 for r in rs if r["low"] is not None and (r["low"] > 0 or r["high"] < 0))
+        stats[f"n_pairs_noise_{level}_capped"] = sum(1 for r in rs if r["corrected"] is not None and abs(r["corrected"]) >= 1)
+    stats["n_pairs_noise"], stats["n_rating_noise_replicates"] = len({r["pair"] for r in noise_rows}), R
+    tables["rating-noise"] = {
+        "description": f"The score correlations of score-correlations (rho, on the stored scores) under random rating noise, and corrected for it. Each of "
+                       f"{R} replicates redraws every stored score as a second reading whose ordinal alpha against the stored score is the level's, independently "
+                       "across scales and mechanics, and recomputes the correlation (report/analysis.yaml rating_noise). Level min gives every scale the lowest "
+                       "alpha observed on the doubly rated mechanics, max the highest, and own each scale its own; alpha x and alpha y are the pair's two scales'. "
+                       f"Median, low, and high are the median and the {round(q_hi - q_lo)}% range of the recomputed correlations. Corrected is Spearman's "
+                       "correction for attenuation, rho divided by the root of alpha x times alpha y, capped at 1 in size. Random noise moves a correlation "
+                       "toward zero and the correction moves it away; neither models errors shared between the two scales or a rater who reads a scale "
+                       "one anchor higher.",
+        "columns": ["pair", "level", "alpha_x", "alpha_y", "rho", "median", "low", "high", "corrected"], "rows": noise_rows}
+
+    # selection: whose agreement the doubly rated mechanics measure. Total variation is the share of the rated mechanics
+    # that would have to change family for their family shares to equal the vocabulary's; as a yardstick for a sample this
+    # small, its median over seeded random draws of as many live mechanics.
+    fam = Counter(m.data["family"] for m in mechs)
+    rf = Counter(by_id[x].data["family"] for x in rated)
+    cf = Counter(m.data["family"] for m in mechs if m.id in cal_ids)
+    nr, nm = len(rated), len(mechs)
+    order = sorted(fam, key=lambda f: (-fam[f], f))
+    tables["rated-families"] = {
+        "description": "Mechanic families of the live vocabulary (mechanics, and pct of them), of the mechanics with independent second ratings (rated, "
+                       "and pct rated of them), and of the calibration set (calibration). The rated mechanics are the first task batch, in alphabetical order "
+                       "of id outside the calibration set (§2.6).",
+        "columns": ["family", "mechanics", "pct", "rated", "pct_rated", "calibration"],
+        "rows": [{"family": f, "mechanics": fam[f], "pct": round(100 * fam[f] / nm), "rated": rf.get(f, 0), "pct_rated": round(100 * rf.get(f, 0) / nr),
+                  "calibration": cf.get(f, 0)} for f in order]}
+    tv = lambda cnt, k: 0.5 * sum(abs(cnt.get(f, 0) / k - fam[f] / nm) for f in fam)  # noqa: E731
+    fams = np.array([m.data["family"] for m in mechs])
+    g = np.random.default_rng([seed, 1])
+    rand_tv = [tv(Counter(fams[g.permutation(nm)[:nr]].tolist()), nr) for _ in range(int((rn.get("selection") or {}).get("draws", 2000)))]
+    stats["pct_family_departure_rated"] = round(100 * tv(rf, nr))
+    stats["pct_family_departure_random_median"] = round(100 * float(np.median(rand_tv)))
+    stats["n_rated_families"], stats["n_live_families"] = len(rf), len(fam)
+    for f in order:
+        stats[f"n_rated_family_{f.replace('-', '_')}"] = rf.get(f, 0)
+        stats[f"pct_family_{f.replace('-', '_')}"] = round(100 * fam[f] / nm)
+        stats[f"pct_rated_family_{f.replace('-', '_')}"] = round(100 * rf.get(f, 0) / nr)
+    sd_ratio = {}
+    for f in fields:
+        rs = np.array([by_id[x].data[f] for x in rated], float)
+        sd_ratio[f] = float(rs.std() / sc[f].std()) if sc[f].std() > 0 else None
+        stats[f"sd_ratio_rated_{f}"] = _r(sd_ratio[f], 2)
+        stats[f"pct_sd_rated_{f}"] = round(100 * sd_ratio[f]) if sd_ratio[f] is not None else None
+        stats[f"n_rated_anchors_{f}"], stats[f"n_anchors_{f}"] = len(set(rs.tolist())), len(set(sc[f].tolist()))
+    ok = [f for f in fields if sd_ratio[f] is not None]
+    if ok:
+        stats["sd_ratio_rated_min"] = _r(min(sd_ratio[f] for f in ok), 2)
 
 
 def _contingency(a, b):

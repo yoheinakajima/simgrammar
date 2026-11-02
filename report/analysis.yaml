@@ -126,6 +126,42 @@ rubric_scores:
   bootstrap: 2000
   seed: 20261031
   interval: 0.95
+rating_noise:
+  # Review finding D8: what the doubly rated mechanics can and cannot say about the score correlations (§5.6, §2.6),
+  # without a new rater. Both simulations model a rating as a standard normal latent value cut at the stored scores'
+  # cumulative shares, so every simulated rating has the stored distribution of its scale over the live mechanics,
+  # and two ratings of one mechanic are two such readings whose latent values correlate; that correlation is solved
+  # from the population ordinal alpha the readings should have. No reading is shifted against the other, so a rater who
+  # reads a scale one anchor higher (as the second rater does on two scales) is not modelled: every disagreement is
+  # random. Bootstrap resamples and the interval are rubric_scores', the paper's own for rater agreement.
+  seed: 20261101
+  sample_size:
+    # How many doubly rated mechanics the bootstrap interval of a scale's ordinal alpha needs before its lower bound clears
+    # lower_bound, for raters whose population agreement is each of true_alpha (observed_max: the best observed
+    # scale's alpha; then two higher levels). Per scale and level, `simulations` samples of each n in `grid`, each
+    # with the paper's bootstrap (the same resampling weights for every sample of one n); reported is the smallest n
+    # at which at least `share` of the samples clear. Levels are scanned from the highest down, each from the n the
+    # level above needed, since less agreement never needs fewer mechanics. A level at or below lower_bound never
+    # clears at any n, since the interval narrows around the true value, so none is simulated. Random streams are
+    # seeded by (seed, n) for the samples of n, (seed, 0) for the perturbation, and (seed, 1) for the random family
+    # draws, so changing the grid does not move the draws of the other n.
+    lower_bound: 0.67
+    share: 0.8
+    simulations: 200
+    true_alpha: [observed_max, 0.85, 0.9]
+    grid: [10, 20, 30, 40, 50, 60, 80, 100, 120, 150, 200, 250, 300, 400]
+  perturbation:
+    # How random rating noise moves the full-sample correlations: each replicate redraws every stored score as a
+    # second reading with population alpha against the stored score (min and max: the lowest and highest observed
+    # scale alpha for every scale; own: each scale at its own observed alpha), independently across scales and
+    # mechanics, and recomputes the five correlations of score-correlations. The same draws serve every level.
+    replicates: 1000
+    levels: [min, own, max]
+  selection:
+    # The doubly rated mechanics' families against the vocabulary's (rated-families). Their total variation distance
+    # from the vocabulary's family shares is read against its median over `draws` seeded random draws of as many live
+    # mechanics, since a sample this small cannot match the shares of every family.
+    draws: 2000
 second_coding:
   # Review findings D3, D6, D4: each mechanic's family, its admission, and each affects edge's effect type were coded
   # by the run that created the record, so agreement on them is unmeasured (§2.6). A second coder, independent of
