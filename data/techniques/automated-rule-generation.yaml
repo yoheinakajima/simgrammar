@@ -70,7 +70,7 @@ risks:
 - labor
 affects:
 - id: policy-toggles
-  effect: enables-new
+  effect: cuts-authoring-cost
   note: Candidate policies can be written as rule code in the game's own description language and screened
     by agent playouts for dominance and balance, so a policy list can be grown by search rather than authored
     one law at a time.
@@ -113,3 +113,4 @@ provenance:
   created: 2026-10-24-techniques-rl-design
   reviewed:
   - 2026-10-25-source-claims-pilot
+  - 2026-11-01-es-v3-edge-audits

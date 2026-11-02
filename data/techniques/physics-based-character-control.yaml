@@ -59,7 +59,7 @@ affects:
   note: Characters join the rigid-body simulation as actuated bodies, so carried, pushed, and collided
     objects affect them and vice versa (InterMimic human-object interaction).
 - id: injury-body-model
-  effect: enables-new
+  effect: replaces-substrate
   note: With a simulated body, a wound could change gait by limiting joint torque instead of swapping
     in an authored limp; the cited work does not demonstrate injury-conditioned motion, so this remains
     a projection.
@@ -77,3 +77,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-world-models
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

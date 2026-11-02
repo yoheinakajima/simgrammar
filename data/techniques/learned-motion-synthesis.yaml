@@ -56,7 +56,7 @@ affects:
   note: Motion-matching-quality responsive locomotion fits in a few MB of weights, making it affordable
     on memory-constrained platforms and for more character types.
 - id: generative-content
-  effect: deepens
+  effect: enables-new
   note: Players author new character motions from their own video (inZOI), so the animation set available
     to life-sim characters is no longer fixed by the studio's mocap library.
 deployed_in:
@@ -75,3 +75,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-world-models
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

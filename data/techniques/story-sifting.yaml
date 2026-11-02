@@ -98,7 +98,7 @@ risks:
 - legibility
 affects:
 - id: history-chronicle
-  effect: deepens
+  effect: explains
   note: The chronicle stores causal links with every event, and sifting patterns retrieve whole storylines
     from it (a revenge arc, a rise and fall) instead of leaving the player to browse records one at a
     time.
@@ -115,7 +115,7 @@ affects:
   note: Reactions and multi-phase plans are recorded with their causes, so any chain can be traced and
     named after the fact rather than only authored in advance.
 - id: storyteller-director
-  effect: deepens
+  effect: enables-new
   note: Policies that a director would use to steer events toward an arc can instead select and frame
     storylines that already happened, leaving the simulation unsteered.
 builds_on: []
@@ -137,3 +137,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-28-story-sifting
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

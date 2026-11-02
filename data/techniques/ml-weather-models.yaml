@@ -71,7 +71,7 @@ affects:
   note: Ensembles (50 GenCast members) give calibrated probabilities, so an in-game forecast can carry
     real uncertainty that players plan against and that occasionally misses honestly.
 - id: random-disasters
-  effect: deepens
+  effect: enables-new
   note: Storms emerge from atmospheric state with forecastable tracks (Aurora beat operational centres
     on 5-day cyclone tracks), turning disasters from dice rolls into threats with lead time.
 - id: pollution-spread
@@ -106,3 +106,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-sim-math
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

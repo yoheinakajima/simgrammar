@@ -1765,6 +1765,9 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         stats["n_effect_explains_top_technique"] = ex_rows[0]["edges"]
         stats["explains_top_technique"] = ex_rows[0]["technique"]
 
+    # ---------------- edge audits: a keyword sweep for missing edges and a precedence audit of every label (review E2, D4)
+    _edge_audits(cfg, vocabs, mechs, techs, by_id, derived, stats, tables)
+
     # ---------------- opportunities ranked
     orows = sorted(({"opportunity": o.id, "type": o.data["opportunity_type"], "priority": derived[o.id]["priority"], "impact": o.data["impact"],
                      "feasibility": o.data["feasibility"], "novelty": o.data["novelty"], "horizon": o.data["horizon"]} for o in opps),
@@ -2649,6 +2652,246 @@ def _second_coding(ents, vocabs, cfg, stats, tables):
             "description": "The four admission tests as the second coder applied them: on the sampled mechanics the vocabulary admits, how many "
                            "codes pass each test, and the same on the candidates it left as proposals.",
             "columns": ["test", "admitted", "admitted_pass", "candidates", "candidates_pass"], "rows": test_rows}
+
+
+def _edge_audits(cfg, vocabs, mechs, techs, by_id, derived, stats, tables):
+    """Two judgments about the affects edges that are not record fields, kept under report/audits/ (report/analysis.yaml
+    edge_audits) and checked against the data here, so the files cannot fall out of step with the records.
+
+    edge-sweep.yaml is a keyword sweep of every source a live technique cites, for the most-used mechanics that had no
+    edge, with a verdict on each hit. It bounds false negatives behind the unreached figures of §8.2: it can only find
+    an edge a cited source states, and only where a keyword appears. effect-audit.yaml checks every edge's label against
+    the §8.1 precedence order and records any secondary label the note also supports. The same rater wrote the edges,
+    the rules, and both files, so the audit tests consistency with the written rules, not agreement (§11.1).
+
+    The build fails on a name that does not resolve, an edge with no audit entry or an entry for no edge, an entry whose
+    label differs from the record's, a missing-edge verdict whose technique lacks the edge or does not cite the source,
+    and counts that disagree with the hits. Whether the swept mechanics are still the most-used unreached ones, and
+    whether every cited source was searched, are stats the paper asserts, so a later data change fails there."""
+    import yaml  # local import, as _second_coding does: the sweep log is large, so the C loader reads it when present
+    ea = cfg.get("edge_audits") or {}
+    load = lambda p: yaml.load((ROOT / p).read_text(encoding="utf-8"), Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))  # noqa: E731
+    sweep, audit = load(ea.get("sweep", "report/audits/edge-sweep.yaml")), load(ea.get("effects", "report/audits/effect-audit.yaml"))
+    mech_ids = {m.id for m in mechs}
+    tech = {t.id: t for t in techs}
+    eff_terms = vocab_terms(vocabs, "effect")
+    edges = {(t.id, a["id"]): a["effect"] for t in techs for a in t.data.get("affects", [])}
+
+    def cited(t):  # every source a technique record cites: its list, its key results, its claims
+        d = t.data
+        out = set(d.get("sources") or [])
+        for c in (d.get("key_results") or []) + (d.get("claims") or []):
+            out |= set(c.get("sources") or [])
+        return out
+
+    def known(kind, ids, where):
+        pool = {"mechanic": mech_ids, "technique": set(tech), "source": {i for i, e in by_id.items() if e.type == "source"}}[kind]
+        bad = sorted(set(ids) - pool)
+        if bad:
+            raise ValueError(f"{where} names unknown or deprecated {kind}(s): {', '.join(bad)}")
+
+    # ---- the keyword sweep
+    sp = "report/audits/edge-sweep.yaml"
+    sel = sweep.get("selection") or {}
+    swept = list(sel.get("mechanics") or [])
+    known("mechanic", swept + list(sweep.get("keywords") or {}) + [h["mechanic"] for h in sweep.get("hits") or []], sp)
+    if set(sweep.get("keywords") or {}) != set(swept):
+        raise ValueError(f"{sp}: keywords must be given for exactly the selected mechanics")
+    added = {(e["technique"], e["mechanic"]) for e in sweep.get("added_edges") or []}
+    known("technique", [t for t, _ in added] + [h["technique"] for h in sweep.get("hits") or [] if h.get("technique")], sp)
+    for e in sweep.get("added_edges") or []:
+        t, m = e["technique"], e["mechanic"]
+        if (t, m) not in edges:
+            raise ValueError(f"{sp}: added edge {t} -> {m} is not in data/techniques/{t}.yaml")
+        if e.get("effect") and e["effect"] != edges[(t, m)]:
+            raise ValueError(f"{sp}: added edge {t} -> {m} says {e['effect']}, the record says {edges[(t, m)]}")
+        uncited = sorted(({s.get("source") for s in e.get("support") or []} | set(e.get("sources") or [])) - cited(tech[t]))
+        if uncited:
+            raise ValueError(f"{sp}: added edge {t} -> {m} rests on sources {t} does not cite: {', '.join(uncited)}")
+    src_rows = sweep.get("sources") or []
+    listed = {s["id"]: s for s in src_rows}
+    known("source", list(listed) + [h["source"] for h in sweep.get("hits") or []], sp)
+    for h in sweep.get("hits") or []:
+        if h["source"] not in listed:
+            raise ValueError(f"{sp}: a hit cites {h['source']}, which the sources list does not hold")
+        if h["verdict"] not in ("missing-edge", "mention", "false-hit"):
+            raise ValueError(f"{sp}: verdict {h['verdict']!r} is not missing-edge, mention, or false-hit")
+        if h["verdict"] == "missing-edge":
+            t = h.get("technique")
+            if (t, h["mechanic"]) not in added or h["source"] not in cited(tech[t]):
+                raise ValueError(f"{sp}: missing-edge hit in {h['source']} needs a technique that cites it and an added edge to {h['mechanic']}")
+    vc = Counter()
+    for h in sweep.get("hits") or []:
+        vc[h["verdict"]] += len(h.get("quotes") or [])
+    want = sweep.get("counts") or {}
+    if want.get("hits") != sum(vc.values()) or any(want.get(k) != vc.get(k, 0) for k in ("missing-edge", "mention", "false-hit")):
+        raise ValueError(f"{sp}: counts {want} disagree with the hits {dict(vc)}")
+    all_cited = set().union(*(cited(t) for t in techs)) if techs else set()
+    stats["n_technique_sources"] = len(all_cited)
+    stats["n_edge_sweep_sources_unlisted"] = len(all_cited - set(listed))
+    reads = Counter(s.get("read") for s in src_rows if s["id"] in all_cited)
+    stats["n_edge_sweep_sources"] = sum(reads.values())
+    stats["n_edge_sweep_sources_read"] = reads.get("full", 0)
+    stats["n_edge_sweep_sources_partial"] = reads.get("partial", 0)
+    stats["n_edge_sweep_sources_unread"] = reads.get("none", 0)
+    stats["n_edge_sweep_sources_with_hits"] = len({h["source"] for h in sweep.get("hits") or []})
+    stats["n_edge_sweep_hits"] = sum(vc.values())
+    stats["n_edge_sweep_hits_missing"] = vc.get("missing-edge", 0)
+    stats["n_edge_sweep_hits_mention"] = vc.get("mention", 0)
+    stats["n_edge_sweep_hits_false"] = vc.get("false-hit", 0)
+    stats["pct_edge_sweep_hits_false"] = _r(100 * vc.get("false-hit", 0) / max(sum(vc.values()), 1), 0)
+    stats["n_edge_sweep_sources_missing"] = len({h["source"] for h in sweep.get("hits") or [] if h["verdict"] == "missing-edge"})
+    stats["n_edge_sweep_keywords"] = sum(len(p) for g in (sweep.get("keywords") or {}).values() for p in g.values())
+    stats["n_edge_sweep_mechanics"] = len(swept)
+    stats["n_edge_sweep_top"] = int(sel.get("top", 10))
+    stats["n_edge_sweep_edges_added"] = len(added)
+    # unreached before the sweep: no edge at all, or only edges the sweep added; the selection must still be its top
+    # ten by catalog games, with ties at the tenth
+    by_mech = defaultdict(set)
+    for t, m in edges:
+        by_mech[m].add(t)
+    before = [m for m in mechs if not (by_mech[m.id] - {t for t, mm in added if mm == m.id})]
+    before.sort(key=lambda m: (-derived[m.id]["prevalence"], m.id))
+    top = stats["n_edge_sweep_top"]
+    cut = derived[before[top - 1].id]["prevalence"] if len(before) >= top else 0
+    want_sel = {m.id for m in before if derived[m.id]["prevalence"] >= cut}
+    stats["n_edge_sweep_selection_mismatch"] = len(want_sel ^ set(swept))
+    stats["n_mechanics_zero_exposure_before_sweep"] = len(before)
+    total_uses = sum(derived[m.id]["prevalence"] for m in mechs) or 1
+    before_uses = sum(derived[m.id]["prevalence"] for m in before) or 1
+    swept_uses = sum(derived[m]["prevalence"] for m in swept)
+    stats["n_edge_sweep_uses"] = swept_uses
+    stats["pct_uses_on_zero_exposure_before_sweep"] = _r(100 * before_uses / total_uses, 0)
+    stats["pct_unreached_uses_swept"] = _r(100 * swept_uses / before_uses, 0)
+    reached = sorted({m for _, m in added if derived[m]["technique_exposure"] > 0})
+    stats["n_edge_sweep_mechanics_reached"] = len(reached)
+    stats["n_edge_sweep_mechanics_still_unreached"] = sum(1 for m in swept if derived[m]["technique_exposure"] == 0)
+    stats["pct_edge_sweep_mechanics_reached"] = _r(100 * len(reached) / max(len(swept), 1), 0)
+    rows = []
+    for m in sorted(swept, key=lambda x: (-derived[x]["prevalence"], x)):
+        c = Counter()
+        for h in sweep.get("hits") or []:
+            if h["mechanic"] == m:
+                c[h["verdict"]] += len(h.get("quotes") or [])
+        rows.append({"mechanic": m, "games": derived[m]["prevalence"], "keywords": sum(len(p) for p in sweep["keywords"][m].values()),
+                     "hits": sum(c.values()), "missing_edge": c.get("missing-edge", 0), "mention": c.get("mention", 0),
+                     "false_hit": c.get("false-hit", 0), "techniques_now": len(by_mech[m])})
+    tables["edge-sweep"] = {
+        "description": "The keyword sweep of §8.2 (report/audits/edge-sweep.yaml): the most-used mechanics that had no affects edge, ranked by the "
+                       "catalog games that use them, with the number of keyword patterns written for each, hits in the full texts of the sources "
+                       "live techniques cite, and each hit's verdict: missing edge (the citing technique changes the mechanic as §8.1 defines it), "
+                       "mention (the mechanic's subject appears but the technique does not change it), or false hit (another sense of the word). "
+                       "Techniques now: techniques with an edge to the mechanic after the sweep.",
+        "columns": ["mechanic", "games", "keywords", "hits", "missing_edge", "mention", "false_hit", "techniques_now"], "rows": rows,
+        "link_columns": ["mechanic"]}
+    for r in rows:
+        stats[f"n_edge_sweep_hits_{r['mechanic'].replace('-', '_')}"] = r["hits"]
+        stats[f"n_edge_sweep_missing_{r['mechanic'].replace('-', '_')}"] = r["missing_edge"]
+
+    # ---- the precedence audit
+    ap = "report/audits/effect-audit.yaml"
+    order = [e for e in ("replaces-substrate", "enables-new", "explains", "deepens", "accelerates", "cuts-authoring-cost", "tunes") if e in eff_terms]
+    ent = {}
+    for e in audit.get("edges") or []:
+        k = (e["technique"], e["mechanic"])
+        if k in ent:
+            raise ValueError(f"{ap}: {k[0]} -> {k[1]} appears twice")
+        ent[k] = e
+    no_entry, no_edge = sorted(set(edges) - set(ent)), sorted(set(ent) - set(edges))
+    if no_entry or no_edge:
+        raise ValueError(f"{ap}: out of step with data/techniques: edges with no entry {['/'.join(k) for k in no_entry]}, "
+                         f"entries for no edge {['/'.join(k) for k in no_edge]}")
+    for k, e in sorted(ent.items()):
+        lab = "/".join(k)
+        for f in ("effect", "was", "secondary", "ahead"):
+            if e.get(f) is not None and e[f] not in eff_terms:
+                raise ValueError(f"{ap}: {lab} {f} {e[f]!r} is not a term of vocab/effect.yaml")
+        if e["effect"] != edges[k]:
+            raise ValueError(f"{ap}: {lab} says {e['effect']}, the record says {edges[k]}")
+        if not isinstance(e.get("compliant"), bool):
+            raise ValueError(f"{ap}: {lab} compliant must be true or false")
+        if e["compliant"] and (e.get("was") or e.get("ahead")):
+            raise ValueError(f"{ap}: {lab} is compliant, so it can neither have been corrected nor have a label ahead of it")
+        if not e["compliant"] and not e.get("was") and not e.get("ahead"):
+            raise ValueError(f"{ap}: {lab} is left non-compliant, so it must name the label ahead of it")
+        if e.get("ahead") and order.index(e["ahead"]) >= order.index(e["effect"]):
+            raise ValueError(f"{ap}: {lab} ahead {e['ahead']} does not come before {e['effect']} in the order")
+        if bool(e.get("added")) != (k in added):
+            raise ValueError(f"{ap}: {lab} added must be true exactly for the edges edge-sweep.yaml added")
+    first = {k: e.get("was") or e["effect"] for k, e in ent.items() if not e.get("added")}
+    letter = {k: e.get("ahead") or e["effect"] for k, e in ent.items()}  # every label as the written order puts it
+    n = len(ent)
+    corrected = [e for e in ent.values() if e.get("was")]
+    left = [e for e in ent.values() if not e["compliant"] and not e.get("was")]
+    boundary = [e for e in ent.values() if e.get("ahead") == "replaces-substrate" and e["effect"] in ("deepens", "accelerates")]
+    stats["n_effect_audit_edges"] = n
+    stats["n_affects_edges_before_audit"] = len(first)
+    stats["n_effect_audit_compliant"] = sum(1 for e in ent.values() if e["compliant"])
+    stats["n_effect_audit_noncompliant"] = sum(1 for e in ent.values() if not e["compliant"])
+    stats["pct_effect_audit_compliant"] = _r(100 * stats["n_effect_audit_compliant"] / max(n, 1), 0)
+    stats["n_effect_audit_corrected"] = len(corrected)
+    stats["n_effect_audit_left"] = len(left)
+    stats["n_effect_audit_boundary"] = len(boundary)
+    stats["n_effect_audit_left_other"] = len(left) - sum(1 for e in left if e in boundary)
+    stats["n_effect_audit_ahead"] = sum(1 for e in ent.values() if e.get("ahead"))
+    stats["n_effect_audit_secondary"] = sum(1 for e in ent.values() if e.get("secondary"))
+    moves = Counter((e["was"], e["effect"]) for e in corrected)
+    for (a, b), c in moves.items():
+        stats[f"n_effect_audit_{a.replace('-', '_')}_to_{b.replace('-', '_')}"] = c
+    if moves:
+        (a, b), c = max(moves.items(), key=lambda x: (x[1], x[0]))
+        stats["effect_audit_top_correction_from"], stats["effect_audit_top_correction_to"] = eff_terms[a]["label"], eff_terms[b]["label"]
+        stats["n_effect_audit_top_correction"] = c
+    before_c, sec_c, letter_c = Counter(first.values()), Counter(e["secondary"] for e in ent.values() if e.get("secondary")), Counter(letter.values())
+    now_c = Counter(edges.values())
+    for k in order:
+        key = k.replace("-", "_")
+        stats[f"n_effect_{key}_before_audit"] = before_c.get(k, 0)
+        stats[f"n_effect_{key}_by_letter"] = letter_c.get(k, 0)
+        stats[f"n_effect_audit_secondary_{key}"] = sec_c.get(k, 0)
+        stats[f"n_effect_{key}_with_secondary"] = sum(1 for kk, e in ent.items() if edges[kk] == k or e.get("secondary") == k)
+    ws = {k: stats[f"n_effect_{k.replace('-', '_')}_with_secondary"] for k in order}
+    stats["rank_effect_explains_with_secondary"] = 1 + sum(1 for k in order if ws[k] < ws.get("explains", 0))  # 1 = rarest
+    top_of = lambda c: eff_terms[max(c.items(), key=lambda x: (x[1], x[0]))[0]]["label"]  # noqa: E731
+    rare_of = lambda c: eff_terms[min(c.items(), key=lambda x: (x[1], x[0]))[0]]["label"]  # noqa: E731
+    if before_c:
+        stats["top_effect_before_audit"], stats["rarest_effect_before_audit"] = top_of(before_c), rare_of(before_c)
+    stats["top_effect_by_letter"], stats["rarest_effect_by_letter"] = top_of(letter_c), rare_of(letter_c)
+    # explanation masked by a label that comes before it, and explanation coded below its place (review D4)
+    stats["n_effect_explains_masked"] = sum(1 for kk, e in ent.items() if e.get("secondary") == "explains" and order.index(edges[kk]) < order.index("explains"))
+    stats["n_effect_audit_to_explains"] = sum(1 for e in corrected if e["effect"] == "explains")
+    # what the order applied to the letter would do to the family exposure ranking of §8.2: the same maturity and
+    # effect weights, with each edge carrying the label the order puts first
+    comp = (vocabs.get("rubrics") or {}).get("composites", {}).get("technique_exposure") or {}
+    mw, ew = comp.get("maturity_weights") or {}, comp.get("effect_weights") or {}
+    if mw and ew:
+        fam_terms = vocab_terms(vocabs, "mechanic_family")
+        fam_of = {m.id: m.data["family"] for m in mechs}
+        tot = {"stored": defaultdict(float), "letter": defaultdict(float)}
+        for (t, m), e in edges.items():
+            w = mw[tech[t].data["maturity"]]
+            tot["stored"][fam_of[m]] += w * ew[e]
+            tot["letter"][fam_of[m]] += w * ew[letter[(t, m)]]
+        fams = sorted(set(fam_of.values()))
+        top_f = lambda v: max(fams, key=lambda f: (round(v[f], 9), f))  # noqa: E731
+        stats["top_exposed_family_by_letter"] = fam_terms[top_f(tot["letter"])]["label"]
+        stats["rho_family_exposure_by_letter"] = _r(_spearman([tot["stored"][f] for f in fams], [tot["letter"][f] for f in fams]), 2)
+    tables["effect-audit"] = {
+        "description": "The precedence audit of §8.1 (report/audits/effect-audit.yaml), by effect: edges carrying it as first coded, as stored after the "
+                       "audit's corrections (including the edge the keyword sweep added), with the order applied to the letter (every edge taking the label "
+                       "the order puts first, so the replaces-substrate boundary goes the order's way), as a secondary label the note also supports, and "
+                       "as stored or secondary. The same rater coded the edges and audited them, so this measures consistency with the written order, "
+                       "not agreement.",
+        "columns": ["effect", "first_coded", "after_audit", "by_letter", "secondary", "stored_or_secondary"],
+        "rows": [{"effect": eff_terms[k]["label"], "first_coded": before_c.get(k, 0), "after_audit": now_c.get(k, 0), "by_letter": letter_c.get(k, 0),
+                  "secondary": sec_c.get(k, 0), "stored_or_secondary": stats[f"n_effect_{k.replace('-', '_')}_with_secondary"]} for k in order]}
+    left_to = Counter((e["effect"], e["ahead"]) for e in left)
+    tables["effect-audit-corrections"] = {
+        "description": "Labels the precedence audit changed, from the first-coded effect to the stored one (corrected); and labels it found "
+                       "non-compliant but left for a second rater, from the stored effect to the label the order would put first (left).",
+        "columns": ["action", "from", "to", "edges"],
+        "rows": [{"action": "corrected", "from": eff_terms[a]["label"], "to": eff_terms[b]["label"], "edges": c} for (a, b), c in sorted(moves.items(), key=lambda x: (-x[1], x[0]))]
+                + [{"action": "left", "from": eff_terms[a]["label"], "to": eff_terms[b]["label"], "edges": c} for (a, b), c in sorted(left_to.items(), key=lambda x: (-x[1], x[0]))]}
 
 
 # ======================================================================= SVG
