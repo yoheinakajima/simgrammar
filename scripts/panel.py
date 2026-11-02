@@ -14,7 +14,9 @@ the sheets alone (review findings D3, D4, D6, D8, E2, E17, E31; tasks/second-rat
 The sheets, in the order a coder fills them (each later sheet shows something an earlier one asks for):
 
   admission, family, effect   scripts/coding.py's three sheets on the second-coding-v1 sample (§2.1, §8.1)
-  recall                      for a random sample of mechanics, which techniques change each one and how (E2): the
+  state                       each sampled mechanic's state class (D6): simulation state, control, meta-structure, or
+                              presentation, by the rules of report/state-class.yaml quoted word for word
+  recall                     for a random sample of mechanics, which techniques change each one and how (E2): the
                               mechanic's description and every live technique's, never an `affects` list
   maturity                    every live technique's maturity, TRL and horizon in games (E17), from its own text
   rubric                      the calibration set first (calibrate.py's sheet, E036), then a random sample of mechanics
@@ -47,11 +49,12 @@ A codes file in report/coding/<kind>/ holds one coder's codes, as coding.py's do
   - {decision: recall, item: <mechanic>, value: [{technique: <id>, effect: <effect term>, rationale: ...}], rationale: ...}
   - {decision: maturity, item: <technique>, value: <technique_maturity term>, rationale: ...}
   - {decision: horizon, item: <technique>, value: <horizon term>, rationale: ...}
+  - {decision: state, item: <mechanic>, value: <class id of report/state-class.yaml>, rationale: ...}
 
 A cross-model file holds the same codes for every sheet, `ratings` as {field, item, value, rationale}, and the
 calibration scores, under the run, operator and model that made them.
 
-To add a sheet kind (the state classification of report/state-class.yaml, say): write a Kind (its items with their
+To add a sheet kind (as `state` was added for report/state-class.yaml): write a Kind (its items with their
 current codes, the runs a coder must be independent of, its sheet files, a reader for the filled rows, a check for one
 recorded value, and its categories' labels), add it to KINDS in fill order, give it a sample under `panel` in
 report/analysis.yaml (and SAMPLE_KEY, with a pool in draw()), and the rest follows from KINDS: the packet, the recorder
@@ -189,10 +192,58 @@ def draw(ents, vocabs, cfg: dict, sc: dict) -> dict:
         out[f"{kind}_pool"] = len(pool)
     out["maturity"] = [t.id for t in _live(ents, "technique")]
     out["opportunity"] = [o.id for o in _live(ents, "opportunity")]
+    # state: stratified by the current class with equal allocation, as second_coding draws families: per_class mechanics
+    # from each class, or all that remain in a smaller one, leaving out the worked examples and every mechanic the rules
+    # name, since the sheet quotes the rules
+    sf = state_file()
+    cls = state_classes(sf)
+    skip = state_examples(sf) | state_named(ents, sf)
+    per = int(cfg["state"]["per_class"])
+    picked, pools = [], {}
+    for c in (c["id"] for c in sf.get("classes") or []):
+        pool = [m for m in mechs if cls.get(m) == c and m not in skip]
+        pools[c] = len(pool)
+        picked += sorted(pool, key=lambda i: _rank(seed, f"state:{i}"))[:per]
+    out["state"] = sorted(picked)
+    out["state_pool"] = pools
+    out["state_left_out"] = sorted(skip)
     return out
 
 
-SAMPLE_KEY = {"recall": "mechanics", "rubric": "mechanics", "maturity": "techniques", "opportunity": "opportunities"}
+SAMPLE_KEY = {"recall": "mechanics", "rubric": "mechanics", "maturity": "techniques", "opportunity": "opportunities", "state": "mechanics"}
+STATE_FILE = ROOT / "report" / "state-class.yaml"
+
+
+def state_file() -> dict:
+    """report/state-class.yaml: each live mechanic's state class, the rules that decide it, and their worked examples."""
+    return (read_yaml(STATE_FILE) if STATE_FILE.exists() else None) or {}
+
+
+def state_classes(sf: dict) -> dict[str, str]:
+    return {e["id"]: e["class"] for e in sf.get("mechanics") or []}
+
+
+def state_examples(sf: dict) -> set[str]:
+    return {x["mechanic"] for c in sf.get("classes") or [] for x in c.get("examples") or []}
+
+
+def state_rules_text(sf: dict) -> str:
+    """The text the state sheet quotes: the procedure, each class's definition, and the worked examples' reasons."""
+    parts = [sf.get("procedure") or ""] + [c.get("definition") or "" for c in sf.get("classes") or []]
+    parts += [x.get("why") or "" for c in sf.get("classes") or [] for x in c.get("examples") or []]
+    return _plain(" ".join(parts))
+
+
+def state_named(ents, sf: dict) -> set[str]:
+    """Live mechanics the state rules name, by name, id read as words, or alias (weather, say, or "queues" for service
+    queues): the sheet quotes the rules, so these would come with a hint, and the draw leaves them out."""
+    txt = state_rules_text(sf).lower()
+    out = set()
+    for m in _live(ents, "mechanic"):
+        names = {m.data["name"].lower(), m.id.replace("-", " ")} | {str(a).lower() for a in m.data.get("aliases") or []}
+        if any(re.search(r"(?<![a-z])" + re.escape(n) + r"(?![a-z])", txt) for n in names):
+            out.add(m.id)
+    return out
 
 
 def sample_ids(cfg: dict, kind: str) -> list[str]:
@@ -256,6 +307,18 @@ def _owners_recall(ents, item):
     for t in _live(ents, "technique"):
         out |= set(record_runs(t))
     return sorted(out)
+
+
+def _first_state(ents, vocabs, cfg, sc):
+    live_m = {m.id for m in _live(ents, "mechanic")}
+    cls = state_classes(state_file())
+    return {"state": {m: cls[m] for m in sample_ids(cfg, "state") if m in live_m and m in cls}}
+
+
+def _owners_state(ents, item):
+    """The run that made report/state-class.yaml (its made_by) and the mechanic's own runs."""
+    made = (state_file().get("made_by") or {}).get("run")
+    return sorted({r for r in [made] + record_runs(_by_id(ents).get(item)) if r})
 
 
 def _first_maturity(ents, vocabs, cfg, sc):
@@ -346,6 +409,44 @@ def _build_coding(decision):
             sh["mechanics"] = {m: v for m, v in sh["mechanics"].items() if any(i.split("/")[1] == m for i in keep)}
         return [(decision, sh)]
     return f
+
+
+def _build_state(ctx, ents, vocabs, cfg, sc, ids):
+    """The rules of report/state-class.yaml word for word (its procedure, each class's definition, and its worked
+    examples' reasons) and each mechanic's own text; never a sampled mechanic's class."""
+    by = _by_id(ents)
+    sf = state_file()
+    header = {"sample": cfg["state"]["id"],
+              "instructions": ("Assign each mechanic one class with the procedure below and the class definitions; the worked examples "
+                               "show the procedure applied. Write the class id in code and, in rationale, the counted variable that decided "
+                               "the class and why it belongs there. " + BLIND),
+              "procedure": _plain(sf.get("procedure")),
+              "classes": {c["id"]: {"label": c["label"], "definition": _plain(c["definition"]),
+                                    "examples": [{"mechanic": by[x["mechanic"]].data["name"] if x["mechanic"] in by else x["mechanic"], "why": _plain(x["why"])}
+                                                 for x in c.get("examples") or []]}
+                          for c in sf.get("classes") or []}}
+    rows = {m: {"name": by[m].data["name"], "summary": _plain(by[m].data["summary"]), "definition": _plain(by[m].data["definition"]),
+                "design_levers": by[m].data.get("design_levers") or [], "code": None, "rationale": None} for m in ids}
+    return _parts("state", header, rows, _order(cfg["seed"], ids), (cfg.get("chunk") or {}).get("state"))
+
+
+def _check_state(d, value, vocabs, ents):
+    ok = {c["id"] for c in state_file().get("classes") or []}
+    return None if isinstance(value, str) and value in ok else f"{value!r} is not a class of report/state-class.yaml ({', '.join(sorted(ok))})"
+
+
+def _read_state(item, row, vocabs, ents):
+    value = row.get("code")
+    if value is None:
+        return [], [f"{item}: not coded"]
+    bad = _check_state("state", value, vocabs, ents) or _rationale(row.get("rationale"))
+    if bad:
+        return [], [f"{item}: {bad}"]
+    return [{"decision": "state", "item": item, "value": value, "rationale": _plain(row.get("rationale"))}], []
+
+
+def _state_labels(vocabs):
+    return {"state": {c["id"]: c["label"] for c in state_file().get("classes") or []}}
 
 
 RECALL_RULE = ("A technique changes a mechanic when its result, as described, changes what the mechanic can be in a "
@@ -618,6 +719,8 @@ KINDS: dict[str, Kind] = {k.name: k for k in (
          _read_coding("admission"), _check_coding, lambda vocabs: {"admission": {"admit": "admitted", "reject": "left as a proposal"}}, True),
     Kind("family", ("family",), (), lambda cfg, sc: sc["sample"]["id"], _first_coding("family"), _owners_coding("family"), _build_coding("family"),
          _read_coding("family"), _check_coding, _vocab_labels((("family", "mechanic_family"),)), True),
+    Kind("state", ("state",), (), lambda cfg, sc: cfg["state"]["id"], _first_state, _owners_state, _build_state, _read_state, _check_state,
+         _state_labels, True),
     Kind("recall", ("recall",), (), lambda cfg, sc: cfg["recall"]["id"], _first_recall, _owners_recall, _build_recall, _read_recall, _check_recall),
     Kind("effect", ("effect",), (), lambda cfg, sc: sc["sample"]["id"], _first_coding("effect"), _owners_coding("effect"), _build_coding("effect"),
          _read_coding("effect"), _check_coding, _vocab_labels((("effect", "effect"),)), True),
@@ -758,7 +861,7 @@ the text, not the order. The files must still parse as YAML when you finish.
 What each sheet asks for:
 
 - **admission**: each of `nameable`, `atomic`, `tunable`, `removable` as `pass` or `fail`, and `rationale` naming the test that decided it.
-- **family**, **effect**: `code` (one id from the sheet's list) and `rationale` (the rule or clause that decided it).
+- **family**, **state**, **effect**: `code` (one id from the sheet's list) and `rationale` (the rule, clause, or counted variable that decided it).
 - **recall**: `changed_by` as a list, one entry per technique that changes the mechanic, and `rationale` for the item:
 
   ```yaml
@@ -1300,7 +1403,7 @@ def main():
             sys.stdout.write(dump_yaml(new))
             return
         bad = False
-        for k in ("recall", "rubric", "maturity", "opportunity"):
+        for k in SAMPLE_KEY:
             rec, now = sorted(sample_ids(cfg, k)), new[k]
             gone, added = sorted(set(rec) - set(now)), sorted(set(now) - set(rec))
             bad |= bool(gone or added)

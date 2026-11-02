@@ -3803,7 +3803,7 @@ def _panel_agreement(ents, vocabs, cfg, raters, stats, tables, p: str, t: str, w
         tables[f"{t}-codes"] = {
             "description": f"Agreement between the dataset's code and {who}, per decision. Agree is the share of pairs that match; kappa is "
                            "Cohen's (unweighted) and alpha Krippendorff's (nominal), each with low and high bounding a "
-                           f"{ivl}, resampled within each first code for the stratified second-coding sample. For admission the "
+                           f"{ivl}, resampled within each first code for a sample stratified by it (second-coding-v1, state-v1). For admission the "
                            "first code is whether the vocabulary admits the item, and the second reader admits an item that passes all four tests.",
             "columns": ["decision", "raters", "items", "pairs", "agree", "kappa", "kappa_low", "kappa_high", "alpha", "alpha_low", "alpha_high"],
             "rows": code_rows}
@@ -4070,6 +4070,9 @@ def _panel_independent(ents, vocabs, cfg, stats, tables):
     stats["n_panel_rubric_mechanics"] = len(first["legibility"])
     stats["n_panel_techniques"] = len(first["maturity"])
     stats["n_panel_opportunities"] = len(first["novelty"])
+    stats["n_panel_state_mechanics"] = len(first["state"])
+    for c, n in sorted(Counter(first["state"].values()).items()):
+        stats[f"n_panel_state_{c.replace('-', '_')}"] = n
     # codes (and the TRL readings a record's ratings cannot hold) from the codes files, then ratings from the records
     raters = {r["run"]: {**r, "ratings": dict(r.get("ratings") or {}), "calibration": None} for r in panel.load_panel_codings(ents, vocabs, pc, sc)}
     runs = {r.id: r for r in ents.get("run", [])}

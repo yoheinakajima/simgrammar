@@ -28,7 +28,10 @@ method: 'Read the review''s open findings, CONTRACT.md, AGENTS.md, tasks/second-
   value is capped at 5 by the schema, so TRL readings stay in the codes file (proposal). Made coding.py''s
   §8.1 rule extraction a function and let a coder''s own run pass its independence check once it has also
   rated a record. Wrote tasks/second-rating.md, updated tasks/second-coding.md, AGENTS.md and .gitignore.
-  No records, sources or report prose changed; no paid model run.'
+  No records, sources or report prose changed; no paid model run. Second commit: merged the state-class
+  branch and added a state sheet after family, quoting report/state-class.yaml''s procedure, class definitions
+  and worked examples, on a sample drawn by class (10 each, presentation 8 after leaving out the worked examples
+  and the mechanics the rules name), tested again on fake answers in both modes.'
 contract_version: '1.2'
 proposals:
 - kind: schema
