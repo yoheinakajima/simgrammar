@@ -63,8 +63,17 @@ claims:
   quote: StarSim is not just an NPC simulator, player actions will feed back into the system to influence
     what kinds of jobs, trades, and actions all the Quanta choose to take.
   locator: Overview
+- text: The StockMarket mod's bot plugins simulate a larger player base to give thin Minecraft servers
+    liquidity and price movement in a player order book.
+  sources:
+  - src-kroia-2025-stockmarket
+  confidence: high
+  quote: For servers that do not have enough players or even for single player, plugins can be added that
+    simulate a large player base and provide liquidity and price movements to the market.
+  locator: README, opening description
 sources:
 - src-starcitizenwiki-2026-quantum
+- src-kroia-2025-stockmarket
 assertions:
 - field.human-behavior-simulation-models.horizon == 3-5y
 - field.mean-field-games.horizon == 3-5y

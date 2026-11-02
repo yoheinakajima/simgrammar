@@ -1,0 +1,15 @@
+id: src-steam-2024-ecosystem
+type: source
+name: Ecosystem
+kind: store-page
+authors:
+- Tom Johnson
+- Slug Disco
+venue: Steam
+date: '2024-11-08'
+url: https://store.steampowered.com/app/1133120/
+accessed: '2026-11-01'
+notes: An evolution sim whose population of creatures moves by neural networks that contract muscles and
+  apply torque at the joints of physically simulated bodies.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

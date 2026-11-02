@@ -1,0 +1,14 @@
+id: src-climateinteractive-2026-climate-action-simulation
+type: source
+name: Climate Action Simulation
+kind: docs
+authors:
+- Climate Interactive
+venue: Climate Interactive
+date: '2026'
+url: https://www.climateinteractive.org/climate-action-simulation/
+accessed: '2026-11-01'
+notes: A free, facilitated role-playing game of a simulated UN climate summit in which players build strategy
+  with the En-ROADS simulator.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

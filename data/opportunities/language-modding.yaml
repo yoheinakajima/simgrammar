@@ -63,8 +63,18 @@ claims:
   confidence: high
   quote: Create and modify objects and scripts in your place's data model
   locator: Introduction, capability list
+- text: Roblox Assistant's playtesting agent tests generated changes against the creator's plan, using
+    the player character as an automated tester.
+  sources:
+  - src-roblox-2026-studio-going-agentic
+  confidence: high
+  quote: Assistant's new playtesting agent beta can help test the game against the original plan, analyzing
+    the code and data model, reading logs, and using the player character as an automated QA tester to
+    verify behavior.
+  locator: 'Test: New Playtesting Agent Beta'
 sources:
 - src-roblox-2026-assistant-guide
+- src-roblox-2026-studio-going-agentic
 status: asserted
 provenance:
   created: 2026-10-24-synthesis

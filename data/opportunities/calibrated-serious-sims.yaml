@@ -62,9 +62,18 @@ claims:
   quote: En-ROADS initializes and calibrates to available historical data, primarily provided by the following
     sources
   locator: Initialization, Calibration, Model Testing
+- text: Climate Interactive's Climate Action Simulation is a role-playing game of a simulated climate
+    summit, played with the En-ROADS simulator.
+  sources:
+  - src-climateinteractive-2026-climate-action-simulation
+  confidence: high
+  quote: This highly interactive role-playing game puts participants in a simulated emergency climate
+    summit organized by the United Nations.
+  locator: How It Works
 sources:
 - src-climateinteractive-2026-en-roads-guide
 - src-climateinteractive-2026-en-roads-calibration
+- src-climateinteractive-2026-climate-action-simulation
 status: asserted
 provenance:
   created: 2026-10-24-synthesis

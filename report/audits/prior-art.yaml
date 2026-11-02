@@ -1,12 +1,14 @@
 # Prior-art search behind each live opportunity's novelty score (review finding E31).
 #
 # Made by run 2026-11-01-es-v3-prior-art (operator yoheinakajima, model claude-opus-5-5, Claude Code). The searches were
-# run by seven parallel agents of the same model in the same run, and the run re-fetched every quoted page before
-# citing it. One entry per live opportunity; scripts/analyze.py (_prior_art) fails the build when an entry is missing,
+# run by agents of the same model in the same run, in two rounds: seven agents searched every opportunity, the shared
+# web-search budget ran out partway, and three more ran the searches that round missing for 21 entries (queries marked
+# `round: 2`). The run re-fetched every quoted page before citing it. One entry per live opportunity; scripts/analyze.py (_prior_art) fails the build when an entry is missing,
 # names a deprecated or unknown record, or falls out of step with the record.
 #
 # Each entry: the date of the search; the queries that were run and where (web search, Semantic Scholar or the arXiv
-# API, Steam, itch.io, Steam Workshop and mod portals); planned queries that could not be run (`not_run`); the pages
+# API, Steam, itch.io, Steam Workshop, mod portals and the App Store); planned queries that could not be run (`not_run`,
+# none left after round 2); the pages
 # opened (`checked`); the closest prior art found, with its URL and, when the record cites it, its source id; further
 # prior art (`also`); the stored novelty before and after; and the verdict against the novelty anchors in
 # vocab/rubrics.yaml.
@@ -118,16 +120,32 @@ entries:
     where: arxiv
   - q: AI traders market MMO
     where: steam
-  not_run:
-  - q: Albion Online Black Market NPC buy orders prices; Star Citizen Quantum Quanta economy (direct pages)
+  - q: Albion Online Black Market NPC buy orders prices how determined
     where: web
+    round: 2
+  - q: Star Citizen Quantum economy simulation NPC traders player data Quanta
+    where: web
+    round: 2
+  - q: MMO adds AI traders bots provide liquidity player-driven market trained on player trading data
+    where: web
+    round: 2
+  - q: EVE Online AI agents trading market research partnership CCP 2025 2026
+    where: web
+    round: 2
+  - q: '"market maker" NPC bots in-game economy liquidity low population server developer blog sandbox
+      MMO'
+    where: web
+    round: 2
+  - q: online game NPC traders place buy and sell orders on player market order book dynamic AI traders
+      patch notes
+    where: web
+    round: 2
   where:
   - arxiv
   - semantic-scholar
   - steam
-  coverage: partial
-  coverage_note: 'No web search was run: the session''s shared web-search budget ran out. A fuller search
-    can only find closer prior art, which could lower the ceiling, not raise it.'
+  - web
+  coverage: full
   checked:
   - name: Quanta / Quantum (Star Citizen Wiki)
     url: https://starcitizen.tools/Quanta
@@ -144,24 +162,55 @@ entries:
     url: https://arxiv.org/abs/2311.03707
   - name: Steam search 'AI traders market MMO'
     url: https://store.steampowered.com/search/?term=AI+traders+market+MMO
+  - name: StockMarket (Minecraft mod) on Modrinth
+    url: https://modrinth.com/mod/Au7CJrhF
+  - name: Modrinth API record for StockMarket
+    url: https://api.modrinth.com/v2/project/Au7CJrhF
+  - name: KROIA/StockMarket README (GitHub)
+    url: https://github.com/KROIA/StockMarket
+  - name: modpackindex StockMarket page
+    url: https://www.modpackindex.com/mod/111808/stockmarket
+  - name: 'SpaceMolt docs: Markets & Orders'
+    url: https://spacemolt.com/docs/markets.md
+  - name: SpaceMolt home page
+    url: https://spacemolt.com/
+  - name: SpaceMolt changelog
+    url: https://spacemolt.com/changelog
+  - name: 'PocketGamer.biz: Eve Online studio CCP rebrands to Fenris Creations as Google takes minority
+      stake (2026-05-06)'
+    url: https://www.pocketgamer.biz/eve-online-studio-ccp-rebrands-to-fenris-creations-as-google-takes-minority-stake/
+  - name: 'Lost Relics blog: Trade Winds Rising (2025-07-07)'
+    url: https://lostrelics.io/blog/post-2025-07-07-trade-winds-rising
   closest:
-    name: Star Citizen Quanta economy (in development)
+    name: StockMarket (Minecraft server mod)
+    kind: mod
+    year: 2025
+    closeness: feature
+    source: src-kroia-2025-stockmarket
+    url: https://github.com/KROIA/StockMarket
+  also:
+  - name: Star Citizen Quanta economy (in development)
     kind: prototype
     year: 2026
     closeness: feature
     source: src-starcitizenwiki-2026-quantum
     url: https://starcitizen.tools/Quanta
-  also:
   - name: Intelligent Trading Agents for Massively Multi-Player Game Economies (AIIDE 2008)
     kind: research
     year: 2008
     closeness: adjacent
     url: https://ojs.aaai.org/index.php/AIIDE/article/view/18680
+  - name: SpaceMolt Station Manager
+    kind: game
+    year: null
+    closeness: feature
+    url: https://spacemolt.com/docs/markets.md
   novelty_before: 3
   novelty: 3
-  verdict: Star Citizen plans an economy run by lightweight NPC traders that respond to players, without
-    a claim of calibration to player trades, and research has built trading agents from EVE Online market
-    data. The anchors would allow 4; the stored 3 is not raised.
+  verdict: A released Minecraft mod puts rule-based bot traders into a player order book so that thin
+    servers keep liquidity, and SpaceMolt's NPC station manager trades in the players' order book; neither
+    is fitted to player trade data, the prediction's feature. Between feature and adjacent the lower ceiling
+    is 3, which equals the stored score, so it stands.
 - opportunity: bottleneck-explainer
   date: '2026-11-01'
   queries:
@@ -296,20 +345,55 @@ entries:
     shipped at the scale of one combat, a partial precedent, so the score falls from 4 to 3.
 - opportunity: calibrated-serious-sims
   date: '2026-11-01'
-  queries: []
-  not_run:
-  - q: serious game epidemic simulation calibrated Bayesian approximate Bayesian computation fit metrics
+  queries:
+  - q: serious game epidemic simulation calibrated Bayesian approximate Bayesian computation fit to data
+      playable
     where: web
-  - q: educational simulation game calibrated agent-based model MCMC posterior goodness of fit
+    round: 2
+  - q: educational climate or pandemic game whose model is calibrated to historical data, documentation
+      of calibration and fit (Fate of the World OR FT Climate Game OR Plague Inc The Cure)
+    where: web
+    round: 2
+  - q: '"serious game" agent-based model "calibrated to" real data published paper players test policies
+      epidemic OR traffic OR fisheries OR economy'
+    where: web
+    round: 2
+  - q: FT Climate Game methodology model calibrated IPCC data how the game's model works
+    where: web
+    round: 2
+  - q: educational simulation game calibrated agent-based model posterior goodness of fit (HTTP 429)
     where: semantic-scholar
-  - q: pandemic simulator game real data calibrated
+    round: 2
+  - q: serious game calibrated epidemic model Bayesian (HTTP 429)
+    where: semantic-scholar
+    round: 2
+  - q: serious game epidemic simulation calibrated real data (HTTP 429)
+    where: semantic-scholar
+    round: 2
+  - q: abs:"serious game" AND abs:simulation (34 results, titles scanned)
+    where: arxiv
+    round: 2
+  - q: abs:"serious game" AND abs:calibrat*; abs:"serious game" AND abs:epidemic; abs:game AND abs:"simulation-based
+      inference" (no entries)
+    where: arxiv
+    round: 2
+  - q: abs:game AND abs:epidemic AND abs:calibrated
+    where: arxiv
+    round: 2
+  - q: pandemic simulator
     where: steam
+    round: 2
+  - q: epidemic model
+    where: steam
+    round: 2
+  - q: covid simulator
+    where: steam
+    round: 2
   where:
-  - direct
-  coverage: partial
-  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
-    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
-    it.'
+  - arxiv
+  - steam
+  - web
+  coverage: full
   checked:
   - name: En-ROADS User Guide (Climate Interactive)
     url: https://docs.climateinteractive.org/projects/en-roads/en/latest/
@@ -325,14 +409,38 @@ entries:
     url: https://arxiv.org/abs/2202.00625
   - name: Plague Inc. (Wikipedia)
     url: https://en.wikipedia.org/wiki/Plague_Inc.
+  - name: 'Steam search: pandemic simulator / epidemic model / covid simulator'
+    url: https://store.steampowered.com/search/?term=pandemic+simulator&sort_by=Reviews_DESC
+  - name: Climate Action Simulation Game (Climate Interactive)
+    url: https://www.climateinteractive.org/climate-action-simulation/
+  - name: En-ROADS calibration page (re-checked)
+    url: https://docs.climateinteractive.org/projects/en-roads-reference-guide/en/latest/pages/calibration.html
+  - name: Fate of the World (Steam)
+    url: https://store.steampowered.com/app/80200/
+  - name: 'COVID: The Outbreak (Steam)'
+    url: https://store.steampowered.com/app/1287000/
+  - name: FT Climate Game launch (InPublishing)
+    url: https://inpublishing.co.uk/articles/ft-launches-the-climate-game-20685
+  - name: Oxford University Innovation page on Fate of the World
+    url: https://innovation.ox.ac.uk/?p=8550
+  - name: Using Gamified Experiments to Tame Complexity (arXiv 2501.08280)
+    url: https://arxiv.org/abs/2501.08280
+  - name: Realism of Simulation Models in Serious Gaming (arXiv 2109.10572)
+    url: https://arxiv.org/abs/2109.10572
   closest:
-    name: En-ROADS
+    name: Climate Action Simulation (role-playing game on En-ROADS)
+    kind: game
+    year: null
+    closeness: feature
+    source: src-climateinteractive-2026-climate-action-simulation
+    url: https://www.climateinteractive.org/climate-action-simulation/
+  also:
+  - name: En-ROADS
     kind: outside
     year: null
     closeness: feature
     source: src-climateinteractive-2026-en-roads-guide
     url: https://docs.climateinteractive.org/projects/en-roads/en/latest/
-  also:
   - name: Covasim
     kind: outside
     year: 2020
@@ -344,11 +452,22 @@ entries:
     closeness: adjacent
     source: src-chopra-2023-gradabm
     url: https://arxiv.org/abs/2207.09714
+  - name: Fate of the World
+    kind: game
+    year: 2011
+    closeness: adjacent
+    url: https://store.steampowered.com/app/80200/
+  - name: Gamified Schelling experiments with approximate Bayesian computation
+    kind: research
+    year: 2025
+    closeness: adjacent
+    url: https://arxiv.org/abs/2501.08280
   novelty_before: 3
   novelty: 3
-  verdict: A policy simulator built for workshops and roleplaying games documents its calibration to historical
-    data (En-ROADS), and research calibrates agent-based epidemic models to data, but no playable release
-    found publishes posterior parameters with a fit metric. The stored 3 stands.
+  verdict: A free role-playing game is played on En-ROADS, whose documentation reports calibration to
+    named historical data, though no Bayesian method or fit metric; digital climate and epidemic games
+    claim real data without stating a method. Between game and outside, and between feature and adjacent,
+    the lower ceiling is 3, which equals the stored score, so it stands.
 - opportunity: causal-why-query
   date: '2026-11-01'
   queries:
@@ -594,13 +713,71 @@ entries:
   - q: abs:memories AND abs:"world model" AND abs:game AND abs:video; abs:game AND abs:"event log" AND
       abs:video
     where: arxiv
+  - q: ai generated memories
+    where: steam
+    round: 2
+  - q: generated memories
+    where: steam
+    round: 2
+  - q: ai video memories
+    where: steam
+    round: 2
+  - q: ai dream generated
+    where: steam
+    round: 2
+  - q: ai generated flashback
+    where: steam
+    round: 2
+  - q: ai illustrated story history
+    where: steam
+    round: 2
+  - q: ai generated chronicle
+    where: steam
+    round: 2
+  - q: memory replay
+    where: steam
+    round: 2
+  - q: stable diffusion images game events
+    where: steam
+    round: 2
+  - q: ai generated memories
+    where: itch.io
+    round: 2
+  - q: world model game
+    where: itch.io
+    round: 2
+  - q: generated video memories
+    where: itch.io
+    round: 2
+  - q: stable diffusion (RimWorld, appid 294100)
+    where: steam-workshop
+    round: 2
+  - q: ai image (RimWorld)
+    where: steam-workshop
+    round: 2
+  - q: memory image (RimWorld)
+    where: steam-workshop
+    round: 2
+  - q: '"image generation" (RimWorld)'
+    where: steam-workshop
+    round: 2
+  - q: ComfyUI (RimWorld)
+    where: steam-workshop
+    round: 2
+  - q: '"AI art" (RimWorld)'
+    where: steam-workshop
+    round: 2
+  - q: '"generated image" (RimWorld)'
+    where: steam-workshop
+    round: 2
   where:
   - arxiv
+  - itch.io
   - semantic-scholar
+  - steam
+  - steam-workshop
   - web
-  coverage: partial
-  coverage_note: 'No storefront search was run: the session''s shared web-search budget ran out. A fuller
-    search can only find closer prior art, which could lower the ceiling, not raise it.'
+  coverage: full
   checked:
   - name: 'Steam Workshop: AI art (RimWorld mod)'
     url: https://steamcommunity.com/sharedfiles/filedetails/?id=2934195167
@@ -620,6 +797,14 @@ entries:
     url: https://www.ea.com/en-gb/news/sims-3-generations-expansion-pack
   - name: AIIDE 2015 'Toward Characters Who Observe, Tell, Misremember, and Lie'
     url: https://ojs.aaai.org/index.php/AIIDE/article/view/12825
+  - name: Steam store searches (9 queries above)
+    url: https://store.steampowered.com/search/?term=ai+generated+memories
+  - name: itch.io searches (3 queries above)
+    url: https://itch.io/search?q=ai+generated+memories
+  - name: RimWorld Workshop search for "image generation" and "generated image"
+    url: https://steamcommunity.com/workshop/browse/?appid=294100&searchtext=%22image+generation%22&browsesort=textsearch&section=readytouseitems
+  - name: AI Camera (RimWorld mod)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3809140874
   closest:
     name: AI art (RimWorld mod)
     kind: mod
@@ -639,28 +824,61 @@ entries:
     year: 2026
     closeness: adjacent
     url: https://arxiv.org/abs/2607.12231
+  - name: AI Camera (RimWorld mod)
+    kind: mod
+    year: null
+    closeness: feature
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3809140874
   novelty_before: 5
   novelty: 3
   verdict: A RimWorld mod has generated images of logged colony events since 2023, and The Sims 3 Generations
     (2011) turned automatic snapshots of a Sim's life into memories. Generated views of a run's own past
     have shipped in partial forms, so the score falls from 5 to 3; a world model drawing subjective, drifting
-    memories remains unshipped.
+    memories remains unshipped. Round 2's storefront searches found no released game that draws generated
+    views of a run's past, only a second RimWorld mod (AI Camera), so the ceiling stays 3.
 - opportunity: event-sourced-sim-runtime
   date: '2026-11-01'
-  queries: []
-  not_run:
+  queries:
   - q: game engine replay determinism LLM outputs recorded event log middleware
     where: web
+    round: 2
   - q: AI NPC middleware replay cached model outputs multiplayer determinism Inworld OR Convai
     where: web
+    round: 2
+  - q: LLM-driven game dev blog replays record model responses so replay is deterministic save file lockstep
+    where: web
+    round: 2
+  - q: SpacetimeDB OR "game backend" commit log replay LLM agents AI NPC record outputs reproducible game
+      server 2026
+    where: web
+    round: 2
   - q: deterministic replay of LLM agent simulation event sourcing
     where: semantic-scholar
+    round: 2
+  - q: reproducibility LLM-based agent simulation caching responses replay
+    where: semantic-scholar
+    round: 2
+  - q: deterministic replay LLM agents event log
+    where: semantic-scholar
+    round: 2
+  - q: all:"record and replay" AND all:LLM
+    where: arxiv
+    round: 2
+  - q: all:replay AND all:deterministic AND all:"generative agents"
+    where: arxiv
+    round: 2
+  - q: LLM simulation rewind timeline
+    where: steam
+    round: 2
+  - q: deterministic replay AI
+    where: steam
+    round: 2
   where:
-  - direct
-  coverage: partial
-  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
-    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
-    it.'
+  - arxiv
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
   checked:
   - name: Events and Event History (Temporal documentation)
     url: https://docs.temporal.io/workflow-execution/event
@@ -670,6 +888,24 @@ entries:
     url: https://github.com/joonspk-research/generative_agents
   - name: AI Town ARCHITECTURE.md (a16z-infra)
     url: https://raw.githubusercontent.com/a16z-infra/ai-town/main/ARCHITECTURE.md
+  - name: timewarp-llm and replayt (PyPI)
+    url: https://pypi.org/project/timewarp-llm/
+  - name: mihhhir08/rewind (GitHub)
+    url: https://github.com/mihhhir08/rewind
+  - name: 'Bernstein docs: Deterministic replay'
+    url: https://bernstein.readthedocs.io/en/latest/operations/deterministic-replay/
+  - name: 'Chronicle: Cut-Point Replay for Regression Testing of LLM Agents (arXiv 2609.20625, 2026-09-17)'
+    url: https://arxiv.org/abs/2609.20625
+  - name: 'ESAA: Event Sourcing for Autonomous Agents in LLM-Based Software Engineering (arXiv 2602.23193,
+      2026-02-26)'
+    url: https://arxiv.org/abs/2602.23193
+  - name: 'Orchestrated Reality: LLM-Driven World Simulation as a Parameterized-Action POMDP (arXiv 2606.16014,
+      2026-06-14)'
+    url: https://arxiv.org/html/2606.16014
+  - name: 'SpacetimeDB docs: Commitlog'
+    url: https://spacetimedb.com/docs/reference/internals/commitlog
+  - name: Steam searches
+    url: https://store.steampowered.com/search/?term=deterministic+replay+AI
   closest:
     name: Temporal durable execution
     kind: outside
@@ -689,11 +925,23 @@ entries:
     year: null
     closeness: feature
     url: https://docs.langchain.com/oss/python/langgraph/use-time-travel
+  - name: Orchestrated Reality
+    kind: research
+    year: 2026
+    closeness: adjacent
+    url: https://arxiv.org/abs/2606.16014
+  - name: SpacetimeDB commit log
+    kind: official
+    year: null
+    closeness: adjacent
+    url: https://spacetimedb.com/docs/reference/internals/commitlog
   novelty_before: 3
   novelty: 3
   verdict: The mechanism ships outside games (Temporal records non-deterministic results once and replays
     them, and resets runs from history), and research agent simulations replay and fork saved runs; nothing
-    found packages it as game middleware. The stored 3 stands.
+    found packages it as game middleware. The stored 3 stands. Round 2's searches found game research
+    that still lists recording model calls for replay as open (Orchestrated Reality) and game infrastructure
+    whose replayable log says nothing of model outputs; the ceiling stays 4.
 - opportunity: explained-delegation
   date: '2026-11-01'
   queries:
@@ -710,11 +958,41 @@ entries:
     where: web
   - q: Black & White creature learns by watching the player imitation leash Richard Evans
     where: web
+  - q: AI governor (search page, sorted by reviews)
+    where: steam
+    round: 2
+  - q: AI advisor (search page, sorted by reviews)
+    where: steam
+    round: 2
+  - q: AI governor; AI advisor learns; learns your playstyle; AI manager learns; delegate AI learns from
+      you (store name-search API, no hits)
+    where: steam
+    round: 2
+  - q: abs:"strategy game" AND abs:delegat* (no entries)
+    where: arxiv
+    round: 2
+  - q: abs:game AND abs:"imitation learning" AND abs:"player modeling" (no entries)
+    where: arxiv
+    round: 2
+  - q: abs:game AND abs:"personalized" AND abs:"behavior cloning"
+    where: arxiv
+    round: 2
+  - q: abs:delegation AND abs:game AND abs:agent AND abs:preferences
+    where: arxiv
+    round: 2
+  - q: management sim LLM AI minister OR steward runs your province, remembers your past decisions, explains
+      its reasoning, approve or veto Steam 2025 2026
+    where: web
+    round: 2
+  - q: strategy game automation "learns from your choices" OR "learns your preferences" governor OR steward
+      OR viceroy manages planets or provinces like you would
+    where: web
+    round: 2
   where:
+  - arxiv
+  - steam
   - web
-  coverage: partial
-  coverage_note: 'No scholarly or storefront search was run: the session''s shared web-search budget ran
-    out. A fuller search can only find closer prior art, which could lower the ceiling, not raise it.'
+  coverage: full
   checked:
   - name: Black & White (Lionhead, 2001)
     url: https://en.wikipedia.org/wiki/Black_%26_White_(video_game)
@@ -732,14 +1010,32 @@ entries:
     url: https://ojs.aaai.org/index.php/AIIDE/article/view/12409
   - name: US11875637B2 Self-evolving AI-based playstyle models (IGT)
     url: https://patents.google.com/patent/US11875637B2/en
+  - name: 'Steam search: AI governor / AI advisor'
+    url: https://store.steampowered.com/search/?term=AI+governor&sort_by=Reviews_DESC
+  - name: Steam app 4902130 (Chongzhen simulator)
+    url: https://store.steampowered.com/app/4902130/
+  - name: Between Empires (Steam 5322360)
+    url: https://store.steampowered.com/app/5322360/
+  - name: LLM Tycoon (Steam 5071100)
+    url: https://store.steampowered.com/app/5071100/
+  - name: 'Soren Johnson, Civilization III Interview #2 (Apolyton)'
+    url: https://apolyton.net/forum/apolyton-civilization-site-general/civilization-lost-history/255541-soren-johnson-civilization-iii-interview-2-26-oct-2001
+  - name: Civilization III governor wiki page (Fandom)
+    url: https://civilization.fandom.com/wiki/Governor_(Civ3)
   closest:
-    name: Black & White
+    name: Civilization III city governors
+    kind: game
+    year: 2001
+    closeness: feature
+    source: src-apolyton-2001-soren-johnson-civ3-interview
+    url: https://apolyton.net/forum/apolyton-civilization-site-general/civilization-lost-history/255541-soren-johnson-civilization-iii-interview-2-26-oct-2001
+  also:
+  - name: Black & White
     kind: game
     year: 2001
     closeness: feature
     source: src-wikipedia-black-and-white
     url: https://en.wikipedia.org/wiki/Black_%26_White_(video_game)
-  also:
   - name: Forza Drivatars
     kind: game
     year: 2014
@@ -748,10 +1044,10 @@ entries:
     url: https://news.xbox.com/en-us/2014/09/30/games-forza-horizon-2-drivatars/
   novelty_before: 3
   novelty: 3
-  verdict: Agents that learn an individual player's wishes and act for them have shipped outside management
-    games (Black & White's creature, Forza's Drivatars), while delegation in management games uses fixed
-    presets. No management title found has managers that adapt to the player's own choices and explain
-    themselves. The stored 3 stands.
+  verdict: Civilization III's city governors (2001) learned from whether the player accepted their suggestions,
+    and took standing emphasize-or-avoid preferences, but gave no explanations; Black & White's creature
+    and Forza's Drivatars learn a player's wishes outside management games. The learning half of the design
+    has shipped and the explaining half has not, so the stored 3 stands.
 - opportunity: generated-inspection-shifts
   date: '2026-11-01'
   queries:
@@ -768,14 +1064,21 @@ entries:
   - q: all:"papers please"; ti:puzzle AND ti:generation AND abs:"language model"; ti:synthetic AND ti:identity
       AND ti:documents
     where: arxiv
+  - q: inspection game like Papers Please uses LLM to generate applicants and documents, rules checked
+      automatically
+    where: web
+    round: 2
+  - q: '"Papers, Please" developer Lucas Pope how entrants documents are generated discrepancies rules
+      procedural'
+    where: web
+    round: 2
   where:
   - arxiv
   - itch.io
   - repository
   - steam
-  coverage: partial
-  coverage_note: 'No web search was run: the session''s shared web-search budget ran out. A fuller search
-    can only find closer prior art, which could lower the ceiling, not raise it.'
+  - web
+  coverage: full
   checked:
   - name: Papers, Please (Wikipedia; catalog game)
     url: https://en.wikipedia.org/wiki/Papers,_Please
@@ -795,13 +1098,15 @@ entries:
     url: https://arxiv.org/abs/2307.05518
   - name: PapersPlease benchmark (arXiv 2506.21961)
     url: https://arxiv.org/abs/2506.21961
+  - name: Designing the bleak genius of Papers, Please (Game Developer, 2013)
+    url: https://www.gamedeveloper.com/design/designing-the-bleak-genius-of-i-papers-please-i-
   closest:
     name: Papers, Please
     kind: game
     year: 2013
     closeness: design
-    source: src-wikipedia-papers-please
-    url: https://en.wikipedia.org/wiki/Papers,_Please
+    source: src-alexander-2013-papers-please-design
+    url: https://www.gamedeveloper.com/design/designing-the-bleak-genius-of-i-papers-please-i-
   also:
   - name: The Imperial Gatekeeper
     kind: game
@@ -816,10 +1121,10 @@ entries:
     url: https://arxiv.org/abs/2307.05518
   novelty_before: 3
   novelty: 2
-  verdict: Papers, Please (2013) already generates entrants at random against each day's formal rules
-    and scores the player's rulings, with an endless mode, and The Imperial Gatekeeper (2022) says its
-    applicants are generated and the player is scored on accuracy. The design is known and shipped, with
-    generated rule changes and forgeries as refinements, so the score falls from 3 to 2.
+  verdict: Papers, Please (2013) fills every unscripted entrant with random data drawn from the current
+    rules and scores the player's rulings, and its developer validated the generator on thousands of entrants
+    at a time; The Imperial Gatekeeper (2022) states the same. Round 2 found no language-model inspection
+    game. The design is known and shipped, so the score of 2 stands.
 - opportunity: generated-recipe-graphs
   date: '2026-11-01'
   queries:
@@ -895,22 +1200,32 @@ entries:
     none designs on-theme production graphs checked by agent playtests. The stored 3 stands.
 - opportunity: generative-decoration-catalogs
   date: '2026-11-01'
-  queries: []
-  not_run:
-  - q: 'life sim text to 3D furniture generator in game (not run: web-search budget exhausted)'
+  queries:
+  - q: life sim game players generate furniture from text prompt AI text-to-3D build mode 2025 2026 -inZOI
     where: web
-  - q: management sim image to 3D object player generated decoration build mode
+    round: 2
+  - q: Sims 4 OR RimWorld OR "Planet Coaster" mod text to 3D object generation AI generated placeable
+      objects
     where: web
-  - q: Sims 4 OR RimWorld mod text to 3D object generation
-    where: web
+    round: 2
   - q: text to 3D
     where: steam
+    round: 2
+  - q: AI furniture generator
+    where: steam
+    round: 2
+  - q: text to 3D furniture
+    where: itch.io
+    round: 2
+  - q: abs:"text-to-3D" AND abs:game
+    where: arxiv
+    round: 2
   where:
-  - direct
-  coverage: partial
-  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
-    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
-    it.'
+  - arxiv
+  - itch.io
+  - steam
+  - web
+  coverage: full
   checked:
   - name: inZOI on Steam
     url: https://store.steampowered.com/app/2456740/inZOI/
@@ -922,6 +1237,12 @@ entries:
     url: https://www.moddb.com/mods/simsgpt
   - name: Rec Room blog
     url: https://blog.recroom.com/
+  - name: Steam searches 'text to 3D' and 'AI furniture generator'
+    url: https://store.steampowered.com/search/?term=AI+furniture+generator
+  - name: Blackbox Creations (Steam, Meshy Game Studio, coming soon)
+    url: https://store.steampowered.com/app/4437020/
+  - name: itch.io search 'text to 3D furniture'
+    url: https://itch.io/search?q=text+to+3D+furniture
   closest:
     name: inZOI image-to-3D objects
     kind: game
@@ -939,7 +1260,8 @@ entries:
   novelty: 2
   verdict: A life sim already lets players make placeable 3D decorations from images (inZOI, 2025), the
     precedent the prediction excludes by name, so the idea is known and rarely done, anchor 2. The stored
-    2 stands.
+    2 stands. Round 2's web, Steam, itch.io and arXiv searches found no second life or management sim
+    and no mod with in-game 3D object generation; the ceiling stays 2.
 - opportunity: human-calibrated-customers
   date: '2026-11-01'
   queries:
@@ -1023,25 +1345,42 @@ entries:
     so the score falls from 4 to 3.
 - opportunity: illustrated-chronicles
   date: '2026-11-01'
-  queries: []
-  not_run:
-  - q: 'game automatically writes chronicle of your playthrough export share (not run: web-search budget
-      exhausted)'
+  queries:
+  - q: game automatically writes a chronicle or history book of your playthrough that you can export or
+      share, generated from in-game events
     where: web
-  - q: Crusader Kings chronicle feature automatic dynasty history
+    round: 2
+  - q: RimWorld OR "Dwarf Fortress" OR "Crusader Kings" mod LLM writes chronicle story of my colony from
+      event log with AI images
     where: web
-  - q: LLM chronicle mod RimWorld OR Dwarf Fortress OR Crusader Kings story of my colony
+    round: 2
+  - q: strategy or simulation game feature generates an illustrated storybook or comic recap of your campaign
+      at the end that players can save and share, patch notes
     where: web
-  - q: roguelike morgue file run summary shared online
+    round: 2
+  - q: Steam strategy or colony game 2025 2026 built-in AI writes the history or chronicle of your kingdom
+      or colony from what happened in your game, export chronicle
     where: web
-  - q: chronicle
+    round: 2
+  - q: chronicle AI story
     where: steam
+    round: 2
+  - q: colony chronicle
+    where: steam
+    round: 2
+  - q: chronicle (RimWorld workshop, text search)
+    where: steam-workshop
+    round: 2
+  - q: abs:"game logs" AND abs:narrative AND abs:"language model"; abs:sifting AND abs:narrative; abs:"emergent
+      narrative" AND abs:summar*; abs:"Dwarf Fortress" AND abs:narrative
+    where: arxiv
+    round: 2
   where:
-  - direct
-  coverage: partial
-  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
-    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
-    it.'
+  - arxiv
+  - steam
+  - steam-workshop
+  - web
+  coverage: full
   checked:
   - name: 'Expansion - Crusader Kings II: Charlemagne (Steam)'
     url: https://store.steampowered.com/app/292982/Expansion_Crusader_Kings_II_Charlemagne/
@@ -1059,6 +1398,26 @@ entries:
     url: https://wiki.cavesofqud.com/wiki/Journal
   - name: SimsGPT (ModDB)
     url: https://www.moddb.com/mods/simsgpt
+  - name: 'RimWorld Workshop search: chronicle'
+    url: https://steamcommunity.com/workshop/browse/?appid=294100&searchtext=chronicle&browsesort=textsearch&section=readytouseitems
+  - name: EchoTales (RimWorld mod)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3473331410
+  - name: RimLegend - Your Colony's Story, Written by AI (RimWorld mod)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3697076313
+  - name: 'WoW addons Forever: Storyteller and Max Adventure Journal (CurseForge)'
+    url: https://www.curseforge.com/wow/addons/forever-storyteller
+  - name: Keng's Little Universe (Steam)
+    url: https://store.steampowered.com/app/1725860/
+  - name: Observe (Steam 3681230)
+    url: https://store.steampowered.com/app/3681230/
+  - name: Dungeon Crawl Stone Soup morgue (CrawlWiki)
+    url: http://crawl.chaosforge.org/Morgue
+  - name: NetHack dumplog (NetHackWiki)
+    url: https://nethackwiki.com/wiki/Dumplog
+  - name: King of Dragon Pass (Steam)
+    url: https://store.steampowered.com/app/352220/
+  - name: 'Steam search: chronicle AI story / colony chronicle'
+    url: https://store.steampowered.com/search/?term=colony+chronicle&sort_by=Reviews_DESC
   closest:
     name: 'Crusader Kings II: Charlemagne''s annual chronicle'
     kind: official
@@ -1078,32 +1437,72 @@ entries:
     closeness: feature
     source: src-primagames-2011-sims-3-generations-new-connections
     url: https://primagames.com/eguides/the-sims-3-generations-eguide/essentials/new-connections
+  - name: RimLegend (RimWorld mod)
+    kind: mod
+    year: null
+    closeness: design
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3697076313
+  - name: Dungeon Crawl Stone Soup morgue files
+    kind: game
+    year: null
+    closeness: feature
+    url: http://crawl.chaosforge.org/Morgue
   novelty_before: 2
   novelty: 2
   verdict: An official expansion writes a yearly chronicle of the player's game from its events (Crusader
     Kings II, 2014), Dwarf Fortress exports its history, and The Sims 3 shared automatic snapshots. Known
-    and rarely done well; the stored 2 stands.
+    and rarely done well; the stored 2 stands. Round 2 found language-model chronicle mods for RimWorld
+    that write and export a run's story (RimLegend, EchoTales) and the shared run histories of Dungeon
+    Crawl Stone Soup, so the idea is known and executed mostly as mods; the ceiling stays 3 and the stored
+    2 stands.
 - opportunity: intent-level-orders
   date: '2026-11-01'
   queries:
   - q: natural language commands colony management game
     where: steam
-  not_run:
-  - q: RimWorld mod natural language orders LLM work priorities
+  - q: colony sim game type commands in plain English, AI sets colonists' job priorities and schedules
+      (LLM) Steam
     where: web
-  - q: colony sim type commands in plain English AI sets job priorities schedule
+    round: 2
+  - q: RimWorld mod natural language orders LLM sets work priorities
     where: web
-  - q: inZOI Smart Zoi prompt schedule Zoi Pen
+    round: 2
+  - q: Steam game manage a colony or base by typing natural-language instructions to LLM-driven workers
+      2025 OR 2026 release
     where: web
+    round: 2
+  - q: '"Brave New Wonders" automatons natural language behaviour editor LLM how commands are translated'
+    where: web
+    round: 2
+  - q: abs:"natural language" AND abs:"real-time strategy" AND abs:commands
+    where: arxiv
+    round: 2
+  - q: abs:"language model" AND abs:colony AND abs:game
+    where: arxiv
+    round: 2
+  - q: abs:"natural language" AND abs:game AND abs:commands AND abs:strategy AND abs:"language model"
+    where: arxiv
+    round: 2
   - q: language model translate player intent into game control primitives
     where: semantic-scholar
+    round: 2
+  - q: brave new wonders
+    where: steam
+    round: 2
+  - q: bot colony
+    where: steam
+    round: 2
+  - q: natural language automation
+    where: steam
+    round: 2
   where:
+  - arxiv
+  - semantic-scholar
   - steam
   - steam-news
   - steam-workshop
-  coverage: partial
-  coverage_note: 'No web or scholarly search was run: the session''s shared web-search budget ran out.
-    A fuller search can only find closer prior art, which could lower the ceiling, not raise it.'
+  - web
+  coverage: full
   checked:
   - name: inZOI Smart Zoi (Steam news API, inZOI announcements)
     url: https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=2456740&count=300&maxlength=0&feeds=steam_community_announcements
@@ -1117,14 +1516,34 @@ entries:
     url: https://www.krafton.com/en/news/press/krafton-introduces-pubg-ally-beta-test/
   - name: RimWorld LLM mods surfaced (RimTalk, EchoColony, AskAPawn, OpenRimWorldAI, RimSaga, RimAI Framework)
     url: https://steamcommunity.com/sharedfiles/filedetails/?id=3529263357
+  - name: Brave New Wonders (Steam store page)
+    url: https://store.steampowered.com/app/2403830/Brave_New_Wonders/
+  - name: Brave New Wonders developer posts (Steam news API; deep dive of 2026-06-05)
+    url: https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=2403830&count=100&maxlength=0&feeds=steam_community_announcements
+  - name: EBSCO article 'Brave New Wonders'
+    url: https://www.ebsco.com/articles/literature-and-writing/f4653d6b-93e4-5582-bee0-7800871ba30c/brave-new-wonders
+  - name: IF:CARGO (arXiv 2608.12195)
+    url: https://arxiv.org/abs/2608.12195
+  - name: Real-Time World Crafting (arXiv 2510.16952)
+    url: https://arxiv.org/abs/2510.16952
+  - name: arXiv API listings (3 queries)
+    url: https://export.arxiv.org/api/query?search_query=abs:%22natural%20language%22%20AND%20abs:%22real-time%20strategy%22%20AND%20abs:commands&max_results=12
+  - name: Semantic Scholar search
+    url: https://api.semanticscholar.org/graph/v1/paper/search?query=language+model+translate+player+intent+into+game+control+primitives&limit=10&fields=title,year,url,externalIds,venue
   closest:
-    name: inZOI Smart Zoi
+    name: Brave New Wonders
+    kind: game
+    year: 2026
+    closeness: design
+    source: src-cityfromnaught-2026-brave-new-wonders
+    url: https://store.steampowered.com/app/2403830/Brave_New_Wonders/
+  also:
+  - name: inZOI Smart Zoi
     kind: game
     year: 2025
     closeness: feature
     source: src-steam-2025-inzoi
     url: https://store.steampowered.com/app/2456740/inZOI/
-  also:
   - name: I WAS A KING
     kind: game
     year: 2026
@@ -1135,32 +1554,58 @@ entries:
     year: 2008
     closeness: feature
     url: https://store.steampowered.com/app/21800/
+  - name: IF:CARGO
+    kind: research
+    year: 2026
+    closeness: design
+    url: https://arxiv.org/abs/2608.12195
   novelty_before: 3
-  novelty: 3
-  verdict: In inZOI typed text steers a character's actions and schedule, and strategy games have parsed
-    spoken or typed orders, but no colony sim found compiles standing free-text orders into its work-priority
-    grid. The stored 3 stands.
+  novelty: 2
+  verdict: A management sim released in September 2026, Brave New Wonders, already turns standing plain-language
+    orders, conditional ones included, into its own behaviour graphs, which the player reviews, edits,
+    and sees in the inspector; actions a worker cannot do are flagged. That is the core design, missing
+    only a priority grid to compile into, conflict checks, and expiry. Between design and feature the
+    lower ceiling is 2, so the score falls from 3 to 2. The earlier closest, inZOI, stays as a narrower
+    form.
 - opportunity: language-modding
   date: '2026-11-01'
-  queries: []
-  not_run:
-  - q: official AI mod creator natural language mod generator simulation game developer announces
+  queries:
+  - q: official AI mod creator natural language mod generator game developer announces tool players describe
+      mod
     where: web
-  - q: Minecraft OR RimWorld OR Cities Skylines OR Factorio official tool generate mod from text description
-      LLM
+    round: 2
+  - q: 'Minecraft OR RimWorld OR "Cities: Skylines" OR Factorio OR inZOI official tool generate mod from
+      text description AI'
     where: web
-  - q: UEFN Epic Developer Assistant writes Verse code; Roblox Assistant generates scripts
+    round: 2
+  - q: Roblox Assistant agentic playtest automatically tests generated code Studio 2025
     where: web
-  - q: AI mod maker; mod generator; text to mod
+    round: 2
+  - q: studio officially partners AI mod creation tool players generate mods from prompts official support
+      Nexus Mods OR CurseForge OR Overwolf 2026
+    where: web
+    round: 2
+  - q: AI mod maker
     where: steam
-  - q: large language model generate game mods modding API automated testing
+    round: 2
+  - q: mod generator
+    where: steam
+    round: 2
+  - q: text to mod
+    where: steam
+    round: 2
+  - q: large language model generate game mods modding automated testing
     where: semantic-scholar
+    round: 2
+  - q: all:modding AND (all:LLM OR all:"language model")
+    where: arxiv
+    round: 2
   where:
-  - direct
-  coverage: partial
-  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
-    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
-    it.'
+  - arxiv
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
   checked:
   - name: 'Roblox Creator Hub: Assistant for Studio'
     url: https://create.roblox.com/docs/assistant/guide
@@ -1174,25 +1619,53 @@ entries:
     url: https://arxiv.org/abs/2305.16291
   - name: Factorio Learning Environment (src-hopkins-2025-factorio-learning-environment)
     url: https://arxiv.org/abs/2503.09617
+  - name: 'Roblox newsroom: Roblox Studio is Going Agentic (2026-04-15)'
+    url: https://about.roblox.com/newsroom/2026/04/roblox-studio-going-agentic
+  - name: Mod Anything (Steam, Upstreet, coming soon)
+    url: https://store.steampowered.com/app/4513910/
+  - name: 'Player Games: AI Minecraft Mod Maker'
+    url: https://www.player.games/en-US/ai-minecraft-mod-maker
+  - name: StarCharM (arXiv 2507.13951, 2025-07-18)
+    url: https://arxiv.org/abs/2507.13951
+  - name: Steam searches
+    url: https://store.steampowered.com/search/?term=mod+generator
   closest:
-    name: Roblox Assistant
+    name: Roblox Assistant planning and playtesting agent
+    kind: official
+    year: 2026
+    closeness: feature
+    source: src-roblox-2026-studio-going-agentic
+    url: https://about.roblox.com/newsroom/2026/04/roblox-studio-going-agentic
+  also:
+  - name: Roblox Assistant
     kind: official
     year: null
     closeness: feature
     source: src-roblox-2026-assistant-guide
     url: https://create.roblox.com/docs/assistant/guide
-  also:
   - name: Voyager
     kind: research
     year: 2023
     closeness: adjacent
     source: src-wang-2023-voyager
     url: https://arxiv.org/abs/2305.16291
+  - name: Player Games AI Minecraft Mod Maker
+    kind: outside
+    year: null
+    closeness: feature
+    url: https://www.player.games/en-US/ai-minecraft-mod-maker
+  - name: Mod Anything (announced)
+    kind: prototype
+    year: null
+    closeness: design
+    url: https://store.steampowered.com/app/4513910/
   novelty_before: 3
   novelty: 3
-  verdict: Roblox's official assistant writes scripts against its own API from typed requests, without
-    automated agent tests and on a creation platform rather than a moddable simulation game; research
-    couples model-written game code with automated checks. The stored 3 stands.
+  verdict: Roblox's official assistant now plans changes, writes the code, and tests the result with a
+    playtesting agent, but it builds a creator's own experience on a creation platform rather than modding
+    an existing simulation game, so it is the feature in a narrower form, not the design. Third-party
+    services write and boot-test Minecraft mods, and no developer of a moddable simulation game has shipped
+    such a tool. The stored 3 stands.
 - opportunity: learned-build-assist
   date: '2026-11-01'
   queries:
@@ -1214,19 +1687,46 @@ entries:
     where: semantic-scholar
   - q: all:sketch AND all:urban AND all:layout AND all:generation
     where: arxiv
-  not_run:
-  - q: 'Blackshark.ai Microsoft Flight Simulator machine learning building footprints (not run: web-search
-      budget exhausted)'
-    where: web
-  - q: AI city builder layout
+  - q: AI city builder
     where: steam
+    round: 2
+  - q: AI city generator
+    where: steam
+    round: 2
+  - q: city layout generator
+    where: steam
+    round: 2
+  - q: procedural city brush
+    where: steam
+    round: 2
+  - q: 'machine learning (Cities: Skylines workshop)'
+    where: steam-workshop
+    round: 2
+  - q: 'neural network (Cities: Skylines workshop)'
+    where: steam-workshop
+    round: 2
+  - q: ai structure generator; neural building; ai build sketch (no hits); ai builder (Modrinth API)
+    where: mod-portal
+    round: 2
+  - q: AI city builder
+    where: itch.io
+    round: 2
+  - q: neural city generator
+    where: itch.io
+    round: 2
+  - q: mod or game uses a neural network trained on real city or player-built layouts to generate roads
+      and buildings from the player's sketch or brush, released 2025 OR 2026
+    where: web
+    round: 2
   where:
   - arxiv
+  - itch.io
+  - mod-portal
   - semantic-scholar
+  - steam
+  - steam-workshop
   - web
-  coverage: partial
-  coverage_note: 'No storefront search was run: the session''s shared web-search budget ran out. A fuller
-    search can only find closer prior art, which could lower the ceiling, not raise it.'
+  coverage: full
   checked:
   - name: Neural Turtle Graphics for Modeling City Road Layouts (arXiv 1910.02055)
     url: https://arxiv.org/abs/1910.02055
@@ -1244,6 +1744,14 @@ entries:
     url: https://about.roblox.com/newsroom/2026/09/rdc-2026-the-world-needs-more-play
   - name: Blackshark.ai homepage
     url: https://blackshark.ai/
+  - name: Steam searches (four terms)
+    url: https://store.steampowered.com/search/?term=AI+city+builder&sort_by=Reviews_DESC
+  - name: 'Cities: Skylines workshop searches'
+    url: https://steamcommunity.com/workshop/browse/?appid=255710&searchtext=machine+learning&browsesort=textsearch&section=readytouseitems
+  - name: AI Builder (Modrinth, Minecraft Spigot plugin)
+    url: https://modrinth.com/plugin/ai-builder
+  - name: itch.io searches
+    url: https://itch.io/search?q=AI+city+builder
   closest:
     name: Neural Turtle Graphics
     kind: research
@@ -1258,11 +1766,19 @@ entries:
     closeness: adjacent
     source: src-steam-2026-tiny-glade
     url: https://store.steampowered.com/app/2198150/Tiny_Glade/
+  - name: AI Builder (Minecraft plugin)
+    kind: mod
+    year: null
+    closeness: adjacent
+    url: https://modrinth.com/plugin/ai-builder
   novelty_before: 3
   novelty: 3
   verdict: Learned, sketch-driven layout generation exists in research (Neural Turtle Graphics, trained
     on OpenStreetMap) and stroke assist has shipped with procedural rules (Tiny Glade), but no city builder
-    found ships a learned layout generator. The anchors would allow 4; the stored 3 is not raised.
+    found ships a learned layout generator. The anchors would allow 4; the stored 3 is not raised. Round
+    2's storefront searches (Steam, the Cities, Skylines Workshop, Modrinth, itch.io) found no city builder
+    or mod with a layout model trained on layout data, only a language-model build plugin for Minecraft;
+    the ceiling stays 4.
 - opportunity: learned-material-surrogates
   date: '2026-11-01'
   queries:
@@ -1273,18 +1789,60 @@ entries:
     where: web
   - q: '"Softmax" "Neural Simulation of Skeletal Physics" FateTrigger GDC LightSpeed'
     where: web
-  not_run:
-  - q: gdcvault SoftMax neural simulation skeletal physics FateTrigger
-    where: web
-  - q: neural physics / machine learning physics
+  - q: neural physics
     where: steam
-  - q: learned fluid simulation real-time game deployment
+    round: 2
+  - q: machine learning physics
+    where: steam
+    round: 2
+  - q: neural network simulation
+    where: steam
+    round: 2
+  - q: AI fluid simulation
+    where: steam
+    round: 2
+  - q: neural cellular automata sand
+    where: steam
+    round: 2
+  - q: fatetrigger / fate trigger
+    where: steam
+    round: 2
+  - q: neural physics
+    where: itch.io
+    round: 2
+  - q: learned physics simulation
+    where: itch.io
+    round: 2
+  - q: abs:neural AND abs:fluid AND abs:game AND abs:"real-time"
+    where: arxiv
+    round: 2
+  - q: abs:"graph network" AND abs:simulator AND abs:interactive
+    where: arxiv
+    round: 2
+  - q: abs:neural AND abs:fracture AND abs:"real-time"
+    where: arxiv
+    round: 2
+  - q: learned fluid simulation real-time game; neural network physics simulation video game runtime;
+      neural destruction fracture simulation real-time games (all HTTP 429)
     where: semantic-scholar
+    round: 2
+  - q: SoftMax FateTrigger "neural" skeletal physics simulation runtime GDC talk shipped game
+    where: web
+    round: 2
+  - q: shipped video game uses trained neural network to simulate cloth, fluid or destruction physics
+      at runtime instead of physics solver
+    where: web
+    round: 2
+  - q: game ships neural network fluid simulation or learned destruction model running during gameplay,
+      developer talk 2025 OR 2026
+    where: web
+    round: 2
   where:
+  - arxiv
+  - itch.io
+  - steam
   - web
-  coverage: partial
-  coverage_note: 'No scholarly or storefront search was run: the session''s shared web-search budget ran
-    out. A fuller search can only find closer prior art, which could lower the ceiling, not raise it.'
+  coverage: full
   checked:
   - name: 'Machine Learning: Physics Simulation, Kolmogorov Complexity, and Squishy Bunnies (GDC 2020)'
     url: https://gdcvault.com/play/1026713/Machine-Learning-Physics-Simulation-Kolmogorov
@@ -1296,14 +1854,34 @@ entries:
     url: https://arxiv.org/abs/2002.09405
   - name: 'GDC 2026 session ''SoftMax: Neural Simulation of Skeletal Physics'' (LightSpeed Studios)'
     url: https://schedule.gdconf.com/session/softmax-neural-simulation-of-skeletal-physics/915222
+  - name: Steam store searches (6 queries above)
+    url: https://store.steampowered.com/search/?term=neural+physics
+  - name: PixelFall (Steam)
+    url: https://store.steampowered.com/app/4899610/PixelFall/
+  - name: Splatterbox (Steam)
+    url: https://store.steampowered.com/app/4645580/Splatterbox/
+  - name: itch.io searches (2 queries above)
+    url: https://itch.io/search?q=neural+physics
+  - name: arXiv API listings (3 queries above)
+    url: https://export.arxiv.org/api/query?search_query=abs:neural%20AND%20abs:fluid%20AND%20abs:game%20AND%20abs:%22real-time%22&max_results=12
+  - name: 'SIGGRAPH 21: Swish, Neural Network Cloth Simulation in Madden NFL 21 (EA SEED)'
+    url: https://www.ea.com/seed/news/swish-neural-network-cloth-sim-in-madden-nfl-21
+  - name: 'SoftMax: Neural Simulation of Skeletal Physics (GDC session page)'
+    url: https://schedule.gdconf.com/session/softmax-neural-simulation-of-skeletal-physics/915222
   closest:
-    name: Unreal Engine ML Deformer
+    name: Swish neural cloth in Madden NFL 21
+    kind: game
+    year: null
+    closeness: adjacent
+    source: src-ea-2021-swish-neural-cloth
+    url: https://www.ea.com/seed/news/swish-neural-network-cloth-sim-in-madden-nfl-21
+  also:
+  - name: Unreal Engine ML Deformer
     kind: official
     year: null
     closeness: adjacent
     source: src-epic-2026-ml-deformer
     url: https://dev.epicgames.com/documentation/en-us/unreal-engine/how-to-use-the-machine-learning-deformer-in-unreal-engine
-  also:
   - name: Subspace Neural Physics (Ubisoft La Forge)
     kind: research
     year: 2019
@@ -1318,27 +1896,51 @@ entries:
     url: https://arxiv.org/abs/2002.09405
   novelty_before: 4
   novelty: 4
-  verdict: Trained models replace offline physical simulation at runtime only for cosmetic mesh deformation
-    (Unreal's ML Deformer), which the prediction excludes; learned fluid and deformable simulators are
-    research. No shipped precedent with adjacent research, anchor 4; the stored 4 stands.
+  verdict: The learned surrogates that have shipped are cosmetic (Swish, EA's neural cloth for Madden
+    NFL 21's jerseys; Unreal's ML Deformer), which the prediction excludes, and learned fluid and deformable
+    simulators remain research. No shipped precedent with adjacent research, anchor 4; the stored 4 stands.
 - opportunity: learned-weather-layer
   date: '2026-11-01'
-  queries: []
-  not_run:
-  - q: game weather machine learning emulator OR neural weather model in-game farming OR flight simulator
+  queries:
+  - q: video game weather generated by machine learning model neural weather emulator in-game farming
+      OR flight OR city simulator
     where: web
-  - q: Microsoft Flight Simulator 2024 weather AI model Meteoblue machine learning
+    round: 2
+  - q: Microsoft Flight Simulator 2024 weather meteoblue machine learning AI model live weather
     where: web
+    round: 2
+  - q: GraphCast OR GenCast OR "Pangu-Weather" OR "FourCastNet" used in video game OR flight simulator
+      add-on OR Unreal Engine weather
+    where: web
+    round: 2
+  - q: game uses machine learning climate emulator OR neural network weather model gameplay climate scenarios
+      developer
+    where: web
+    round: 2
   - q: procedural weather generation neural network game
     where: semantic-scholar
+    round: 2
+  - q: all:weather AND (all:"video game" OR all:"game engine")
+    where: arxiv
+    round: 2
+  - q: ti:weather AND abs:game
+    where: arxiv
+    round: 2
+  - q: all:"weather generator" AND (all:neural OR all:learned OR all:diffusion)
+    where: arxiv
+    round: 2
   - q: weather simulation AI
     where: steam
+    round: 2
+  - q: AI weather
+    where: steam
+    round: 2
   where:
-  - direct
-  coverage: partial
-  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
-    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
-    it.'
+  - arxiv
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
   checked:
   - name: Microsoft Flight Simulator (2020 video game) (Wikipedia)
     url: https://en.wikipedia.org/wiki/Microsoft_Flight_Simulator_(2020_video_game)
@@ -1348,6 +1950,10 @@ entries:
     url: https://arxiv.org/abs/2310.02074
   - name: NVIDIA Earth-2
     url: https://www.nvidia.com/en-us/high-performance-computing/earth-2/
+  - name: 'SRF: Live-Wetter im Flugsimulator - Microsoft fliegt mit Schweizer Wetter (2020-09-24)'
+    url: https://www.srf.ch/news/wirtschaft/live-wetter-im-flugsimulator-microsoft-fliegt-mit-schweizer-wetter
+  - name: Steam searches 'weather simulation AI' and 'AI weather'
+    url: https://store.steampowered.com/search/?term=AI+weather
   closest:
     name: ACE (AI2 Climate Emulator)
     kind: research
@@ -1362,11 +1968,18 @@ entries:
     closeness: none
     source: src-wikipedia-microsoft-flight-simulator-2020
     url: https://en.wikipedia.org/wiki/Microsoft_Flight_Simulator_(2020_video_game)
+  - name: Microsoft Flight Simulator live weather (Meteoblue)
+    kind: game
+    year: 2020
+    closeness: adjacent
+    url: https://www.srf.ch/news/wirtschaft/live-wetter-im-flugsimulator-microsoft-fliegt-mit-schweizer-wetter
   novelty_before: 3
   novelty: 3
   verdict: Learned atmospheric emulators exist in research (ACE, GenCast) and in products outside games,
     while shipped sims use forecast feeds, which the prediction excludes. The anchors would allow 4; the
-    stored 3 is not raised.
+    stored 3 is not raised. Round 2's searches found no sim or add-on running a learned weather emulator;
+    the nearest is a streamed forecast whose provider blends models with machine learning, which the prediction
+    excludes, so the ceiling stays 4.
 - opportunity: living-workforce-factories
   date: '2026-11-01'
   queries:
@@ -1378,13 +1991,24 @@ entries:
     where: repository
   - q: ti:"Project Sid"; abs:"agent-based" AND abs:workforce AND abs:aging; abs:"factory game"
     where: arxiv
+  - q: factory automation game where workers age, retire, have children and you must train the next generation
+      of operators for machines
+    where: web
+    round: 2
+  - q: 'Steam automation factory builder with population lifecycle: workers grow old, have kids, go to
+      school, skilled workers retire, generational workforce production chains'
+    where: web
+    round: 2
+  - q: '"automation" colony game 2025 OR 2026 early access workers have families, children grow up and
+      inherit jobs, elderly workers retire, conveyor production lines'
+    where: web
+    round: 2
   where:
   - arxiv
   - repository
   - steam
-  coverage: partial
-  coverage_note: 'No web search was run: the session''s shared web-search budget ran out. A fuller search
-    can only find closer prior art, which could lower the ceiling, not raise it.'
+  - web
+  coverage: full
   checked:
   - name: 'Workers & Resources: Soviet Republic (Steam; catalog game)'
     url: https://store.steampowered.com/app/784150/
@@ -1400,6 +2024,20 @@ entries:
     url: https://store.steampowered.com/app/1162750/
   - name: Steam storefront searches
     url: https://store.steampowered.com/search/?term=factory+workers+generations&sort_by=Reviews_DESC
+  - name: Kubifaktorium (Steam)
+    url: https://store.steampowered.com/app/898720/
+  - name: Stardeus (Steam)
+    url: https://store.steampowered.com/app/1380910/
+  - name: Clanfolk (Steam)
+    url: https://store.steampowered.com/app/1700870/
+  - name: Ostriv (Steam)
+    url: https://store.steampowered.com/app/773790/
+  - name: Genesis Factory Demo (Steam 5298710)
+    url: https://store.steampowered.com/app/5298710/
+  - name: Dawn Apart (Steam 1866300)
+    url: https://store.steampowered.com/app/1866300/
+  - name: Agromatic (Steam 5167230) and Steam Colony (Steam 5007730)
+    url: https://store.steampowered.com/app/5167230/
   closest:
     name: 'Workers & Resources: Soviet Republic'
     kind: game
@@ -1414,11 +2052,18 @@ entries:
     closeness: feature
     source: src-steam-2026-banished
     url: https://store.steampowered.com/app/242920/Banished/
+  - name: Clanfolk
+    kind: game
+    year: null
+    closeness: adjacent
+    url: https://store.steampowered.com/app/1700870/
   novelty_before: 3
   novelty: 3
   verdict: Workers & Resources couples deep production chains to citizens followed from childhood to death,
     whose schooling gates jobs and production, though training is by education tier, with no per-machine
-    operators or succession. Strong partial precedents; the stored 3 stands.
+    operators or succession. Strong partial precedents; the stored 3 stands. Round 2's web searches found
+    automation-colony hybrids with skills but no lifecycle and generational colonies without automation
+    (Clanfolk), so the ceiling stays 3.
 - opportunity: llm-society-terrarium
   date: '2026-11-01'
   queries:
@@ -1595,12 +2240,48 @@ entries:
     where: arxiv
   - q: abs:"mean field game" AND abs:traffic AND abs:route
     where: arxiv
+  - q: crowd simulation
+    where: steam
+    round: 2
+  - q: flow field
+    where: steam
+    round: 2
+  - q: traffic simulation city
+    where: steam
+    round: 2
+  - q: million citizens city builder
+    where: steam
+    round: 2
+  - q: fluid dynamics crowd
+    where: steam
+    round: 2
+  - q: pedestrian simulation
+    where: steam
+    round: 2
+  - q: crowd flow
+    where: steam
+    round: 2
+  - q: theme park crowd
+    where: steam
+    round: 2
+  - q: billion citizens / subway builder (app lookup)
+    where: steam
+    round: 2
+  - q: flow field crowd
+    where: itch.io
+    round: 2
+  - q: continuum crowd
+    where: itch.io
+    round: 2
+  - q: mean field traffic
+    where: itch.io
+    round: 2
   where:
   - arxiv
+  - itch.io
+  - steam
   - web
-  coverage: partial
-  coverage_note: 'No storefront search was run: the session''s shared web-search budget ran out. A fuller
-    search can only find closer prior art, which could lower the ceiling, not raise it.'
+  coverage: full
   checked:
   - name: Meet the team Q&A - Owen Mc Carthy (Frontier Forums, archived copy)
     url: https://web.archive.org/web/20250807115146/https://forums.frontier.co.uk/threads/meet-the-team-q-a-owen-mc-carthy.494627/
@@ -1622,6 +2303,14 @@ entries:
     url: https://en.wikipedia.org/wiki/Supreme_Commander_2
   - name: 'Solving N-player dynamic routing games with congestion: a mean field approach (arXiv 2110.11943)'
     url: https://arxiv.org/abs/2110.11943
+  - name: Steam store searches (8 queries above)
+    url: https://store.steampowered.com/search/?term=crowd+simulation
+  - name: Billion Citizens (Steam)
+    url: https://store.steampowered.com/app/4533070/Billion_Citizens/
+  - name: Subway Builder (Steam)
+    url: https://store.steampowered.com/app/4039140/Subway_Builder/
+  - name: itch.io searches (3 queries above)
+    url: https://itch.io/search?q=flow+field+crowd
   closest:
     name: Planet Coaster guest crowd
     kind: game
@@ -1640,11 +2329,18 @@ entries:
     year: 2021
     closeness: adjacent
     url: https://arxiv.org/abs/2110.11943
+  - name: Subway Builder
+    kind: game
+    year: 2026
+    closeness: adjacent
+    url: https://store.steampowered.com/app/4039140/Subway_Builder/
   novelty_before: 4
   novelty: 3
   verdict: Planet Coaster's programmer describes a fluid-dynamics, that is continuum, model of its guest
     crowd, the population of a management sim, and Supreme Commander 2 marketed continuum-crowd pathfinding.
-    A mean-field route-choice equilibrium for city traffic is unshipped, so this is anchor 3, not 4.
+    A mean-field route-choice equilibrium for city traffic is unshipped, so this is anchor 3, not 4. Round
+    2's Steam and itch.io searches found no city builder naming a field or equilibrium traffic model;
+    Subway Builder routes its commuters one by one, so the ceiling stays 3.
 - opportunity: mechanic-discovery-search
   date: '2026-11-01'
   queries:
@@ -1664,13 +2360,41 @@ entries:
     where: semantic-scholar
   - q: abs:mechanics AND abs:evolving AND abs:game AND abs:design (sorted by date)
     where: arxiv
+  - q: game designed by AI
+    where: steam
+    round: 2
+  - q: evolved rules
+    where: steam
+    round: 2
+  - q: Ludii
+    where: steam
+    round: 2
+  - q: ANGELINA
+    where: steam
+    round: 2
+  - q: AI generated mechanics
+    where: steam
+    round: 2
+  - q: Yavalath
+    where: steam
+    round: 2
+  - q: ANGELINA game designer
+    where: itch.io
+    round: 2
+  - q: mechanic miner
+    where: itch.io
+    round: 2
+  - q: wevva; gamika (Apple App Store search API)
+    where: app-store
+    round: 2
   where:
+  - app-store
   - arxiv
+  - itch.io
   - semantic-scholar
+  - steam
   - web
-  coverage: partial
-  coverage_note: 'No storefront search was run: the session''s shared web-search budget ran out. A fuller
-    search can only find closer prior art, which could lower the ceiling, not raise it.'
+  coverage: full
   checked:
   - name: Cameron's Yavalath Page (cambolbro.com)
     url: https://www.cambolbro.com/games/yavalath/
@@ -1689,6 +2413,18 @@ entries:
     url: https://boardgamegeek.com/blogpost/2814/yavalath-evolutionary-game-design
   - name: Semantic Scholar API
     url: https://api.semanticscholar.org/graph/v1/paper/search
+  - name: This game was made by AI (Steam 3307880, released 2024-11-18)
+    url: https://store.steampowered.com/app/3307880/
+  - name: The ANGELINA Game Player (itch.io, Games by ANGELINA)
+    url: https://gamesbyangelina.itch.io/player
+  - name: Quid Pro UFO, To That Sect, Wheel And Steal, Stretch Bouquet Point (itch.io, Games by ANGELINA)
+    url: https://gamesbyangelina.itch.io/quid-pro-ufo
+  - name: Steam searches 'Ludii' and 'Yavalath'
+    url: https://store.steampowered.com/search/?term=Yavalath
+  - name: Apple App Store search API for 'wevva' and 'gamika'
+    url: https://itunes.apple.com/search?term=wevva&entity=software&limit=5
+  - name: BoardGameGeek XML API and nestorgames home
+    url: https://boardgamegeek.com/xmlapi2/search?query=Yavalath
   closest:
     name: Yavalath (rules evolved by Ludi)
     kind: game
@@ -1713,7 +2449,9 @@ entries:
   verdict: Commercially published games already credit their rules to automated search (Yavalath and Pentalath,
     evolved by Browne's Ludi), and a released game's mechanics were invented by ANGELINA's Mechanic Miner
     in 2012. Shipped precedents rule out 5 and 4; language-model-guided search over simulation mechanics
-    with agent populations is the new combination, anchor 3.
+    with agent populations is the new combination, anchor 3. Round 2's Steam, itch.io and App Store searches
+    found AI-made games that credit themes, levels or code to AI, not rules to search; the ceiling stays
+    3.
 - opportunity: natural-language-legislation
   date: '2026-11-01'
   queries:
@@ -1853,25 +2591,42 @@ entries:
     stands.
 - opportunity: neural-npc-motion
   date: '2026-11-01'
-  queries: []
-  not_run:
-  - q: 'colony sim reinforcement learning physics-based animation villagers (not run: web-search budget
-      exhausted)'
+  queries:
+  - q: ARC Raiders ARC robots locomotion reinforcement learning trained physics-based movement Embark
+      machine learning
     where: web
-  - q: shipped game trained policy physics character locomotion crowd
+    round: 2
+  - q: colony sim OR city builder OR management game uses reinforcement learning trained physics-based
+      animation for its characters or villagers, developer blog
     where: web
-  - q: ARC Raiders reinforcement learning robot locomotion physics
+    round: 2
+  - q: shipped video game NPCs or creatures animated by physics-based controllers trained with deep reinforcement
+      learning, first commercial game to use learned locomotion
     where: web
-  - q: physics-based pedestrian crowd controller reinforcement learning
-    where: semantic-scholar
+    round: 2
   - q: physics based animation colony
     where: steam
+    round: 2
+  - q: neural network evolution creatures
+    where: steam
+    round: 2
+  - q: reinforcement learning
+    where: steam
+    round: 2
+  - q: active ragdoll simulation
+    where: steam
+    round: 2
+  - q: abs:"physics-based" AND abs:crowd AND abs:"reinforcement learning"
+    where: arxiv
+    round: 2
+  - q: abs:"physics-based character" AND abs:injury OR abs:fatigue
+    where: arxiv
+    round: 2
   where:
-  - direct
-  coverage: partial
-  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
-    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
-    it.'
+  - arxiv
+  - steam
+  - web
+  coverage: full
   checked:
   - name: Evolution by Keiwan (itch.io)
     url: https://keiwan.itch.io/evolution
@@ -1883,14 +2638,39 @@ entries:
     url: https://www.gran-turismo.com/us/gt7/news/00_5962264.html
   - name: 'ARC Raiders: Evolution of ARC Raiders EP3'
     url: https://arcraiders.com/news/evolution-of-arc-raiders-episode-3
+  - name: '4Gamer report of the GDC 2026 talk ''Learning to Move: Physics-Based Enemy Locomotion in ARC
+      Raiders'''
+    url: https://www.4gamer.net/games/609/G060942/20260312064/
+  - name: GDC session page
+    url: https://schedule.gdconf.com/session/learning-to-move-physics-based-enemy-locomotion-in-arc-raiders/917319
+  - name: arcraiders.com Evolution of ARC Raiders Episode 3 (re-checked)
+    url: https://arcraiders.com/news/evolution-of-arc-raiders-episode-3
+  - name: ARC-RL (arXiv 2605.19503)
+    url: https://arxiv.org/abs/2605.19503
+  - name: Ecosystem (Steam)
+    url: https://store.steampowered.com/app/1133120/
+  - name: 'Substrate: Emergence (Steam)'
+    url: https://store.steampowered.com/app/4248790/
+  - name: Little Learning Machines (Steam)
+    url: https://store.steampowered.com/app/1993710/
+  - name: Shining Rock Software dev blog (Feb 2021)
+    url: https://shiningrocksoftware.com/?p=3320
+  - name: 'Tired Actor: Fatigue-Informed Character Control (arXiv 2608.03528)'
+    url: https://arxiv.org/abs/2608.03528
   closest:
-    name: Evolution (Keiwan)
+    name: Ecosystem
+    kind: game
+    year: 2024
+    closeness: feature
+    source: src-steam-2024-ecosystem
+    url: https://store.steampowered.com/app/1133120/
+  also:
+  - name: Evolution (Keiwan)
     kind: game
     year: null
     closeness: feature
     source: src-keiwan-2026-evolution
     url: https://keiwan.itch.io/evolution
-  also:
   - name: Gran Turismo Sophy in Gran Turismo 7
     kind: official
     year: 2023
@@ -1902,11 +2682,22 @@ entries:
     year: 2023
     closeness: adjacent
     url: https://arxiv.org/abs/2304.01893
+  - name: ARC Raiders robot locomotion
+    kind: game
+    year: 2025
+    closeness: feature
+    url: https://www.4gamer.net/games/609/G060942/20260312064/
+  - name: Tired Actor
+    kind: research
+    year: 2026
+    closeness: adjacent
+    url: https://arxiv.org/abs/2608.03528
   novelty_before: 3
   novelty: 3
-  verdict: Trained neural controllers drive physics bodies in released games outside the genre (Evolution's
-    creatures, Gran Turismo Sophy's cars), and physics controllers for crowds exist in research; no management
-    sim drives its population this way. The stored 3 stands.
+  verdict: A released evolution sim moves its whole population by neural controllers that apply torque
+    at physics joints (Ecosystem, 2024), and ARC Raiders' robots walk by deep reinforcement learning on
+    physics, but no management or colony sim drives its agents this way or conditions motion on injury
+    or load. The stored 3 stands.
 - opportunity: open-ended-evolution-sandbox
   date: '2026-11-01'
   queries:
@@ -1926,13 +2717,31 @@ entries:
     where: steam
   - q: lenia
     where: itch.io
+  - q: abs:Lenia AND abs:game
+    where: arxiv
+    round: 2
+  - q: abs:"neural cellular automata" AND abs:game
+    where: arxiv
+    round: 2
+  - q: abs:"artificial life" AND abs:"foundation models" AND abs:search
+    where: arxiv
+    round: 2
+  - q: abs:"Flow-Lenia"
+    where: arxiv
+    round: 2
+  - q: abs:"open-ended evolution" AND abs:"video game"
+    where: arxiv
+    round: 2
+  - q: Lenia artificial life game
+    where: semantic-scholar
+    round: 2
   where:
+  - arxiv
   - itch.io
+  - semantic-scholar
   - steam
   - web
-  coverage: partial
-  coverage_note: 'No scholarly search was run: the session''s shared web-search budget ran out. A fuller
-    search can only find closer prior art, which could lower the ceiling, not raise it.'
+  coverage: full
   checked:
   - name: Steam search 'lenia'
     url: https://store.steampowered.com/search/?term=lenia
@@ -1947,6 +2756,16 @@ entries:
     url: https://itch.io/search?q=lenia
   - name: 'Automata Quest: NCAs as a Video Game Life Mechanic (arXiv 2309.14364)'
     url: https://arxiv.org/abs/2309.14364
+  - name: arXiv API listings (5 queries above)
+    url: https://export.arxiv.org/api/query?search_query=abs:Lenia%20AND%20abs:game&max_results=12
+  - name: 'Semantic Scholar: Lenia artificial life game'
+    url: https://api.semanticscholar.org/graph/v1/paper/search?query=Lenia+artificial+life+game&limit=10&fields=title,year,url,externalIds,venue
+  - name: Exploring Flow-Lenia Universes with a Curiosity-driven AI Scientist (arXiv 2505.15998)
+    url: https://arxiv.org/abs/2505.15998
+  - name: Guiding Evolution of Artificial Life Using Vision-Language Models (arXiv 2509.22447)
+    url: https://arxiv.org/abs/2509.22447
+  - name: 'Substrate: Emergence (Steam)'
+    url: https://store.steampowered.com/app/4248790/Substrate_Emergence/
   closest:
     name: Vivarium
     kind: game
@@ -1965,11 +2784,17 @@ entries:
     year: 2023
     closeness: adjacent
     url: https://arxiv.org/abs/2309.14364
+  - name: Exploring Flow-Lenia Universes with a Curiosity-driven AI Scientist
+    kind: research
+    year: 2025
+    closeness: design
+    url: https://arxiv.org/abs/2505.15998
   novelty_before: 4
   novelty: 3
   verdict: A released free sandbox already runs on Lenia (Vivarium), and an in-development web game evolves
     Particle Lenia creatures, but neither evolves open-ended forms with automated discovery. A shipped
-    Lenia sandbox is a partial precedent, so between 3 and 4 the lower is taken.
+    Lenia sandbox is a partial precedent, so between 3 and 4 the lower is taken. Round 2's scholarly searches
+    added research on automated discovery in Flow-Lenia, with no game; the ceiling stays 3.
 - opportunity: parallel-autobalance
   date: '2026-11-01'
   queries:
@@ -1997,11 +2822,32 @@ entries:
   - q: '"economy" balance "simulated players" OR "AI agents" pre-launch city builder OR colony sim developer
       blog'
     where: web
+  - q: automated playtesting game economy balance agents commercial game
+    where: semantic-scholar
+    round: 2
+  - q: simulation-based game balancing large-scale agent play
+    where: semantic-scholar
+    round: 2
+  - q: automated playtesting game economy balance agents
+    where: semantic-scholar
+    round: 2
+  - q: simulation-based game balancing automated agents economy
+    where: semantic-scholar
+    round: 2
+  - q: all:"game balance" AND (all:agents OR all:simulation)
+    where: arxiv
+    round: 2
+  - q: all:playtesting AND all:economy
+    where: arxiv
+    round: 2
+  - q: all:"automated playtesting" AND all:balance
+    where: arxiv
+    round: 2
   where:
+  - arxiv
+  - semantic-scholar
   - web
-  coverage: partial
-  coverage_note: 'No scholarly or storefront search was run: the session''s shared web-search budget ran
-    out. A fuller search can only find closer prior art, which could lower the ceiling, not raise it.'
+  coverage: full
   checked:
   - name: Exploring Gameplay With AI Agents (EA; arXiv 1811.06962, AIIDE 2018)
     url: https://arxiv.org/abs/1811.06962
@@ -2013,6 +2859,15 @@ entries:
     url: https://forum.paradoxplaza.com/forum/developer-diary/stellaris-dev-diary-385-ai-benchmarks.1756633/
   - name: Unity Game Simulation case studies (iLLOGIKA Rogue Racers; Furyion Death Carnival)
     url: https://unity.com/case-study/illogika
+  - name: Semantic Scholar
+    url: https://api.semanticscholar.org/graph/v1/paper/search
+  - name: 'Beyond Equilibrium: Utilizing AI Agents in Video Game Economy Balancing (CHI PLAY 2023, Semantic
+      Scholar record)'
+    url: https://api.semanticscholar.org/graph/v1/paper/65fb9da69e724a743e6052a159676891e6c0a9bd
+  - name: Assessing Video Game Balance using Autonomous Agents (arXiv 2304.08699)
+    url: https://arxiv.org/abs/2304.08699
+  - name: Where Does Balance Break? Boundary Discovery for Game Balance Testing (arXiv 2608.28364, 2026-08-28)
+    url: https://arxiv.org/abs/2608.28364
   closest:
     name: EA's agent playtesting of The Sims Mobile
     kind: official
@@ -2030,7 +2885,9 @@ entries:
   novelty: 2
   verdict: A studio has published thousands of agent simulations used to rebalance a released simulation
     game's economy of actions and rewards (EA, The Sims Mobile, 2018), so the idea is known and rarely
-    done at scale, anchor 2. The stored 2 stands.
+    done at scale, anchor 2. The stored 2 stands. Round 2's scholarly searches added only academic balancing
+    work and no second studio; studio talks and papers are not store items, so no storefront search applies.
+    The ceiling stays 2.
 - opportunity: participatory-planning-sandboxes
   date: '2026-11-01'
   queries:
@@ -2307,13 +3164,28 @@ entries:
     where: wiki
   - q: ti:"Virtual Lab" AND agents; abs:agent-based AND science AND collaboration AND discovery AND simulation
     where: arxiv
+  - q: strategy or management game where research is done by named scientists whose relationships, collaborations
+      and rivalries change what gets discovered
+    where: web
+    round: 2
+  - q: Steam research lab management sim hire named scientists with personalities, team chemistry or rivalries
+      affect research speed and breakthroughs, scientists can be poached
+    where: web
+    round: 2
+  - q: 4X or grand strategy game scientist characters who are friends or rivals get research bonuses or
+      penalties working together, tech discovery depends on which scientists collaborate
+    where: web
+    round: 2
+  - q: game mechanic scientists who like each other research faster, scientists who dislike each other
+      slow research, assign research team compatibility video game
+    where: web
+    round: 2
   where:
   - arxiv
   - steam
+  - web
   - wiki
-  coverage: partial
-  coverage_note: 'No web search was run: the session''s shared web-search budget ran out. A fuller search
-    can only find closer prior art, which could lower the ceiling, not raise it.'
+  coverage: full
   checked:
   - name: 'Dwarf Fortress Wiki: Scholar (v50)'
     url: https://dwarffortresswiki.org/index.php/Scholar
@@ -2331,6 +3203,10 @@ entries:
     url: https://store.steampowered.com/app/2478540/
   - name: An agent-based model of interdisciplinary interactions in science (arXiv 2006.16399)
     url: https://arxiv.org/abs/2006.16399
+  - name: 'Professor Simulator: Desktop Lab (Steam)'
+    url: https://store.steampowered.com/app/3894790/
+  - name: Virus Lab (Steam)
+    url: https://store.steampowered.com/app/4349170/Virus_Lab/
   closest:
     name: Dwarf Fortress scholars
     kind: game
@@ -2349,11 +3225,17 @@ entries:
     year: 2015
     closeness: feature
     url: https://store.steampowered.com/app/362620/
+  - name: 'Professor Simulator: Desktop Lab'
+    kind: game
+    year: 2026
+    closeness: adjacent
+    url: https://store.steampowered.com/app/3894790/
   novelty_before: 3
   novelty: 3
   verdict: Named scholars in Dwarf Fortress research by discussing topics with each other and teach apprentices,
     and named scientists lead projects in Hearts of Iron IV, but in neither do friendships or rivalries
-    change what is discovered. The stored 3 stands.
+    change what is discovered. The stored 3 stands. Round 2's web searches found no video game where relationships
+    between researchers change discoveries; the ceiling stays 3.
 - opportunity: sim-instructor-coach
   date: '2026-11-01'
   queries:
@@ -2428,22 +3310,41 @@ entries:
     add-ons, and official sims ship scripted voiced lessons; the stored 2 stands.
 - opportunity: sims-as-agent-benchmarks
   date: '2026-11-01'
-  queries: []
-  not_run:
-  - q: Factorio Learning Environment Wube official
+  queries:
+  - q: game studio officially releases headless API or benchmark for AI agents based on its simulation
+      game (factory, city builder, colony) 2025 2026
     where: web
-  - q: game developer official headless API reinforcement learning research release
+    round: 2
+  - q: Factorio Learning Environment Wube official headless server AI agents benchmark developer response
     where: web
-  - q: simulation game studio benchmark for AI agents official repository
-    where: web
-  - q: official game API for AI research environment developer
+    round: 2
+  - q: abs:Factorio
+    where: arxiv
+    round: 2
+  - q: abs:"long-horizon" AND abs:benchmark AND abs:"simulation game" AND abs:agents
+    where: arxiv
+    round: 2
+  - q: abs:"city" AND abs:"builder" AND abs:"LLM" AND abs:agents AND abs:benchmark
+    where: arxiv
+    round: 2
+  - q: official game API for AI research environment developer (failed, HTTP 429 after retries; arXiv
+      used instead)
     where: semantic-scholar
+    round: 2
+  - q: AI agent benchmark
+    where: steam
+    round: 2
+  - q: for AI agents
+    where: steam
+    round: 2
+  - q: LLM agents play
+    where: steam
+    round: 2
   where:
-  - direct
-  coverage: partial
-  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
-    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
-    it.'
+  - arxiv
+  - steam
+  - web
+  coverage: full
   checked:
   - name: Factorio Learning Environment (GitHub)
     url: https://github.com/JackHopkins/factorio-learning-environment
@@ -2463,6 +3364,14 @@ entries:
     url: https://rlbot.org/
   - name: Valve Dota Bot Scripting wiki
     url: https://developer.valvesoftware.com/wiki/Dota_Bot_Scripting
+  - name: Firespawn Studios README (The Null Epoch)
+    url: https://firespawnstudios-readme.static.hf.space/README.md
+  - name: 'arXiv API listing: abs:Factorio'
+    url: https://export.arxiv.org/api/query?search_query=abs:Factorio&max_results=12
+  - name: Steam store searches (3 queries above)
+    url: https://store.steampowered.com/search/?term=LLM+agents+play
+  - name: 'Broken Rift: Dominion (Steam)'
+    url: https://store.steampowered.com/app/5122860/Broken_Rift_Dominion/
   closest:
     name: StarCraft II API (Blizzard)
     kind: official
@@ -2487,11 +3396,18 @@ entries:
     closeness: adjacent
     source: src-hopkins-2025-factorio-learning-environment
     url: https://arxiv.org/abs/2503.09617
+  - name: The Null Epoch (Firespawn Studios)
+    kind: official
+    year: null
+    closeness: design
+    url: https://firespawnstudios-readme.static.hf.space/README.md
   novelty_before: 2
   novelty: 2
   verdict: Game owners have officially released research APIs with headless builds before (Blizzard's
     StarCraft II API in 2017, Microsoft's Malmo on Minecraft in 2016); the best-known factory benchmark
-    is third-party. Known and rarely done, anchor 2; the stored 2 stands.
+    is third-party. Known and rarely done, anchor 2; the stored 2 stands. Round 2's web, arXiv and Steam
+    searches found only weaker evidence of the same kind (a studio's game built for outside agents); the
+    ceiling stays 2.
 - opportunity: specification-programming-games
   date: '2026-11-01'
   queries:

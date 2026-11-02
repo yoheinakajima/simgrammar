@@ -61,9 +61,27 @@ claims:
   quote: Race Together allows players of all levels and abilities the opportunity to go wheel to wheel
     against GT Sophy.
   locator: article body
+- text: Ecosystem's creatures move by neural networks that contract muscles and apply torque at the joints
+    of physically simulated bodies.
+  sources:
+  - src-steam-2024-ecosystem
+  confidence: high
+  quote: data from sense organs passes through a network of neurons and finally contracts a muscle in
+    a specific body part. Creatures swim just like real sea-life, applying torque at their joints to push
+    against the water
+  locator: About This Game
+- text: Ecosystem simulates a population of evolving creatures, so learned physics-based motion drives
+    a whole simulated population.
+  sources:
+  - src-steam-2024-ecosystem
+  confidence: high
+  quote: At its heart are evolving virtual lifeforms, who grow from synthetic DNA and live in a physically-simulated
+    ocean.
+  locator: About This Game
 sources:
 - src-keiwan-2026-evolution
 - src-polyphony-2023-gt-sophy-race-together
+- src-steam-2024-ecosystem
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
