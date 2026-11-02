@@ -22,6 +22,7 @@ How it is made, downloads, and the research log: **[simgrammar.com/about](https:
 | A graph | [nodes.jsonl](https://simgrammar.com/dist/graph/nodes.jsonl), [edges.jsonl](https://simgrammar.com/dist/graph/edges.jsonl), Cytoscape JSON, GraphML for Gephi |
 | The data behind any page | `data/` (one YAML file per record) and `log/runs/` (who added what, how) |
 | Integrity certificate | [manifest.json](https://simgrammar.com/dist/manifest.json): per-record and dataset SHA-256 |
+| Programs and agents | [simgrammar.com/developers](https://simgrammar.com/developers/): every file with its schema, examples, and limits · [llms.txt](https://simgrammar.com/llms.txt) · [openapi.json](https://simgrammar.com/openapi.json) · an agent skill, [SKILL.md](https://simgrammar.com/.well-known/agent-skills/simgrammar/SKILL.md) |
 
 `dist/` is not committed. `make build` writes it locally (it also feeds the old explorer at `site/index.html`, served from the repository root, and `make sqlite`). CI builds it on every push, checks the build is deterministic, and publishes it with the site.
 
