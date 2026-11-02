@@ -4,11 +4,11 @@ name: Generated inspection shifts
 summary: Rule-checking job sims with generated documents, items, and rule changes each shift, verified
   against an answer key so infinite variety stays fair.
 opportunity_type: mechanic-upgrade
-thesis: Papers, Please and its successors are limited by hand-built document sets that players memorize.
-  Constrained generation can produce documents, forgeries, and edge cases from a formal rule set, and
-  because the rules are formal, every generated case has a computable correct answer. That combination
-  gives endless fair variety, which ordinary procedural generation struggles to make interesting and unconstrained
-  generation cannot make fair.
+thesis: Papers, Please and its successors generate their entrants, but from hand-built document types
+  and authored daily rules that players memorize. Constrained generation can produce documents, forgeries,
+  and edge cases from a formal rule set, and because the rules are formal, every generated case has a
+  computable correct answer. That combination gives endless fair variety, which ordinary procedural generation
+  struggles to make interesting and unconstrained generation cannot make fair.
 design_sketch: Each day introduces rule changes written as formal predicates and rendered as in-world
   memos. Applicants, documents, and stories are generated to exercise boundary cases of the current rules.
   The game knows the correct ruling for every case and scores accordingly.

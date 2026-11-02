@@ -5,10 +5,12 @@ summary: An observer-gardener genre where players seed and nudge a persistent so
   agents and watch institutions, cultures, and histories form.
 opportunity_type: new-genre
 thesis: 'Generative Agents (2023) and Project Sid (2024) showed that populations of language-model agents
-  produce recognizable social structure: parties, roles, rules, shared beliefs. These are research demos,
-  not games, but the experience they produce resembles the Game of Life and Dwarf Fortress legends: watching
-  a world write its own history. With cheaper inference and chronicle tooling, a terrarium genre becomes
-  viable where the player sets initial conditions and intervenes sparingly, and the product is the history.'
+  produce recognizable social structure: parties, roles, rules, shared beliefs. They began as research
+  demos, and the agent-society games that followed (SpaceMolt, AI Society) let players watch or coach
+  agents rather than set up and tend a whole world, but the experience they produce resembles the Game
+  of Life and Dwarf Fortress legends: watching a world write its own history. With cheaper inference and
+  chronicle tooling, a terrarium genre becomes viable where the player sets initial conditions and intervenes
+  sparingly, and the product is the history.'
 design_sketch: 'The player picks a map, founding traits, and scarcity levels, then seeds 50 to 500 agents.
   Interventions are god-scale and rare: a drought, a prophet, a trade caravan. A chronicle tool summarizes
   eras, factions, and turning points; players share worlds and replay them from saved event logs.'
