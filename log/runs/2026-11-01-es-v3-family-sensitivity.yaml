@@ -1,0 +1,42 @@
+id: 2026-11-01-es-v3-family-sensitivity
+type: run
+kind: maintenance
+date: '2026-11-01'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Test how far the white-space list, the ceilings figure, and the family exposure ranks depend
+  on single-rater family assignments (Explore Science review D3), without adding a judgment.
+method: >-
+  D3, first two bullets; the second-coder bullet is another worker's. No record or source changed. New code is one
+  helper in scripts/analyze.py (_family_sensitivity, called at the end of the by-family exposure checks) with its
+  parameters in report/analysis.yaml (family_sensitivity), plus the ceilings figure in scripts/viz.py.
+
+  Reassignment. Each mechanic gets two runner-up families from the records, with no new judgment: by wording (tf-idf
+  cosine of its name, aliases, summary and definition to the other mechanics of each family, its own family leaving it
+  out) and by use (mean Jaccard of shared games with each other family's mechanics). No runner-up was named by hand.
+  A mechanic is on a boundary when its wording is at least as close to its runner-up as to its own family (69 of 199),
+  and on a named boundary when either family is resources, economy, agents, social relations or control (39). The 5.5
+  white-space screen and the 8.2 family ranks were re-run with all named-boundary mechanics moved to either runner-up,
+  and over 1,000 seeded draws moving each on a fair coin (and a second set moving any boundary mechanic). The fair coin
+  and the boundary rule were fixed before the draws were looked at. Result: every table pair of 5.5 survives every
+  draw (a kept column on the table); 8.2 keeps narrative and generation first per mechanic and resources and logistics
+  low, but control and automation leaves the four that lead in total under both deterministic moves and in 32 percent
+  of draws. Moving any boundary mechanic leaves narrative and generation first in only 24 percent.
+
+  Intervals. A percentile bootstrap (2,000 resamples) over the mechanics within each family, for exposure per mechanic
+  and its rank (new table family-exposure-intervals) and for the four scores of the ceilings figure, which now draws
+  the intervals as whiskers and draws hollow a mark whose interval crosses its line: 5 of its 16 marks clear it. Chose
+  intervals over pooling the four-to-six-mechanic families, since pooling unlike families answers no question the
+  prose asks.
+
+  Prose. 5.5: a paragraph on reassignment. 6: a paragraph on the intervals. 8.2: rewrote the per-mechanic order (the
+  lead of narrative and generation and of world generation is not firm under resampling; economy and population can
+  rise to places 9 and 8) and added a paragraph and table on family assignment; operation and procedure is now read by
+  its edge count (none). Book chapter 8 restates the same three claims. Every reading carries an assertion. No existing
+  stat changed value, so no voice line moved. Not touched: the abstract, 2.1 and 4.1, which a later edit could point
+  at these checks.
+contract_version: '1.2'
+proposals: []
