@@ -26,6 +26,7 @@ The operator is the accountable human. An agent never verifies, rates, or resolv
 | [rate-scores.md](rate-scores.md): calibrate, then add independent ratings | `verification` | 10 mechanics |
 | [resolve-prediction.md](resolve-prediction.md): resolve a falsifiable prediction | `verification` | 1 to 3 opportunities |
 | [second-coding.md](second-coding.md): code families, admission tests, and effect types a second time | `verification` | one sample, no records changed |
+| [second-rating.md](second-rating.md): every panel sheet in one run (codes, recall, maturity, rubric and opportunity ratings) | `verification` | one packet; ratings change about 82 records (`bulk`) |
 | [propose-mechanic.md](propose-mechanic.md): propose a missing mechanic | any (a proposal) | 1 proposal |
 
-Taxonomy work (creating mechanics), synthesis (opportunities, report prose), and anything under `vocab/`, `schema/`, `scripts/`, `calibration/`, or `report/` is maintainer-reviewed (`.github/CODEOWNERS`). Propose it; do not do it in a task PR. The one exception is the codes file a second-coding task adds under `report/coding/` (`tasks/second-coding.md`).
+Taxonomy work (creating mechanics), synthesis (opportunities, report prose), and anything under `vocab/`, `schema/`, `scripts/`, `calibration/`, or `report/` is maintainer-reviewed (`.github/CODEOWNERS`). Propose it; do not do it in a task PR. The one exception is the codes files a second-coding or second-rating task adds under `report/coding/` (`tasks/second-coding.md`, `tasks/second-rating.md`).

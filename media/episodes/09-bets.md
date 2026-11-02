@@ -74,7 +74,7 @@ Target runtime about 12 minutes: about 1,230 words of narration at 135 words a m
 
 **Frame.** mockup kind=ui bet=branch-preview-forecasts title="Preview" chart=fan lines="Unemployment and approval over the next year" button="Pass the law"
 
-**Voice.** Second on the list is a branch preview.{{assert:rank.opportunities-ranked.branch-preview-forecasts == 2}} Before you pass a law, the game copies the live save dozens of times, runs each copy a year ahead with different random seeds, and shows you the spread. Because a deterministic simulation can fork from any moment, the preview runs the game's own rules. The target: sixty-four futures in under five seconds on an ordinary PC.
+**Voice.** Tied for second is a branch preview.{{assert:rank.opportunities-ranked.branch-preview-forecasts == 2}} Before you pass a law, the game copies the live save dozens of times, runs each copy a year ahead with different random seeds, and shows you the spread. Because a deterministic simulation can fork from any moment, the preview runs the game's own rules. The target: sixty-four futures in under five seconds on an ordinary PC.
 
 ## 7. A colonist with a memory (6:24 to 7:46)
 
@@ -118,7 +118,7 @@ Target runtime about 12 minutes: about 1,230 words of narration at 135 words a m
 
 **Frame.** record at="And a search over rule programs" bet=mechanic-discovery-search fields=summary,falsifiable_signal
 
-**Voice.** At the far end are the long shots, each scored low for feasibility and high for novelty.{{assert:field.symbolic-sim-neural-render.feasibility == 2}}{{assert:field.llm-society-terrarium.feasibility == 2}} A city builder that keeps its state as a tile grid and lets a generative model draw it in any style. A terrarium of hundreds of language-model agents that you seed, nudge rarely, and watch write their own history. And a search over rule programs that proposes new mechanics, checked against the catalog in this series for what already exists. That last prediction runs the longest, to {{stat:last_prediction_resolves_spoken}}.{{assert:field.mechanic-discovery-search.falsifiable_signal.resolve_by == last_prediction_resolves}}
+**Voice.** At the far end are the long shots, each scored low for feasibility.{{assert:field.symbolic-sim-neural-render.feasibility == 2}}{{assert:field.llm-society-terrarium.feasibility == 2}} A city builder that keeps its state as a tile grid and lets a generative model draw it in any style. A terrarium of hundreds of language-model agents that you seed, nudge rarely, and watch write their own history. And a search over rule programs that proposes new mechanics, checked against the catalog in this series for what already exists. That last prediction runs the longest, to {{stat:last_prediction_resolves_spoken}}.{{assert:field.mechanic-discovery-search.falsifiable_signal.resolve_by == last_prediction_resolves}}
 
 ## 11. Who builds what (10:40 to 11:31)
 
