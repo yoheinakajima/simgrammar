@@ -4238,7 +4238,7 @@ def _edge_audits(cfg, vocabs, mechs, techs, by_id, derived, stats, tables):
         stats[f"n_edge_sweep_hits_{r['mechanic'].replace('-', '_')}"] = r["hits"]
         stats[f"n_edge_sweep_missing_{r['mechanic'].replace('-', '_')}"] = r["missing_edge"]
 
-    # ---- the precedence audit
+    # ---- the precedence audit: each edge's label as first coded (coded), after the audit's first pass (corrected), and now
     ap = "report/audits/effect-audit.yaml"
     order = [e for e in ("replaces-substrate", "enables-new", "explains", "deepens", "accelerates", "cuts-authoring-cost", "tunes") if e in eff_terms]
     ent = {}
@@ -4253,95 +4253,103 @@ def _edge_audits(cfg, vocabs, mechs, techs, by_id, derived, stats, tables):
                          f"entries for no edge {['/'.join(k) for k in no_edge]}")
     for k, e in sorted(ent.items()):
         lab = "/".join(k)
-        for f in ("effect", "was", "secondary", "ahead"):
+        for f in ("effect", "coded", "corrected", "secondary", "ahead"):
             if e.get(f) is not None and e[f] not in eff_terms:
                 raise ValueError(f"{ap}: {lab} {f} {e[f]!r} is not a term of vocab/effect.yaml")
         if e["effect"] != edges[k]:
             raise ValueError(f"{ap}: {lab} says {e['effect']}, the record says {edges[k]}")
         if not isinstance(e.get("compliant"), bool):
             raise ValueError(f"{ap}: {lab} compliant must be true or false")
-        if e["compliant"] and (e.get("was") or e.get("ahead")):
-            raise ValueError(f"{ap}: {lab} is compliant, so it can neither have been corrected nor have a label ahead of it")
-        if not e["compliant"] and not e.get("was") and not e.get("ahead"):
-            raise ValueError(f"{ap}: {lab} is left non-compliant, so it must name the label ahead of it")
+        if e.get("coded") == e["effect"]:
+            raise ValueError(f"{ap}: {lab} gives coded only when the label has changed")
+        moved = bool(e.get("coded") or e.get("corrected"))
+        if e["compliant"] and (moved or e.get("ahead")):
+            raise ValueError(f"{ap}: {lab} met the order as first coded, so it can neither have changed nor have a label ahead of it")
+        if not e["compliant"] and not e.get("added") and not moved and not e.get("ahead"):
+            raise ValueError(f"{ap}: {lab} did not meet the order, so it must have changed or name the label ahead of it")
         if e.get("ahead") and order.index(e["ahead"]) >= order.index(e["effect"]):
             raise ValueError(f"{ap}: {lab} ahead {e['ahead']} does not come before {e['effect']} in the order")
-        if bool(e.get("added")) != (k in added):
-            raise ValueError(f"{ap}: {lab} added must be true exactly for the edges edge-sweep.yaml added")
-    first = {k: e.get("was") or e["effect"] for k, e in ent.items() if not e.get("added")}
-    letter = {k: e.get("ahead") or e["effect"] for k, e in ent.items()}  # every label as the written order puts it
+        if bool(e.get("added")) != (k in added) or (e.get("added") and e.get("coded")):
+            raise ValueError(f"{ap}: {lab} added must be true exactly for the edges edge-sweep.yaml added, which were never coded")
+    coded = {k: e.get("coded") or e["effect"] for k, e in ent.items() if not e.get("added")}
+    first_pass = {k: e.get("corrected") or e.get("coded") or e["effect"] for k, e in ent.items() if not e.get("added")}
     n = len(ent)
-    corrected = [e for e in ent.values() if e.get("was")]
-    left = [e for e in ent.values() if not e["compliant"] and not e.get("was")]
-    boundary = [e for e in ent.values() if e.get("ahead") == "replaces-substrate" and e["effect"] in ("deepens", "accelerates")]
+    changed = [k for k, e in ent.items() if e.get("coded")]
+    corrected = [k for k, e in ent.items() if e.get("corrected")]
+    relabelled = [k for k in coded if first_pass[k] != edges[k]]  # changed after the first pass, by applying the order
+    left = [k for k, e in ent.items() if e.get("ahead")]
     stats["n_effect_audit_edges"] = n
-    stats["n_affects_edges_before_audit"] = len(first)
+    stats["n_affects_edges_before_audit"] = len(coded)
     stats["n_effect_audit_compliant"] = sum(1 for e in ent.values() if e["compliant"])
     stats["n_effect_audit_noncompliant"] = sum(1 for e in ent.values() if not e["compliant"])
     stats["pct_effect_audit_compliant"] = _r(100 * stats["n_effect_audit_compliant"] / max(n, 1), 0)
+    stats["n_effect_audit_changed"] = len(changed)
+    stats["pct_effect_audit_changed"] = _r(100 * len(changed) / max(len(coded), 1), 0)
     stats["n_effect_audit_corrected"] = len(corrected)
+    stats["n_effect_audit_relabelled"] = len(relabelled)
+    stats["n_effect_audit_relabelled_twice"] = sum(1 for k in relabelled if k in corrected)
+    stats["n_effect_audit_boundary"] = sum(1 for k in relabelled if edges[k] == "replaces-substrate")
+    stats["n_effect_audit_relabelled_other"] = len(relabelled) - stats["n_effect_audit_boundary"]
     stats["n_effect_audit_left"] = len(left)
-    stats["n_effect_audit_boundary"] = len(boundary)
-    stats["n_effect_audit_left_other"] = len(left) - sum(1 for e in left if e in boundary)
-    stats["n_effect_audit_ahead"] = sum(1 for e in ent.values() if e.get("ahead"))
     stats["n_effect_audit_secondary"] = sum(1 for e in ent.values() if e.get("secondary"))
-    moves = Counter((e["was"], e["effect"]) for e in corrected)
+    moves = Counter((coded[k], edges[k]) for k in changed)
     for (a, b), c in moves.items():
         stats[f"n_effect_audit_{a.replace('-', '_')}_to_{b.replace('-', '_')}"] = c
     if moves:
         (a, b), c = max(moves.items(), key=lambda x: (x[1], x[0]))
-        stats["effect_audit_top_correction_from"], stats["effect_audit_top_correction_to"] = eff_terms[a]["label"], eff_terms[b]["label"]
-        stats["n_effect_audit_top_correction"] = c
-    before_c, sec_c, letter_c = Counter(first.values()), Counter(e["secondary"] for e in ent.values() if e.get("secondary")), Counter(letter.values())
-    now_c = Counter(edges.values())
+        stats["effect_audit_top_change_from"], stats["effect_audit_top_change_to"] = eff_terms[a]["label"], eff_terms[b]["label"]
+        stats["n_effect_audit_top_change"] = c
+    coded_c, pass_c = Counter(coded.values()), Counter(first_pass.values())
+    sec_c, now_c = Counter(e["secondary"] for e in ent.values() if e.get("secondary")), Counter(edges.values())
     for k in order:
         key = k.replace("-", "_")
-        stats[f"n_effect_{key}_before_audit"] = before_c.get(k, 0)
-        stats[f"n_effect_{key}_by_letter"] = letter_c.get(k, 0)
+        stats[f"n_effect_{key}_before_audit"] = coded_c.get(k, 0)
+        stats[f"n_effect_{key}_first_pass"] = pass_c.get(k, 0)
         stats[f"n_effect_audit_secondary_{key}"] = sec_c.get(k, 0)
         stats[f"n_effect_{key}_with_secondary"] = sum(1 for kk, e in ent.items() if edges[kk] == k or e.get("secondary") == k)
     ws = {k: stats[f"n_effect_{k.replace('-', '_')}_with_secondary"] for k in order}
     stats["rank_effect_explains_with_secondary"] = 1 + sum(1 for k in order if ws[k] < ws.get("explains", 0))  # 1 = rarest
+    stats["rank_effect_explains"] = 1 + sum(1 for k in order if now_c.get(k, 0) < now_c.get("explains", 0))  # 1 = rarest
     top_of = lambda c: eff_terms[max(c.items(), key=lambda x: (x[1], x[0]))[0]]["label"]  # noqa: E731
     rare_of = lambda c: eff_terms[min(c.items(), key=lambda x: (x[1], x[0]))[0]]["label"]  # noqa: E731
-    if before_c:
-        stats["top_effect_before_audit"], stats["rarest_effect_before_audit"] = top_of(before_c), rare_of(before_c)
-    stats["top_effect_by_letter"], stats["rarest_effect_by_letter"] = top_of(letter_c), rare_of(letter_c)
-    # explanation masked by a label that comes before it, and explanation coded below its place (review D4)
+    if coded_c:
+        stats["top_effect_before_audit"], stats["rarest_effect_before_audit"] = top_of(coded_c), rare_of(coded_c)
+    # explanation masked by a label that comes before it (review D4); edges the audit moved to explanation
     stats["n_effect_explains_masked"] = sum(1 for kk, e in ent.items() if e.get("secondary") == "explains" and order.index(edges[kk]) < order.index("explains"))
-    stats["n_effect_audit_to_explains"] = sum(1 for e in corrected if e["effect"] == "explains")
-    # what the order applied to the letter would do to the family exposure ranking of §8.2: the same maturity and
-    # effect weights, with each edge carrying the label the order puts first
+    stats["n_effect_audit_to_explains"] = sum(1 for k in changed if edges[k] == "explains")
+    # the family exposure ranking of §8.2 with the labels as first coded, against the current ones: the same maturity
+    # and effect weights; an edge the sweep added keeps its current label
     comp = (vocabs.get("rubrics") or {}).get("composites", {}).get("technique_exposure") or {}
     mw, ew = comp.get("maturity_weights") or {}, comp.get("effect_weights") or {}
     if mw and ew:
         fam_terms = vocab_terms(vocabs, "mechanic_family")
         fam_of = {m.id: m.data["family"] for m in mechs}
-        tot = {"stored": defaultdict(float), "letter": defaultdict(float)}
+        tot = {"now": defaultdict(float), "coded": defaultdict(float)}
         for (t, m), e in edges.items():
             w = mw[tech[t].data["maturity"]]
-            tot["stored"][fam_of[m]] += w * ew[e]
-            tot["letter"][fam_of[m]] += w * ew[letter[(t, m)]]
+            tot["now"][fam_of[m]] += w * ew[e]
+            tot["coded"][fam_of[m]] += w * ew[coded.get((t, m), e)]
         fams = sorted(set(fam_of.values()))
         top_f = lambda v: max(fams, key=lambda f: (round(v[f], 9), f))  # noqa: E731
-        stats["top_exposed_family_by_letter"] = fam_terms[top_f(tot["letter"])]["label"]
-        stats["rho_family_exposure_by_letter"] = _r(_spearman([tot["stored"][f] for f in fams], [tot["letter"][f] for f in fams]), 2)
+        stats["top_exposed_family_before_audit"] = fam_terms[top_f(tot["coded"])]["label"]
+        stats["rho_family_exposure_before_audit"] = _r(_spearman([tot["now"][f] for f in fams], [tot["coded"][f] for f in fams]), 2)
     tables["effect-audit"] = {
-        "description": "The precedence audit of §8.1 (report/audits/effect-audit.yaml), by effect: edges carrying it as first coded, as stored after the "
-                       "audit's corrections (including the edge the keyword sweep added), with the order applied to the letter (every edge taking the label "
-                       "the order puts first, so the replaces-substrate boundary goes the order's way), as a secondary label the note also supports, and "
-                       "as stored or secondary. The same rater coded the edges and audited them, so this measures consistency with the written order, "
-                       "not agreement.",
-        "columns": ["effect", "first_coded", "after_audit", "by_letter", "secondary", "stored_or_secondary"],
-        "rows": [{"effect": eff_terms[k]["label"], "first_coded": before_c.get(k, 0), "after_audit": now_c.get(k, 0), "by_letter": letter_c.get(k, 0),
-                  "secondary": sec_c.get(k, 0), "stored_or_secondary": stats[f"n_effect_{k.replace('-', '_')}_with_secondary"]} for k in order]}
-    left_to = Counter((e["effect"], e["ahead"]) for e in left)
+        "description": "The precedence audit of §8.1 (report/audits/effect-audit.yaml), by effect: edges carrying it as first coded, after the "
+                       "audit's first pass of corrections, and now, once the written order was applied to every edge the first pass flagged "
+                       "(now includes the edge the keyword sweep added); then edges with it as a secondary label the note also supports, and "
+                       "edges with it now or as secondary. The same rater coded the edges, wrote the order, and audited them, so this measures "
+                       "consistency with the written order, not agreement.",
+        "columns": ["effect", "first_coded", "first_pass", "now", "secondary", "now_or_secondary"],
+        "rows": [{"effect": eff_terms[k]["label"], "first_coded": coded_c.get(k, 0), "first_pass": pass_c.get(k, 0), "now": now_c.get(k, 0),
+                  "secondary": sec_c.get(k, 0), "now_or_secondary": ws[k]} for k in order]}
     tables["effect-audit-corrections"] = {
-        "description": "Labels the precedence audit changed, from the first-coded effect to the stored one (corrected); and labels it found "
-                       "non-compliant but left for a second rater, from the stored effect to the label the order would put first (left).",
-        "columns": ["action", "from", "to", "edges"],
-        "rows": [{"action": "corrected", "from": eff_terms[a]["label"], "to": eff_terms[b]["label"], "edges": c} for (a, b), c in sorted(moves.items(), key=lambda x: (-x[1], x[0]))]
-                + [{"action": "left", "from": eff_terms[a]["label"], "to": eff_terms[b]["label"], "edges": c} for (a, b), c in sorted(left_to.items(), key=lambda x: (-x[1], x[0]))]}
+        "description": "Every label the precedence audit changed, from the label as first coded to the current one. First pass: corrected "
+                       "because the note does not support the label or states an earlier one outright. Order: relabelled when the written "
+                       "order was applied to every flagged edge, including first-pass corrections that the order then moved again.",
+        "columns": ["step", "from", "to", "edges"],
+        "rows": [{"step": st, "from": eff_terms[a]["label"], "to": eff_terms[b]["label"], "edges": c}
+                 for st, ks in (("first pass", [k for k in changed if k not in relabelled]), ("order", relabelled))
+                 for (a, b), c in sorted(Counter((coded[k], edges[k]) for k in ks).items(), key=lambda x: (-x[1], x[0]))]}
 
 
 # ======================================================================= SVG

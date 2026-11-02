@@ -78,7 +78,7 @@ affects:
   note: Typed messages are translated into predicted intents that feed a planner, so what the player says
     changes what the AI does on the map, and the AI's replies are constrained to match its own plan.
 - id: reputation
-  effect: deepens
+  effect: replaces-substrate
   note: An AI that models what others expect it to do can also track whether the player's stated intentions
     matched their moves, turning standing into a learned estimate of trustworthiness rather than a scalar
     moved by scripted events.
@@ -87,7 +87,7 @@ affects:
   note: Planner-grounded dialogue lets AI counterparties propose, counter, and keep terms in free text
     instead of accepting or rejecting fixed offers.
 - id: war-score-peace
-  effect: deepens
+  effect: enables-new
   note: Peace terms could be negotiated in language against the war score, with the planner checking what
     the opponent will actually accept.
 builds_on:
@@ -113,3 +113,4 @@ provenance:
   - 2026-10-24-technique-links
   - 2026-10-24-review-fixes
   - 2026-10-25-source-claims-pilot
+  - 2026-11-01-es-v3-edge-audits

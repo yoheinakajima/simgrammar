@@ -52,7 +52,7 @@ risks:
 - labor
 affects:
 - id: direct-avatar
-  effect: deepens
+  effect: replaces-substrate
   note: Motion-matching-quality responsive locomotion fits in a few MB of weights, making it affordable
     on memory-constrained platforms and for more character types.
 - id: generative-content

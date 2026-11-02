@@ -102,7 +102,7 @@ affects:
     can read them directly or interview the agent about why it acted, which is how the original paper
     evaluated believability.
 - id: offscreen-life-progression
-  effect: deepens
+  effect: replaces-substrate
   note: Memory streams summarized at low frequency give off-screen characters histories that persist when
     the player returns.
 - id: aspiration-wants
@@ -137,3 +137,4 @@ provenance:
   reviewed:
   - 2026-10-24-technique-links
   - 2026-10-24-review-fixes
+  - 2026-11-01-es-v3-edge-audits

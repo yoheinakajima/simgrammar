@@ -14,21 +14,19 @@
 # (generative-content, natural-language-interaction, gossip-propagation), whose catalog games already run on the
 # technique family, a further result of that family deepens the mechanic rather than replacing its substrate.
 #
-# Fields. effect: the label stored now. compliant: whether the label as first coded met the rules (true or false).
-# was: the first-coded label, when this audit corrected it. secondary: another effect the note also supports, or null.
-# ahead: present when the stored label still does not meet the written order; the label the order would put first.
-# added: the edge was added by the keyword sweep (edge-sweep.yaml), so it has no first-coded label.
+# Fields. effect: the label stored now. coded: the label as first coded, when it differs from effect. corrected: the label
+# the audit's first pass gave, when that pass changed it. compliant: whether the label as first coded met the order
+# (true or false). secondary: another effect the note also supports, or null. added: the edge was added by the keyword
+# sweep (edge-sweep.yaml), so it was never coded before the audit.
 #
-# Corrections. A label was corrected when the note does not support it (an enables-new edge whose note claims no new
-# form, a design-time change coded as a runtime one) or when the note states outright a label that comes before it
-# (explanation addressed to the player, a form the old rule 'no longer' limits). One boundary was not corrected: an
-# edge whose note says the technique computes the mechanic in place of a named rule and also that the mechanic gets
-# richer (or cheaper). The written order puts replaces-substrate first; the labels were coded deepens (or accelerates)
-# for the richer behavior. The disagreement is systematic, so it is a question about which of the two states the
-# convention, not a set of isolated slips, and those edges keep their label with replaces-substrate ahead, for a
-# second rater to settle; where another label also comes before the stored one whatever the boundary, the label was
-# corrected to it and replaces-substrate stays ahead. Other edges left non-compliant say which label arguably comes
-# first and why the note does not settle it.
+# Corrections. The first pass corrected a label when the note does not support it (an enables-new edge whose note
+# claims no new form, a design-time change coded as a runtime one) or when the note states outright a label that comes
+# before it (explanation addressed to the player, a form the old rule 'no longer' limits). It left one boundary open:
+# edges whose notes say the technique computes the mechanic in place of a named rule and also that the mechanic gets
+# richer or cheaper, coded deepens or accelerates while the written order puts replaces-substrate first. The operator
+# then had the written order applied to every edge the pass had flagged, so those edges, and the three first-pass
+# corrections that also sat on the boundary, became replaces-substrate, keeping the label they replaced as secondary,
+# and war-score-peace became enables-new. Every label now meets the order as this rater reads it.
 #
 # Made by run 2026-11-01-es-v3-edge-audits (operator yoheinakajima, model claude-opus-5-5), the same rater that wrote the edges and the
 # rules, reading only each edge's note. It tests whether the labels follow the written rules, not whether another
@@ -122,8 +120,9 @@ edges:
 - technique: automated-rule-generation
   mechanic: policy-toggles
   effect: cuts-authoring-cost
+  coded: enables-new
+  corrected: cuts-authoring-cost
   compliant: false
-  was: enables-new
   secondary: tunes
   reason: "growing the policy list by search instead of writing each law is content made before release; the note claims no policy a hand-written list could not hold, and the playout screen is a balance test"
 - technique: automated-rule-generation
@@ -158,18 +157,18 @@ edges:
   reason: "free-text proposals and counters are terms fixed offers could not produce"
 - technique: cicero-strategic-dialogue
   mechanic: reputation
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "standing becomes a learned estimate computed by the AI rather than a scalar moved by scripted events, while its role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "standing becomes a learned estimate computed by the AI rather than a scalar moved by scripted events, while its role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: cicero-strategic-dialogue
   mechanic: war-score-peace
-  effect: deepens
+  effect: enables-new
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: enables-new
-  reason: "peace terms negotiated in language are arguably a form fixed peace demands could not produce, as the record codes negotiation; the note claims no new form outright, so the label is left for a second rater"
+  secondary: deepens
+  reason: "peace terms negotiated in language are arguably a form fixed peace demands could not produce, as the record codes negotiation; the note claims no new form outright, so the first pass left the label for a second rater. Relabelled enables-new when the written order was applied to every flagged edge: language-negotiated peace terms are a form fixed peace demands could not produce, as the record codes negotiation."
 - technique: constrained-decoding
   mechanic: dilemma-cards
   effect: cuts-authoring-cost
@@ -214,11 +213,11 @@ edges:
   reason: "selection acts on creatures that emerge from the physics, which declared fitness stats could not produce"
 - technique: continuous-alife-and-asal
   mechanic: trait-inheritance
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "inheritance is computed by parameters mixing in space instead of an explicit crossover function, while its role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "inheritance is computed by parameters mixing in space instead of an explicit crossover function, while its role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: deep-rl-npc-policies
   mechanic: agent-pathfinding
   effect: replaces-substrate
@@ -288,8 +287,9 @@ edges:
 - technique: diffusion-game-engines
   mechanic: procedural-terrain
   effect: replaces-substrate
+  coded: enables-new
+  corrected: replaces-substrate
   compliant: false
-  was: enables-new
   secondary: null
   reason: "terrain comes from the training game's learned distribution with no seed or noise function; the note names no output the old generator could not make, only a persistence limit"
 - technique: diffusion-game-engines
@@ -313,8 +313,9 @@ edges:
 - technique: gaussian-splatting
   mechanic: soft-body-deformation
   effect: replaces-substrate
+  coded: enables-new
+  corrected: replaces-substrate
   compliant: false
-  was: enables-new
   secondary: cuts-authoring-cost
   reason: "MPM runs on the captured Gaussians in place of a node-beam or finite-element mesh; the deformation is of the same kind, and the saving is the mesh-building step"
 - technique: generalist-game-agents
@@ -350,8 +351,9 @@ edges:
 - technique: generated-3d-worlds
   mechanic: procedural-build-assist
   effect: replaces-substrate
+  coded: enables-new
+  corrected: replaces-substrate
   compliant: false
-  was: enables-new
   secondary: cuts-authoring-cost
   reason: "the note calls it the same rough-input to detailed-output contract as existing build assist with a learned generator, a substrate swap; as an editor mode it also saves authoring"
 - technique: generated-3d-worlds
@@ -404,11 +406,11 @@ edges:
   reason: "retrievable free-text memories and reflections are something a catalog of timed modifiers could not produce"
 - technique: generative-agents
   mechanic: offscreen-life-progression
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "summarized memory streams compute off-screen histories, so replaces substrate arguably comes first; the note names no replaced rule and claims persistence, so the label is left for a second rater"
+  secondary: deepens
+  reason: "summarized memory streams compute off-screen histories, so replaces substrate arguably comes first; the note names no replaced rule and claims persistence, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: generative-agents
   mechanic: relationship-values
   effect: replaces-substrate
@@ -471,53 +473,53 @@ edges:
   reason: "promptable weather by text is something the weather system could not produce; borderline, since the change is visual only and nothing reads it"
 - technique: graph-network-simulators
   mechanic: flight-aerodynamics
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "surrogate flow fields drive the flight model instead of fixed lift and drag tables, while its role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "surrogate flow fields drive the flight model instead of fixed lift and drag tables, while its role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: graph-network-simulators
   mechanic: fluid-gas-simulation
-  effect: accelerates
+  effect: replaces-substrate
+  coded: accelerates
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "a learned surrogate computes the flow, so replaces substrate arguably comes before accelerates; the note claims the same flow at large speedups and names no replaced rule, so the label is left for a second rater"
+  secondary: accelerates
+  reason: "a learned surrogate computes the flow, so replaces substrate arguably comes before accelerates; the note claims the same flow at large speedups and names no replaced rule, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: graph-network-simulators
   mechanic: hydrology
-  effect: accelerates
+  effect: replaces-substrate
+  coded: accelerates
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "the note calls the neural operator a replacement for per-cell iterative water-flow updates, a substrate swap; the one-pass speed is secondary, so replaces substrate comes first in the written order; the note also supports accelerates, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: accelerates
+  reason: "the note calls the neural operator a replacement for per-cell iterative water-flow updates, a substrate swap; the one-pass speed is secondary, so replaces substrate comes first in the written order; the note also supports accelerates, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: graph-network-simulators
   mechanic: material-interactions
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
   secondary: cuts-authoring-cost
-  ahead: replaces-substrate
-  reason: "one learned model computes mixed-material reactions in place of hand-written pairwise rules, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  reason: "one learned model computes mixed-material reactions in place of hand-written pairwise rules, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: graph-network-simulators
   mechanic: soft-body-deformation
-  effect: accelerates
+  effect: replaces-substrate
+  coded: accelerates
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "a learned surrogate computes the deformation, so replaces substrate arguably comes before accelerates; the note claims speed and names no replaced rule in the game, so the label is left for a second rater"
+  secondary: accelerates
+  reason: "a learned surrogate computes the deformation, so replaces substrate arguably comes before accelerates; the note claims speed and names no replaced rule in the game, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: graph-network-simulators
   mechanic: structural-integrity
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "stress fields from a learned surrogate replace binary support checks, while the mechanic's role stays; graded failure is the deepening, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "stress fields from a learned surrogate replace binary support checks, while the mechanic's role stays; graded failure is the deepening, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: human-behavior-simulation-models
   mechanic: advertising-awareness
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "response is predicted by a model of human choice in place of a flat awareness multiplier, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "response is predicted by a model of human choice in place of a flat awareness multiplier, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: human-behavior-simulation-models
   mechanic: crowd-preferences
   effect: deepens
@@ -538,11 +540,11 @@ edges:
   reason: "predicted pick rates test cards before ship"
 - technique: human-behavior-simulation-models
   mechanic: elections
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "an electorate built from survey-grounded agents computes the vote, so replaces substrate arguably comes first; the note claims fidelity and names no replaced rule, so the label is left for a second rater"
+  secondary: deepens
+  reason: "an electorate built from survey-grounded agents computes the vote, so replaces substrate arguably comes first; the note claims fidelity and names no replaced rule, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: human-behavior-simulation-models
   mechanic: interest-groups
   effect: deepens
@@ -551,18 +553,18 @@ edges:
   reason: "preferences derived from simulated members are a richer input to the same mechanic"
 - technique: human-behavior-simulation-models
   mechanic: negotiation
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "acceptance follows a model of human bargaining in place of a single reservation price, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "acceptance follows a model of human bargaining in place of a single reservation price, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: human-behavior-simulation-models
   mechanic: personality-traits
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "a text profile whose predicted behavior matches a real person stands in for a few trait tags, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "a text profile whose predicted behavior matches a real person stands in for a few trait tags, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: human-behavior-simulation-models
   mechanic: travel-mode-choice
   effect: tunes
@@ -583,19 +585,19 @@ edges:
   reason: "AI opponents now respect hidden state, so concealment matters; the fog rules themselves are unchanged"
 - technique: imperfect-information-solvers
   mechanic: military-operations
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "equilibrium strategies would make the opponents' decisions, so replaces substrate arguably comes first; the note claims deception at calibrated rates and names no replaced rule, so the label is left for a second rater"
+  secondary: deepens
+  reason: "equilibrium strategies would make the opponents' decisions, so replaces substrate arguably comes first; the note claims deception at calibrated rates and names no replaced rule, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: imperfect-information-solvers
   mechanic: negotiation
-  effect: enables-new
+  effect: replaces-substrate
+  coded: deepens
+  corrected: enables-new
   compliant: false
-  was: deepens
-  secondary: null
-  ahead: replaces-substrate
-  reason: "equilibrium strategies bluff and concede in ways scripted thresholds cannot, which the note claims outright, so enables new form comes before deepens; replaces substrate comes before both in the written order (they decide in place of scripted thresholds), on the boundary the header describes"
+  secondary: enables-new
+  reason: "equilibrium strategies bluff and concede in ways scripted thresholds cannot, which the note claims outright, so enables new form comes before deepens; replaces substrate comes before both in the written order (they decide in place of scripted thresholds), on the boundary the header describes. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: imperfect-information-solvers
   mechanic: rival-firms
   effect: deepens
@@ -610,11 +612,11 @@ edges:
   reason: "AI opponents scout and hide, a real counterpart to the player's scouting"
 - technique: learned-level-generation
   mechanic: adaptive-threat-scaling
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "a difficulty-conditioned generator builds the next map or wave in place of multiplying enemy counts, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "a difficulty-conditioned generator builds the next map or wave in place of multiplying enemy counts, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: learned-level-generation
   mechanic: generative-content
   effect: deepens
@@ -635,16 +637,17 @@ edges:
   reason: "scenario maps from a written description, checked by an agent playthrough"
 - technique: learned-motion-synthesis
   mechanic: direct-avatar
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "a few megabytes of weights stand in for a motion-matching database, so replaces substrate arguably comes first; the note claims affordability and names no replaced rule, so the label is left for a second rater"
+  secondary: deepens
+  reason: "a few megabytes of weights stand in for a motion-matching database, so replaces substrate arguably comes first; the note claims affordability and names no replaced rule, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: learned-motion-synthesis
   mechanic: generative-content
   effect: enables-new
+  coded: deepens
+  corrected: enables-new
   compliant: false
-  was: deepens
   secondary: deepens
   reason: "the note says the animation set is no longer fixed by the studio's mocap library, since players author motions from their own video: a form the library could not produce"
 - technique: llm-agent-societies
@@ -698,19 +701,19 @@ edges:
   reason: "a policy's effect is measured on an agent population instead of read from authored edges"
 - technique: llm-agent-societies
   mechanic: taxation
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "compliance becomes an agent decision in place of an automatic deduction at the set rate, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "compliance becomes an agent decision in place of an automatic deduction at the set rate, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: llm-explanation-of-state
   mechanic: advisors
-  effect: explains
+  effect: replaces-substrate
+  coded: deepens
+  corrected: explains
   compliant: false
-  was: deepens
-  secondary: null
-  ahead: replaces-substrate
-  reason: "answers to arbitrary questions about the situation are addressed to the player's understanding, so explains comes before deepens; replaces substrate comes before both in the written order (a language model answers in place of threshold-triggered messages, as the on-device record codes the same advisor), on the boundary the header describes"
+  secondary: explains
+  reason: "answers to arbitrary questions about the situation are addressed to the player's understanding, so explains comes before deepens; replaces substrate comes before both in the written order (a language model answers in place of threshold-triggered messages, as the on-device record codes the same advisor), on the boundary the header describes. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: llm-explanation-of-state
   mechanic: agent-inspection
   effect: explains
@@ -726,8 +729,9 @@ edges:
 - technique: llm-explanation-of-state
   mechanic: history-chronicle
   effect: explains
+  coded: deepens
+  corrected: explains
   compliant: false
-  was: deepens
   secondary: deepens
   reason: "retelling recorded events as biographies and recaps for the player is output addressed to the player's understanding of the record, which comes before deepens"
 - technique: llm-explanation-of-state
@@ -745,8 +749,9 @@ edges:
 - technique: llm-game-master
   mechanic: natural-language-interaction
   effect: enables-new
+  coded: deepens
+  corrected: enables-new
   compliant: false
-  was: deepens
   secondary: deepens
   reason: "any typed action is adjudicated instead of matched against a parser's verb list, so unanticipated approaches open narrative paths the parser could not"
 - technique: llm-game-master
@@ -829,11 +834,11 @@ edges:
   reason: "a controller trained for each player-built body, which fixed controllers could not give"
 - technique: massively-parallel-simulation
   mechanic: natural-selection
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "fitness is computed by simulating each individual's behavior in place of summed stat values, while selection keeps its role, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "fitness is computed by simulating each individual's behavior in place of summed stat values, while selection keeps its role, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: massively-parallel-simulation
   mechanic: rigid-body-physics
   effect: accelerates
@@ -854,32 +859,32 @@ edges:
   reason: "batched rollouts search utility weights against metrics"
 - technique: mean-field-games
   mechanic: agent-pathfinding
-  effect: accelerates
+  effect: replaces-substrate
+  coded: accelerates
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "one equilibrium policy replaces per-agent searches, a substrate swap; the saving with agent count is secondary, so replaces substrate comes first in the written order; the note also supports accelerates, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: accelerates
+  reason: "one equilibrium policy replaces per-agent searches, a substrate swap; the saving with agent count is secondary, so replaces substrate comes first in the written order; the note also supports accelerates, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: mean-field-games
   mechanic: crowd-preferences
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "visitors choose in equilibrium with expected queues in place of greedy choice, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "visitors choose in equilibrium with expected queues in place of greedy choice, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: mean-field-games
   mechanic: service-queues
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "queue choice computed as equilibrium behavior arguably swaps the joining rule, so replaces substrate comes first; the note names no replaced rule, so the label is left for a second rater"
+  secondary: deepens
+  reason: "queue choice computed as equilibrium behavior arguably swaps the joining rule, so replaces substrate comes first; the note names no replaced rule, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: mean-field-games
   mechanic: supply-demand-pricing
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "prices come from an equilibrium of many small producers and consumers in place of a fixed elasticity formula, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "prices come from an equilibrium of many small producers and consumers in place of a fixed elasticity formula, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: mean-field-games
   mechanic: traffic-congestion
   effect: replaces-substrate
@@ -888,11 +893,11 @@ edges:
   reason: "trip routing becomes an equilibrium computed for the population"
 - technique: mean-field-games
   mechanic: travel-mode-choice
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "mode split solved as a population equilibrium arguably swaps the per-trip cost comparison; the note names no replaced rule, so the label is left for a second rater"
+  secondary: deepens
+  reason: "mode split solved as a population equilibrium arguably swaps the per-trip cost comparison; the note names no replaced rule, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: ml-weather-models
   mechanic: forecasting
   effect: enables-new
@@ -901,47 +906,47 @@ edges:
   reason: "calibrated ensembles give forecasts with real uncertainty, which a forecast drawn from the weather table could not; the forecast is also addressed to the player's understanding of the weather state"
 - technique: ml-weather-models
   mechanic: planetary-climate
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "a fine-tuned earth-system model would compute the coupled climate, arguably a substrate swap; the note is hedged and names no replaced rule, so the label is left for a second rater"
+  secondary: deepens
+  reason: "a fine-tuned earth-system model would compute the coupled climate, arguably a substrate swap; the note is hedged and names no replaced rule, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: ml-weather-models
   mechanic: pollution-spread
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "a learned forecast would carry plumes on simulated wind, which arguably swaps the diffusion rule; the note names no replaced rule, so the label is left for a second rater"
+  secondary: deepens
+  reason: "a learned forecast would carry plumes on simulated wind, which arguably swaps the diffusion rule; the note names no replaced rule, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: ml-weather-models
   mechanic: random-disasters
-  effect: enables-new
+  effect: replaces-substrate
+  coded: deepens
+  corrected: enables-new
   compliant: false
-  was: deepens
   secondary: deepens
-  ahead: replaces-substrate
-  reason: "threats with forecastable lead time are something dice rolls could not produce, which the note claims, so enables new form comes before deepens; replaces substrate comes before both in the written order (storms emerge from atmospheric state in place of dice rolls), on the boundary the header describes"
+  reason: "threats with forecastable lead time are something dice rolls could not produce, which the note claims, so enables new form comes before deepens; replaces substrate comes before both in the written order (storms emerge from atmospheric state in place of dice rolls), on the boundary the header describes. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: ml-weather-models
   mechanic: weather
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "a learned global field computes weather in place of a per-region Markov chain, while weather keeps its role, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "a learned global field computes weather in place of a per-region Markov chain, while weather keeps its role, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: model-based-planning-muzero
   mechanic: creature-learning
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "the creature learns by planning in a learned model in place of reacting with a fixed network, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "the creature learns by planning in a learned model in place of reacting with a fixed network, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: model-based-planning-muzero
   mechanic: military-operations
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "opponents plan with a learned value function and search where hand-written doctrine is brittle, a swap of the doctrine that governs units, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "opponents plan with a learned value function and search where hand-written doctrine is brittle, a swap of the doctrine that governs units, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: model-based-planning-muzero
   mechanic: policy-toggles
   effect: tunes
@@ -962,32 +967,32 @@ edges:
   reason: "self-play reveals dominant research orders"
 - technique: monte-carlo-tree-search
   mechanic: delegation-to-ai
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "governors that search toward the player's goal arguably swap the scripted controller, so replaces substrate or enables new form comes first; the note names neither outright, so the label is left for a second rater"
+  secondary: deepens
+  reason: "governors that search toward the player's goal arguably swap the scripted controller, so replaces substrate or enables new form comes first; the note names neither outright, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: monte-carlo-tree-search
   mechanic: faction-diplomacy
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "AI factions weigh options by simulating future turns in place of fixed opinion thresholds, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "AI factions weigh options by simulating future turns in place of fixed opinion thresholds, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: monte-carlo-tree-search
   mechanic: military-operations
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "tactical AI plans action sequences rather than following scripted doctrine, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "tactical AI plans action sequences rather than following scripted doctrine, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: monte-carlo-tree-search
   mechanic: rival-firms
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "rivals choose by rolling the economic model forward in place of bespoke heuristics, as the record codes the MuZero rival, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "rivals choose by rolling the economic model forward in place of bespoke heuristics, as the record codes the MuZero rival, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: monte-carlo-tree-search
   mechanic: utility-action-selection
   effect: replaces-substrate
@@ -1003,8 +1008,9 @@ edges:
 - technique: muse-wham
   mechanic: generative-content
   effect: tunes
+  coded: enables-new
+  corrected: tunes
   compliant: false
-  was: enables-new
   secondary: null
   reason: "a designer's preview of how an inserted object would play is a test of a content change before it is built; the note claims no runtime form of generated content, so enables new form is not supported"
 - technique: muse-wham
@@ -1064,8 +1070,9 @@ edges:
 - technique: on-device-language-models
   mechanic: memories-thoughts
   effect: enables-new
+  coded: deepens
+  corrected: enables-new
   compliant: false
-  was: deepens
   secondary: deepens
   reason: "generated thoughts and reflections replace a list of authored mood modifiers, the change the generative-agents record codes as enables-new; deepens comes after it"
 - technique: on-device-language-models
@@ -1088,11 +1095,11 @@ edges:
   reason: "a small model picks actions over the same action set"
 - technique: open-ended-environment-generation
   mechanic: adaptive-threat-scaling
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "challenge scales with measured learning progress in place of wealth or time survived, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "challenge scales with measured learning progress in place of wealth or time survived, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: open-ended-environment-generation
   mechanic: creature-learning
   effect: deepens
@@ -1173,16 +1180,17 @@ edges:
   reason: "scene video predicted under driving inputs with no tire model"
 - technique: physics-based-character-control
   mechanic: direct-avatar
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "a physical body that adapts footing is computed in place of canned clips, while direct control keeps its role, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "a physical body that adapts footing is computed in place of canned clips, while direct control keeps its role, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: physics-based-character-control
   mechanic: injury-body-model
   effect: replaces-substrate
+  coded: enables-new
+  corrected: replaces-substrate
   compliant: false
-  was: enables-new
   secondary: null
   reason: "a wound would limit joint torque in place of an authored limp, while the injury keeps its role; the note says it is a projection, not a new form"
 - technique: physics-based-character-control
@@ -1217,11 +1225,11 @@ edges:
   reason: "mapping the build space exposes dominant combinations before release"
 - technique: quality-diversity-search
   mechanic: procedural-terrain
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "a shipped archive of maps stands in for a seed-to-map generator, arguably a substrate swap or content made before release; the note claims controlled variety, so the label is left for a second rater"
+  secondary: deepens
+  reason: "a shipped archive of maps stands in for a seed-to-map generator, arguably a substrate swap or content made before release; the note claims controlled variety, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: quality-diversity-search
   mechanic: rival-firms
   effect: deepens
@@ -1333,8 +1341,9 @@ edges:
 - technique: story-sifting
   mechanic: history-chronicle
   effect: explains
+  coded: deepens
+  corrected: explains
   compliant: false
-  was: deepens
   secondary: deepens
   reason: "sifting retrieves whole storylines instead of leaving the player to browse records, output addressed to the player's understanding of the record, which comes before deepens; the stored causal links are the deepening"
 - technique: story-sifting
@@ -1346,8 +1355,9 @@ edges:
 - technique: story-sifting
   mechanic: storyteller-director
   effect: enables-new
+  coded: deepens
+  corrected: enables-new
   compliant: false
-  was: deepens
   secondary: explains
   reason: "a director that selects and frames storylines that already happened, instead of steering events, is a form the steering director could not produce, so the same mechanic does not simply deepen; framing past storylines is also addressed to the player's understanding"
 - technique: story-sifting
@@ -1364,11 +1374,11 @@ edges:
   reason: "tissue and cloth react to tools in real time, richer feedback for the skill"
 - technique: subspace-neural-physics
   mechanic: soft-body-deformation
-  effect: accelerates
+  effect: replaces-substrate
+  coded: accelerates
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "a learned subspace model computes the deformation, so replaces substrate arguably comes before accelerates; the note claims the solver's quality at real-time speed and names no replaced rule, so the label is left for a second rater"
+  secondary: accelerates
+  reason: "a learned subspace model computes the deformation, so replaces substrate arguably comes before accelerates; the note claims the solver's quality at real-time speed and names no replaced rule, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: text-to-3d-assets
   mechanic: decoration-beauty
   effect: cuts-authoring-cost
@@ -1431,11 +1441,11 @@ edges:
   reason: "constraint propagation is how this kind of build assist works, made richer over hundreds of modules"
 - technique: wave-function-collapse
   mechanic: procedural-terrain
-  effect: deepens
+  effect: replaces-substrate
+  coded: deepens
   compliant: false
-  secondary: null
-  ahead: replaces-substrate
-  reason: "tile maps come from constraint propagation over an example or adjacency table in place of noise thresholds, while terrain keeps its role, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+  secondary: deepens
+  reason: "tile maps come from constraint propagation over an example or adjacency table in place of noise thresholds, while terrain keeps its role, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the first pass left the label for a second rater. Relabelled replaces-substrate when the written order was applied to every flagged edge; the label it replaced is kept as the secondary."
 - technique: wave-function-collapse
   mechanic: zoning
   effect: cuts-authoring-cost

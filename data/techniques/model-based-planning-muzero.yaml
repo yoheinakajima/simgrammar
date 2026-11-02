@@ -93,12 +93,12 @@ affects:
   note: Each toggle combination is a rule variant; converged self-play under each variant measures how
     much a policy shifts outcomes and flags toggles that are strictly dominant or never worth enacting.
 - id: creature-learning
-  effect: deepens
+  effect: replaces-substrate
   note: Sample-efficient model-based learners (EfficientZero needed about two hours of experience) make
     it plausible for a creature to learn new behaviors from player reward within a session, by planning
     in a learned model of its world rather than reacting with a fixed network.
 - id: military-operations
-  effect: deepens
+  effect: replaces-substrate
   note: Opponents plan with a learned value function plus search over unit actions, giving strong play
     in operational simulations where hand-written doctrine is brittle; latent models allow planning where
     exact rollouts are too slow.
@@ -127,3 +127,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-rl-design
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

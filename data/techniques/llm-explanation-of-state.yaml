@@ -65,7 +65,7 @@ risks:
 - player-trust
 affects:
 - id: advisors
-  effect: explains
+  effect: replaces-substrate
   note: Advisors can answer arbitrary player questions about the current situation and recommend actions
     in context, instead of speaking a fixed catalog of threshold-triggered messages.
 - id: agent-inspection

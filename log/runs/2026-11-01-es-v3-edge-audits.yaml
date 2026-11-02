@@ -21,23 +21,18 @@ method: 'Sweep (E2). Took the 11 mechanics with no affects edge and the most cat
   were judged covered by the production-chain edge. Log in report/audits/edge-sweep.yaml. Audit (D4). Read
   all 225 edge notes against the 8.1 order: 172 compliant as coded; corrected 15 (6 deepens to enables-new,
   3 to explains, 4 enables-new to replaces-substrate whose notes claim no new form, 1 to cuts-authoring-cost,
-  1 to tunes); left 38. Applying the order to the letter first moved 37 labels and flipped the top effect,
-  the rarest effect and the top-exposed family, claims that voice lines repeat. Those edges share one
-  pattern (a named rule replaced by an engine that also makes the mechanic richer, coded deepens or
-  accelerates), so they are reported as a boundary for a second rater, with replaces-substrate as the
-  label ahead, not corrected. Log in report/audits/effect-audit.yaml. Changed records: 14 techniques,
-  affects edges only, run appended to reviewed; key results and their quotes were not re-checked. analyze.py
-  _edge_audits checks both files against the data and reports the stats; prose in 8.1, 8.2, 8.4, book
-  chapters 7 and 8.'
+  1 to tunes) and flagged 38. 37 of those share one pattern: a named rule replaced by an engine that also
+  makes the mechanic richer, coded deepens or accelerates where the order puts replaces-substrate first. The
+  operator then had the order applied to every flagged edge: those 37 and 3 first-pass corrections on the
+  same boundary became replaces-substrate, war-score-peace became enables-new (as negotiation is coded), so
+  53 labels changed. The flip moves the top effect to replaces-substrate, the rarest to accelerates, and the
+  top-exposed family to agents and behavior; rewrote the sentences it broke in 8.1-8.3, Finding 4, book
+  chapters 5-8, and the Voice lines and Japanese cues of ep04 s11, ep07 s5, s7, s8 and short 007. First-coded
+  labels and reasons stay in report/audits/effect-audit.yaml. Changed records: 28 technique records, affects edges
+  only, run appended to reviewed; key results and their quotes were not re-checked. analyze.py _edge_audits
+  checks both files against the data and reports the stats.'
 contract_version: '1.2'
 proposals:
-- kind: rule
-  target: section 8.1 effect precedence
-  detail: 'Decide the replaces-substrate boundary. 37 edges have notes that name a rule the technique replaces
-    and also say the mechanic gets richer or cheaper; they are coded deepens or accelerates, while the written
-    order puts replaces-substrate first. Either qualify replaces-substrate (the mechanic keeps the same behavior
-    with a new engine) or relabel those edges; report/audits/effect-audit.yaml lists them with ahead: replaces-substrate.
-    An independent coder should settle it, since the rater who wrote the order also coded the edges.'
 - kind: other
   target: report/src/02-method.md section 2.6
   detail: 'The Coding bullet says the technique layer has had no recall audit. It now has a keyword sweep of

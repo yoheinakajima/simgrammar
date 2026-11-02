@@ -86,7 +86,7 @@ affects:
   note: AI bidders play mixed strategies over private valuations instead of bidding a fixed fraction of
     value, which removes simple exploits such as always outbidding the AI by one unit.
 - id: military-operations
-  effect: deepens
+  effect: replaces-substrate
   note: Deception becomes a stable part of AI play, as DeepNash bluffed with hidden unit identities in
     Stratego, so operational wargames could field opponents that feint and conceal force composition at
     calibrated rates.
@@ -95,7 +95,7 @@ affects:
   note: Competitors with private costs or plans can bluff in price wars and market entry, and designers
     can measure how exploitable a fixed AI pricing script is by computing a best response against it.
 - id: negotiation
-  effect: enables-new
+  effect: replaces-substrate
   note: Bargaining with hidden reservation values is an imperfect-information game; equilibrium strategies
     bluff and concede in ways scripted thresholds cannot.
 limitations:

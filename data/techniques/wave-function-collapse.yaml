@@ -73,7 +73,7 @@ affects:
     hundreds of modules: in Townscaper a click toggles one cell and the solver re-chooses compatible modules
     around it, so each placement reshapes its neighbors.'
 - id: procedural-terrain
-  effect: deepens
+  effect: replaces-substrate
   note: Tile maps can be generated from a small example or adjacency table instead of noise thresholds,
     giving locally coherent coastlines, cliffs, and interiors, as in Bad North's islands and Caves of
     Qud's areas; large-scale structure still needs another layer.
@@ -103,3 +103,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-rl-design
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

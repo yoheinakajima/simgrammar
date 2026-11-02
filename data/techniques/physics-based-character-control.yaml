@@ -51,7 +51,7 @@ affects:
     it on new furniture geometry without a bespoke animation per object, as MaskedMimic shows for chairs,
     stools, and sofas.
 - id: direct-avatar
-  effect: deepens
+  effect: replaces-substrate
   note: The controlled character becomes a physical body that adapts footing to terrain and reacts to
     pushes, instead of playing canned clips that slide over geometry.
 - id: rigid-body-physics

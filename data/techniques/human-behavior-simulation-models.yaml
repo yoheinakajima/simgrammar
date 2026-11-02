@@ -76,7 +76,7 @@ affects:
   note: Visitor populations could be drawn from person-grounded profiles whose preferences and tolerances
     are measured against real people rather than sampled from designer distributions.
 - id: elections
-  effect: deepens
+  effect: replaces-substrate
   note: Simulated electorates could be built from survey-grounded agents that reproduce subgroup opinion
     distributions, so vote shares respond to issues the way measured populations do.
 - id: interest-groups
@@ -84,7 +84,7 @@ affects:
   note: A group's preferences over policies could be derived from simulated members (silicon samples)
     rather than a single authored ideology vector.
 - id: personality-traits
-  effect: deepens
+  effect: replaces-substrate
   note: A character's disposition can be a rich text profile whose predicted Big Five scores and economic-game
     behavior match a real respondent, rather than a few discrete trait tags.
 - id: dilemma-cards
@@ -92,11 +92,11 @@ affects:
   note: Before ship, designers could estimate option pick rates for each card by querying a choice model
     on the card text; untested on game content.
 - id: negotiation
-  effect: deepens
+  effect: replaces-substrate
   note: Counterparties whose acceptance follows models of human bargaining (fairness, anchoring) rather
     than a single reservation price.
 - id: advertising-awareness
-  effect: deepens
+  effect: replaces-substrate
   note: Segment-level response to advertising predicted from models of human choice instead of a flat
     awareness multiplier.
 - id: travel-mode-choice
@@ -129,3 +129,4 @@ provenance:
   created: 2026-10-24-techniques-llm-agents
   reviewed:
   - 2026-10-24-technique-links
+  - 2026-11-01-es-v3-edge-audits

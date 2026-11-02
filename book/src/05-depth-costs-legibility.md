@@ -118,7 +118,7 @@ Oxygen Not Included derives insulation, phase changes, and overheating machines 
 
 The cost of making depth readable is design work and screen space. Each coupled system needs a way to be read, and each legibility mechanic brings failure modes of its own.
 
-Explaining a simulation's state from its own logs needs retrieval, summarization, and constrained generation, all of which exist; chapter 8 counts how few techniques in the dataset do it.{{assert:rarest_effect == Explains}} Chapter 10 makes the case for a why-query, a box where a player asks why something happened and gets an answer drawn from the game's event log.
+Explaining a simulation's state from its own logs needs retrieval, summarization, and constrained generation, all of which exist; chapter 8 counts how few techniques in the dataset do it.{{assert:rank_effect_explains <= 2}} Chapter 10 makes the case for a why-query, a box where a player asks why something happened and gets an answer drawn from the game's event log.
 
 ## Exercise: trace a collapse
 

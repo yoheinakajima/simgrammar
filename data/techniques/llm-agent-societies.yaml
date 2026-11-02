@@ -91,7 +91,7 @@ affects:
     universal basic income and hurricane experiments) instead of reading hand-authored weighted edges
     from policies to voter groups.
 - id: taxation
-  effect: deepens
+  effect: replaces-substrate
   note: Tax compliance becomes an agent decision that responds to law changes and influencer messaging,
     as in Project Sid's 20% tax experiment, rather than an automatic deduction at the set rate.
 - id: persistent-world

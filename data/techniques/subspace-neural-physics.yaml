@@ -45,7 +45,7 @@ risks:
 - controllability
 affects:
 - id: soft-body-deformation
-  effect: accelerates
+  effect: replaces-substrate
   note: Deformation learned from an offline solver runs 300-5000x faster than that solver, putting near-offline-quality
     cloth and flesh response within a real-time budget.
 - id: embodied-skill-control
@@ -71,3 +71,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-sim-math
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

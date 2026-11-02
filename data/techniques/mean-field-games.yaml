@@ -60,23 +60,23 @@ affects:
     equilibrium in which drivers anticipate congestion, computed once for the population at a cost independent
     of car count.
 - id: crowd-preferences
-  effect: deepens
+  effect: replaces-substrate
   note: Park visitors can choose attractions in equilibrium with expected queues and crowding rather than
     greedily, producing realistic spreading of crowds across a park.
 - id: service-queues
-  effect: deepens
+  effect: replaces-substrate
   note: Queue choice and arrival timing become equilibrium behavior, so changing capacity at one service
     shifts load across the others as people anticipate the change.
 - id: supply-demand-pricing
-  effect: deepens
+  effect: replaces-substrate
   note: Prices can come from many small rational producers and consumers in equilibrium (as in MFG models
     of energy markets), instead of a fixed elasticity formula.
 - id: agent-pathfinding
-  effect: accelerates
+  effect: replaces-substrate
   note: One equilibrium policy over positions serves any number of agents, like a flow field that already
     includes congestion effects, replacing per-agent searches.
 - id: travel-mode-choice
-  effect: deepens
+  effect: replaces-substrate
   note: Mode split solved as a population equilibrium in which each traveler responds to congestion created
     by everyone else.
 deployed_in: []
@@ -101,3 +101,4 @@ provenance:
   created: 2026-10-24-techniques-sim-math
   reviewed:
   - 2026-10-24-technique-links
+  - 2026-11-01-es-v3-edge-audits

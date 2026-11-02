@@ -52,27 +52,27 @@ risks:
 - compute-cost
 affects:
 - id: fluid-gas-simulation
-  effect: accelerates
+  effect: replaces-substrate
   note: Learned fluid surrogates (GNS particles, FNO fields) reproduce solver-quality flow at large speedups,
     raising resolution or extent of water and gas within a frame budget.
 - id: soft-body-deformation
-  effect: accelerates
+  effect: replaces-substrate
   note: MeshGraphNets predicts cloth and structural deformation 10-100x faster than its training solver,
     allowing finite-element-like deformation where games now use coarse node-beam models.
 - id: material-interactions
-  effect: deepens
+  effect: replaces-substrate
   note: GNS simulates several materials (fluids, rigid solids, deformables) interacting in one learned
     model, so mixed-material reactions need no hand-written pairwise rules.
 - id: flight-aerodynamics
-  effect: deepens
+  effect: replaces-substrate
   note: MeshGraphNets learned aerodynamic flow around airfoils, pointing to flight models driven by surrogate
     CFD fields instead of fixed lift and drag coefficient tables.
 - id: structural-integrity
-  effect: deepens
+  effect: replaces-substrate
   note: Learned structural-mechanics surrogates output stress and deformation fields, which could replace
     binary support checks with graded bending, sagging and stress-driven failure.
 - id: hydrology
-  effect: accelerates
+  effect: replaces-substrate
   note: Neural operators solve parametric flow PDEs in one forward pass at any grid resolution, a candidate
     replacement for per-cell iterative water-flow updates over large terrains.
 deployed_in: []
@@ -93,3 +93,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-sim-math
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits
