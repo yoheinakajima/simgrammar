@@ -50,10 +50,27 @@ falsifiable_signal:
     to that player''s feedback. Single-layer learners such as Black & White''s perceptrons do not count.
     Technique class: deep networks, language models, or deep RL policies only, so this is a technique
     test.'
-sources: []
+claims:
+- text: Little Learning Machines (2024) has players train their AI robot companions in real time.
+  sources:
+  - src-steam-2024-little-learning-machines
+  confidence: high
+  quote: Welcome to Little Learning Machines-a simulation where you train your real AI companions to solve
+    challenges together, across whimsical islands.
+  locator: About This Game
+- text: Its developers state the companions are real neural networks; the store page does not give their
+    depth.
+  sources:
+  - src-steam-2024-little-learning-machines
+  confidence: high
+  quote: They're real neural networks and they need lots of space!
+  locator: System Requirements, Additional Notes
+sources:
+- src-steam-2024-little-learning-machines
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

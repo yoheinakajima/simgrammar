@@ -1,0 +1,16 @@
+id: src-climateinteractive-2026-en-roads-guide
+type: source
+name: En-ROADS User Guide
+kind: docs
+authors:
+- Climate Interactive
+- Ventana Systems
+- UML Climate Change Initiative
+- MIT Sloan
+venue: Climate Interactive
+date: 2026-08
+url: https://docs.climateinteractive.org/projects/en-roads/en/latest/
+accessed: '2026-11-01'
+notes: En-ROADS is a climate-policy simulator designed for policy workshops and roleplaying games.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

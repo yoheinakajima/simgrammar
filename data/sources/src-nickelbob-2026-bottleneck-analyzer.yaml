@@ -1,0 +1,14 @@
+id: src-nickelbob-2026-bottleneck-analyzer
+type: source
+name: Bottleneck Analyzer
+kind: store-page
+authors:
+- nickelbob
+venue: Factorio Mod Portal
+date: '2026'
+url: https://mods.factorio.com/mod/bottleneck-analyzer
+accessed: '2026-11-01'
+notes: Samples every crafting building in the running factory and reports which missing ingredients cause
+  production delays; it does not perturb or re-run the network.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

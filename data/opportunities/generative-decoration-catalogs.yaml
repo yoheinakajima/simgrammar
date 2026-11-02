@@ -46,10 +46,21 @@ falsifiable_signal:
     text-to-3D or image-to-3D object generation inside the game. Technique class: text-to-3D or image-to-3D
     generation by any method counts, classical photogrammetry from a player''s photos included, so this
     is a feature test; it shows a learned model landed only if the material says one makes the objects.'
-sources: []
+claims:
+- text: inZOI lets players create 3D objects from 2D images and use them as interior decorations, a shipped
+    form of this opportunity.
+  sources:
+  - src-steam-2025-inzoi
+  confidence: high
+  quote: They can also create 3D objects from 2D image input, which can be used as interior decorations
+    or character accessories, and add distinctive motions to their Zoi using video input.
+  locator: AI Generated Content Disclosure
+sources:
+- src-steam-2025-inzoi
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

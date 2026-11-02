@@ -85,7 +85,7 @@ key_results:
   quote: A C# runtime tailored for Unity is planned.
   locator: README, Status
 maturity: prototype
-trl: 5
+trl: 6
 runtime:
 - server-realtime
 - client-realtime
@@ -137,3 +137,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-28-story-sifting
+  reviewed:
+  - 2026-11-01-es-v3-prior-art

@@ -28,7 +28,8 @@ precedent:
 - dwarf-fortress
 - oxygen-not-included
 - prison-architect
-novelty: 3
+- inzoi
+novelty: 2
 feasibility: 4
 impact: 3
 horizon: now
@@ -48,10 +49,51 @@ falsifiable_signal:
     translated into the game''s existing work or priority settings. Technique class: any parser counts,
     a keyword or grammar-based one included, so this is a feature test; it shows language models landed
     only if the material says one translates the orders.'
-sources: []
+claims:
+- text: In inZOI typed text can steer a character's actions and thoughts through a small language model,
+    a life-sim form of intent-level orders.
+  sources:
+  - src-steam-2025-inzoi
+  confidence: high
+  quote: character actions and thoughts can be influenced with text using SLM technology
+  locator: AI Generated Content Disclosure
+- text: Brave New Wonders (2026), a factory-automation sim, lets players program its worker robots in
+    plain language.
+  sources:
+  - src-cityfromnaught-2026-brave-new-wonders
+  confidence: high
+  quote: Start with simple presets, then program your robots in plain language, any language, with no
+    coding required.
+  locator: About This Game
+- text: Its orders can be standing conditional rules, the intent-level form this opportunity proposes.
+  sources:
+  - src-cityfromnaught-2026-brave-new-wonders
+  confidence: high
+  quote: When RED signal is detected at warehouse, pick up crystal compound from general factory and deposit
+    it at warehouse.
+  locator: About This Game (behaviour editor example)
+- text: The game parses each typed command into a visual behaviour graph, its own control primitive.
+  sources:
+  - src-cityfromnaught-2026-brave-new-wonders-text-commands
+  confidence: high
+  quote: The game parses your text and generates a visual behaviour.
+  locator: 'How a Command Becomes Behaviour: Step-by-Step, Step 2'
+- text: The compiled logic stays visible in the inspector while workers follow it, so the order stays
+    inspectable.
+  sources:
+  - src-cityfromnaught-2026-brave-new-wonders-text-commands
+  confidence: high
+  quote: Your commands are never executed blindly, and you will always see the compiled logic in the inspector
+    when the automatons are following it.
+  locator: 'How a Command Becomes Behaviour: Step-by-Step'
+sources:
+- src-steam-2025-inzoi
+- src-cityfromnaught-2026-brave-new-wonders
+- src-cityfromnaught-2026-brave-new-wonders-text-commands
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

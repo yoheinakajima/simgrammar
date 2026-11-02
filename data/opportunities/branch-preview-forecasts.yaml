@@ -27,7 +27,7 @@ precedent:
 - frostpunk
 - democracy-4
 - surviving-mars
-novelty: 4
+novelty: 3
 feasibility: 4
 impact: 4
 horizon: 1-2y
@@ -48,7 +48,24 @@ falsifiable_signal:
     shown to the player. A single deterministic projection does not count. Technique class: forked runs
     of the game''s own simulation count, classical Monte Carlo runs with no learned surrogate included,
     so this is a feature test.'
-sources: []
+claims:
+- text: Battle for Wesnoth's attack dialog shows the player a histogram of hitpoint outcomes for the pending
+    combat.
+  sources:
+  - src-josteph-2019-wesnoth-multiple-combats
+  confidence: medium
+  quote: The attack dialog shows the expected hitpoints histogram for the results of one combat
+  locator: first post
+- text: Wesnoth's attack prediction includes a Monte Carlo implementation of its combat outcome matrix,
+    so the preview runs the game's own rules forward many times.
+  sources:
+  - src-wesnoth-2024-attack-prediction
+  confidence: high
+  quote: Implementation of combat_matrix based on Monte Carlo simulation.
+  locator: comment above class monte_carlo_combat_matrix
+sources:
+- src-josteph-2019-wesnoth-multiple-combats
+- src-wesnoth-2024-attack-prediction
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
@@ -56,3 +73,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-techniques-opportunities
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

@@ -1,0 +1,14 @@
+id: src-steam-2023-heard-of-the-story
+type: source
+name: Heard of the Story?
+kind: store-page
+authors:
+- Shasaur
+venue: Steam
+date: '2023-09-14'
+url: https://store.steampowered.com/app/1881940
+accessed: '2026-11-01'
+notes: An early-access city builder whose villagers have personal histories and dialogue drawn from their
+  experiences and the world state; the store page says each building changes their lives.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

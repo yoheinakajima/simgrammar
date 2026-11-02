@@ -1,0 +1,15 @@
+id: src-roblox-2026-studio-going-agentic
+type: source
+name: Roblox Studio is Going Agentic
+kind: news
+authors:
+- Nick Tornow
+- Roblox
+venue: Roblox Newsroom
+date: '2026-04-15'
+url: https://about.roblox.com/newsroom/2026/04/roblox-studio-going-agentic
+accessed: '2026-11-01'
+notes: Roblox Assistant gains a planning mode and a playtesting agent that tests generated changes against
+  the creator's plan, using the player character as an automated tester.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

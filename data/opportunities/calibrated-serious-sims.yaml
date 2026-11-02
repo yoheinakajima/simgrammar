@@ -46,10 +46,38 @@ falsifiable_signal:
     least one goodness-of-fit metric. Technique class: classical Bayesian calibration, such as Markov
     chain Monte Carlo or approximate Bayesian computation, counts as well as neural simulation-based inference,
     so this is a feature test.'
-sources: []
+claims:
+- text: En-ROADS is a climate-policy simulator designed for policy workshops and roleplaying games.
+  sources:
+  - src-climateinteractive-2026-en-roads-guide
+  confidence: high
+  quote: It is designed to provide a synthesis of the best available science on climate solutions and
+    put it at the fingertips of groups in policy workshops and roleplaying games.
+  locator: En-ROADS User Guide, introduction
+- text: En-ROADS documents its initialization and calibration to named historical data sources, though
+    the pages read name no Bayesian method or fit metric.
+  sources:
+  - src-climateinteractive-2026-en-roads-calibration
+  confidence: high
+  quote: En-ROADS initializes and calibrates to available historical data, primarily provided by the following
+    sources
+  locator: Initialization, Calibration, Model Testing
+- text: Climate Interactive's Climate Action Simulation is a role-playing game of a simulated climate
+    summit, played with the En-ROADS simulator.
+  sources:
+  - src-climateinteractive-2026-climate-action-simulation
+  confidence: high
+  quote: This highly interactive role-playing game puts participants in a simulated emergency climate
+    summit organized by the United Nations.
+  locator: How It Works
+sources:
+- src-climateinteractive-2026-en-roads-guide
+- src-climateinteractive-2026-en-roads-calibration
+- src-climateinteractive-2026-climate-action-simulation
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

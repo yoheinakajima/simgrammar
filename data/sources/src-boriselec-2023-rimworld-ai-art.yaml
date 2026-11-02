@@ -1,0 +1,15 @@
+id: src-boriselec-2023-rimworld-ai-art
+type: source
+name: AI art (RimWorld mod)
+kind: store-page
+authors:
+- boriselec
+- Aantt
+venue: Steam Workshop (RimWorld)
+date: '2023-02-16'
+url: https://steamcommunity.com/sharedfiles/filedetails/?id=2934195167
+accessed: '2026-11-01'
+notes: Generates images of in-game artworks with Stable Diffusion from their tale descriptions, which
+  name the run's colonists and dated events.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

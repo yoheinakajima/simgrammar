@@ -47,7 +47,23 @@ falsifiable_signal:
     user reviews, as an official announcement or repository; community wrappers and academic forks do
     not count. Technique class: any method counts, a conventional software interface included, so this
     is a feature test.'
-sources: []
+claims:
+- text: Blizzard's official StarCraft II API gives scripted and machine-learning bots full external control
+    of the game, a developer-released agent environment.
+  sources:
+  - src-blizzard-2017-s2client-proto
+  confidence: high
+  quote: 'The StarCraft II API is an interface that provides full external control of StarCraft II. This
+    API exposes functionality for developing software for: Scripted bots. Machine-learning based bots.'
+  locator: README, Overview
+- text: Blizzard ships headless Linux builds of StarCraft II for the API.
+  sources:
+  - src-blizzard-2017-s2client-proto
+  confidence: high
+  quote: Self contained headless linux StarCraft II builds.
+  locator: README, Contents, Linux Packages
+sources:
+- src-blizzard-2017-s2client-proto
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
@@ -55,3 +71,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-techniques-opportunities
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

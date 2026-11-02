@@ -26,7 +26,7 @@ precedent:
 - screeps
 - bitburner
 - the-farmer-was-replaced
-novelty: 5
+novelty: 3
 feasibility: 4
 impact: 2
 horizon: now
@@ -44,10 +44,34 @@ falsifiable_signal:
     players specifying, testing, or verifying AI-generated code as the main mechanic. Technique class:
     any code generator counts, classical program synthesis included, so this is a feature test; it shows
     language models landed only if the page says one writes the code.'
-sources: []
+claims:
+- text: Agents! Please? (2026) casts the player as the last human reviewer of code that AI agents write.
+  sources:
+  - src-steam-2026-agents-please
+  confidence: high
+  quote: The AI writes all the code. Confidently. Wrong. You are the last human reviewer.
+  locator: Short description, header
+- text: In Agents! Please? the player catches wrong code by running it on inputs they choose, a testing
+    loop like the one this opportunity proposes.
+  sources:
+  - src-steam-2026-agents-please
+  confidence: high
+  quote: Read the brief, read the diff, run the code on inputs you choose, and catch what the whole swarm
+    missed.
+  locator: About This Game, THE JOB
+- text: The game's AI-written code was generated in advance and reviewed by people, not produced live
+    by a model.
+  sources:
+  - src-steam-2026-agents-please
+  confidence: high
+  quote: every AI line in the game was really machine-written, then human-reviewed.
+  locator: WHAT IS IN THE BOX
+sources:
+- src-steam-2026-agents-please
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

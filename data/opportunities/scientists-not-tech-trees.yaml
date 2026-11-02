@@ -45,7 +45,23 @@ falsifiable_signal:
     describes research progress that depends on relationships between named researcher characters, not
     only on their individual stats. Technique class: any method counts, conventional agent simulation
     included, so this is a feature test.'
-sources: []
+claims:
+- text: Dwarf Fortress scholars research topics by pondering and by discussing them with other scholars.
+  sources:
+  - src-dfwiki-2026-scholar
+  confidence: medium
+  quote: Scholars research topics through pondering and discussing them.
+  locator: Introduction
+- text: Dwarf Fortress scholars form master and apprentice relationships through which topics are taught,
+    so who works with whom shapes what each scholar knows.
+  sources:
+  - src-dfwiki-2026-scholar
+  confidence: medium
+  quote: Scholars can also form master/apprentice relationships, and the master will teach their apprentices
+    about a topic.
+  locator: Research section
+sources:
+- src-dfwiki-2026-scholar
 assertions:
 - 'derived.tech-tree.prevalence_rank <= 5'
 - 'derived.relationship-values.prevalence_share >= 0.08'
@@ -58,3 +74,4 @@ provenance:
   - 2026-10-25-contributor-readiness
   - 2026-10-31-tag-audit
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

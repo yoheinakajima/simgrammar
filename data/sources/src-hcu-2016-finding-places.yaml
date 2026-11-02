@@ -1,0 +1,15 @@
+id: src-hcu-2016-finding-places
+type: source
+name: Finding Places
+kind: docs
+authors:
+- City Science Lab
+- HafenCity University Hamburg
+venue: City Science Lab Hamburg
+date: '2016'
+url: https://www.citysciencelab.hamburg/projects/findingplaces
+accessed: '2026-11-01'
+notes: A 2016 project of HafenCity University and the City of Hamburg in which residents used interactive
+  CityScope models in workshops to propose refugee-housing sites, which the city reviewed.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

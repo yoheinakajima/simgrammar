@@ -1,0 +1,14 @@
+id: src-steam-2026-agents-please
+type: source
+name: Agents! Please?
+kind: store-page
+authors:
+- KIB Games
+venue: Steam
+date: '2026-09-10'
+url: https://store.steampowered.com/app/5166150/Agents_Please/
+accessed: '2026-11-01'
+notes: A game in which the player is the last human reviewer of code written by AI agents; the in-game
+  code was machine-written in advance and human-reviewed.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

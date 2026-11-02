@@ -25,7 +25,8 @@ precedent:
 - factorio
 - minecraft
 - satisfactory
-novelty: 4
+- black-and-white
+novelty: 3
 feasibility: 3
 impact: 3
 horizon: 1-2y
@@ -45,10 +46,30 @@ falsifiable_signal:
     store page or developer documentation describes companion skills learned from the player that persist
     and can be reused on new tasks. Technique class: any method counts, classical programming by demonstration
     included, so this is a feature test.'
-sources: []
+claims:
+- text: Autonauts teaches its bots tasks by having them repeat the player's actions, stored as visual
+    programs, a shipped form of skills learned from demonstration.
+  sources:
+  - src-steam-2026-autonauts
+  confidence: high
+  quote: Teach your workerbots requisite steps to complete tasks by asking them to repeat actions utilising
+    a visual programming language.
+  locator: 'About This Game, Key Features: Playful Programming'
+- text: In Black & White the player can teach the creature companion tasks such as stocking the village
+    store.
+  sources:
+  - src-wikipedia-black-and-white
+  confidence: medium
+  quote: As a god, the player can teach their creature to perform tasks such as stocking the village store
+    or performing miracles.
+  locator: Gameplay
+sources:
+- src-steam-2026-autonauts
+- src-wikipedia-black-and-white
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

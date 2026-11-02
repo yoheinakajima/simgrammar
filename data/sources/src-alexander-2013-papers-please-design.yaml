@@ -1,0 +1,14 @@
+id: src-alexander-2013-papers-please-design
+type: source
+name: Designing the bleak genius of Papers, Please
+kind: news
+authors:
+- Leigh Alexander
+venue: Game Developer (Gamasutra)
+date: '2013-09-03'
+url: https://www.gamedeveloper.com/design/designing-the-bleak-genius-of-i-papers-please-i-
+accessed: '2026-11-01'
+notes: Lucas Pope says entrant details that are not scripted are filled with random data based on the
+  current game rules, and that he validated the generator by creating thousands of immigrants at a time.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

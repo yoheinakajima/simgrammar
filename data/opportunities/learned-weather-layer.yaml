@@ -50,7 +50,17 @@ falsifiable_signal:
     or a console release; documentation or a developer statement describes a machine-learned weather emulator
     running in the shipped game. Technique class: machine-learned emulators only, so this is a technique
     test.'
-sources: []
+claims:
+- text: ACE is a learned emulator of a global atmospheric model, research prior art for a weather layer
+    distilled from a learned model.
+  sources:
+  - src-wattmeyer-2023-ace
+  confidence: high
+  quote: We present ACE (AI2 Climate Emulator), a 200M-parameter, autoregressive machine learning emulator
+    of an existing comprehensive 100-km resolution global atmospheric model.
+  locator: Abstract
+sources:
+- src-wattmeyer-2023-ace
 assertions:
 - field.ml-weather-models.horizon == 3-5y
 - field.ml-weather-models.maturity == research
@@ -63,3 +73,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-techniques-opportunities
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

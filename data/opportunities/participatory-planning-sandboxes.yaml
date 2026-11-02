@@ -47,10 +47,38 @@ falsifiable_signal:
     that it simulates resident responses, and records its use in an official consultation. Technique class:
     any simulation of resident responses counts, classical agent-based models included, so this is a feature
     test.'
-sources: []
+claims:
+- text: 'Stockholm city officials took part in a 2016 workshop that used Cities: Skylines to plan a new
+    district.'
+  sources:
+  - src-pcgamer-2016-cities-skylines-stockholm
+  confidence: high
+  quote: Alongside Paradox and officials from the city of Stockholm, a workshop is set to run on September
+    3 and 4
+  locator: Article body
+- text: In 2016 Hamburg residents used interactive CityScope models in workshops to propose refugee-housing
+    sites.
+  sources:
+  - src-hcu-2016-finding-places
+  confidence: high
+  quote: In the period from May 26 to July 15, 2016, Hamburg residents took part in numerous workshops
+    at CityScopes to search for public spaces suitable for the construction of refugee accommodation.
+  locator: Project description
+- text: The city reviewed the proposals from those workshops, an official consultation on a game-like
+    model without simulated residents.
+  sources:
+  - src-hcu-2016-finding-places
+  confidence: high
+  quote: 161 commented proposals were sent to the city for consideration. The city then reviewed the areas
+    within 14 days.
+  locator: Project description
+sources:
+- src-pcgamer-2016-cities-skylines-stockholm
+- src-hcu-2016-finding-places
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

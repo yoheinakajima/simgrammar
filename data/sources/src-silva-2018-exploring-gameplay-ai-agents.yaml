@@ -1,0 +1,19 @@
+id: src-silva-2018-exploring-gameplay-ai-agents
+type: source
+name: Exploring Gameplay With AI Agents
+kind: preprint
+authors:
+- Fernando de Mesentier Silva
+- Igor Borovikov
+- John Kolen
+- Navid Aghdaie
+- Kazi Zaman
+venue: arXiv (AIIDE 2018)
+date: '2018-11-16'
+url: https://arxiv.org/abs/1811.06962
+arxiv: '1811.06962'
+accessed: '2026-11-01'
+notes: EA staff ran thousands of agent simulations of The Sims Mobile to find imbalances in actions and
+  rewards, and the findings changed the released game.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

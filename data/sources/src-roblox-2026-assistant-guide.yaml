@@ -1,0 +1,14 @@
+id: src-roblox-2026-assistant-guide
+type: source
+name: Assistant for Studio
+kind: docs
+authors:
+- Roblox Corporation
+venue: Roblox Creator Hub
+date: '2026'
+url: https://create.roblox.com/docs/assistant/guide
+accessed: '2026-11-01'
+notes: Roblox's official assistant combines a language model with a run-command system that creates and
+  modifies objects and scripts in a place from typed requests.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

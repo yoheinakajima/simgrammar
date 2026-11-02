@@ -26,6 +26,7 @@ precedent:
 - football-manager
 - anno-1800
 - victoria-3
+- black-and-white
 novelty: 3
 feasibility: 4
 impact: 3
@@ -46,10 +47,30 @@ falsifiable_signal:
     choices. Fixed presets or global difficulty settings do not count. Technique class: any adaptation
     counts, tallies of the player''s past choices or hand-written rules included, so this is a feature
     test.'
-sources: []
+claims:
+- text: Black & White's creature, which carries out tasks for the player, learns what this player wants
+    from the player's rewards and punishments.
+  sources:
+  - src-wikipedia-black-and-white
+  confidence: medium
+  quote: 'Teaching is performed using a reinforcement learning system: if the creature does something
+    the player does not want, it can be discouraged with a slap.'
+  locator: Gameplay, creature
+- text: Civilization III's city governors learn from the player accepting or overriding their suggestions,
+    a shipped delegate trained on the player's own choices.
+  sources:
+  - src-apolyton-2001-soren-johnson-civ3-interview
+  confidence: medium
+  quote: a learning algorithm was implemented to allow the user to train the AI by either accepting the
+    governor's suggestions or making different choices
+  locator: Answer to 'How smart will the governors be this time?'
+sources:
+- src-wikipedia-black-and-white
+- src-apolyton-2001-soren-johnson-civ3-interview
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art
