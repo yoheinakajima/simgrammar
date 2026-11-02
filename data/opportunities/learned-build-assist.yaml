@@ -45,10 +45,30 @@ falsifiable_signal:
     developer documentation states that a model trained on layout data, as opposed to hand-written procedural
     rules, generates the layout from player brushes or strokes. Technique class: models trained on layout
     data only, so this is a technique test.'
-sources: []
+claims:
+- text: Neural Turtle Graphics, trained on map data, lets users choose a city style and sketch parts of
+    the road layout it then generates, research prior art for this opportunity.
+  sources:
+  - src-chu-2019-neural-turtle-graphics
+  confidence: high
+  quote: Moreover, our method allows users to control styles of generated road layouts mimicking existing
+    cities as well as to sketch parts of the city road layout to be synthesized.
+  locator: Abstract
+- text: Tiny Glade's stroke assist assembles building detail around the player's gestures with procedural
+    rules, not a learned model.
+  sources:
+  - src-steam-2026-tiny-glade
+  confidence: high
+  quote: Explore gridless building chemistry, and watch the game carefully assemble every brick, pebble
+    and plank, adapting to your whim.
+  locator: About This Game
+sources:
+- src-chu-2019-neural-turtle-graphics
+- src-steam-2026-tiny-glade
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

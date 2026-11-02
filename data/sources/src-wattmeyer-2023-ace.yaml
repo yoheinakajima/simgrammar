@@ -1,0 +1,26 @@
+id: src-wattmeyer-2023-ace
+type: source
+name: 'ACE: A fast, skillful learned global atmospheric model for climate prediction'
+kind: preprint
+authors:
+- Oliver Watt-Meyer
+- Gideon Dresdner
+- Jeremy McGibbon
+- Spencer K. Clark
+- Brian Henn
+- James Duncan
+- Noah D. Brenowitz
+- Karthik Kashinath
+- Michael S. Pritchard
+- Boris Bonev
+- Matthew E. Peters
+- Christopher S. Bretherton
+venue: arXiv
+date: '2023-10-03'
+url: https://arxiv.org/abs/2310.02074
+arxiv: '2310.02074'
+accessed: '2026-11-01'
+notes: A 200M-parameter learned emulator of a 100-km global atmospheric model, run stably for long climate
+  rollouts.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

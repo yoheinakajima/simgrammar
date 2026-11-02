@@ -25,6 +25,7 @@ precedent:
 - dwarf-fortress
 - planet-zoo
 - the-sims-4
+- gran-turismo-7
 novelty: 3
 feasibility: 3
 impact: 2
@@ -43,10 +44,48 @@ falsifiable_signal:
     developer documentation names learned motion control (a trained policy driving a physics character)
     for population agents, not only motion-matched animation. Technique class: trained control policies
     only, so this is a technique test.'
-sources: []
+claims:
+- text: In Evolution a neural network trained by a genetic algorithm learns to move each player-built
+    physics creature, a narrow released form of learned physics-based motion.
+  sources:
+  - src-keiwan-2026-evolution
+  confidence: medium
+  quote: Watch how the combination of a neural network and a genetic algorithm can enable your creatures
+    to
+  locator: page description
+- text: Gran Turismo 7 shipped races against Gran Turismo Sophy, a trained policy that drives a physics-simulated
+    car.
+  sources:
+  - src-polyphony-2023-gt-sophy-race-together
+  confidence: high
+  quote: Race Together allows players of all levels and abilities the opportunity to go wheel to wheel
+    against GT Sophy.
+  locator: article body
+- text: Ecosystem's creatures move by neural networks that contract muscles and apply torque at the joints
+    of physically simulated bodies.
+  sources:
+  - src-steam-2024-ecosystem
+  confidence: high
+  quote: data from sense organs passes through a network of neurons and finally contracts a muscle in
+    a specific body part. Creatures swim just like real sea-life, applying torque at their joints to push
+    against the water
+  locator: About This Game
+- text: Ecosystem simulates a population of evolving creatures, so learned physics-based motion drives
+    a whole simulated population.
+  sources:
+  - src-steam-2024-ecosystem
+  confidence: high
+  quote: At its heart are evolving virtual lifeforms, who grow from synthetic DNA and live in a physically-simulated
+    ocean.
+  locator: About This Game
+sources:
+- src-keiwan-2026-evolution
+- src-polyphony-2023-gt-sophy-race-together
+- src-steam-2024-ecosystem
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

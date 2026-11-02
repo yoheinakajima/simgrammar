@@ -47,10 +47,38 @@ falsifiable_signal:
     descriptions. Technique class: any method counts, a compiler for a controlled subset of English included,
     so this is a feature test; it shows language models landed only if the tool''s material says one writes
     the mod.'
-sources: []
+claims:
+- text: Roblox's official Assistant combines a language model with a command system that acts directly
+    on a creator's place.
+  sources:
+  - src-roblox-2026-assistant-guide
+  confidence: high
+  quote: In Studio, Assistant combines a large language model (LLM) with a run-command system that can
+    act directly on your data model.
+  locator: Introduction (page undated; accessed 2026-11-01)
+- text: The Assistant creates and modifies scripts as well as objects, a platform-owner tool that turns
+    typed requests into working code.
+  sources:
+  - src-roblox-2026-assistant-guide
+  confidence: high
+  quote: Create and modify objects and scripts in your place's data model
+  locator: Introduction, capability list
+- text: Roblox Assistant's playtesting agent tests generated changes against the creator's plan, using
+    the player character as an automated tester.
+  sources:
+  - src-roblox-2026-studio-going-agentic
+  confidence: high
+  quote: Assistant's new playtesting agent beta can help test the game against the original plan, analyzing
+    the code and data model, reading logs, and using the player character as an automated QA tester to
+    verify behavior.
+  locator: 'Test: New Playtesting Agent Beta'
+sources:
+- src-roblox-2026-assistant-guide
+- src-roblox-2026-studio-going-agentic
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

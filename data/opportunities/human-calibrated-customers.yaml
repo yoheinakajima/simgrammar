@@ -27,7 +27,7 @@ precedent:
 - planet-coaster
 - game-dev-tycoon
 - big-ambitions
-novelty: 4
+novelty: 3
 feasibility: 3
 impact: 3
 horizon: 1-2y
@@ -47,10 +47,21 @@ falsifiable_signal:
     blog, talk, or store text attributes in-game demand or preference parameters to a behavioral, survey-fitted,
     or language model. Technique class: classical behavioral or survey-fitted models, such as discrete-choice
     models, count as well as language models, so this is a feature test.'
-sources: []
+claims:
+- text: Stardock says The Political Machine 2024 builds its electorate from voter enthusiasm, demographic,
+    and polling data, citizen preferences set from survey data in a shipped game.
+  sources:
+  - src-stardock-2025-political-machine-2024-update
+  confidence: medium
+  quote: The Stardock team captures various metrics such as voter enthusiasm, demographic data, and campaign
+    polling data in order to create the most true-to-life political game.
+  locator: Press release body, second paragraph
+sources:
+- src-stardock-2025-political-machine-2024-update
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

@@ -58,7 +58,23 @@ falsifiable_signal:
     developer documentation, postmortems, or mod-verified behavior show model calls triggered by discrete
     events while routine behavior runs on non-model systems. Technique class: language models only, called
     on events, so this is a technique test.'
-sources: []
+claims:
+- text: Since update 0.3.0, inZOI's on-device Smart Zoi model writes inner thoughts at meaningful life
+    events, over the game's ordinary needs simulation.
+  sources:
+  - src-krafton-2025-inzoi-v0-3-0-patch-notes
+  confidence: high
+  quote: Inner thoughts also appear during meaningful moments, such as marriage, childbirth, or aging.
+  locator: 'Simulation, Smart Zoi Enhancements (store page: https://store.steampowered.com/news/app/2456740/view/1808601382400813)'
+- text: The same update triggers Smart Zoi thoughts after ordinary actions as well, so model calls are
+    not reserved for salient events.
+  sources:
+  - src-krafton-2025-inzoi-v0-3-0-patch-notes
+  confidence: high
+  quote: Inner thoughts are now triggered after actions, providing a more natural emotional flow.
+  locator: Simulation, Smart Zoi Enhancements
+sources:
+- src-krafton-2025-inzoi-v0-3-0-patch-notes
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
@@ -66,3 +82,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-31-review-corrections
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

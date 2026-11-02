@@ -45,10 +45,21 @@ falsifiable_signal:
     developer documentation, patch notes, or a technical talk states that a language model scores or ranks
     candidate authored events against the current game state at runtime. Generated event text alone does
     not count. Technique class: language models only, so this is a technique test.'
-sources: []
+claims:
+- text: The RimAgent storyteller mod for RimWorld has a language model read colony and pawn information
+    and the available incidents and choose story events from the colony's state.
+  sources:
+  - src-redstonepanda-2026-rimagent
+  confidence: medium
+  quote: The agent storyteller can read colony summaries, recent letters, pawn information, and available
+    incidents Optional AI planning lets the agent choose story events based on the current colony state
+  locator: Description, Main Features
+sources:
+- src-redstonepanda-2026-rimagent
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

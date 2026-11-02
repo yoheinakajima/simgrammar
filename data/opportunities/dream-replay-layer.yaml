@@ -28,7 +28,7 @@ precedent:
 - dwarf-fortress
 - rimworld
 - kenshi
-novelty: 5
+novelty: 3
 feasibility: 3
 impact: 2
 horizon: 1-2y
@@ -48,7 +48,34 @@ falsifiable_signal:
     events specific to the player''s run. Pre-rendered cutscenes do not count. Technique class: any method
     counts, the game''s own renderer drawing past events from its log included, so this is a feature test;
     it shows a world model landed only if the material says one draws the visuals.'
-sources: []
+claims:
+- text: The AI art mod for RimWorld generates images of in-game artworks with Stable Diffusion from the
+    game's own descriptions.
+  sources:
+  - src-boriselec-2023-rimworld-ai-art
+  confidence: medium
+  quote: Use stable diffusion to generate unique images of art (statues, masterwork/legendary weapons
+    etc). Generated images based on vanilla text description (Art tab).
+  locator: Description
+- text: Those descriptions name the run's colonists and dated events, so the generated images show the
+    player's own history.
+  sources:
+  - src-boriselec-2023-rimworld-ai-art
+  confidence: medium
+  quote: This representation relates to Wyn'oyosh visiting the grave of Nenevon on 14th of Decembary,
+    5504.
+  locator: Description (example prompt)
+- text: The Sims 3 Generations made memories of a Sim's life from automatic snapshots, an official precedent
+    for views of a run's past.
+  sources:
+  - src-primagames-2011-sims-3-generations-new-connections
+  confidence: medium
+  quote: your wall can now serve as a creative outlet for sharing memories created within Generations,
+    either through automatic snapshots or use of the new Capture This Moment feature
+  locator: New Connections, Facebook section
+sources:
+- src-boriselec-2023-rimworld-ai-art
+- src-primagames-2011-sims-3-generations-new-connections
 assertions:
 - field.genie-world-models.horizon == 3-5y
 - field.diffusion-game-engines.horizon == 3-5y
@@ -60,3 +87,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-techniques-opportunities
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

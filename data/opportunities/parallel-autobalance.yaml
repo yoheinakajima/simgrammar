@@ -47,10 +47,28 @@ falsifiable_signal:
     each naming a commercial title with at least 1,000 Steam user reviews and describing automated agent
     play at scale used for economy balance. Technique class: any automated agents count, scripted bots
     included, so this is a feature test.'
-sources: []
+claims:
+- text: EA staff ran thousands of automated agent simulations of The Sims Mobile and found imbalances
+    in its actions and rewards.
+  sources:
+  - src-silva-2018-exploring-gameplay-ai-agents
+  confidence: high
+  quote: The analysis of thousands of game simulations exposed imbalances in game actions, identified
+    inconsequential rewards and evaluated the effectiveness of optional strategic choices.
+  locator: Abstract
+- text: The agents' findings changed the design of the released game.
+  sources:
+  - src-silva-2018-exploring-gameplay-ai-agents
+  confidence: high
+  quote: Our test case game, The Sims Mobile, was recently released and the findings shown here influenced
+    design changes that resulted in improved player experience.
+  locator: Abstract
+sources:
+- src-silva-2018-exploring-gameplay-ai-agents
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

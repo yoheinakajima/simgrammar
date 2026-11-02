@@ -31,7 +31,7 @@ precedent:
 - victoria-3
 - rimworld
 - cities-skylines-2
-novelty: 4
+novelty: 3
 feasibility: 4
 impact: 5
 horizon: 1-2y
@@ -55,7 +55,24 @@ falsifiable_signal:
     save state, not from a wiki or general help text. Technique class: any method that answers free text
     from save state counts, a grammar parser with template answers included, so this is a feature test;
     it shows a language model landed only if the notes say one writes the answers.'
-sources: []
+claims:
+- text: EchoColony, a RimWorld mod, answers typed questions to colonists with a language model conditioned
+    on each colonist's mood, traits, and relationships from the save.
+  sources:
+  - src-nahuelcoy-2025-echocolony
+  confidence: high
+  quote: 'Dynamic Conversations: Context-aware responses based on colonist mood, traits, and relationships'
+  locator: README, Features
+- text: AskAPawn, a RimWorld mod, lets the player put any typed question to a pawn and has a language
+    model answer it.
+  sources:
+  - src-lemone-2025-askapawn
+  confidence: medium
+  quote: AskAPawn Requires "OpenRimWorldAI" Ask a pawn whatever you want!
+  locator: Description
+sources:
+- src-nahuelcoy-2025-echocolony
+- src-lemone-2025-askapawn
 assertions:
 - field.llm-explanation-of-state.maturity == prototype
 - field.constrained-decoding.maturity == research
@@ -66,3 +83,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-techniques-opportunities
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

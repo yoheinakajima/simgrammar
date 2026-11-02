@@ -49,7 +49,18 @@ falsifiable_signal:
     network to identify the limiting resource, machine, or link. Technique class: any method that perturbs
     or re-runs the network counts, classical sensitivity analysis included, so this is a feature test,
     not evidence that a learned technique landed.'
-sources: []
+claims:
+- text: The Bottleneck Analyzer mod for Factorio samples every crafting building in the running factory
+    and reports which missing ingredients delay production, a narrower form of this opportunity that does
+    not test the network.
+  sources:
+  - src-nickelbob-2026-bottleneck-analyzer
+  confidence: high
+  quote: Bottleneck Analyzer continuously samples every crafting building in your factory and tells you
+    exactly which missing ingredients are causing production delays.
+  locator: Mod description, 'Why is this machine not working?'
+sources:
+- src-nickelbob-2026-bottleneck-analyzer
 assertions:
 - 'derived.production-chain.technique_count == 1'
 status: asserted
@@ -60,3 +71,4 @@ provenance:
   - 2026-10-25-contributor-readiness
   - 2026-10-31-tag-audit
   - 2026-10-31-es-review-techniques-opportunities
+  - 2026-11-01-es-v3-prior-art

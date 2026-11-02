@@ -1,0 +1,22 @@
+id: 2026-11-01-es-v3-prior-art
+type: run
+kind: maintenance
+date: '2026-11-01'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Document the prior-art search behind every live opportunity's novelty score, correct the scores
+  the search shows are above the anchors, and correct the three technique TRLs that break the written
+  TRL-maturity correspondence.
+method: |-
+  E31 (prior art). Same operator and model as the opportunities' raters, so these are the original rater's corrections, not a second rating. Round 1: seven agents of this model searched six opportunities each, queries first, on the web, Semantic Scholar (mostly HTTP 429; arXiv API instead), Steam, itch.io, Steam Workshop and mod portals, opened the top results and named the closest prior art. The web-search budget ran out partway; round 2 (three agents, next turn) ran the missing searches for 21 entries, so all 42 now have full coverage. This run re-fetched each quoted page with check_sources.py's fetcher (97 of 97 quotes found) and wrote report/audits/prior-art.yaml: queries, places, pages opened, closest prior art with URL, verdict.
+
+  Rule (file header; table in analysis.yaml prior_art.ceiling): a game or official release doing the core design leaves novelty 2; one doing the prediction's defining feature or a narrower form, or any mod, 3; prototypes, research, work outside games, 4; nothing, 5; between two, the lower. Lowered 16 scores, raised none. 5 to 3: llm-society-terrarium (SpaceMolt, AI Society), symbolic-sim-neural-render (DLSS 5, Oasis 2.0 mod), specification-programming-games (Agents! Please?), dream-replay-layer (RimWorld AI-art mod, Sims 3 Generations), mechanic-discovery-search (Yavalath). 4 to 3: agent-ambassadors-async (SpaceMolt), causal-why-query (EchoColony, AskAPawn), branch-preview-forecasts (Wesnoth), mean-field-crowds (Planet Coaster), natural-language-legislation (EQUILIBRIUM), placement-that-tells-stories (Heard of the Story?), human-calibrated-customers (Political Machine 2024), teachable-sim-companion (Autonauts), open-ended-evolution-sandbox (Vivarium). 3 to 2: generated-inspection-shifts (Papers, Please) and, in round 2, intent-level-orders (Brave New Wonders). Records gained 97 quoted claims, 51 new sources, and catalogued precedents (black-and-white, inzoi, infinite-craft, gran-turismo-7). analyze.py _prior_art fails the build on a missing entry, a deprecated id, a score that differs from or exceeds its entry, or uncited shipped prior art. Rewrote 7.1, 9.1, book chapter 10.
+
+  E17 (TRL). automated-rule-generation, llm-explanation-of-state and story-sifting were prototype at TRL 5. Their evidence (GAVEL games on the Ludii portal, the PHARAOH advisor NVIDIA shows as a preview, Viv in open beta) fits prototype and the TRL 6 anchor, so TRL was wrong; set to 6. A verification run needs another operator (E035); none is available.
+
+  At the coordinator's request: rewrote the thesis clause the prior art contradicts in llm-society-terrarium, natural-language-legislation, placement-that-tells-stories, generated-inspection-shifts; the abstract's Finding 6 sentence; and the reason section 2 and book chapter 13 give for asserted opportunities.
+contract_version: '1.2'
+proposals: []

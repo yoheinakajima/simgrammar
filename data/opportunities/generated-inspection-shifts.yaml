@@ -4,11 +4,11 @@ name: Generated inspection shifts
 summary: Rule-checking job sims with generated documents, items, and rule changes each shift, verified
   against an answer key so infinite variety stays fair.
 opportunity_type: mechanic-upgrade
-thesis: Papers, Please and its successors are limited by hand-built document sets that players memorize.
-  Constrained generation can produce documents, forgeries, and edge cases from a formal rule set, and
-  because the rules are formal, every generated case has a computable correct answer. That combination
-  gives endless fair variety, which ordinary procedural generation struggles to make interesting and unconstrained
-  generation cannot make fair.
+thesis: Papers, Please and its successors generate their entrants, but from hand-built document types
+  and authored daily rules that players memorize. Constrained generation can produce documents, forgeries,
+  and edge cases from a formal rule set, and because the rules are formal, every generated case has a
+  computable correct answer. That combination gives endless fair variety, which ordinary procedural generation
+  struggles to make interesting and unconstrained generation cannot make fair.
 design_sketch: Each day introduces rule changes written as formal predicates and rendered as in-world
   memos. Applicants, documents, and stories are generated to exercise boundary cases of the current rules.
   The game knows the correct ruling for every case and scores accordingly.
@@ -24,7 +24,7 @@ applies:
 precedent:
 - papers-please
 - contraband-police
-novelty: 3
+novelty: 2
 feasibility: 5
 impact: 2
 horizon: now
@@ -42,10 +42,42 @@ falsifiable_signal:
     statement describes runtime-generated cases whose correct outcome is computed from the game''s rules,
     not authored per case. Technique class: classical procedural generation checked by a rule engine counts,
     so this is a feature test.'
-sources: []
+claims:
+- text: Papers, Please mixes scripted encounters with randomly generated entrants checked against the
+    day's rules.
+  sources:
+  - src-wikipedia-papers-please
+  confidence: medium
+  quote: The game uses a mix of scripted encounters interspersed between randomly generated entrants.
+  locator: Gameplay
+- text: The Imperial Gatekeeper generates its checkpoint applicants at random.
+  sources:
+  - src-steam-2022-imperial-gatekeeper
+  confidence: high
+  quote: Applicants are randomly generated, ensuring no two days on the job are the same.
+  locator: About This Game, Randomly Generated & Handcrafted Characters
+- text: The Imperial Gatekeeper scores the player on the accuracy of their rulings.
+  sources:
+  - src-steam-2022-imperial-gatekeeper
+  confidence: high
+  quote: earn evaluation points by being accurate and quick to advance your career
+  locator: About This Game
+- text: Lucas Pope says Papers, Please fills every unscripted entrant with random data based on the current
+    game rules.
+  sources:
+  - src-alexander-2013-papers-please-design
+  confidence: high
+  quote: Anything that's not specified for a particular person is filled in with random data based on
+    the current game rules.
+  locator: Scripted encounters, random encounters
+sources:
+- src-wikipedia-papers-please
+- src-steam-2022-imperial-gatekeeper
+- src-alexander-2013-papers-please-design
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

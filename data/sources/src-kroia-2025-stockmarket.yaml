@@ -1,0 +1,15 @@
+id: src-kroia-2025-stockmarket
+type: source
+name: 'StockMarket: a Minecraft mod with a player order-book exchange'
+kind: repository
+authors:
+- KROIA
+venue: GitHub
+date: '2025'
+url: https://github.com/KROIA/StockMarket
+accessed: '2026-11-01'
+notes: A Minecraft server mod, published on Modrinth on 2025-01-10, whose bot plugins add liquidity and
+  price movement to a player order book on servers with few players; the bots are rule-based, not fitted
+  to player trades.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

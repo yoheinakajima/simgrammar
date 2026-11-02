@@ -1,0 +1,14 @@
+id: src-steam-2026-ai-society
+type: source
+name: AI Society
+kind: store-page
+authors:
+- b8ve
+venue: Steam
+date: '2026-03-20'
+url: https://store.steampowered.com/app/4468180/AI_Society/
+accessed: '2026-11-01'
+notes: A town sim whose characters each run on a local language model through a bundled Ollama runtime;
+  up to 25 characters; no internet required.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

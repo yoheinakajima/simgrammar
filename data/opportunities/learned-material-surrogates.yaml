@@ -48,10 +48,39 @@ falsifiable_signal:
     documentation or a technical talk confirms that a trained neural model computes physical material
     behavior during play, not only visual effects. Technique class: trained neural models only, so this
     is a technique test.'
-sources: []
+claims:
+- text: Unreal Engine's ML Deformer trains on simulation data to approximate mesh deformation at runtime,
+    a cosmetic use of a learned surrogate that the prediction does not count.
+  sources:
+  - src-epic-2026-ml-deformer
+  confidence: high
+  quote: you can train a ML Deformer Model, using externally pre-generated mesh deformation simulation
+    data, to make Morph Target selections in order to approximate high quality mesh deformations at runtime
+  locator: introduction
+- text: Ubisoft's subspace neural physics targets the performance budgets of games, but as research rather
+    than a shipped gameplay system.
+  sources:
+  - src-holden-2019-subspace-neural-physics
+  confidence: high
+  quote: existing data-driven methods fall short of the extreme memory and performance constraints imposed
+    by modern interactive applications like AAA games and virtual reality
+  locator: Abstract
+- text: Madden NFL 21 shipped Swish, a neural-network cloth simulation for jersey wrinkles, a visual-only
+    learned surrogate the prediction does not count.
+  sources:
+  - src-ea-2021-swish-neural-cloth
+  confidence: high
+  quote: Swish was used to generate realistic cloth deformation and wrinkles for NFL player jerseys in
+    Madden NFL 21. To our knowledge, this is the first neural cloth simulation featured in a shipped game.
+  locator: Introduction
+sources:
+- src-epic-2026-ml-deformer
+- src-holden-2019-subspace-neural-physics
+- src-ea-2021-swish-neural-cloth
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

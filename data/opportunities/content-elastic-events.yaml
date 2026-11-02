@@ -48,10 +48,29 @@ falsifiable_signal:
     must conform to a fixed structure of triggers, options, and effects. Technique class: any runtime
     generator counts, template or grammar-based ones included, so this is a feature test; it shows language
     models landed only if the disclosure or documentation says one writes the events.'
-sources: []
+claims:
+- text: EQUILIBRIUM constrains its runtime model output to developer-defined structured fields and clamps
+    the effects in the engine, the schema-and-validator half of this opportunity.
+  sources:
+  - src-steam-2026-equilibrium
+  confidence: high
+  quote: 'Guardrails: AI output is constrained to a fixed set of structured fields defined by the developer.
+    All numeric effects are clamped within bounds enforced by the simulation engine'
+  locator: AI Generated Content Disclosure
+- text: Caves of Qud mixes dynamically generated quests and villages with handwritten ones.
+  sources:
+  - src-steam-2024-caves-of-qud
+  confidence: high
+  quote: Quests, NPCs, villages, historic sites; some dynamic and some handwritten, interwoven to produce
+    a transportative RPG experience.
+  locator: About This Game, RPG ELEMENTS
+sources:
+- src-steam-2026-equilibrium
+- src-steam-2024-caves-of-qud
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art
