@@ -4033,6 +4033,8 @@ def _panel_agreement(ents, vocabs, cfg, raters, stats, tables, p: str, t: str, w
         stats[f"{p}n_top_overlap_lower_median"] = len(top(r1) & top(rl))
         stats[f"{p}top_opportunity_second"] = min(r2, key=r2.get)
         stats[f"{p}top_opportunity_lower_median"] = min(rl, key=rl.get)
+        top1 = min(r1, key=r1.get)   # where the second and combined readings put the original rater's first opportunity
+        stats[f"{p}rank_second_top_opportunity"], stats[f"{p}rank_lower_median_top_opportunity"] = r2[top1], rl[top1]
         tables[f"{t}-opportunity-ranking"] = {
             "description": f"The opportunity ranking of §9.1 under three readings of the scores: first (the original rater's, which stays the stored "
                            f"ranking until a second rating is recorded in the record), second ({who}'s alone), and lower median (the original score and "
@@ -4057,6 +4059,32 @@ def _cross_model(ents, vocabs, cfg, stats, tables):
         _panel_agreement(ents, vocabs, cfg, raters, stats, tables, "xm_", "cross-model", "the cross-model reader", list(panel.DECISION_KIND),
                          note="A cross-model reader is another model run on the blind packet by the records' own operator, so its "
                               "agreement is a check across models, not independent agreement (CONTRACT.md I14, E035).")
+        extra = Counter(r["technique"] for r in (tables.get("cross-model-recall-edges") or {}).get("rows", []) if r["status"] == "extra")
+        if extra:   # which technique the second reader adds most often, and how many of its additions explain
+            (t_top, n_top), = extra.most_common(1)
+            stats["xm_recall_extra_top_technique"], stats["xm_n_recall_extra_top_technique"] = t_top, n_top
+            stats["xm_n_recall_extra_explains"] = sum(1 for r in tables["cross-model-recall-edges"]["rows"] if r["status"] == "extra" and r["second_effect"] == "explains")
+        for k in [k for k in stats if k.startswith(("xm_agree_", "xm_calibration_within_one", "xm_calibration_exact"))]:
+            stats["xm_pct_" + k[3:]] = round(100 * stats[k])   # the same shares as percentages, for prose
+        # The effect audit applied the §8.1 order to the stored labels after the cross-model run, so effect agreement is
+        # also reported against the labels as first coded (effect-audit.yaml `coded`); edges the sweep added had none.
+        audit = read_yaml(ROOT / ((cfg.get("edge_audits") or {}).get("effects") or "report/audits/effect-audit.yaml")) or {}
+        coded = {f"{e['technique']}/{e['mechanic']}": e.get("coded") or e["effect"] for e in audit.get("edges") or [] if not e.get("added")}
+        cats = list(panel.code_labels(vocabs)["effect"])
+        items = sorted(set().union(*(r["codes"].get("effect") or {} for r in raters)) & set(coded))
+        units = [(i, coded[i], [r["codes"]["effect"][i] for r in raters if i in (r["codes"].get("effect") or {})]) for i in items]
+        units = [u for u in units if u[2] and u[1] in cats]
+        if units:
+            pc = cfg.get("panel") or {}
+            n_boot, q = int(pc.get("bootstrap", 2000)), 100 * (1 - float(pc.get("interval", 0.95))) / 2
+            row, _ = _xm_nominal(units, cats, np.random.default_rng([int(pc.get("seed", 0)), 8]), n_boot, q, stratify=False)
+            stats["xm_agree_effect_first_coded"], stats["xm_kappa_effect_first_coded"] = row["agree"], row["kappa"]
+            stats["xm_kappa_effect_first_coded_low"], stats["xm_kappa_effect_first_coded_high"] = row["kappa_low"], row["kappa_high"]
+            now = {f"{e['technique']}/{e['mechanic']}": e["effect"] for e in audit.get("edges") or []}
+            changed = [(i, v) for i, f, v in units if now.get(i) != f]   # sampled edges the audit relabelled
+            stats["xm_n_effect_sample_relabelled"] = len(changed)
+            stats["xm_n_effect_relabelled_as_second"] = sum(1 for i, v in changed if v[0] == now[i])   # the second reading already had the new label
+            stats["xm_pct_effect_relabelled_as_second"] = round(100 * stats["xm_n_effect_relabelled_as_second"] / len(changed)) if changed else 0
 
 
 def _panel_independent(ents, vocabs, cfg, stats, tables):

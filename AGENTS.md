@@ -61,7 +61,7 @@ If a candidate fails, it is a game-specific feature (describe it in that game's 
 A dated, citable result (paper, preprint, model release, shipped system, or engine feature) that changes at least one mechanic, with `affects` edges that say how (`effect` vocab). Vendor marketing alone fails. `year` is the year of the key result. `maturity` and `trl` describe deployment **in games**, not in AI generally.
 
 ### Opportunity test
-Names at least one mechanic in `involves`, has a `validation_experiment` a small team could run, and a `falsifiable_signal` with a `resolve_by` date and criteria a stranger could check, ending with the technique class that counts (`Technique class: …, so this is a technique test.` or `… a feature test.`); the build counts both kinds and fails on a prediction with neither (§11).
+Names at least one mechanic in `involves`, has a `validation_experiment` a small team could run, and a `falsifiable_signal` with a `resolve_by` date and criteria a stranger could check, ending with the technique class that counts (`Technique class: …, so this is a technique test.` or `… a feature test.`); the build counts both kinds and fails on a prediction with neither (§11). A new opportunity also needs an entry in `report/predictions.yaml` (its reference class, generic-diffusion baseline, and base-rate spec) and one in `report/audits/prior-art.yaml` (the prior-art search behind its novelty score, which may not exceed the ceiling that search sets); the build fails without either.
 
 ## 4. Fields: how to fill them without drifting
 

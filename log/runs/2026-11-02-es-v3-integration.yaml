@@ -1,0 +1,14 @@
+id: 2026-11-02-es-v3-integration
+type: run
+kind: maintenance
+date: '2026-11-02'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'Integrate the v0.5 revision: report the cross-model check in the paper and book, rewrite the
+  abstract, and bump the version to 0.5.'
+method: 'Read the reports of the seven v0.5 workers (PRs 72 to 78) and the cross-model results (PR 79). analyze.py: in the cross-model block, percentage forms of the agreement shares, effect agreement against the labels as first coded (from report/audits/effect-audit.yaml, 0.53 against 0.73 now), how many sampled edges the audit relabelled (9) and how many the second model had already given the new label (8), the technique the second model adds most often in recall, and where the second and lower-median readings put the stored first opportunity (27 and 16). Paper: the abstract gains a cross-model sentence, the state-class subset in Findings 1 and 2, the sample-size, noise and cross-model checks in Finding 3, the reassignment, keyword sweep, blind recall and relabelled effect counts in Finding 4, and the cross-model ranking and prediction baselines in Finding 6, whose heading now says the order is the original rater''s. Section 2.1 reports cross-model family, state and admission agreement; 2.6 rewrites the Coding bullet and adds a cross-model bullet with how the check ran and what it can show; 5.6 the second model''s correlations on 40 random mechanics; 7.1 maturity, TRL and horizon agreement; 8.1 the effect agreement before and after the relabelling, with the order of events; 8.2 a blind recall paragraph and the state-class share; 9.1 the second reading of the ranking; 1.1 the baseline sentence; 11.1 items 5 and 6. Book chapters 5, 10 and 13 say the same. AGENTS.md: a new opportunity needs entries in report/predictions.yaml and report/audits/prior-art.yaml. tasks/README.md lists second-rating.md. Voice text, with the Japanese cues: episode 9 scenes 6 (tied for second) and 10 (long shots no longer score high for novelty), episode 7 scene 7 (the per-mechanic order is not firm), episode 11 scene 4 (size is a stated bar); with the four scenes and short 007 that the edge relabelling changed, eight takes are now stale and are re-voiced in a later run. Version 0.5, dated 2026-11-02. make check passes.'
+contract_version: '1.2'
+proposals: []

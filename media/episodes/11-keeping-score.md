@@ -42,7 +42,7 @@ Target runtime about 11 minutes: about 1,180 words of narration at 135 words a m
 
 **Voice.** A bet with no date can't lose, so every bet in the dataset carries one. They weren't always this strict. When an outside reviewer read the first version, the predictions said things like "a major studio" or "a popular game", leaned on store rankings, and had no start date, so a feature that already existed could have settled them. One was already true on the day it was written. The fix, and the reasons for it, are written down in the project's decision records, where anyone can read why the rules are what they are.
 
-**Voice.** The fix set three rules for every prediction. A feature only counts if it first shipped after the dataset was published. Size is a stated number of Steam reviews, or a console release. And the evidence has to come from the developer: patch notes, a store page, documentation, a talk.
+**Voice.** The fix set three rules for every prediction. A feature only counts if it first shipped after the dataset was published. Size is a stated bar, almost always a number of Steam reviews or a console release. And the evidence has to come from the developer: patch notes, a store page, documentation, a talk.
 
 ## 5. Two tests per bet (3:26 to 4:34)
 
