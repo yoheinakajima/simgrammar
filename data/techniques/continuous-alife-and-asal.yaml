@@ -64,7 +64,7 @@ affects:
   note: In Flow-Lenia, rules travel with matter, so selection can act on creatures that emerge from the
     physics itself rather than on declared fitness stats.
 - id: trait-inheritance
-  effect: deepens
+  effect: replaces-substrate
   note: Rule parameters mix where creatures meet in Flow-Lenia, giving inheritance and hybridization as
     a spatial process instead of an explicit genome crossover function.
 - id: generative-content
@@ -89,3 +89,4 @@ provenance:
   created: 2026-10-24-techniques-sim-math
   reviewed:
   - 2026-10-25-source-claims-pilot
+  - 2026-11-01-es-v3-edge-audits

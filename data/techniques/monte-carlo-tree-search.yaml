@@ -53,22 +53,22 @@ affects:
     instead of scoring one-step options with hand-tuned utility curves, so choices account for consequences
     several actions ahead at a per-decision compute cost.
 - id: military-operations
-  effect: deepens
+  effect: replaces-substrate
   note: Tactical AI plans multi-unit action sequences within a time budget, as in Fable Legends' real-time
     tactical planning, rather than following scripted doctrine; the iteration budget becomes a difficulty
     lever.
 - id: faction-diplomacy
-  effect: deepens
+  effect: replaces-substrate
   note: 'AI factions can weigh war, peace, and alliance options by simulating future turns of the campaign,
     the kind of high-level campaign decision Total War: Rome II gave to MCTS, so choices respond to the
     actual strategic position instead of fixed opinion thresholds.'
 - id: rival-firms
-  effect: deepens
+  effect: replaces-substrate
   note: AI competitors can pick prices, expansions, and acquisitions by rolling the economic model forward,
     so rival play adapts to the player's position and to rule changes without bespoke heuristics per market
     rule.
 - id: delegation-to-ai
-  effect: deepens
+  effect: replaces-substrate
   note: Governors or managers given a subsystem can search over action sequences toward the player-set
     goal with the same forward model, staying competent in rule configurations designers did not script
     for.
@@ -88,3 +88,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-rl-design
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

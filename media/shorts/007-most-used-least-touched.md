@@ -32,9 +32,9 @@ Vertical, about 55 seconds, about 100 words of narration. One finding, from tech
 
 ## 0:40 to 0:52. Where the research went
 
-**Picture.** The family bars, narrative and generation at the top.
+**Picture.** The family bars, agents and behavior at the top.
 
-**Voice.** Instead the techniques pile up on stories and characters. Narrative and generation is the most exposed family in the set.{{assert:top_exposed_family == Narrative & generation}}
+**Voice.** Instead the techniques pile up on characters and stories. Agents and behavior is the most exposed family in the set.{{assert:top_exposed_family == Agents & behavior}}
 
 ## 0:52 to 0:57. End card
 

@@ -81,7 +81,7 @@ affects:
   note: Scenario maps can be produced from a written description of the situation, Word2World-style story
     to world, with an agent playthrough confirming the stated goal is reachable.
 - id: adaptive-threat-scaling
-  effect: deepens
+  effect: replaces-substrate
   note: Difficulty-conditioned generators let the next map or wave be built at a target difficulty instead
     of multiplying enemy counts, though EA SEED's match-3 model hit the requested difficulty only a third
     of the time.
@@ -110,3 +110,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-rl-design
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

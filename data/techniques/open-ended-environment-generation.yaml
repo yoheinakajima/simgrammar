@@ -70,7 +70,7 @@ affects:
     walker terrain roughness, gaps, and stumps, so maps grow harder along the axes a player has already
     mastered.
 - id: adaptive-threat-scaling
-  effect: deepens
+  effect: replaces-substrate
   note: Challenge scales with measured learning progress per task family rather than with wealth or time
     survived, using a band that admits only tasks the current agent or player can partly solve.
 - id: creature-learning
@@ -101,3 +101,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-rl-design
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

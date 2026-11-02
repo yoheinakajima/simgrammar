@@ -93,7 +93,7 @@ affects:
     controller trained for its specific body, so assembled designs move competently without the player
     programming them.
 - id: natural-selection
-  effect: deepens
+  effect: replaces-substrate
   note: Fitness can be measured by simulating every individual of a large population in its own physics
     world each generation, so selection acts on actual behavior rather than on summed stat values.
 - id: design-performance-rating
@@ -142,3 +142,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-sim-math
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits
