@@ -1,0 +1,2788 @@
+# Prior-art search behind each live opportunity's novelty score (review finding E31).
+#
+# Made by run 2026-11-01-es-v3-prior-art (operator yoheinakajima, model claude-opus-5-5, Claude Code). The searches were
+# run by seven parallel agents of the same model in the same run, and the run re-fetched every quoted page before
+# citing it. One entry per live opportunity; scripts/analyze.py (_prior_art) fails the build when an entry is missing,
+# names a deprecated or unknown record, or falls out of step with the record.
+#
+# Each entry: the date of the search; the queries that were run and where (web search, Semantic Scholar or the arXiv
+# API, Steam, itch.io, Steam Workshop and mod portals); planned queries that could not be run (`not_run`); the pages
+# opened (`checked`); the closest prior art found, with its URL and, when the record cites it, its source id; further
+# prior art (`also`); the stored novelty before and after; and the verdict against the novelty anchors in
+# vocab/rubrics.yaml.
+#
+# kind:      game (a released game, commercial or free), official (an update, expansion, or tool its developer or the
+#            platform owner released), mod (a released third-party modification or add-on), prototype (a public demo,
+#            jam or research game, in-development or announced feature), research (a paper or lab demo), outside (a
+#            product or deployment outside games).
+# closeness: design (does the opportunity's core design, its thesis and the heart of its sketch), feature (does the
+#            prediction's defining feature, read from its criteria without the date and review thresholds, or a
+#            narrower form of it, or a narrower form of the design), adjacent (comes close without doing either),
+#            none (nothing relevant).
+# ceiling:   the highest novelty anchor the closest prior art allows, computed by analyze.py from kind and closeness with
+#            the table in report/analysis.yaml (prior_art.ceiling): a game or official release that does the design
+#            leaves 2 ("known idea, rarely executed well"); a game, official release, or mod that does the feature or
+#            a narrower form, or a mod that does the design, leaves 3 ("new combination with partial precedents");
+#            work that is only adjacent, or only a prototype, research, or outside games, leaves 4 ("no shipped
+#            precedent; adjacent research exists"); nothing found leaves 5. Where the evidence sits between two
+#            ceilings, the lower is taken (CONTRACT.md I5).
+# novelty:   must equal the record's stored score and must not exceed the ceiling. A stored score above the ceiling was
+#            lowered to it, by the run that made the original ratings (same operator and model), and the change is
+#            disclosed in report/src/09-opportunities.md and in the run's method. No score was raised: where the
+#            ceiling is above the stored score, the score stands.
+# coverage:  full when a web search, a scholarly search, and (where a shipped game could exist) a storefront search
+#            were run; partial otherwise, with a note.
+
+entries:
+- opportunity: agent-ambassadors-async
+  date: '2026-11-01'
+  queries:
+  - q: game your AI agent trades and negotiates with other players' agents while you are offline LLM 2025
+    where: web
+  - q: Parallel Colony AI agents autonomous trade other players launch
+    where: web
+  - q: Forza Drivatar earns credits while you are offline races in friends' games learns how you drive
+    where: web
+  - q: MapleStory Hired Merchant sells items while you are offline
+    where: web
+  - q: Ultima Online player vendor sells items while owner offline uo.com
+    where: web
+  - q: FINAL FANTASY XIV retainer sell items market board while you are offline official guide
+    where: web
+  - q: SpaceMolt MMO for AI agents players watch
+    where: web
+  - q: AI agent trade offline / asynchronous trading / AI envoy
+    where: steam
+  - q: ti:"Magentic Marketplace"; ti:"Agent-to-Agent Negotiations"; abs:"on behalf of" AND negotiat* AND
+      "LLM agents" AND game
+    where: arxiv
+  where:
+  - arxiv
+  - steam
+  - web
+  coverage: full
+  checked:
+  - name: SpaceMolt README
+    url: https://spacemolt-readme.static.hf.space/README.md
+  - name: Decrypt on SpaceMolt
+    url: https://decrypt.co/357657/spacemolt-multiplayer-game-built-exclusively-ai-agents
+  - name: 'Forza support: What''s a Drivatar? (FH3)'
+    url: https://support.forza.net/hc/en-us/articles/360005302934-FH3-Drivatars
+  - name: 'Xbox Wire: Forza Horizon 2, What''s a Drivatar (2014-09-30)'
+    url: https://news.xbox.com/en-us/2014/09/30/games-forza-horizon-2-drivatars/
+  - name: 'NiaMeowDB: Cashier: Teddy Bear Clerk (MapleStory Classic)'
+    url: https://meowdb.com/msclassic/item-db/2129
+  - name: 'BlockchainGamer: Parallel launches Colony: Survival'
+    url: https://www.blockchaingamer.biz/?p=42884
+  - name: The Automated but Risky Game (arXiv 2506.00073)
+    url: https://arxiv.org/abs/2506.00073
+  - name: Magentic Marketplace (arXiv 2510.25779)
+    url: https://arxiv.org/abs/2510.25779
+  - name: FINAL FANTASY XIV retainer guide (guessed official URL)
+    url: https://na.finalfantasyxiv.com/uiguide/retainer/
+  closest:
+    name: SpaceMolt
+    kind: game
+    year: 2026
+    closeness: feature
+    source: src-spacemolt-2026-readme
+    url: https://spacemolt-readme.static.hf.space/README.md
+  also:
+  - name: Forza Drivatars
+    kind: game
+    year: 2014
+    closeness: feature
+    source: src-xbox-2014-forza-horizon-2-drivatars
+    url: https://news.xbox.com/en-us/2014/09/30/games-forza-horizon-2-drivatars/
+  - name: MapleStory Hired Merchant
+    kind: game
+    year: null
+    closeness: feature
+    url: https://meowdb.com/msclassic/item-db/2129
+  novelty_before: 4
+  novelty: 3
+  verdict: Player-owned language-model agents already negotiate trade deals with other players' agents
+    while their owners are away in SpaceMolt (2026), and learned proxies of absent players have raced
+    in other players' games since Forza's Drivatars. What is unshipped is envoys bound by written mandates
+    travelling between separate single-player worlds, with transcripts to ratify, which is anchor 3, not
+    4.
+- opportunity: ai-liquidity-in-player-markets
+  date: '2026-11-01'
+  queries:
+  - q: agent-based model MMORPG virtual economy player trading data
+    where: semantic-scholar
+  - q: trading agents massively multiplayer game economy
+    where: semantic-scholar
+  - q: abs:MMORPG AND abs:economy; all:"virtual economy" AND all:agents; all:"game economy"; limit order
+      book calibration agents; ti:"Neural MMO"
+    where: arxiv
+  - q: AI traders market MMO
+    where: steam
+  not_run:
+  - q: Albion Online Black Market NPC buy orders prices; Star Citizen Quantum Quanta economy (direct pages)
+    where: web
+  where:
+  - arxiv
+  - semantic-scholar
+  - steam
+  coverage: partial
+  coverage_note: 'No web search was run: the session''s shared web-search budget ran out. A fuller search
+    can only find closer prior art, which could lower the ceiling, not raise it.'
+  checked:
+  - name: Quanta / Quantum (Star Citizen Wiki)
+    url: https://starcitizen.tools/Quanta
+  - name: Albion Online Black Market (official wiki, official site, fandom)
+    url: https://wiki.albiononline.com/wiki/Black_Market
+  - name: Intelligent Trading Agents for Massively Multi-Player Game Economies (Reeder, Sukthankar, Georgiopoulos,
+      Anagnostopoulos; AIIDE 2008)
+    url: https://ojs.aaai.org/index.php/AIIDE/article/view/18680
+  - name: Market Interventions in a Large-Scale Virtual Economy (arXiv 2210.07970)
+    url: https://arxiv.org/abs/2210.07970
+  - name: 'Going Out of Business: Auction House Behavior in the MMOG (arXiv 1603.07610)'
+    url: https://arxiv.org/abs/1603.07610
+  - name: The NeurIPS 2022 Neural MMO Challenge (arXiv 2311.03707)
+    url: https://arxiv.org/abs/2311.03707
+  - name: Steam search 'AI traders market MMO'
+    url: https://store.steampowered.com/search/?term=AI+traders+market+MMO
+  closest:
+    name: Star Citizen Quanta economy (in development)
+    kind: prototype
+    year: 2026
+    closeness: feature
+    source: src-starcitizenwiki-2026-quantum
+    url: https://starcitizen.tools/Quanta
+  also:
+  - name: Intelligent Trading Agents for Massively Multi-Player Game Economies (AIIDE 2008)
+    kind: research
+    year: 2008
+    closeness: adjacent
+    url: https://ojs.aaai.org/index.php/AIIDE/article/view/18680
+  novelty_before: 3
+  novelty: 3
+  verdict: Star Citizen plans an economy run by lightweight NPC traders that respond to players, without
+    a claim of calibration to player trades, and research has built trading agents from EVE Online market
+    data. The anchors would allow 4; the stored 3 is not raised.
+- opportunity: bottleneck-explainer
+  date: '2026-11-01'
+  queries:
+  - q: Factorio mod bottleneck detection identifies limiting machine production chain analysis
+    where: web
+  - q: factory game feature shows bottleneck in production line simulation bottleneck indicator Satisfactory
+      OR Captain of Industry OR Production Line OR shapez
+    where: web
+  - q: Factorio calculator linear programming limiting resource shadow price YAFC Factory Planner bottleneck
+    where: web
+  - q: Tecnomatix Plant Simulation Bottleneck Analyzer tool documentation
+    where: web
+  - q: shifting bottleneck detection simulation
+    where: semantic-scholar
+  where:
+  - mod-portal
+  - semantic-scholar
+  - web
+  coverage: full
+  checked:
+  - name: Bottleneck Analyzer (Factorio 2.0 mod, nickelbob)
+    url: https://mods.factorio.com/mod/bottleneck-analyzer
+  - name: Bottleneck (Factorio mod, trold)
+    url: https://mods.factorio.com/mod/Bottleneck
+  - name: Assembly Analyst (Factorio mod, Therenas)
+    url: https://mods.factorio.com/mod/assemblyanalyst
+  - name: FBI, Factorio Blueprint Investigator (CLI)
+    url: https://github.com/SeaRyanC/fbi
+  - name: Flowline (Steam, upcoming)
+    url: https://store.steampowered.com/app/5071610/
+  - name: Throughput Sensitivity Analysis using a single simulation (Roser et al., WSC 2002)
+    url: https://www.allaboutlean.com/publications/2002_wsc-throughput-sensitivityanalysis-preprint/
+  - name: WSC 2002 full paper PDF
+    url: https://informs-sim.org/wsc02papers/146.pdf
+  - name: Siemens Plant Simulation tools reference
+    url: https://docs.plm.automation.siemens.com/content/plant_sim_help/15/plant_sim_all_in_one_html/en_US/tecnomatix_plant_simulation_help/objects_reference_help/tools/tools.html
+  closest:
+    name: Bottleneck Analyzer (Factorio mod)
+    kind: mod
+    year: 2026
+    closeness: feature
+    source: src-nickelbob-2026-bottleneck-analyzer
+    url: https://mods.factorio.com/mod/bottleneck-analyzer
+  also:
+  - name: Bottleneck (Factorio mod)
+    kind: mod
+    year: 2016
+    closeness: feature
+    url: https://mods.factorio.com/mod/Bottleneck
+  - name: Throughput sensitivity analysis (Roser, Nakano, Tanaka)
+    kind: research
+    year: 2002
+    closeness: adjacent
+    url: https://www.allaboutlean.com/publications/2002_wsc-throughput-sensitivityanalysis-preprint/
+  novelty_before: 3
+  novelty: 3
+  verdict: Factorio mods name the starved ingredients from the running factory, but by sampling, not by
+    perturbing or re-running the network, and they write no explanation; sensitivity analysis of throughput
+    is established in manufacturing research. The stored 3 stands.
+- opportunity: branch-preview-forecasts
+  date: '2026-11-01'
+  queries:
+  - q: Bob's Buddy Hearthstone Battlegrounds combat simulator win chance simulations
+    where: web
+  - q: '"Command: Modern Operations" Monte Carlo analysis run scenario multiple times statistics'
+    where: web
+  - q: strategy game feature simulate outcome "1000 times" before decision preview spread of outcomes
+    where: web
+  - q: Wesnoth attack_prediction monte carlo simulation damage calculations HP distribution
+    where: web
+  - q: Out of the Park Baseball projected standings simulate season thousands of times feature
+    where: web
+  - q: Football Manager OR Motorsport Manager OR Eastside Hockey Manager simulate match many times show
+      win probability before match
+    where: web
+  - q: game runs the simulation multiple times shows player probability outcomes before committing decision
+      city builder OR grand strategy
+    where: web
+  - q: AI-powered strategy game LLM preview possible outcomes before committing action simulate futures
+      Steam 2025
+    where: web
+  - q: forecasting future game states shown to player strategy game simulation preview
+    where: semantic-scholar
+  - q: abs:"what-if" AND abs:game AND abs:simulation AND abs:player
+    where: arxiv
+  - q: monte carlo simulation
+    where: steam
+  where:
+  - arxiv
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
+  checked:
+  - name: Introducing Bob's Buddy (HSReplay.net)
+    url: https://articles.hsreplay.net/2020/04/24/introducing-bobs-buddy/
+  - name: Battle for Wesnoth src/attack_prediction.cpp (tag 1.18.0)
+    url: https://raw.githubusercontent.com/wesnoth/wesnoth/1.18.0/src/attack_prediction.cpp
+  - name: How do you predict the outcome of multiple combats? (Wesnoth forums)
+    url: https://forums.wesnoth.org/viewtopic.php?p=641941
+  - name: Simulating The Simulation For Enhanced Player Rationality (Barton, ABSEL 1981)
+    url: https://absel-ojs-ttu.tdl.org/absel/article/view/2471
+  - name: Out of the Park Baseball simulates the '23 World Series winner (MLB.com)
+    url: https://mlb.com/news/out-of-the-park-baseball-simulations-of-2023-mlb-season
+  - name: CoupVisor (arXiv 2608.15868)
+    url: https://arxiv.org/abs/2608.15868
+  - name: Steam search 'monte carlo simulation'
+    url: https://store.steampowered.com/search/?term=monte+carlo+simulation
+  closest:
+    name: Battle for Wesnoth attack prediction
+    kind: game
+    year: 2019
+    closeness: feature
+    source: src-wesnoth-2024-attack-prediction
+    url: https://raw.githubusercontent.com/wesnoth/wesnoth/1.18.0/src/attack_prediction.cpp
+  also:
+  - name: Bob's Buddy (Hearthstone Battlegrounds overlay)
+    kind: mod
+    year: 2020
+    closeness: feature
+    url: https://articles.hsreplay.net/2020/04/24/introducing-bobs-buddy/
+  - name: Barton's business simulation
+    kind: research
+    year: 1981
+    closeness: adjacent
+    url: https://absel-ojs-ttu.tdl.org/absel/article/view/2471
+  novelty_before: 4
+  novelty: 3
+  verdict: Battle for Wesnoth shows the distribution of a pending attack's outcomes before the player
+    commits, computed with the game's own combat rules and by Monte Carlo runs, and a Hearthstone overlay
+    simulates thousands of combats from the live boards. Stochastic forward runs of the real rules have
+    shipped at the scale of one combat, a partial precedent, so the score falls from 4 to 3.
+- opportunity: calibrated-serious-sims
+  date: '2026-11-01'
+  queries: []
+  not_run:
+  - q: serious game epidemic simulation calibrated Bayesian approximate Bayesian computation fit metrics
+    where: web
+  - q: educational simulation game calibrated agent-based model MCMC posterior goodness of fit
+    where: semantic-scholar
+  - q: pandemic simulator game real data calibrated
+    where: steam
+  where:
+  - direct
+  coverage: partial
+  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
+    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
+    it.'
+  checked:
+  - name: En-ROADS User Guide (Climate Interactive)
+    url: https://docs.climateinteractive.org/projects/en-roads/en/latest/
+  - name: 'En-ROADS Technical Reference: Initialization, Calibration, Model Testing'
+    url: https://docs.climateinteractive.org/projects/en-roads-reference-guide/en/latest/pages/calibration.html
+  - name: 'En-ROADS Technical Reference: Model Comparison - History'
+    url: https://docs.climateinteractive.org/projects/en-roads-reference-guide/en/latest/pages/comparison_history.html
+  - name: Covasim repository README
+    url: https://github.com/InstituteforDiseaseModeling/covasim
+  - name: Differentiable Agent-based Epidemiology (GradABM, arXiv 2207.09714)
+    url: https://arxiv.org/abs/2207.09714
+  - name: Black-box Bayesian inference for economic agent-based models (arXiv 2202.00625)
+    url: https://arxiv.org/abs/2202.00625
+  - name: Plague Inc. (Wikipedia)
+    url: https://en.wikipedia.org/wiki/Plague_Inc.
+  closest:
+    name: En-ROADS
+    kind: outside
+    year: null
+    closeness: feature
+    source: src-climateinteractive-2026-en-roads-guide
+    url: https://docs.climateinteractive.org/projects/en-roads/en/latest/
+  also:
+  - name: Covasim
+    kind: outside
+    year: 2020
+    closeness: feature
+    url: https://github.com/InstituteforDiseaseModeling/covasim
+  - name: GradABM
+    kind: research
+    year: 2022
+    closeness: adjacent
+    source: src-chopra-2023-gradabm
+    url: https://arxiv.org/abs/2207.09714
+  novelty_before: 3
+  novelty: 3
+  verdict: A policy simulator built for workshops and roleplaying games documents its calibration to historical
+    data (En-ROADS), and research calibrates agent-based epidemic models to data, but no playable release
+    found publishes posterior parameters with a fit metric. The stored 3 stands.
+- opportunity: causal-why-query
+  date: '2026-11-01'
+  queries:
+  - q: 'mod lets you ask an AI questions about your save game why colony LLM RimWorld OR Stellaris OR
+      Cities: Skylines'
+    where: web
+  - q: strategy game AI advisor answers natural language questions about your current game state save
+      file LLM shipped feature
+    where: web
+  - q: Dwarf Fortress OR Crusader Kings tool ask why something happened in your world legends LLM chat
+    where: web
+  - q: Total War PHARAOH AI advisor NVIDIA ACE playtest game state questions
+    where: web
+  - q: Paradox save file LLM chat tool ask questions about my campaign
+    where: web
+  - q: RimWorld mod LLM ask storyteller explain what happened colony history
+    where: web
+  - q: language model explains simulation game outcomes from causal event log why question answering
+    where: web
+  - q: Whyline why did why didn't questions debugging
+    where: web
+  - q: answering why questions game simulation event log language model
+    where: semantic-scholar
+  - q: abs:game AND abs:"event log" AND abs:explanation; abs:"why questions" AND abs:game
+    where: arxiv
+  - q: AI advisor
+    where: steam
+  where:
+  - arxiv
+  - semantic-scholar
+  - steam
+  - steam-workshop
+  - web
+  coverage: full
+  checked:
+  - name: OpenRimWorldAI.AskAPawn (RimWorld mod)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3412825218
+  - name: OpenRimWorldAI (RimWorld mod)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3411917876
+  - name: EchoColony (RimWorld mod)
+    url: https://github.com/CarlosNahuelcoy/EchoColony
+  - name: EchoColony Workshop page
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3463505750
+  - name: 'Total War: PHARAOH ACE advisor (NVIDIA CES 2026 news)'
+    url: https://www.nvidia.com/en-us/geforce/news/dlss-4-rtx-path-tracing-game-announcements-ces-2026/
+  - name: Creative Assembly blog on the ACE advisor
+    url: https://www.creative-assembly.com/blog/working-nvidia-ace-power-interactive-advisor
+  - name: Xbox Gaming Copilot (beta)
+    url: https://news.xbox.com/en-us/2025/08/06/gaming-copilot-beta-begins-rolling-out-to-xbox-insiders-on-game-bar-today/
+  - name: 'CityAgent (Cities: Skylines II mod)'
+    url: https://github.com/dnorris823/CityAgent
+  - name: Whyline (Ko and Myers)
+    url: https://www.microsoft.com/en-us/research/?p=182651
+  - name: Causal Explanations Over Time (arXiv 2506.03915)
+    url: https://arxiv.org/abs/2506.03915
+  - name: RimSaga, Local AI Social Interactions, RimAI Framework, RimTalk (RimWorld mods)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3551203752
+  closest:
+    name: EchoColony and AskAPawn (RimWorld mods)
+    kind: mod
+    year: 2025
+    closeness: feature
+    source: src-nahuelcoy-2025-echocolony
+    url: https://github.com/CarlosNahuelcoy/EchoColony
+  also:
+  - name: OpenRimWorldAI.AskAPawn
+    kind: mod
+    year: 2025
+    closeness: feature
+    source: src-lemone-2025-askapawn
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3412825218
+  - name: 'Total War: PHARAOH AI advisor (prototype)'
+    kind: prototype
+    year: 2026
+    closeness: adjacent
+    url: https://www.nvidia.com/en-us/geforce/news/dlss-4-rtx-path-tracing-game-announcements-ces-2026/
+  - name: Whyline
+    kind: research
+    year: 2004
+    closeness: adjacent
+    url: https://www.microsoft.com/en-us/research/?p=182651
+  novelty_before: 4
+  novelty: 3
+  verdict: RimWorld mods already let players type any question, why-questions included, and answer it
+    with a language model fed the colony's state, a narrower form of the prediction's feature without
+    a cause-linked log, citations, or a refusal when ungrounded. A shipped mod with a weaker form is a
+    partial precedent, so the score falls from 4 to 3.
+- opportunity: content-elastic-events
+  date: '2026-11-01'
+  queries:
+  - q: game LLM generates events at runtime JSON schema options effects validated against game state Steam
+      AI disclosure "events are generated"
+    where: web
+  - q: Reigns-like card game LLM generated dilemmas runtime swipe AI generated cards Steam itch.io
+    where: web
+  - q: Bannerlord "AI Influence" mod LLM dynamic events generated diplomacy
+    where: web
+  - q: '"Voices of the Court" Crusader Kings 3 mod LLM actions effects events'
+    where: web
+  - q: abs:"game events" AND abs:"language model"
+    where: arxiv
+  - q: AI Influence
+    where: steam-workshop
+  where:
+  - arxiv
+  - itch.io
+  - steam-workshop
+  - web
+  coverage: full
+  checked:
+  - name: EQUILIBRIUM (Steam)
+    url: https://store.steampowered.com/app/4661850/
+  - name: Caves of Qud (Steam)
+    url: https://store.steampowered.com/app/333640/Caves_of_Qud/
+  - name: Fault Lines (itch.io, Anate)
+    url: https://anate.itch.io/fault-lines
+  - name: 'AI Influence [AI Diplomacy] (Mount & Blade II: Bannerlord Workshop mod, MFive)'
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3584621421
+  - name: Voices of the Court (CK3 mod)
+    url: https://catalogue.smods.ru/archives/414014
+  - name: Orchestrated Reality (arXiv 2606.16014)
+    url: https://arxiv.org/abs/2606.16014
+  - name: PANGeA (arXiv 2404.19721)
+    url: https://arxiv.org/abs/2404.19721
+  - name: The Corvane Papers (itch.io)
+    url: https://meierottodane.itch.io/the-corvane-papers
+  closest:
+    name: EQUILIBRIUM
+    kind: game
+    year: 2026
+    closeness: feature
+    source: src-steam-2026-equilibrium
+    url: https://store.steampowered.com/app/4661850/
+  also:
+  - name: Caves of Qud dynamic quests
+    kind: game
+    year: 2024
+    closeness: feature
+    source: src-steam-2024-caves-of-qud
+    url: https://store.steampowered.com/app/333640/Caves_of_Qud/
+  - name: AI Influence (Bannerlord mod)
+    kind: mod
+    year: 2025
+    closeness: feature
+    source: src-mfive-2025-ai-influence
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3584621421
+  novelty_before: 3
+  novelty: 3
+  verdict: Runtime generation constrained to a fixed schema with clamped effects has shipped (EQUILIBRIUM),
+    classical games generate quests at runtime (Caves of Qud), and a Bannerlord mod generates world events
+    with a model; none fills designer templates into a validated event deck. The stored 3 stands.
+- opportunity: drama-aware-storyteller
+  date: '2026-11-01'
+  queries:
+  - q: RimWorld mod LLM generated incidents events AI storyteller mod GPT
+    where: web
+  - q: steamcommunity workshop RimWorld LLM storyteller mod chooses incidents based on colonists relationships
+      AI language model
+    where: web
+  - q: RimTalk RimGPT EchoColony RimWorld AI mods list language model 2025
+    where: web
+  - q: RimSaga RimWorld mod AI storyteller generates events narrative
+    where: web
+  - q: colony sim Steam "AI storyteller" powered by large language model chooses events colonists relationships
+      2025 2026 game
+    where: web
+  - q: LLM drama manager selects authored events narrative relevance game research paper experience management
+      language model
+    where: web
+  - q: LLM drama manager storylets selection interactive narrative
+    where: semantic-scholar
+  - q: abs:storylet AND abs:LLM; abs:"language model" AND abs:storyteller AND abs:game
+    where: arxiv
+  - q: LLM (RimWorld Workshop text search)
+    where: steam-workshop
+  where:
+  - arxiv
+  - semantic-scholar
+  - steam-workshop
+  - web
+  coverage: full
+  checked:
+  - name: 'RimAgent: Orca Deepseek (Beta) (RimWorld Workshop mod, RedstonePanda)'
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3736679812
+  - name: RimSaga (RimWorld Workshop mod, blobwatanabe)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3258739992
+  - name: RimTalk Event+ (RimWorld Workshop mod)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3612632140
+  - name: Better Event Manager (RimWorld Workshop mod, JKLASDWD)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3704431722
+  - name: RimWorld Workshop text search 'LLM'
+    url: https://steamcommunity.com/workshop/browse/?appid=294100&searchtext=LLM&browsesort=textsearch&section=readytouseitems
+  - name: RimWorld - Claude collab (lablab.ai hackathon, 2023-05-26)
+    url: https://lablab.ai/submissions/cli5131j100cz3n6j62b6yeus
+  - name: Drama Llama (arXiv 2501.09099)
+    url: https://arxiv.org/html/2501.09099v1
+  - name: Dramamancer (arXiv 2601.18785)
+    url: https://arxiv.org/abs/2601.18785
+  - name: RimWorld AI storytellers
+    url: https://rimworldwiki.com/wiki/AI_Storytellers
+  - name: Semantic Scholar API
+    url: https://api.semanticscholar.org/graph/v1/paper/search
+  closest:
+    name: 'RimAgent: Orca Deepseek (RimWorld mod)'
+    kind: mod
+    year: 2026
+    closeness: design
+    source: src-redstonepanda-2026-rimagent
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3736679812
+  also:
+  - name: Drama Llama
+    kind: research
+    year: 2025
+    closeness: adjacent
+    url: https://arxiv.org/abs/2501.09099
+  novelty_before: 3
+  novelty: 3
+  verdict: A 2026 RimWorld mod already has a language model read colony and pawn state and choose among
+    the available authored incidents, the core of this design, but as a mod without documented arc scoring
+    or logged reasons. A mod is a partial precedent; the stored 3 stands.
+- opportunity: dream-replay-layer
+  date: '2026-11-01'
+  queries:
+  - q: The Sims 3 Generations memories feature automatic photos of sim's life events
+    where: web
+  - q: The Sims 4 memories feature screenshots removed patch
+    where: web
+  - q: game uses AI video generation to show character memories flashbacks of player's own playthrough
+      events
+    where: web
+  - q: life sim AI-generated images of character's past memories diary generated from in-game events Steam
+    where: web
+  - q: Civilization VI Rise and Fall timeline historic moments illustrations review your civilization's
+      history
+    where: web
+  - q: RimWorld mod stable diffusion generates image of art tale or colonist memory event
+    where: web
+  - q: Proxi Gallium Studios Will Wright memories turned into scenes release Steam 2026
+    where: web
+  - q: AnimeGamer infinite anime life simulation; story visualization from game event logs video generation
+      (HTTP 429)
+    where: semantic-scholar
+  - q: abs:memories AND abs:"world model" AND abs:game AND abs:video; abs:game AND abs:"event log" AND
+      abs:video
+    where: arxiv
+  where:
+  - arxiv
+  - semantic-scholar
+  - web
+  coverage: partial
+  coverage_note: 'No storefront search was run: the session''s shared web-search budget ran out. A fuller
+    search can only find closer prior art, which could lower the ceiling, not raise it.'
+  checked:
+  - name: 'Steam Workshop: AI art (RimWorld mod)'
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=2934195167
+  - name: 'Prima Games: The Sims 3 Generations eGuide, New Connections'
+    url: https://primagames.com/eguides/the-sims-3-generations-eguide/essentials/new-connections
+  - name: 'Kotaku: Live Virtual Life To The Fullest With The Sims 3 Generations'
+    url: https://kotaku.com/live-virtual-life-to-the-fullest-with-the-sims-3-genera-5789168
+  - name: 'PCGamesN: Civ 6 Rise and Fall interview (Anton Strenger)'
+    url: https://pcgamesn.com/civilization-vi/civ-6-rise-and-fall-anton-strenger-interview
+  - name: 'The GEST-Engine: From Event Graphs to Synthetic Video (arXiv 2607.12231)'
+    url: https://arxiv.org/abs/2607.12231
+  - name: AnimeGamer (arXiv 2504.01014)
+    url: https://arxiv.org/abs/2504.01014
+  - name: SimsGPT (ModDB)
+    url: https://www.moddb.com/mods/simsgpt
+  - name: EA news page and 2011 EA press release PDF for Sims 3 Generations
+    url: https://www.ea.com/en-gb/news/sims-3-generations-expansion-pack
+  - name: AIIDE 2015 'Toward Characters Who Observe, Tell, Misremember, and Lie'
+    url: https://ojs.aaai.org/index.php/AIIDE/article/view/12825
+  closest:
+    name: AI art (RimWorld mod)
+    kind: mod
+    year: 2023
+    closeness: feature
+    source: src-boriselec-2023-rimworld-ai-art
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=2934195167
+  also:
+  - name: 'The Sims 3: Generations memories'
+    kind: official
+    year: 2011
+    closeness: feature
+    source: src-primagames-2011-sims-3-generations-new-connections
+    url: https://primagames.com/eguides/the-sims-3-generations-eguide/essentials/new-connections
+  - name: GEST-Engine
+    kind: research
+    year: 2026
+    closeness: adjacent
+    url: https://arxiv.org/abs/2607.12231
+  novelty_before: 5
+  novelty: 3
+  verdict: A RimWorld mod has generated images of logged colony events since 2023, and The Sims 3 Generations
+    (2011) turned automatic snapshots of a Sim's life into memories. Generated views of a run's own past
+    have shipped in partial forms, so the score falls from 5 to 3; a world model drawing subjective, drifting
+    memories remains unshipped.
+- opportunity: event-sourced-sim-runtime
+  date: '2026-11-01'
+  queries: []
+  not_run:
+  - q: game engine replay determinism LLM outputs recorded event log middleware
+    where: web
+  - q: AI NPC middleware replay cached model outputs multiplayer determinism Inworld OR Convai
+    where: web
+  - q: deterministic replay of LLM agent simulation event sourcing
+    where: semantic-scholar
+  where:
+  - direct
+  coverage: partial
+  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
+    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
+    it.'
+  checked:
+  - name: Events and Event History (Temporal documentation)
+    url: https://docs.temporal.io/workflow-execution/event
+  - name: Use time-travel (LangGraph docs)
+    url: https://docs.langchain.com/oss/python/langgraph/use-time-travel
+  - name: joonspk-research/generative_agents (README)
+    url: https://github.com/joonspk-research/generative_agents
+  - name: AI Town ARCHITECTURE.md (a16z-infra)
+    url: https://raw.githubusercontent.com/a16z-infra/ai-town/main/ARCHITECTURE.md
+  closest:
+    name: Temporal durable execution
+    kind: outside
+    year: null
+    closeness: design
+    source: src-temporal-2026-event-history
+    url: https://docs.temporal.io/workflow-execution/event
+  also:
+  - name: Generative Agents repository (replay and fork)
+    kind: research
+    year: 2023
+    closeness: adjacent
+    source: src-park-2023-generative-agents-repository
+    url: https://github.com/joonspk-research/generative_agents
+  - name: LangGraph time travel
+    kind: outside
+    year: null
+    closeness: feature
+    url: https://docs.langchain.com/oss/python/langgraph/use-time-travel
+  novelty_before: 3
+  novelty: 3
+  verdict: The mechanism ships outside games (Temporal records non-deterministic results once and replays
+    them, and resets runs from history), and research agent simulations replay and fork saved runs; nothing
+    found packages it as game middleware. The stored 3 stands.
+- opportunity: explained-delegation
+  date: '2026-11-01'
+  queries:
+  - q: strategy game AI governor learns from your past decisions imitates player choices automation delegation
+    where: web
+  - q: game learns your playstyle auto mode AI plays like you management OR city builder OR 4X delegation
+    where: web
+  - q: Galactic Civilizations IV governors AI learns player preferences OR Stardock AI that learns how
+      you play
+    where: web
+  - q: Forza Drivatar learns how you drive races for you earns credits while offline official
+    where: web
+  - q: mobile game smart auto OR auto battle learns from your manual play AI copies player decisions
+    where: web
+  - q: Black & White creature learns by watching the player imitation leash Richard Evans
+    where: web
+  where:
+  - web
+  coverage: partial
+  coverage_note: 'No scholarly or storefront search was run: the session''s shared web-search budget ran
+    out. A fuller search can only find closer prior art, which could lower the ceiling, not raise it.'
+  checked:
+  - name: Black & White (Lionhead, 2001)
+    url: https://en.wikipedia.org/wiki/Black_%26_White_(video_game)
+  - name: Forza Drivatar (FH3 support article)
+    url: https://support.forza.net/hc/en-us/articles/360005302934-FH3-Drivatars
+  - name: 'Provisional Authority: An AI Governance Simulation (Steam, 2026)'
+    url: https://store.steampowered.com/app/4532370/
+  - name: Galactic Civilizations IV (search results only)
+    url: https://store.steampowered.com/app/1357210/
+  - name: Mirror Mode in Fire Emblem (arXiv 2512.11902)
+    url: https://arxiv.org/abs/2512.11902
+  - name: DFKI Cyborg (2008)
+    url: https://dfki.de/web/forschung/projekte-publikationen/publikation/4545
+  - name: Player Modeling in Civilization IV (AIIDE)
+    url: https://ojs.aaai.org/index.php/AIIDE/article/view/12409
+  - name: US11875637B2 Self-evolving AI-based playstyle models (IGT)
+    url: https://patents.google.com/patent/US11875637B2/en
+  closest:
+    name: Black & White
+    kind: game
+    year: 2001
+    closeness: feature
+    source: src-wikipedia-black-and-white
+    url: https://en.wikipedia.org/wiki/Black_%26_White_(video_game)
+  also:
+  - name: Forza Drivatars
+    kind: game
+    year: 2014
+    closeness: feature
+    source: src-xbox-2014-forza-horizon-2-drivatars
+    url: https://news.xbox.com/en-us/2014/09/30/games-forza-horizon-2-drivatars/
+  novelty_before: 3
+  novelty: 3
+  verdict: Agents that learn an individual player's wishes and act for them have shipped outside management
+    games (Black & White's creature, Forza's Drivatars), while delegation in management games uses fixed
+    presets. No management title found has managers that adapt to the player's own choices and explain
+    themselves. The stored 3 stands.
+- opportunity: generated-inspection-shifts
+  date: '2026-11-01'
+  queries:
+  - q: papers please procedural
+    where: itch.io
+  - q: papers please AI generated
+    where: itch.io
+  - q: procedurally generated documents inspection
+    where: steam
+  - q: checkpoint documents (sorted by reviews)
+    where: steam
+  - q: inspector documents rules (sorted by reviews)
+    where: steam
+  - q: all:"papers please"; ti:puzzle AND ti:generation AND abs:"language model"; ti:synthetic AND ti:identity
+      AND ti:documents
+    where: arxiv
+  where:
+  - arxiv
+  - itch.io
+  - repository
+  - steam
+  coverage: partial
+  coverage_note: 'No web search was run: the session''s shared web-search budget ran out. A fuller search
+    can only find closer prior art, which could lower the ceiling, not raise it.'
+  checked:
+  - name: Papers, Please (Wikipedia; catalog game)
+    url: https://en.wikipedia.org/wiki/Papers,_Please
+  - name: Papers, Please (Steam)
+    url: https://store.steampowered.com/app/239030/Papers_Please/
+  - name: The Imperial Gatekeeper (Steam, Tengsten / Kagura Games)
+    url: https://store.steampowered.com/app/1933650/The_Imperial_Gatekeeper
+  - name: Contraband Police (Steam; catalog game)
+    url: https://store.steampowered.com/app/756800/Contraband_Police/
+  - name: Airport Contraband (Steam, DRAGO entertainment)
+    url: https://store.steampowered.com/app/1167820/Airport_Contraband/
+  - name: That's not my Neighbor (Steam)
+    url: https://store.steampowered.com/app/3431040/
+  - name: The Corvane Papers (itch.io)
+    url: https://meierottodane.itch.io/the-corvane-papers
+  - name: Procedurally generating rules to adapt difficulty for narrative puzzle games (arXiv 2307.05518)
+    url: https://arxiv.org/abs/2307.05518
+  - name: PapersPlease benchmark (arXiv 2506.21961)
+    url: https://arxiv.org/abs/2506.21961
+  closest:
+    name: Papers, Please
+    kind: game
+    year: 2013
+    closeness: design
+    source: src-wikipedia-papers-please
+    url: https://en.wikipedia.org/wiki/Papers,_Please
+  also:
+  - name: The Imperial Gatekeeper
+    kind: game
+    year: 2022
+    closeness: design
+    source: src-steam-2022-imperial-gatekeeper
+    url: https://store.steampowered.com/app/1933650/The_Imperial_Gatekeeper
+  - name: Procedurally generated narrative puzzle rules (Volden et al.)
+    kind: research
+    year: 2023
+    closeness: adjacent
+    url: https://arxiv.org/abs/2307.05518
+  novelty_before: 3
+  novelty: 2
+  verdict: Papers, Please (2013) already generates entrants at random against each day's formal rules
+    and scores the player's rulings, with an endless mode, and The Imperial Gatekeeper (2022) says its
+    applicants are generated and the player is scored on accuracy. The design is known and shipped, with
+    generated rule changes and forgeries as refinements, so the score falls from 3 to 2.
+- opportunity: generated-recipe-graphs
+  date: '2026-11-01'
+  queries:
+  - q: Factorio mod randomizes recipes and technology tree procedurally generated mod portal
+    where: web
+  - q: Archipelago Factorio randomizer tech tree layout recipe randomization options
+    where: web
+  - q: Infinite Craft Neal Agarwal recipes generated by language model Llama
+    where: web
+  - q: factory automation game procedurally generated recipes and items every playthrough unique production
+      chains Steam
+    where: web
+  - q: procedural generation of crafting recipes tech tree paper automated game design crafting system
+      generation
+    where: web
+  - q: names/summaries matching random|procedural|generated recipe across all mods (API dump, sorted by
+      downloads)
+    where: mod-portal
+  - q: recipe randomizer; randomizer; random crafting; random recipes; procedural recipes
+    where: mod-portal
+  - q: infinite craft; AI crafting; procedural recipes; random tech tree
+    where: steam
+  - q: procedural generation crafting recipes game
+    where: semantic-scholar
+  - q: abs:crafting AND abs:procedural; abs:"tech tree" AND abs:game; abs:"crafting tree" OR abs:"crafting
+      system"
+    where: arxiv
+  where:
+  - arxiv
+  - mod-portal
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
+  checked:
+  - name: exfret's randomizer (Factorio mod portal)
+    url: https://mods.factorio.com/mod/propertyrandomizer
+  - name: Factorio mod portal API dump
+    url: https://mods.factorio.com/api/mods?page_size=max
+  - name: 'Archipelago: Factorio game info'
+    url: https://archipelago.gg/games/Factorio/info/en
+  - name: Random Crafting (Modrinth, Minecraft)
+    url: https://modrinth.com/mod/random-crafting
+  - name: Infinite Craft (Wikipedia; catalog game infinite-craft)
+    url: https://en.wikipedia.org/wiki/Infinite_Craft
+  - name: Factorio Learning Environment (arXiv 2503.09617)
+    url: https://arxiv.org/abs/2503.09617
+  - name: One Turret devlog (itch.io)
+    url: https://kaplin86.itch.io/one-turret/devlog/873209/i-added-an-index-into-my-td-factory-game
+  closest:
+    name: exfret's randomizer (Factorio mod)
+    kind: mod
+    year: 2022
+    closeness: feature
+    source: src-exfret-2022-factorio-randomizer
+    url: https://mods.factorio.com/mod/propertyrandomizer
+  also:
+  - name: Infinite Craft
+    kind: game
+    year: 2024
+    closeness: feature
+    source: src-wikipedia-infinite-craft
+    url: https://en.wikipedia.org/wiki/Infinite_Craft
+  - name: Archipelago Factorio randomizer
+    kind: mod
+    year: null
+    closeness: feature
+    url: https://archipelago.gg/games/Factorio/info/en
+  novelty_before: 3
+  novelty: 3
+  verdict: Generated recipe graphs and tech trees have shipped as Factorio randomizer mods tuned to stay
+    completable, and a crafting game's whole recipe graph is written by a language model (Infinite Craft);
+    none designs on-theme production graphs checked by agent playtests. The stored 3 stands.
+- opportunity: generative-decoration-catalogs
+  date: '2026-11-01'
+  queries: []
+  not_run:
+  - q: 'life sim text to 3D furniture generator in game (not run: web-search budget exhausted)'
+    where: web
+  - q: management sim image to 3D object player generated decoration build mode
+    where: web
+  - q: Sims 4 OR RimWorld mod text to 3D object generation
+    where: web
+  - q: text to 3D
+    where: steam
+  where:
+  - direct
+  coverage: partial
+  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
+    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
+    it.'
+  checked:
+  - name: inZOI on Steam
+    url: https://store.steampowered.com/app/2456740/inZOI/
+  - name: Introducing Roblox Cube (Roblox newsroom)
+    url: https://about.roblox.com/newsroom/2025/03/introducing-roblox-cube
+  - name: Roblox Cube engineering page
+    url: https://about.roblox.com/engineering/cube
+  - name: SimsGPT (ModDB)
+    url: https://www.moddb.com/mods/simsgpt
+  - name: Rec Room blog
+    url: https://blog.recroom.com/
+  closest:
+    name: inZOI image-to-3D objects
+    kind: game
+    year: 2025
+    closeness: design
+    source: src-steam-2025-inzoi
+    url: https://store.steampowered.com/app/2456740/inZOI/
+  also:
+  - name: Roblox Cube in-experience mesh generation
+    kind: official
+    year: 2025
+    closeness: feature
+    url: https://about.roblox.com/newsroom/2025/03/introducing-roblox-cube
+  novelty_before: 2
+  novelty: 2
+  verdict: A life sim already lets players make placeable 3D decorations from images (inZOI, 2025), the
+    precedent the prediction excludes by name, so the idea is known and rarely done, anchor 2. The stored
+    2 stands.
+- opportunity: human-calibrated-customers
+  date: '2026-11-01'
+  queries:
+  - q: tycoon game customers preferences based on real survey data choice model developer
+    where: web
+  - q: management simulation game LLM-powered customers AI generated customer personalities Steam
+    where: web
+  - q: airline management game passenger demand model based on real-world data statistics
+    where: web
+  - q: The Political Machine 2024 voters real polling demographic data model Stardock
+    where: web
+  - q: restaurant or shop simulation game customers powered by large language model haggling Steam 2025
+    where: web
+  - q: Kemperman Borgers Timmermans theme park visitor choice behavior simulation model conjoint
+    where: web
+  - q: Brand Israeli Ngwe Using GPT for Market Research willingness to pay
+    where: web
+  - q: simulation game customer behavior discrete choice model
+    where: semantic-scholar
+  - q: abs:"management game" AND abs:customer; abs:"language model" AND consumer AND "willingness to pay";
+      theme park visitor simulation
+    where: arxiv
+  - q: AI customers LLM; tycoon AI customers
+    where: steam
+  where:
+  - arxiv
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
+  checked:
+  - name: New Political Machine 2024 Update Includes Tariffs Event, Updated State Demographics, and More
+      (Stardock press release)
+    url: https://www.gamespress.com/New-Political-Machine-2024-Update-Includes-Tariffs-Event-Updated-State
+  - name: Real data backs Plymouth-made presidential campaign game (Stardock news)
+    url: https://www.stardock.com/news/530378/real-data-backs-plymouth-made-presidential-campaign-game
+  - name: APRON (itch.io demo)
+    url: https://schdahle.itch.io/apron
+  - name: Re:collect (Steam, coming soon)
+    url: https://store.steampowered.com/app/4783310
+  - name: AI Society (Steam search result, released 2026-03-20)
+    url: https://store.steampowered.com/search/?term=AI+Society
+  - name: 'Consumer choice of theme parks: a conjoint choice model of seasonality effects and variety
+      seeking behavior (Kemperman et al. 2000)'
+    url: https://research.monash.edu/en/publications/consumer-choice-of-theme-parks-a-conjoint-choice-model-of-seasona/
+  - name: Generative Agent Simulations of 1,000 People (Park et al. 2024)
+    url: https://arxiv.org/abs/2411.10109
+  - name: A foundation model to predict and capture human cognition (Centaur, Binz et al. 2025)
+    url: https://www.nature.com/articles/s41586-025-09215-4
+  - name: Using LLMs for Market Research (Brand, Israeli, Ngwe; SSRN and HBS Working Knowledge)
+    url: https://papers.ssrn.com/abstract=4395751
+  - name: 'Return on Roller Coasters: A Model to Guide Investments in Theme Park Attractions (Marketing
+      Science)'
+    url: https://pubsonline.informs.org/doi/10.1287/mksc.1090.0553
+  - name: Semantic Scholar API
+    url: https://api.semanticscholar.org/graph/v1/paper/search?query=simulation+game+customer+preferences+discrete+choice+model
+  closest:
+    name: The Political Machine 2024 (April 2025 update)
+    kind: official
+    year: 2025
+    closeness: feature
+    source: src-stardock-2025-political-machine-2024-update
+    url: https://www.gamespress.com/New-Political-Machine-2024-Update-Includes-Tariffs-Event-Updated-State
+  also:
+  - name: APRON (airline management demo)
+    kind: prototype
+    year: 2026
+    closeness: feature
+    url: https://schdahle.itch.io/apron
+  - name: Generative Agent Simulations of 1,000 People
+    kind: research
+    year: 2024
+    closeness: adjacent
+    source: src-park-2024-1000-people
+    url: https://arxiv.org/abs/2411.10109
+  novelty_before: 4
+  novelty: 3
+  verdict: A shipped strategy game sets its simulated voters' preferences from polling and demographic
+    data (The Political Machine 2024), a narrower form without a fitted behavioral model or a tycoon market;
+    fitted choice models and language-model predictors of individual responses are research. Partial precedents,
+    so the score falls from 4 to 3.
+- opportunity: illustrated-chronicles
+  date: '2026-11-01'
+  queries: []
+  not_run:
+  - q: 'game automatically writes chronicle of your playthrough export share (not run: web-search budget
+      exhausted)'
+    where: web
+  - q: Crusader Kings chronicle feature automatic dynasty history
+    where: web
+  - q: LLM chronicle mod RimWorld OR Dwarf Fortress OR Crusader Kings story of my colony
+    where: web
+  - q: roguelike morgue file run summary shared online
+    where: web
+  - q: chronicle
+    where: steam
+  where:
+  - direct
+  coverage: partial
+  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
+    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
+    it.'
+  checked:
+  - name: 'Expansion - Crusader Kings II: Charlemagne (Steam)'
+    url: https://store.steampowered.com/app/292982/Expansion_Crusader_Kings_II_Charlemagne/
+  - name: Chronicle events - Crusader Kings II Wiki
+    url: https://ck2.paradoxwikis.com/Chronicle
+  - name: Legends - Dwarf Fortress Wiki
+    url: https://dwarffortresswiki.org/index.php/Legends
+  - name: 'Prima: The Sims 3 Generations eGuide'
+    url: https://primagames.com/eguides/the-sims-3-generations-eguide/essentials/new-connections
+  - name: 'PCGamesN: Civ 6 Rise and Fall interview'
+    url: https://pcgamesn.com/civilization-vi/civ-6-rise-and-fall-anton-strenger-interview
+  - name: Wildermyth on Steam
+    url: https://store.steampowered.com/app/763890/Wildermyth/
+  - name: Journal - Caves of Qud Wiki
+    url: https://wiki.cavesofqud.com/wiki/Journal
+  - name: SimsGPT (ModDB)
+    url: https://www.moddb.com/mods/simsgpt
+  closest:
+    name: 'Crusader Kings II: Charlemagne''s annual chronicle'
+    kind: official
+    year: 2014
+    closeness: feature
+    source: src-steam-2014-crusader-kings-2-charlemagne
+    url: https://store.steampowered.com/app/292982/Expansion_Crusader_Kings_II_Charlemagne/
+  also:
+  - name: Dwarf Fortress Legends export
+    kind: game
+    year: null
+    closeness: feature
+    url: https://dwarffortresswiki.org/index.php/Legends
+  - name: 'The Sims 3: Generations memories'
+    kind: official
+    year: 2011
+    closeness: feature
+    source: src-primagames-2011-sims-3-generations-new-connections
+    url: https://primagames.com/eguides/the-sims-3-generations-eguide/essentials/new-connections
+  novelty_before: 2
+  novelty: 2
+  verdict: An official expansion writes a yearly chronicle of the player's game from its events (Crusader
+    Kings II, 2014), Dwarf Fortress exports its history, and The Sims 3 shared automatic snapshots. Known
+    and rarely done well; the stored 2 stands.
+- opportunity: intent-level-orders
+  date: '2026-11-01'
+  queries:
+  - q: natural language commands colony management game
+    where: steam
+  not_run:
+  - q: RimWorld mod natural language orders LLM work priorities
+    where: web
+  - q: colony sim type commands in plain English AI sets job priorities schedule
+    where: web
+  - q: inZOI Smart Zoi prompt schedule Zoi Pen
+    where: web
+  - q: language model translate player intent into game control primitives
+    where: semantic-scholar
+  where:
+  - steam
+  - steam-news
+  - steam-workshop
+  coverage: partial
+  coverage_note: 'No web or scholarly search was run: the session''s shared web-search budget ran out.
+    A fuller search can only find closer prior art, which could lower the ceiling, not raise it.'
+  checked:
+  - name: inZOI Smart Zoi (Steam news API, inZOI announcements)
+    url: https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=2456740&count=300&maxlength=0&feeds=steam_community_announcements
+  - name: inZOI store page
+    url: https://store.steampowered.com/app/2456740/inZOI/
+  - name: I WAS A KING (Steam, 2026)
+    url: https://store.steampowered.com/app/4296250/
+  - name: Tom Clancy's EndWar (Steam)
+    url: https://store.steampowered.com/app/21800/
+  - name: PUBG Ally (KRAFTON press)
+    url: https://www.krafton.com/en/news/press/krafton-introduces-pubg-ally-beta-test/
+  - name: RimWorld LLM mods surfaced (RimTalk, EchoColony, AskAPawn, OpenRimWorldAI, RimSaga, RimAI Framework)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3529263357
+  closest:
+    name: inZOI Smart Zoi
+    kind: game
+    year: 2025
+    closeness: feature
+    source: src-steam-2025-inzoi
+    url: https://store.steampowered.com/app/2456740/inZOI/
+  also:
+  - name: I WAS A KING
+    kind: game
+    year: 2026
+    closeness: feature
+    url: https://store.steampowered.com/app/4296250/
+  - name: Tom Clancy's EndWar
+    kind: game
+    year: 2008
+    closeness: feature
+    url: https://store.steampowered.com/app/21800/
+  novelty_before: 3
+  novelty: 3
+  verdict: In inZOI typed text steers a character's actions and schedule, and strategy games have parsed
+    spoken or typed orders, but no colony sim found compiles standing free-text orders into its work-priority
+    grid. The stored 3 stands.
+- opportunity: language-modding
+  date: '2026-11-01'
+  queries: []
+  not_run:
+  - q: official AI mod creator natural language mod generator simulation game developer announces
+    where: web
+  - q: Minecraft OR RimWorld OR Cities Skylines OR Factorio official tool generate mod from text description
+      LLM
+    where: web
+  - q: UEFN Epic Developer Assistant writes Verse code; Roblox Assistant generates scripts
+    where: web
+  - q: AI mod maker; mod generator; text to mod
+    where: steam
+  - q: large language model generate game mods modding API automated testing
+    where: semantic-scholar
+  where:
+  - direct
+  coverage: partial
+  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
+    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
+    it.'
+  checked:
+  - name: 'Roblox Creator Hub: Assistant for Studio'
+    url: https://create.roblox.com/docs/assistant/guide
+  - name: 'Roblox Creator Hub: Assistant prompt guide and examples'
+    url: https://create.roblox.com/docs/assistant/prompt-engineering
+  - name: Epic Developer Assistant page
+    url: https://dev.epicgames.com/community/assistant
+  - name: inZOI Steam page (src-steam-2025-inzoi)
+    url: https://store.steampowered.com/app/2456740/inZOI/
+  - name: Voyager (src-wang-2023-voyager)
+    url: https://arxiv.org/abs/2305.16291
+  - name: Factorio Learning Environment (src-hopkins-2025-factorio-learning-environment)
+    url: https://arxiv.org/abs/2503.09617
+  closest:
+    name: Roblox Assistant
+    kind: official
+    year: null
+    closeness: feature
+    source: src-roblox-2026-assistant-guide
+    url: https://create.roblox.com/docs/assistant/guide
+  also:
+  - name: Voyager
+    kind: research
+    year: 2023
+    closeness: adjacent
+    source: src-wang-2023-voyager
+    url: https://arxiv.org/abs/2305.16291
+  novelty_before: 3
+  novelty: 3
+  verdict: Roblox's official assistant writes scripts against its own API from typed requests, without
+    automated agent tests and on a creation platform rather than a moddable simulation game; research
+    couples model-written game code with automated checks. The stored 3 stands.
+- opportunity: learned-build-assist
+  date: '2026-11-01'
+  queries:
+  - q: city builder game machine learning model generates streets and buildings from player brush strokes
+    where: web
+  - q: sketch to city layout generation deep learning interactive urban block generation paper
+    where: web
+  - q: Steam game AI generates city from text prompt city builder generative AI layout 2025 2026
+    where: web
+  - q: Fable Cezanne impressionist city builder game brush strokes AI
+    where: web
+  - q: neural network OR machine learning city layout generator mod Cities Skylines OR Minecraft settlement
+      generation trained on real city data
+    where: web
+  - q: Autodesk Forma AI site layout generation machine learning trained urban design proposals
+    where: web
+  - q: sketch guided urban layout generation; interactive city layout generation user brush neural (both
+      HTTP 429)
+    where: semantic-scholar
+  - q: all:sketch AND all:urban AND all:layout AND all:generation
+    where: arxiv
+  not_run:
+  - q: 'Blackshark.ai Microsoft Flight Simulator machine learning building footprints (not run: web-search
+      budget exhausted)'
+    where: web
+  - q: AI city builder layout
+    where: steam
+  where:
+  - arxiv
+  - semantic-scholar
+  - web
+  coverage: partial
+  coverage_note: 'No storefront search was run: the session''s shared web-search budget ran out. A fuller
+    search can only find closer prior art, which could lower the ceiling, not raise it.'
+  checked:
+  - name: Neural Turtle Graphics for Modeling City Road Layouts (arXiv 1910.02055)
+    url: https://arxiv.org/abs/1910.02055
+  - name: 'CityGen: Infinite and Controllable City Layout Generation (arXiv 2312.01508)'
+    url: https://arxiv.org/abs/2312.01508
+  - name: 'GroundUp: Rapid Sketch-Based 3D City Massing (arXiv 2407.12739)'
+    url: https://arxiv.org/abs/2407.12739
+  - name: Tiny Glade on Steam
+    url: https://store.steampowered.com/app/2198150/Tiny_Glade/
+  - name: Cezanne City (web prototype)
+    url: https://cezanne-city.netlify.app/
+  - name: 'blockchain.news: Fable unveils Cezanne city builder using AI'
+    url: https://blockchain.news/ainews/fable-unveils-cezanne-city-builder-using-ai
+  - name: 'Roblox RDC 2026: The World Needs More Play'
+    url: https://about.roblox.com/newsroom/2026/09/rdc-2026-the-world-needs-more-play
+  - name: Blackshark.ai homepage
+    url: https://blackshark.ai/
+  closest:
+    name: Neural Turtle Graphics
+    kind: research
+    year: 2019
+    closeness: adjacent
+    source: src-chu-2019-neural-turtle-graphics
+    url: https://arxiv.org/abs/1910.02055
+  also:
+  - name: Tiny Glade
+    kind: game
+    year: 2024
+    closeness: adjacent
+    source: src-steam-2026-tiny-glade
+    url: https://store.steampowered.com/app/2198150/Tiny_Glade/
+  novelty_before: 3
+  novelty: 3
+  verdict: Learned, sketch-driven layout generation exists in research (Neural Turtle Graphics, trained
+    on OpenStreetMap) and stroke assist has shipped with procedural rules (Tiny Glade), but no city builder
+    found ships a learned layout generator. The anchors would allow 4; the stored 3 is not raised.
+- opportunity: learned-material-surrogates
+  date: '2026-11-01'
+  queries:
+  - q: first game to use neural network physics simulation at runtime fluid OR cloth OR destruction shipped
+      machine learning physics game
+    where: web
+  - q: Ubisoft La Forge "subspace neural physics" cloth shipped game runtime
+    where: web
+  - q: '"Softmax" "Neural Simulation of Skeletal Physics" FateTrigger GDC LightSpeed'
+    where: web
+  not_run:
+  - q: gdcvault SoftMax neural simulation skeletal physics FateTrigger
+    where: web
+  - q: neural physics / machine learning physics
+    where: steam
+  - q: learned fluid simulation real-time game deployment
+    where: semantic-scholar
+  where:
+  - web
+  coverage: partial
+  coverage_note: 'No scholarly or storefront search was run: the session''s shared web-search budget ran
+    out. A fuller search can only find closer prior art, which could lower the ceiling, not raise it.'
+  checked:
+  - name: 'Machine Learning: Physics Simulation, Kolmogorov Complexity, and Squishy Bunnies (GDC 2020)'
+    url: https://gdcvault.com/play/1026713/Machine-Learning-Physics-Simulation-Kolmogorov
+  - name: Subspace Neural Physics (Holden et al., SCA 2019)
+    url: https://theorangeduck.com/page/subspace-neural-physics-fast-data-driven-interactive-simulation
+  - name: How to use the Machine Learning Deformer in Unreal Engine
+    url: https://dev.epicgames.com/documentation/en-us/unreal-engine/how-to-use-the-machine-learning-deformer-in-unreal-engine
+  - name: Learning to Simulate Complex Physics with Graph Networks (arXiv 2002.09405)
+    url: https://arxiv.org/abs/2002.09405
+  - name: 'GDC 2026 session ''SoftMax: Neural Simulation of Skeletal Physics'' (LightSpeed Studios)'
+    url: https://schedule.gdconf.com/session/softmax-neural-simulation-of-skeletal-physics/915222
+  closest:
+    name: Unreal Engine ML Deformer
+    kind: official
+    year: null
+    closeness: adjacent
+    source: src-epic-2026-ml-deformer
+    url: https://dev.epicgames.com/documentation/en-us/unreal-engine/how-to-use-the-machine-learning-deformer-in-unreal-engine
+  also:
+  - name: Subspace Neural Physics (Ubisoft La Forge)
+    kind: research
+    year: 2019
+    closeness: adjacent
+    source: src-holden-2019-subspace-neural-physics
+    url: https://theorangeduck.com/page/subspace-neural-physics-fast-data-driven-interactive-simulation
+  - name: Graph Network-based Simulators
+    kind: research
+    year: 2020
+    closeness: adjacent
+    source: src-sanchezgonzalez-2020-gns
+    url: https://arxiv.org/abs/2002.09405
+  novelty_before: 4
+  novelty: 4
+  verdict: Trained models replace offline physical simulation at runtime only for cosmetic mesh deformation
+    (Unreal's ML Deformer), which the prediction excludes; learned fluid and deformable simulators are
+    research. No shipped precedent with adjacent research, anchor 4; the stored 4 stands.
+- opportunity: learned-weather-layer
+  date: '2026-11-01'
+  queries: []
+  not_run:
+  - q: game weather machine learning emulator OR neural weather model in-game farming OR flight simulator
+    where: web
+  - q: Microsoft Flight Simulator 2024 weather AI model Meteoblue machine learning
+    where: web
+  - q: procedural weather generation neural network game
+    where: semantic-scholar
+  - q: weather simulation AI
+    where: steam
+  where:
+  - direct
+  coverage: partial
+  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
+    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
+    it.'
+  checked:
+  - name: Microsoft Flight Simulator (2020 video game) (Wikipedia)
+    url: https://en.wikipedia.org/wiki/Microsoft_Flight_Simulator_(2020_video_game)
+  - name: Probabilistic weather forecasting with machine learning (GenCast, Nature 2024)
+    url: https://www.nature.com/articles/s41586-024-08252-9
+  - name: 'ACE: A fast, skillful learned global atmospheric model for climate prediction (arXiv 2310.02074)'
+    url: https://arxiv.org/abs/2310.02074
+  - name: NVIDIA Earth-2
+    url: https://www.nvidia.com/en-us/high-performance-computing/earth-2/
+  closest:
+    name: ACE (AI2 Climate Emulator)
+    kind: research
+    year: 2023
+    closeness: adjacent
+    source: src-wattmeyer-2023-ace
+    url: https://arxiv.org/abs/2310.02074
+  also:
+  - name: Microsoft Flight Simulator (2020) live weather
+    kind: game
+    year: 2020
+    closeness: none
+    source: src-wikipedia-microsoft-flight-simulator-2020
+    url: https://en.wikipedia.org/wiki/Microsoft_Flight_Simulator_(2020_video_game)
+  novelty_before: 3
+  novelty: 3
+  verdict: Learned atmospheric emulators exist in research (ACE, GenCast) and in products outside games,
+    while shipped sims use forecast feeds, which the prediction excludes. The anchors would allow 4; the
+    stored 3 is not raised.
+- opportunity: living-workforce-factories
+  date: '2026-11-01'
+  queries:
+  - q: factory workers generations (sorted by reviews)
+    where: steam
+  - q: automation colonists age children (sorted by reviews)
+    where: steam
+  - q: catalog games tagged with production chains and agent lifecycles
+    where: repository
+  - q: ti:"Project Sid"; abs:"agent-based" AND abs:workforce AND abs:aging; abs:"factory game"
+    where: arxiv
+  where:
+  - arxiv
+  - repository
+  - steam
+  coverage: partial
+  coverage_note: 'No web search was run: the session''s shared web-search budget ran out. A fuller search
+    can only find closer prior art, which could lower the ceiling, not raise it.'
+  checked:
+  - name: 'Workers & Resources: Soviet Republic (Steam; catalog game)'
+    url: https://store.steampowered.com/app/784150/
+  - name: Banished (Steam; catalog game)
+    url: https://store.steampowered.com/app/242920/Banished/
+  - name: RimWorld - Biotech (Steam)
+    url: https://store.steampowered.com/app/1826140/RimWorld__Biotech/
+  - name: Timberborn (Steam; catalog game)
+    url: https://store.steampowered.com/app/1062090/Timberborn/
+  - name: Captain of Industry (Steam; catalog game)
+    url: https://store.steampowered.com/app/1594320
+  - name: Songs of Syx (Steam)
+    url: https://store.steampowered.com/app/1162750/
+  - name: Steam storefront searches
+    url: https://store.steampowered.com/search/?term=factory+workers+generations&sort_by=Reviews_DESC
+  closest:
+    name: 'Workers & Resources: Soviet Republic'
+    kind: game
+    year: 2024
+    closeness: feature
+    source: src-steam-2026-workers-and-resources
+    url: https://store.steampowered.com/app/784150/
+  also:
+  - name: Banished
+    kind: game
+    year: 2014
+    closeness: feature
+    source: src-steam-2026-banished
+    url: https://store.steampowered.com/app/242920/Banished/
+  novelty_before: 3
+  novelty: 3
+  verdict: Workers & Resources couples deep production chains to citizens followed from childhood to death,
+    whose schooling gates jobs and production, though training is by education tier, with no per-machine
+    operators or succession. Strong partial precedents; the stored 3 stands.
+- opportunity: llm-society-terrarium
+  date: '2026-11-01'
+  queries:
+  - q: LLM agent society simulation game Steam watch AI villagers form civilization
+    where: web
+  - q: game where hundreds of LLM agents build a society, player as god intervenes, Steam early access
+      2025 2026
+    where: web
+  - q: Aivilization HKUST AI agents town sandbox game 2025
+    where: web
+  - q: Microverse KsanaDock god simulation sandbox multi-agent Steam
+    where: web
+  - q: SpaceMolt MMO for AI agents players watch
+    where: web
+  - q: '"AI People" GoodAI early access Steam LLM NPCs sandbox'
+    where: web
+  - q: AI society / AI agents civilization / LLM simulation / generative agents / AI villagers / AI civilization
+      / AI town / AI sandbox society / AI NPC sandbox / AI god game
+    where: steam
+  - q: llm society / generative agents / llm colony / ai agents town
+    where: itch.io
+  - q: all:Aivilization; abs:"agent society" AND abs:game; abs:"generative agents" AND sandbox AND players
+    where: arxiv
+  - q: Aivilization multi-agent sandbox; large-scale LLM agent society simulation game players
+    where: semantic-scholar
+  where:
+  - arxiv
+  - itch.io
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
+  checked:
+  - name: SpaceMolt README (Hugging Face org page)
+    url: https://spacemolt-readme.static.hf.space/README.md
+  - name: SpaceMolt home page
+    url: https://www.spacemolt.com/
+  - name: 'Decrypt: SpaceMolt is a multiplayer game built exclusively for AI agents (2026-02-10)'
+    url: https://decrypt.co/357657/spacemolt-multiplayer-game-built-exclusively-ai-agents
+  - name: 'HKUST news: World''s Largest AI-Powered Educational Sandbox Game (2025-08-19)'
+    url: https://hkust.edu.hk/news/hkust-launches-worlds-largest-ai-powered-educational-sandbox-game-advancing-ai-literacy-and
+  - name: AIvilization v0 (arXiv 2602.10429)
+    url: https://arxiv.org/abs/2602.10429
+  - name: AI Society on Steam (b8ve, 2026-03-20)
+    url: https://store.steampowered.com/app/4468180/AI_Society/
+  - name: Microverse In Box on Steam (Ksana Dock, TBA)
+    url: https://store.steampowered.com/app/3902630/
+  - name: Microverse README (GitHub, June 2025 demo)
+    url: https://raw.githubusercontent.com/KsanaDock/Microverse/main/README_EN.md
+  - name: Project Sid (arXiv 2411.00114)
+    url: https://arxiv.org/abs/2411.00114
+  - name: AI Cultivation Sandbox on Steam
+    url: https://store.steampowered.com/app/4248930/
+  - name: 'Digital Civilization: Evolution on Steam'
+    url: https://store.steampowered.com/app/4620990/
+  - name: MemeticBox on Steam
+    url: https://store.steampowered.com/app/5352720/
+  - name: 'Boing Boing: 700 AI agents built a civilization with a new religion (2026-03-21)'
+    url: https://boingboing.net/2026/03/21/700-ai-agents-built-a-civilization-with-a-new-religion.html
+  - name: Semantic Scholar API
+    url: https://api.semanticscholar.org/graph/v1/paper/search
+  - name: itch.io search pages
+    url: https://itch.io/search?q=llm+society
+  closest:
+    name: SpaceMolt
+    kind: game
+    year: 2026
+    closeness: feature
+    source: src-spacemolt-2026-readme
+    url: https://spacemolt-readme.static.hf.space/README.md
+  also:
+  - name: AI Society
+    kind: game
+    year: 2026
+    closeness: feature
+    source: src-steam-2026-ai-society
+    url: https://store.steampowered.com/app/4468180/AI_Society/
+  - name: Aivilization (HKUST)
+    kind: prototype
+    year: 2025
+    closeness: feature
+    url: https://hkust.edu.hk/news/hkust-launches-worlds-largest-ai-powered-educational-sandbox-game-advancing-ai-literacy-and
+  novelty_before: 5
+  novelty: 3
+  verdict: SpaceMolt, a free persistent game whose players are language-model agents that their owners
+    watch and coach, had more than 350 agents in February 2026, and AI Society runs a smaller local-model
+    town on Steam. Watching a language-agent society has shipped, so neither 5 nor 4 holds. The gardener
+    design, with seeded worlds, rare god-scale interventions, and a chronicle, has not, which is anchor
+    3.
+- opportunity: local-first-ai-sims
+  date: '2026-11-01'
+  queries:
+  - q: '"AI People" GoodAI early access Steam LLM NPCs sandbox'
+    where: web
+  - q: NARAKA BLADEPOINT AI teammate NVIDIA ACE available now local inference PC launch 2025
+    where: web
+  - q: local LLM / LLM simulation / 4X LLM / AI diplomacy language model
+    where: steam
+  - q: 'NARAKA: BLADEPOINT announcements mentioning NVIDIA or AI teammate (400 items, 2021-2026)'
+    where: steam-news
+  - q: abs:"small language model" AND abs:NPC; abs:on-device AND LLM AND game AND NPC
+    where: arxiv
+  where:
+  - arxiv
+  - steam
+  - steam-news
+  - web
+  coverage: full
+  checked:
+  - name: inZOI on Steam
+    url: https://store.steampowered.com/app/2456740/inZOI/
+  - name: AI Society on Steam
+    url: https://store.steampowered.com/app/4468180/AI_Society/
+  - name: 'Broken Rift: Dominion on Steam'
+    url: https://store.steampowered.com/app/5122860/
+  - name: NVIDIA ACE for Games (developer page)
+    url: https://developer.nvidia.com/ace
+  - name: NVIDIA ACE autonomous game characters
+    url: https://www.nvidia.com/en-us/geforce/news/nvidia-ace-autonomous-ai-companions-pubg-naraka-bladepoint/
+  - name: 'NARAKA: BLADEPOINT Steam announcements (news API)'
+    url: https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=1203220&count=400&maxlength=0&format=json
+  - name: Fixed-Persona SLMs with Modular Memory (arXiv 2511.10277)
+    url: https://arxiv.org/abs/2511.10277
+  closest:
+    name: inZOI
+    kind: game
+    year: 2025
+    closeness: design
+    source: src-steam-2025-inzoi
+    url: https://store.steampowered.com/app/2456740/inZOI/
+  also:
+  - name: AI Society
+    kind: game
+    year: 2026
+    closeness: design
+    source: src-steam-2026-ai-society
+    url: https://store.steampowered.com/app/4468180/AI_Society/
+  - name: 'Broken Rift: Dominion (demo)'
+    kind: prototype
+    year: 2026
+    closeness: design
+    source: src-steam-2026-broken-rift-dominion
+    url: https://store.steampowered.com/app/5122860/
+  novelty_before: 2
+  novelty: 2
+  verdict: On-device language models already run runtime features in a large life sim (inZOI, 2025) and
+    in small Steam titles that need no connection, so the idea is known and rarely executed, anchor 2.
+    The stored 2 stands.
+- opportunity: mean-field-crowds
+  date: '2026-11-01'
+  queries:
+  - q: Supreme Commander 2 flow field pathfinding continuum crowds Elijah Emerson
+    where: web
+  - q: Planet Coaster crowd simulation flow fields guests Frontier GDC talk
+    where: web
+  - q: '"Planet Coaster" crowd "flow field" OR "fluid dynamics" OR "vector field" guests pathing Jonny
+      Wilcox'
+    where: web
+  - q: Planet Coaster Wilcox crowd simulation research fluid flow interview Edge 2016 guests move
+    where: web
+  - q: SimCity 4 traffic simulator how it works commuters pathfinding congestion recalculated Network
+      Addon Mod
+    where: web
+  - q: city builder game traffic simulation "flow field" OR "continuum" OR "macroscopic traffic model"
+      developer blog devlog
+    where: web
+  - q: '"flow field" pathfinding city builder OR colony sim thousands of citizens devlog Songs of Syx
+      OR Diplomacy is Not an Option OR They Are Billions'
+    where: web
+  - q: Treuille "Continuum Crowds" "Supreme Commander 2" / "University of Washington" "Supreme Commander
+      2" crowd flow
+    where: web
+  - q: abs:"mean field game" AND abs:crowd
+    where: arxiv
+  - q: abs:"mean field game" AND abs:traffic AND abs:route
+    where: arxiv
+  where:
+  - arxiv
+  - web
+  coverage: partial
+  coverage_note: 'No storefront search was run: the session''s shared web-search budget ran out. A fuller
+    search can only find closer prior art, which could lower the ceiling, not raise it.'
+  checked:
+  - name: Meet the team Q&A - Owen Mc Carthy (Frontier Forums, archived copy)
+    url: https://web.archive.org/web/20250807115146/https://forums.frontier.co.uk/threads/meet-the-team-q-a-owen-mc-carthy.494627/
+  - name: Best Coast (Edge, 2016-09-15, PressReader)
+    url: https://www.pressreader.com/australia/edge/20160915/282544427753277
+  - name: Audiokinetic blog, Planet Coaster crowd management part 1
+    url: https://blog.audiokinetic.com/en/planet-coaster-part-1-crowd-management-using-data-to-generate-dynamic-crowd-audio/
+  - name: Frontier site nodes 762/763 (Planet Coaster crowd management/audio)
+    url: https://www.frontier.co.uk/node/762
+  - name: Supreme Commander 2 pathfinding (Wildfire Games forum)
+    url: https://wildfiregames.com/forum/topic/16018-supreme-commander-2-pathfinding/
+  - name: Deuxieme mise a jour pour Supreme Commander 2 (paperblog.fr, 2010)
+    url: https://www.paperblog.fr/2930838/deuxieme-mise-a-jour-pour-supreme-commander-2/amp
+  - name: Continuum Crowds project page (UW GRAIL)
+    url: https://grail.cs.washington.edu/projects/continuum-crowds
+  - name: Game AI Pro index
+    url: http://www.gameaipro.com/
+  - name: Supreme Commander 2 (Wikipedia) and Blue's News fact sheet
+    url: https://en.wikipedia.org/wiki/Supreme_Commander_2
+  - name: 'Solving N-player dynamic routing games with congestion: a mean field approach (arXiv 2110.11943)'
+    url: https://arxiv.org/abs/2110.11943
+  closest:
+    name: Planet Coaster guest crowd
+    kind: game
+    year: 2016
+    closeness: feature
+    source: src-frontier-2016-owen-mccarthy-qa
+    url: https://forums.frontier.co.uk/threads/meet-the-team-q-a-owen-mc-carthy.494627/
+  also:
+  - name: Supreme Commander 2 flow-field pathfinding
+    kind: game
+    year: 2010
+    closeness: feature
+    url: https://wildfiregames.com/forum/topic/16018-supreme-commander-2-pathfinding/
+  - name: Mean-field dynamic routing games (Cabannes et al.)
+    kind: research
+    year: 2021
+    closeness: adjacent
+    url: https://arxiv.org/abs/2110.11943
+  novelty_before: 4
+  novelty: 3
+  verdict: Planet Coaster's programmer describes a fluid-dynamics, that is continuum, model of its guest
+    crowd, the population of a management sim, and Supreme Commander 2 marketed continuum-crowd pathfinding.
+    A mean-field route-choice equilibrium for city traffic is unshipped, so this is anchor 3, not 4.
+- opportunity: mechanic-discovery-search
+  date: '2026-11-01'
+  queries:
+  - q: Yavalath Ludi evolved game commercially published nestorgames
+    where: web
+  - q: '"A Puzzling Present" Mechanic Miner ANGELINA game mechanics generated released'
+    where: web
+  - q: commercial game mechanic discovered by evolutionary algorithm rule search published board game
+      AI-designed rules
+    where: web
+  - q: commercial video game whose core rules were invented by an AI search system developer credits algorithm
+      with designing the mechanic
+    where: web
+  - q: Gamika Wevva app evolved casual games Powley Colton released
+    where: web
+  - q: evolving game mechanics large language model quality diversity
+    where: semantic-scholar
+  - q: abs:mechanics AND abs:evolving AND abs:game AND abs:design (sorted by date)
+    where: arxiv
+  where:
+  - arxiv
+  - semantic-scholar
+  - web
+  coverage: partial
+  coverage_note: 'No storefront search was run: the session''s shared web-search budget ran out. A fuller
+    search can only find closer prior art, which could lower the ceiling, not raise it.'
+  checked:
+  - name: Cameron's Yavalath Page (cambolbro.com)
+    url: https://www.cambolbro.com/games/yavalath/
+  - name: Evolutionary game design (Browne and Maire 2010), QUT ePrints record
+    url: https://eprints.qut.edu.au/31909/
+  - name: 'Opinionated Gamers: Cameron Browne''s Automatic generation and evaluation of recombination
+      games (2018)'
+    url: https://opinionatedgamers.com/2018/04/23/james-nathan-cameron-brownes-automatic-generation-and-evaluation-of-recombination-games/
+  - name: 'Imperial College news: AI computer program develops free downloadable game for Christmas (2012-12-18)'
+    url: https://imperial.ac.uk/news/117527/ai-computer-program-develops-free-downloadable
+  - name: 'Mortar: Evolving Mechanics for Automatic Game Design (arXiv 2601.00105, 2025-12-31)'
+    url: https://arxiv.org/abs/2601.00105
+  - name: cameronius.com Yavalath page
+    url: http://www.cameronius.com/games/yavalath/
+  - name: 'BGG designer diary: Yavalath evolutionary game design'
+    url: https://boardgamegeek.com/blogpost/2814/yavalath-evolutionary-game-design
+  - name: Semantic Scholar API
+    url: https://api.semanticscholar.org/graph/v1/paper/search
+  closest:
+    name: Yavalath (rules evolved by Ludi)
+    kind: game
+    year: 2008
+    closeness: feature
+    source: src-browne-2026-yavalath
+    url: https://www.cambolbro.com/games/yavalath/
+  also:
+  - name: A Puzzling Present (ANGELINA's Mechanic Miner)
+    kind: game
+    year: 2012
+    closeness: feature
+    source: src-imperial-2012-angelina-puzzling-present
+    url: https://imperial.ac.uk/news/117527/ai-computer-program-develops-free-downloadable
+  - name: Mortar
+    kind: research
+    year: 2025
+    closeness: adjacent
+    url: https://arxiv.org/abs/2601.00105
+  novelty_before: 5
+  novelty: 3
+  verdict: Commercially published games already credit their rules to automated search (Yavalath and Pentalath,
+    evolved by Browne's Ludi), and a released game's mechanics were invented by ANGELINA's Mechanic Miner
+    in 2012. Shipped precedents rule out 5 and 4; language-model-guided search over simulation mechanics
+    with agent populations is the new combination, anchor 3.
+- opportunity: natural-language-legislation
+  date: '2026-11-01'
+  queries:
+  - q: game where you write your own laws in plain text AI simulation politics
+    where: web
+  - q: Steam LLM political simulation game "write any law" or "type any policy"
+    where: web
+  - q: AI nation simulator game players propose policies free text large language model country leader
+      game 2025
+    where: web
+  - q: mod ChatGPT write custom law decree grand strategy game LLM mod Victoria 3 OR Crusader Kings OR
+      Hearts of Iron free text
+    where: web
+  - q: natural language policy game large language model legislation simulation
+    where: semantic-scholar
+  - q: all:language AND all:legislation AND all:simulation
+    where: arxiv
+  - q: AI laws natural language
+    where: steam
+  - q: write laws AI
+    where: itch.io
+  where:
+  - arxiv
+  - itch.io
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
+  checked:
+  - name: EQUILIBRIUM (Steam, Obliquon Corporation)
+    url: https://store.steampowered.com/app/4661850/
+  - name: AI Democracy (GitHub, cosmin-novac)
+    url: https://github.com/cosmin-novac/aidemocracy
+  - name: Lawmaker (browser game) wiki
+    url: https://wiki.lawmakergame.com/gameplay/legislation/
+  - name: Mandat (Steam, JL Games Studio)
+    url: https://store.steampowered.com/app/4898150/Mandat/
+  - name: PlayPotus (Veronata) via Stork.ai listing
+    url: https://www.stork.ai/tool/playpotus
+  - name: House of Bill (itch.io)
+    url: https://thomasasia.itch.io/house-of-bill
+  - name: NomicLaw (arXiv 2508.05344)
+    url: https://arxiv.org/abs/2508.05344
+  - name: Large Legislative Models (arXiv 2410.08345)
+    url: https://arxiv.org/abs/2410.08345
+  - name: Semantic Scholar API
+    url: https://api.semanticscholar.org/graph/v1/paper/search
+  closest:
+    name: EQUILIBRIUM
+    kind: game
+    year: 2026
+    closeness: feature
+    source: src-steam-2026-equilibrium
+    url: https://store.steampowered.com/app/4661850/
+  also:
+  - name: AI Democracy
+    kind: prototype
+    year: 2023
+    closeness: feature
+    url: https://github.com/cosmin-novac/aidemocracy
+  - name: Lawmaker
+    kind: game
+    year: 2026
+    closeness: feature
+    url: https://wiki.lawmakergame.com/gameplay/legislation/
+  novelty_before: 4
+  novelty: 3
+  verdict: A Steam early-access game (EQUILIBRIUM, September 2026) turns typed laws into structured, engine-clamped
+    effects on its economy with a parliamentary vote, the prediction's feature. In-character interest
+    groups grounded in welfare are unshipped, so this is a new combination with partial precedents, 3,
+    not 4.
+- opportunity: negotiating-faction-ai
+  date: '2026-11-01'
+  queries:
+  - q: LLM diplomacy mod strategy game AI leaders negotiate in natural language Civilization Stellaris
+      Crusader Kings mod
+    where: web
+  - q: Vox Deorum Civilization V LLM strategist Vox Populi arXiv
+    where: web
+  - q: '"Voices of the Court" Crusader Kings III mod LLM characters actions'
+    where: web
+  - q: Bannerlord "AI Influence" mod LLM lords diplomacy kingdoms negotiate war peace Nexus
+    where: web
+  - q: LLM diplomacy / AI diplomacy language model / negotiate AI leaders / 4X LLM / AI envoy
+    where: steam
+  - q: AI Influence (Bannerlord)
+    where: steam-workshop
+  - q: abs:diplomacy AND abs:"4X" AND abs:LLM; abs:Unciv AND abs:LLM; abs:"Crusader Kings"
+    where: arxiv
+  where:
+  - arxiv
+  - steam
+  - steam-workshop
+  - web
+  coverage: full
+  checked:
+  - name: 'Broken Rift: Dominion on Steam (Last Exit Diner, release 2026-11-03)'
+    url: https://store.steampowered.com/app/5122860/
+  - name: AI Influence [AI Diplomacy] (Bannerlord Steam Workshop, 2025-10-10)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3584621421
+  - name: Voices of the Court (GitHub)
+    url: https://github.com/Demeter29/Voices_of_the_Court
+  - name: Vox Deorum (arXiv 2512.18564)
+    url: https://arxiv.org/abs/2512.18564
+  - name: Digital Player / CivAgent (arXiv 2502.20807)
+    url: https://arxiv.org/abs/2502.20807
+  - name: 'Global Protocol: New World Order on Steam'
+    url: https://store.steampowered.com/app/4500270/
+  - name: Warrior Quest on Steam
+    url: https://store.steampowered.com/app/4970750/
+  - name: catalogue.smods.ru mirror of AI Influence
+    url: https://catalogue.smods.ru/archives/402946
+  closest:
+    name: AI Influence [AI Diplomacy] (Bannerlord mod)
+    kind: mod
+    year: 2025
+    closeness: feature
+    source: src-mfive-2025-ai-influence
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3584621421
+  also:
+  - name: 'Broken Rift: Dominion (demo; release planned for 2026-11-03)'
+    kind: prototype
+    year: 2026
+    closeness: design
+    source: src-steam-2026-broken-rift-dominion
+    url: https://store.steampowered.com/app/5122860/
+  - name: Vox Deorum (Civilization V research build)
+    kind: research
+    year: 2025
+    closeness: adjacent
+    url: https://arxiv.org/abs/2512.18564
+  novelty_before: 3
+  novelty: 3
+  verdict: A widely used Bannerlord mod has language-model rulers negotiate and decide war and peace,
+    and an indie 4X demo writes its factions' diplomacy with a packaged model over game-state evaluation.
+    No released grand strategy or 4X title does it, so the stored 3, new combination with partial precedents,
+    stands.
+- opportunity: neural-npc-motion
+  date: '2026-11-01'
+  queries: []
+  not_run:
+  - q: 'colony sim reinforcement learning physics-based animation villagers (not run: web-search budget
+      exhausted)'
+    where: web
+  - q: shipped game trained policy physics character locomotion crowd
+    where: web
+  - q: ARC Raiders reinforcement learning robot locomotion physics
+    where: web
+  - q: physics-based pedestrian crowd controller reinforcement learning
+    where: semantic-scholar
+  - q: physics based animation colony
+    where: steam
+  where:
+  - direct
+  coverage: partial
+  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
+    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
+    it.'
+  checked:
+  - name: Evolution by Keiwan (itch.io)
+    url: https://keiwan.itch.io/evolution
+  - name: Trace and Pace (arXiv 2304.01893)
+    url: https://arxiv.org/abs/2304.01893
+  - name: inZOI on Steam
+    url: https://store.steampowered.com/app/2456740/inZOI/
+  - name: 'Gran Turismo 7: Race Together with GT Sophy'
+    url: https://www.gran-turismo.com/us/gt7/news/00_5962264.html
+  - name: 'ARC Raiders: Evolution of ARC Raiders EP3'
+    url: https://arcraiders.com/news/evolution-of-arc-raiders-episode-3
+  closest:
+    name: Evolution (Keiwan)
+    kind: game
+    year: null
+    closeness: feature
+    source: src-keiwan-2026-evolution
+    url: https://keiwan.itch.io/evolution
+  also:
+  - name: Gran Turismo Sophy in Gran Turismo 7
+    kind: official
+    year: 2023
+    closeness: feature
+    source: src-polyphony-2023-gt-sophy-race-together
+    url: https://www.gran-turismo.com/us/gt7/news/00_5962264.html
+  - name: Trace and Pace
+    kind: research
+    year: 2023
+    closeness: adjacent
+    url: https://arxiv.org/abs/2304.01893
+  novelty_before: 3
+  novelty: 3
+  verdict: Trained neural controllers drive physics bodies in released games outside the genre (Evolution's
+    creatures, Gran Turismo Sophy's cars), and physics controllers for crowds exist in research; no management
+    sim drives its population this way. The stored 3 stands.
+- opportunity: open-ended-evolution-sandbox
+  date: '2026-11-01'
+  queries:
+  - q: Steam game Lenia artificial life continuous cellular automata
+    where: web
+  - q: neural cellular automata game released itch.io Steam
+    where: web
+  - q: Lenia game itch.io creatures evolve sandbox Flow-Lenia playable
+    where: web
+  - q: Steam game "Lenia" OR "Flow-Lenia" OR "neural cellular automata" store page 2025 2026 evolution
+      simulation
+    where: web
+  - q: '"neural cellular automata" in a commercial video game shipped'
+    where: web
+  - q: lenia; cellular automata; neural cellular; artificial life; particle life; evolution sandbox; evolution
+      simulator; open-ended evolution; alife
+    where: steam
+  - q: lenia
+    where: itch.io
+  where:
+  - itch.io
+  - steam
+  - web
+  coverage: partial
+  coverage_note: 'No scholarly search was run: the session''s shared web-search budget ran out. A fuller
+    search can only find closer prior art, which could lower the ceiling, not raise it.'
+  checked:
+  - name: Steam search 'lenia'
+    url: https://store.steampowered.com/search/?term=lenia
+  - name: Steam searches 'cellular automata', 'neural cellular', 'artificial life', 'evolution sandbox',
+      'alife'
+    url: https://store.steampowered.com/search/?term=cellular+automata
+  - name: Vivarium (Matt Hodges, itch.io)
+    url: https://matthodges.itch.io/vivarium
+  - name: Particular (leonbzt, itch.io)
+    url: https://leonbzt.itch.io/particular
+  - name: itch.io search 'lenia'
+    url: https://itch.io/search?q=lenia
+  - name: 'Automata Quest: NCAs as a Video Game Life Mechanic (arXiv 2309.14364)'
+    url: https://arxiv.org/abs/2309.14364
+  closest:
+    name: Vivarium
+    kind: game
+    year: 2026
+    closeness: feature
+    source: src-hodges-2026-vivarium
+    url: https://matthodges.itch.io/vivarium
+  also:
+  - name: Particular (in development)
+    kind: prototype
+    year: 2026
+    closeness: feature
+    url: https://leonbzt.itch.io/particular
+  - name: Automata Quest
+    kind: research
+    year: 2023
+    closeness: adjacent
+    url: https://arxiv.org/abs/2309.14364
+  novelty_before: 4
+  novelty: 3
+  verdict: A released free sandbox already runs on Lenia (Vivarium), and an in-development web game evolves
+    Particle Lenia creatures, but neither evolves open-ended forms with automated discovery. A shipped
+    Lenia sandbox is a partial precedent, so between 3 and 4 the lower is taken.
+- opportunity: parallel-autobalance
+  date: '2026-11-01'
+  queries:
+  - q: developers ran thousands of AI-only games overnight to balance economy strategy game dev diary
+      automated tests balance
+    where: web
+  - q: game studio used bots simulating millions of games to balance card game before release blog
+    where: web
+  - q: Machinations.io game economy simulation used by studios case study balance before launch
+    where: web
+  - q: Paradox dev diary "observer" AI runs automated testing balance economy Victoria 3 OR Stellaris
+      OR "Europa Universalis V"
+    where: web
+  - q: Unity Game Simulation press release studio balanced game economy simulated playthroughs customer
+    where: web
+  - q: GDC talk automated balancing simulation bots game economy "Monte Carlo" playthroughs free-to-play
+      studio talk
+    where: web
+  - q: Prismata AI used to balance units playtesting Lunarch Hierarchical Portfolio Search balance
+    where: web
+  - q: '"autoplay" AI-only games balance testing Civilization OR "Old World" OR "Humankind"'
+    where: web
+  - q: Offworld Trading Company AI versus AI automated games balance testing Soren Johnson
+    where: web
+  - q: '"economy" balance "simulated players" OR "AI agents" pre-launch city builder OR colony sim developer
+      blog'
+    where: web
+  where:
+  - web
+  coverage: partial
+  coverage_note: 'No scholarly or storefront search was run: the session''s shared web-search budget ran
+    out. A fuller search can only find closer prior art, which could lower the ceiling, not raise it.'
+  checked:
+  - name: Exploring Gameplay With AI Agents (EA; arXiv 1811.06962, AIIDE 2018)
+    url: https://arxiv.org/abs/1811.06962
+  - name: Unity Game Simulation press release (2020-03-23)
+    url: https://unity.com/news/unity-releases-cloud-based-simulation-solution-help-game-creators-achieve
+  - name: 'GEEvo: Game Economy Generation and Balancing with Evolutionary Algorithms (arXiv 2404.18574)'
+    url: https://arxiv.org/abs/2404.18574
+  - name: 'Stellaris Dev Diary #385 AI Benchmarks (Paradox forum)'
+    url: https://forum.paradoxplaza.com/forum/developer-diary/stellaris-dev-diary-385-ai-benchmarks.1756633/
+  - name: Unity Game Simulation case studies (iLLOGIKA Rogue Racers; Furyion Death Carnival)
+    url: https://unity.com/case-study/illogika
+  closest:
+    name: EA's agent playtesting of The Sims Mobile
+    kind: official
+    year: 2018
+    closeness: design
+    source: src-silva-2018-exploring-gameplay-ai-agents
+    url: https://arxiv.org/abs/1811.06962
+  also:
+  - name: Unity Game Simulation
+    kind: outside
+    year: 2020
+    closeness: feature
+    url: https://unity.com/news/unity-releases-cloud-based-simulation-solution-help-game-creators-achieve
+  novelty_before: 2
+  novelty: 2
+  verdict: A studio has published thousands of agent simulations used to rebalance a released simulation
+    game's economy of actions and rewards (EA, The Sims Mobile, 2018), so the idea is known and rarely
+    done at scale, anchor 2. The stored 2 stands.
+- opportunity: participatory-planning-sandboxes
+  date: '2026-11-01'
+  queries:
+  - q: A/B Street traffic simulation game used by council consultation low traffic neighbourhood
+    where: web
+  - q: city council planning consultation AI simulated residents personas LLM 2025
+    where: web
+  - q: CityScope Hamburg FindingPlaces citizen participation refugee housing interactive simulation
+    where: web
+  - q: 'Cities: Skylines used by city planners official public consultation'
+    where: web
+  - q: digital twin agent-based simulation of residents used in official public participation urban plan
+      city
+    where: web
+  - q: '"synthetic residents" OR "virtual residents" public consultation planning AI council pilot'
+    where: web
+  - q: participatory urban planning simulation game residents agent-based
+    where: semantic-scholar
+  - q: id_list 2402.17161 (LLM participatory urban planning)
+    where: arxiv
+  where:
+  - arxiv
+  - semantic-scholar
+  - web
+  coverage: full
+  checked:
+  - name: Finding Places (City Science Lab, HafenCity University)
+    url: https://www.citysciencelab.hamburg/projects/findingplaces
+  - name: 'Cities: Skylines used by Swedish city planners (PC Gamer, 2016-08-23)'
+    url: https://www.pcgamer.com/uk/cities-skylines-used-by-swedish-city-planners-to-design-new-city-district
+  - name: PlayStation Consultation (Lichfields blog, 2018)
+    url: https://lichfields.uk/blog/2018/august/15/playstation-consultation
+  - name: Urban Development Simulator, Ruse (REAL CORP 2014)
+    url: https://repository.corp.at/258
+  - name: Large Language Model for Participatory Urban Planning (Zhou et al., arXiv 2402.17161)
+    url: https://arxiv.org/abs/2402.17161
+  - name: 'Generative AI in Participatory Urban Planning: Synthetic Inhabitants and Experts (Univ. of
+      Turku, Land 2026)'
+    url: https://www.utupub.fi/handle/11111/60684
+  - name: AI 'Virtual Residents' Offer Early Read on Data Center Sentiment (Data Center Knowledge)
+    url: https://datacenterknowledge.com/data-center-site-selection/ai-virtual-residents-offer-early-read-on-data-center-sentiment
+  - name: A/B Street README
+    url: https://raw.githubusercontent.com/a-b-street/abstreet/main/README.md
+  closest:
+    name: 'Cities: Skylines workshop with Stockholm officials'
+    kind: game
+    year: 2016
+    closeness: feature
+    source: src-pcgamer-2016-cities-skylines-stockholm
+    url: https://www.pcgamer.com/uk/cities-skylines-used-by-swedish-city-planners-to-design-new-city-district
+  also:
+  - name: Finding Places (Hamburg)
+    kind: outside
+    year: 2016
+    closeness: feature
+    source: src-hcu-2016-finding-places
+    url: https://www.citysciencelab.hamburg/projects/findingplaces
+  - name: Large Language Model for Participatory Urban Planning
+    kind: research
+    year: 2024
+    closeness: adjacent
+    url: https://arxiv.org/abs/2402.17161
+  novelty_before: 3
+  novelty: 3
+  verdict: Stockholm officials have planned a district in Cities, Skylines, whose citizens are simulated
+    but uncalibrated, and Hamburg ran an official consultation on interactive CityScope models without
+    simulated residents. Each half has partial precedents; the stored 3 stands.
+- opportunity: placement-that-tells-stories
+  date: '2026-11-01'
+  queries:
+  - q: city builder where placing buildings triggers story events about named villagers neighbors
+    where: web
+  - q: LLM city builder game villagers generative AI stories react to buildings you place Steam 2025 2026
+    where: web
+  - q: city builder "each villager" has a name and story events "where you build" narrative city builder
+    where: web
+  - q: city builder adjacency events villagers react to neighboring buildings tavern next to temple event
+      chain indie 2024 2025
+    where: web
+  - q: SimCity 4 "My Sim" mode move sim into house comments about neighborhood
+    where: web
+  - q: Dragon Quest Builders 2 villagers named rooms build requests story events
+    where: web
+  - q: city building game narrative generation inhabitants events
+    where: semantic-scholar
+  - q: all:"city-building" AND all:narrative; all:"emergent narrative" AND all:simulation
+    where: arxiv
+  - q: city builder villagers stories
+    where: steam
+  - q: LLM city builder
+    where: itch.io
+  where:
+  - arxiv
+  - itch.io
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
+  checked:
+  - name: Heard of the Story? (Steam, Shasaur)
+    url: https://store.steampowered.com/app/1881940
+  - name: Town to City (Steam, Galaxy Grove / Kwalee)
+    url: https://store.steampowered.com/app/3115220/
+  - name: 'Dwarf Fortress Wiki: Petition'
+    url: https://dwarffortresswiki.org/index.php/Petition
+  - name: Dragon Quest Builders 2 room preference (fan wiki, search snippet only)
+    url: https://dragon-quest.org/wiki/Room_preference
+  - name: Project Highrise tenant noise (Steam forum, search snippet only)
+    url: https://steamcommunity.com/app/423580/discussions/0/343786195669049630
+  - name: SimCity 4 My Sim mode (search snippets only)
+    url: https://en.wikipedia.org/wiki/SimCity_4
+  - name: Generative Agents (arXiv 2304.03442)
+    url: https://arxiv.org/abs/2304.03442
+  - name: Semantic Scholar API
+    url: https://api.semanticscholar.org/graph/v1/paper/search
+  closest:
+    name: Heard of the Story?
+    kind: game
+    year: 2023
+    closeness: feature
+    source: src-steam-2023-heard-of-the-story
+    url: https://store.steampowered.com/app/1881940
+  also:
+  - name: Town to City
+    kind: game
+    year: 2026
+    closeness: feature
+    url: https://store.steampowered.com/app/3115220/
+  - name: Dwarf Fortress petitions
+    kind: game
+    year: null
+    closeness: feature
+    url: https://dwarffortresswiki.org/index.php/Petition
+  novelty_before: 4
+  novelty: 3
+  verdict: A city builder already ties its individually written villagers' lives and dialogue to the buildings
+    the player places (Heard of the Story?, 2023), and others tie named residents' requests to what is
+    built, though none fires discrete events from placement or adjacency. Partial precedents, so the score
+    falls from 4 to 3.
+- opportunity: qd-scenario-libraries
+  date: '2026-11-01'
+  queries:
+  - q: MAP-Elites level generation used in a commercial released game levels shipped quality diversity
+    where: web
+  - q: puzzle game levels generated by evolutionary algorithm solver verified released Steam developer
+      blog generated levels difficulty
+    where: web
+  - q: '"quality diversity" OR "MAP-Elites" game studio GDC talk content generation production'
+    where: web
+  - q: indie game "MAP-Elites" levels devlog released game uses MAP-Elites to generate
+    where: web
+  - q: map-elites; "quality diversity"
+    where: itch.io
+  - q: abs:"MAP-Elites" AND abs:levels AND abs:players; ti:Elimination AND ti:Design AND ti:Analysis
+    where: arxiv
+  where:
+  - arxiv
+  - itch.io
+  - web
+  coverage: full
+  checked:
+  - name: ELIMINATION from Design to Analysis (arXiv 1905.06379)
+    url: https://arxiv.org/abs/1905.06379
+  - name: Hexcells Infinite (Steam)
+    url: https://store.steampowered.com/app/304410/Hexcells_Infinite/
+  - name: Empowering Quality Diversity in Dungeon Design with Interactive Constrained MAP-Elites (arXiv
+      1906.05175)
+    url: https://arxiv.org/abs/1906.05175
+  - name: itch.io searches 'map-elites' and '"quality diversity"'
+    url: https://itch.io/search?q=map-elites
+  closest:
+    name: ELIMINATION
+    kind: game
+    year: 2019
+    closeness: feature
+    source: src-khalifa-2019-elimination
+    url: https://arxiv.org/abs/1905.06379
+  also:
+  - name: Hexcells Infinite
+    kind: game
+    year: 2014
+    closeness: feature
+    url: https://store.steampowered.com/app/304410/Hexcells_Infinite/
+  - name: Evolutionary Dungeon Designer (constrained MAP-Elites)
+    kind: research
+    year: 2019
+    closeness: adjacent
+    url: https://arxiv.org/abs/1906.05175
+  novelty_before: 2
+  novelty: 2
+  verdict: Released games ship generated level sets (ELIMINATION's evolved levels with a designed difficulty
+    curve, Hexcells Infinite's generator), but no shipped game names quality-diversity search for its
+    levels. The anchors would allow 3; the stored 2 is not raised.
+- opportunity: salience-gated-llm-agents
+  date: '2026-11-01'
+  queries:
+  - q: RimTalk RimWorld mod LLM colonists conversations triggered events local model
+    where: web
+  - q: RimGPT mod RimWorld AI commentator reacts to game events ChatGPT brrainz
+    where: web
+  - q: RimWorld mod LLM generates mood thoughts memories when event happens death raid "thought" local
+      model
+    where: web
+  - q: inZOI Smart Zoi how it works on-device language model thoughts reflect daily plan official update
+      notes
+    where: web
+  - q: RimTalk (RimWorld)
+    where: steam-workshop
+  - q: inZOI announcements mentioning 'Smart Zoi' (192 items, 2025-03 to 2026-10)
+    where: steam-news
+  - q: abs:"generative agents" AND abs:cost AND abs:"LLM calls"
+    where: arxiv
+  where:
+  - arxiv
+  - steam-news
+  - steam-workshop
+  - web
+  coverage: full
+  checked:
+  - name: inZOI v0.3.0 & DLC patch notes (2025-08-20), Steam news API
+    url: https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=2456740&count=1&maxlength=0&enddate=1755669690&format=json
+  - name: inZOI v0.10.0 patch notes (2026-09-03), Steam news API
+    url: https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=2456740&count=1&maxlength=0&enddate=1788415349&format=json
+  - name: 'inZOI Steam news: Guidance on System Requirements for Using Smart Zoi (2025-03-26)'
+    url: https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=2456740&count=300&maxlength=0&format=json
+  - name: inZOI on Steam
+    url: https://store.steampowered.com/app/2456740/inZOI/
+  - name: NVIDIA ACE autonomous game characters (PUBG, inZOI, NARAKA)
+    url: https://www.nvidia.com/en-us/geforce/news/nvidia-ace-autonomous-ai-companions-pubg-naraka-bladepoint/
+  - name: RimTalk (Steam Workshop, 2025-08-17)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3551203752
+  - name: EchoColony (Steam Workshop, 2025-04-13)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3463505750
+  - name: Local AI Social Interactions (Steam Workshop, 2025-01-23)
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3413305419
+  - name: Lyfe Agents (arXiv 2310.02172)
+    url: https://arxiv.org/abs/2310.02172
+  - name: Affordable Generative Agents (arXiv 2402.02053)
+    url: https://arxiv.org/abs/2402.02053
+  closest:
+    name: inZOI Smart Zoi (v0.3.0 update)
+    kind: official
+    year: 2025
+    closeness: feature
+    source: src-krafton-2025-inzoi-v0-3-0-patch-notes
+    url: https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=2456740&count=1&maxlength=0&enddate=1755669690&format=json
+  also:
+  - name: RimTalk (RimWorld mod)
+    kind: mod
+    year: 2025
+    closeness: feature
+    url: https://steamcommunity.com/sharedfiles/filedetails/?id=3551203752
+  - name: Lyfe Agents
+    kind: research
+    year: 2023
+    closeness: adjacent
+    url: https://arxiv.org/abs/2310.02172
+  novelty_before: 3
+  novelty: 3
+  verdict: inZOI's on-device model writes inner thoughts after actions and at life events over a conventional
+    needs simulation, a narrower form of the opportunity without a salience threshold or a call budget,
+    and RimWorld mods add model dialogue over the vanilla utility AI. The stored 3 stands.
+- opportunity: scientists-not-tech-trees
+  date: '2026-11-01'
+  queries:
+  - q: scientists management / research lab tycoon / laboratory management researchers / university research
+      management
+    where: steam
+  - q: 'Dwarf Fortress scholar research discussion apprentice (direct wiki page: Scholar)'
+    where: wiki
+  - q: 'Hearts of Iron IV scientists special projects (direct wiki pages: Scientist, Special project)'
+    where: wiki
+  - q: Software Inc. team compatibility research (store page and official wiki Teams page)
+    where: wiki
+  - q: ti:"Virtual Lab" AND agents; abs:agent-based AND science AND collaboration AND discovery AND simulation
+    where: arxiv
+  where:
+  - arxiv
+  - steam
+  - wiki
+  coverage: partial
+  coverage_note: 'No web search was run: the session''s shared web-search budget ran out. A fuller search
+    can only find closer prior art, which could lower the ceiling, not raise it.'
+  checked:
+  - name: 'Dwarf Fortress Wiki: Scholar (v50)'
+    url: https://dwarffortresswiki.org/index.php/Scholar
+  - name: 'Hearts of Iron 4 Wiki: Scientist'
+    url: https://hoi4.paradoxwikis.com/Scientist
+  - name: 'Hearts of Iron 4 Wiki: Special project'
+    url: https://hoi4.paradoxwikis.com/Special_project
+  - name: Software Inc. on Steam
+    url: https://store.steampowered.com/app/362620/
+  - name: 'Software Inc. wiki: Teams'
+    url: https://softwareinc.coredumping.com/wiki/index.php/Teams
+  - name: AI Lab Tycoon on Steam
+    url: https://store.steampowered.com/app/5015590/
+  - name: Miskatonic University on Steam
+    url: https://store.steampowered.com/app/2478540/
+  - name: An agent-based model of interdisciplinary interactions in science (arXiv 2006.16399)
+    url: https://arxiv.org/abs/2006.16399
+  closest:
+    name: Dwarf Fortress scholars
+    kind: game
+    year: 2020
+    closeness: feature
+    source: src-dfwiki-2026-scholar
+    url: https://dwarffortresswiki.org/index.php/Scholar
+  also:
+  - name: 'Hearts of Iron IV: Gotterdammerung scientists'
+    kind: official
+    year: 2024
+    closeness: feature
+    url: https://hoi4.paradoxwikis.com/Special_project
+  - name: Software Inc.
+    kind: game
+    year: 2015
+    closeness: feature
+    url: https://store.steampowered.com/app/362620/
+  novelty_before: 3
+  novelty: 3
+  verdict: Named scholars in Dwarf Fortress research by discussing topics with each other and teach apprentices,
+    and named scientists lead projects in Hearts of Iron IV, but in neither do friendships or rivalries
+    change what is discovered. The stored 3 stands.
+- opportunity: sim-instructor-coach
+  date: '2026-11-01'
+  queries:
+  - q: Microsoft Flight Simulator flight training lessons instructor voice real-time feedback landing
+      grade
+    where: web
+  - q: AI voice racing coach sim racing real-time telemetry iRacing Trophi Mansell AI
+    where: web
+  - q: SayIntentions AI flight instructor CFI mode copilot feedback MSFS
+    where: web
+  - q: Microsoft Flight Simulator 2024 career flight training instructor real-time feedback official
+    where: web
+  - q: X-Plane flight school tutorial virtual instructor monitors your flying voice feedback
+    where: web
+  - q: EA Sports F1 race engineer radio voice commands official
+    where: web
+  - q: Assetto Corsa EVO Driving Academy instructor feedback voice lessons official
+    where: web
+  - q: AI flight instructor simulator feedback language model
+    where: semantic-scholar
+  - q: abs:"flight simulator" AND abs:"language model"; abs:racing AND abs:coaching
+    where: arxiv
+  - q: AI flight instructor; racing coach
+    where: steam
+  where:
+  - arxiv
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
+  checked:
+  - name: What should I do first in Microsoft Flight Simulator? (official guide)
+    url: https://www.flightsimulator.com/guide/what-should-i-do-first-in-microsoft-flight-simulator/
+  - name: Microsoft Flight Simulator (2020)/Flight Training (flight.wiki.gg)
+    url: https://flight.wiki.gg/wiki/Microsoft_Flight_Simulator_(2020)/Flight_Training
+  - name: MSFS forum threads on Flight Training
+    url: https://forums.flightsimulator.com/t/poor-state-of-fs2020-flying-lessons/444377
+  - name: Microsoft Flight Simulator 2024 Career mode (Xbox Wire)
+    url: https://news.xbox.com/en-us/2024/11/15/microsoft-flight-simulator-2024-creating-career-mode-for-all-players/
+  - name: FS Flying School Pro 2015 (Just Flight)
+    url: https://www.justflight.com/product/fs-flying-school-pro-2015
+  - name: trophi.ai sim racing coaching (Mansell)
+    url: https://www.trophi.ai/sim-racing-coaching
+  - name: SimInstructorAI goes live (MSFS Addons, 2026-01-13)
+    url: https://msfsaddons.com/2026/01/13/siminstructor-ai-goes-live-a-cfi-trained-no-subscription-ai-mentor-for-msfs/
+  - name: EA F1 22 accessibility, audio settings
+    url: https://www.ea.com/able/resources/f1-22/pc/audio
+  - name: Virtu-Pilot (Steam)
+    url: https://store.steampowered.com/app/2612420/VirtuPilot/
+  - name: Semantic Scholar API
+    url: https://api.semanticscholar.org/graph/v1/paper/search?query=AI+flight+instructor+simulator+feedback+language+model
+  - name: SimCoachCorpus (arXiv 2509.14548)
+    url: https://arxiv.org/abs/2509.14548
+  - name: AI Coaching for Accelerating Human Skill Development with Reinforcement Learning (arXiv 2606.25337)
+    url: https://arxiv.org/abs/2606.25337
+  closest:
+    name: FS Flying School
+    kind: mod
+    year: 2015
+    closeness: design
+    source: src-justflight-2015-fs-flying-school-pro
+    url: https://www.justflight.com/product/fs-flying-school-pro-2015
+  also:
+  - name: Microsoft Flight Simulator Flight Training (virtual instructor)
+    kind: official
+    year: 2020
+    closeness: feature
+    url: https://www.flightsimulator.com/guide/what-should-i-do-first-in-microsoft-flight-simulator/
+  novelty_before: 2
+  novelty: 2
+  verdict: Talking instructors that watch the flight and warn of mistakes have shipped for years as third-party
+    add-ons, and official sims ship scripted voiced lessons; the stored 2 stands.
+- opportunity: sims-as-agent-benchmarks
+  date: '2026-11-01'
+  queries: []
+  not_run:
+  - q: Factorio Learning Environment Wube official
+    where: web
+  - q: game developer official headless API reinforcement learning research release
+    where: web
+  - q: simulation game studio benchmark for AI agents official repository
+    where: web
+  - q: official game API for AI research environment developer
+    where: semantic-scholar
+  where:
+  - direct
+  coverage: partial
+  coverage_note: 'No web, scholarly, or storefront search was run: the session''s shared web-search budget
+    ran out. A fuller search can only find closer prior art, which could lower the ceiling, not raise
+    it.'
+  checked:
+  - name: Factorio Learning Environment (GitHub)
+    url: https://github.com/JackHopkins/factorio-learning-environment
+  - name: Factorio wiki, Multiplayer (headless server)
+    url: https://wiki.factorio.com/Multiplayer
+  - name: Blizzard s2client-proto (StarCraft II API)
+    url: https://github.com/Blizzard/s2client-proto
+  - name: Microsoft Project Malmo
+    url: https://github.com/microsoft/malmo
+  - name: OpenTTD Script / NoAI wiki
+    url: https://wiki.openttd.org/en/Development/Script/
+  - name: OpenTTD AI API docs
+    url: https://docs.openttd.org/ai-api/
+  - name: 'Screeps: World (Steam)'
+    url: https://store.steampowered.com/app/464350/Screeps_World/
+  - name: RLBot
+    url: https://rlbot.org/
+  - name: Valve Dota Bot Scripting wiki
+    url: https://developer.valvesoftware.com/wiki/Dota_Bot_Scripting
+  closest:
+    name: StarCraft II API (Blizzard)
+    kind: official
+    year: 2017
+    closeness: design
+    source: src-blizzard-2017-s2client-proto
+    url: https://github.com/Blizzard/s2client-proto
+  also:
+  - name: Project Malmo (Microsoft, on Minecraft)
+    kind: official
+    year: 2016
+    closeness: design
+    url: https://github.com/microsoft/malmo
+  - name: OpenTTD script API
+    kind: official
+    year: 2009
+    closeness: feature
+    url: https://wiki.openttd.org/en/Development/Script/
+  - name: Factorio Learning Environment (third party)
+    kind: research
+    year: 2025
+    closeness: adjacent
+    source: src-hopkins-2025-factorio-learning-environment
+    url: https://arxiv.org/abs/2503.09617
+  novelty_before: 2
+  novelty: 2
+  verdict: Game owners have officially released research APIs with headless builds before (Blizzard's
+    StarCraft II API in 2017, Microsoft's Malmo on Minecraft in 2016); the best-known factory benchmark
+    is third-party. Known and rarely done, anchor 2; the stored 2 stands.
+- opportunity: specification-programming-games
+  date: '2026-11-01'
+  queries:
+  - q: programming puzzle game where AI writes the code and the player writes the tests
+    where: web
+  - q: Steam game review AI-generated code find bugs vibe coding game 2025
+    where: web
+  - q: itch.io game write unit tests to catch buggy implementations mutation testing game
+    where: web
+  - q: code review game spot the bug in AI-written code itch.io
+    where: web
+  - q: game students write test cases to expose bugs in LLM-generated code, gamified
+    where: web
+  - q: vibe coding / prompt engineering / unit test / AI coding / test driven / pull request / code reviewer
+      / debugging AI
+    where: steam
+  - q: write tests / unit tests / AI writes code / specification / test cases
+    where: itch.io
+  - q: Code Defenders mutation testing game
+    where: semantic-scholar
+  - q: '"code defenders"; mutation AND testing AND game AND gamification'
+    where: arxiv
+  where:
+  - arxiv
+  - itch.io
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
+  checked:
+  - name: Agents! Please? (KIB Games / Kiborgik)
+    url: https://store.steampowered.com/app/5166150/Agents_Please/
+  - name: Agents! Please? Demo (itch.io)
+    url: https://kiborgik.itch.io/agents-please
+  - name: Code Defenders
+    url: https://code-defenders.org/
+  - name: BugSpotter (arXiv 2411.14303)
+    url: https://arxiv.org/abs/2411.14303
+  - name: FormalZ (arXiv 1903.00334)
+    url: https://arxiv.org/abs/1903.00334
+  - name: Qodo Bug-Chasing Game
+    url: https://www.qodo.ai/blog/tired-of-reviewing-vibe-coded-projects
+  - name: 'Vibe-coding idle games on Steam (Vibe Idler, Vibe Lab: Idle Dev Sim, Prince of Vibe Code)'
+    url: https://store.steampowered.com/app/4747800/
+  - name: Code Grid, MatchMaker95, Open Sourcerer, Dystopian Debugger
+    url: https://store.steampowered.com/app/4748140/
+  - name: TU Delft 'Prompted' (IEEE CoG)
+    url: https://publications.graphics.tudelft.nl/papers/858
+  - name: PlayMerge.ai (Product Hunt)
+    url: https://www.producthunt.com/p/merge-4/playmerge-ai
+  closest:
+    name: Agents! Please?
+    kind: game
+    year: 2026
+    closeness: feature
+    source: src-steam-2026-agents-please
+    url: https://store.steampowered.com/app/5166150/Agents_Please/
+  also:
+  - name: Code Defenders
+    kind: prototype
+    year: 2016
+    closeness: adjacent
+    url: https://code-defenders.org/
+  - name: BugSpotter
+    kind: research
+    year: 2024
+    closeness: adjacent
+    url: https://arxiv.org/abs/2411.14303
+  novelty_before: 5
+  novelty: 3
+  verdict: A Steam game released in September 2026 makes reviewing and testing AI-written code its main
+    mechanic, which is the prediction's defining feature, so the category exists and 5 does not hold.
+    Writing specifications against a live generator and scoring by wrong programs rejected is unshipped
+    and exists only in research games, which is anchor 3.
+- opportunity: symbolic-sim-neural-render
+  date: '2026-11-01'
+  queries:
+  - q: game rendered in real time by diffusion model conditioned on game state map grid
+    where: web
+  - q: NVIDIA DLSS 5 neural rendering generative model photoreal lighting games 2026
+    where: web
+  - q: Steam game graphics generated by AI image model every frame from game state world model indie 2025
+    where: web
+  - q: Intel Enhancing Photorealism Enhancement GTA V G-buffers
+    where: web
+  - q: Decart Oasis 2.0 Minecraft mod real-time AI restyle world
+    where: web
+  - q: Roblox Reality real-time world model rendering experiences 2026
+    where: web
+  - q: diffusion rendering game G-buffer
+    where: semantic-scholar
+  - q: abs:"game state" AND abs:diffusion AND abs:rendering; abs:"world model" AND abs:"game engine" AND
+      abs:state AND abs:render; ti:"photorealism enhancement"
+    where: arxiv
+  - q: world model AI generated frames
+    where: steam
+  - q: real-time diffusion rendered game
+    where: itch.io
+  where:
+  - arxiv
+  - itch.io
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
+  checked:
+  - name: 'NVIDIA DLSS 5 Available Now: 3D-Guided Neural Rendering Debuts In NBA 2K27'
+    url: https://www.nvidia.com/en-us/geforce/news/dlss-5-3d-guided-neural-rendering/
+  - name: Oasis 2.0 (Modrinth)
+    url: https://modrinth.com/mod/oasis2
+  - name: How to Play Oasis 2.0
+    url: https://oasis2.decart.ai/how-to-play
+  - name: Pioneering AI Founders Join to Accelerate Roblox Reality Vision
+    url: https://about.roblox.com/newsroom/2026/06/pioneering-ai-founders-join-to-accelerate-roblox-reality-vision
+  - name: 'GameDirector: Decoupling Gameplay Logic from Rendering for Player-Configurable Game World Models
+      (arXiv 2609.25652)'
+    url: https://arxiv.org/abs/2609.25652
+  - name: 'From Pixels to States: Rethinking Interactive World Models as Game Engines (arXiv 2607.14076)'
+    url: https://arxiv.org/abs/2607.14076
+  - name: New NVIDIA Research Creates Interactive Worlds with AI (2018)
+    url: https://nvidianews.nvidia.com/news/new-nvidia-research-creates-interactive-worlds-with-ai
+  - name: Enhancing Photorealism Enhancement (arXiv 2105.04619)
+    url: https://arxiv.org/abs/2105.04619
+  - name: Steam search 'world model AI generated frames'
+    url: https://store.steampowered.com/search/?term=world+model+AI+generated+frames
+  - name: itch.io search 'real-time diffusion rendered game'
+    url: https://itch.io/search?q=real-time+diffusion+rendered+game
+  closest:
+    name: DLSS 5 in NBA 2K27
+    kind: official
+    year: 2026
+    closeness: feature
+    source: src-nvidia-2026-dlss-5
+    url: https://www.nvidia.com/en-us/geforce/news/dlss-5-3d-guided-neural-rendering/
+  also:
+  - name: Oasis 2.0 (Minecraft mod)
+    kind: mod
+    year: 2025
+    closeness: feature
+    source: src-decart-2025-oasis-2
+    url: https://oasis2.decart.ai/how-to-play
+  - name: GameDirector
+    kind: research
+    year: 2026
+    closeness: adjacent
+    url: https://arxiv.org/abs/2609.25652
+  novelty_before: 5
+  novelty: 3
+  verdict: A generative model now produces a shipped game's main view frame by frame (DLSS 5 in NBA 2K27),
+    and a Minecraft mod restyles the whole view live, but both condition on conventionally rendered frames
+    rather than on symbolic state. Rendering from the symbolic state itself exists only in research and
+    announcements. Shipped partial forms rule out 5 and 4, so the score falls to 3.
+- opportunity: teachable-sim-companion
+  date: '2026-11-01'
+  queries:
+  - q: Autonauts teach bots by demonstration copy script other bots
+    where: web
+  - q: Minecraft AI companion mod learns skills from player LLM remembers tasks
+    where: web
+  - q: Player2 Steve AI companion Minecraft mod teach it new skills
+    where: web
+  - q: mindcraft LLM Minecraft agents learn new skills from player code library
+    where: web
+  - q: game companion learns by watching the player imitation learning shipped game record routine reuse
+    where: web
+  - q: '"Tulpa" Minecraft mod LLM companion SKILL.md skills'
+    where: web
+  - q: programming by demonstration game companion agent
+    where: semantic-scholar
+  - q: id_list 2310.01627, 2305.16291 (VAL, Voyager)
+    where: arxiv
+  - q: teach bots demonstration; teach your companion
+    where: steam
+  - q: programming by demonstration
+    where: itch.io
+  where:
+  - arxiv
+  - itch.io
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
+  checked:
+  - name: Autonauts (Steam)
+    url: https://store.steampowered.com/app/979120
+  - name: Black & White (Wikipedia, existing source)
+    url: https://en.wikipedia.org/wiki/Black_%26_White_(video_game)
+  - name: Tulpa (CurseForge Minecraft mod)
+    url: https://www.curseforge.com/minecraft/mc-mods/tulpa
+  - name: AI Player mod (Player Games creator hub)
+    url: https://www.player.games/en-US/creator-hub/minecraft/community/aiplayermod-ys2ah27y
+  - name: mindcraft README
+    url: https://raw.githubusercontent.com/mindcraft-bots/mindcraft/main/README.md
+  - name: Voyager (arXiv 2305.16291, existing source)
+    url: https://arxiv.org/abs/2305.16291
+  - name: 'VAL: Interactive Task Learning with GPT Dialog Parsing (arXiv 2310.01627)'
+    url: https://arxiv.org/abs/2310.01627
+  - name: MimicA (Cal Poly thesis, 2016)
+    url: https://digitalcommons.calpoly.edu/theses/1593
+  - name: Semantic Scholar API
+    url: https://api.semanticscholar.org/graph/v1/paper/search?query=programming+by+demonstration+game+companion+agent
+  - name: Steam and itch.io searches
+    url: https://store.steampowered.com/search/?term=teach+your+companion
+  closest:
+    name: Autonauts
+    kind: game
+    year: 2019
+    closeness: feature
+    source: src-steam-2026-autonauts
+    url: https://store.steampowered.com/app/979120
+  also:
+  - name: Black & White
+    kind: game
+    year: 2001
+    closeness: feature
+    source: src-wikipedia-black-and-white
+    url: https://en.wikipedia.org/wiki/Black_%26_White_(video_game)
+  - name: VAL
+    kind: research
+    year: 2023
+    closeness: adjacent
+    url: https://arxiv.org/abs/2310.01627
+  novelty_before: 4
+  novelty: 3
+  verdict: Autonauts (2019) teaches bots routines by having them repeat the player's actions, kept as
+    editable programs, and Black & White's creature learns tasks from demonstration. Shipped narrower
+    forms of learning from the player, so the score falls from 4 to 3; language instruction and skills
+    that transfer to new tasks are research.
+- opportunity: trainable-creatures-revival
+  date: '2026-11-01'
+  queries:
+  - q: Little Learning Machines Transforms Games reinforcement learning neural network train robots rewards
+    where: web
+  - q: virtual pet game neural network creature learns from player rewards punishment 2024 2025 Steam
+      deep learning pet
+    where: web
+  - q: Deep TAMER training agents from human feedback real-time high-dimensional Warnell 2018 arXiv
+    where: web
+  - q: interactive reinforcement learning human feedback virtual pet
+    where: semantic-scholar
+  - q: all:"Little Learning Machines"; id_list 1709.10163
+    where: arxiv
+  - q: reinforcement learning; neural network pet; train your AI; Little Learning Machines
+    where: steam
+  where:
+  - arxiv
+  - semantic-scholar
+  - steam
+  - web
+  coverage: full
+  checked:
+  - name: Little Learning Machines (Steam)
+    url: https://store.steampowered.com/app/1993710/Little_Learning_Machines/
+  - name: CEUR-WS Vol-3626 index
+    url: https://ceur-ws.org/Vol-3626/
+  - name: 'GDC Vault: ''Little Learning Machines'' Postmortem: A Game About Training Neural Networks'
+    url: https://gdcvault.com/play/1034597/AI-Summit-Little-Learning-Machines
+  - name: Little Learning Machines launch press release (Games Press mirror)
+    url: https://gamespress.westeu-v2.propressroom.com/Train-real-AI-robot-companions-and-overcome-challenges-together-as-Lit
+  - name: Creatures Docking Station (Steam)
+    url: https://store.steampowered.com/app/1659050/Creatures_Docking_Station/
+  - name: Black & White (Wikipedia, existing source)
+    url: https://en.wikipedia.org/wiki/Black_%26_White_(video_game)
+  - name: Dosidicus (itch.io)
+    url: https://vicioussquid.itch.io/dosidicus
+  - name: Deep TAMER (arXiv 1709.10163)
+    url: https://arxiv.org/abs/1709.10163
+  - name: Semantic Scholar API
+    url: https://api.semanticscholar.org/graph/v1/paper/search?query=interactive+reinforcement+learning+human+feedback+virtual+pet
+  - name: Steam searches
+    url: https://store.steampowered.com/search/?term=neural+network+pet
+  closest:
+    name: Little Learning Machines
+    kind: game
+    year: 2024
+    closeness: feature
+    source: src-steam-2024-little-learning-machines
+    url: https://store.steampowered.com/app/1993710/Little_Learning_Machines/
+  also:
+  - name: Creatures Docking Station
+    kind: game
+    year: 2001
+    closeness: feature
+    url: https://store.steampowered.com/app/1659050/Creatures_Docking_Station/
+  - name: Deep TAMER
+    kind: research
+    year: 2018
+    closeness: adjacent
+    url: https://arxiv.org/abs/1709.10163
+  novelty_before: 3
+  novelty: 3
+  verdict: Little Learning Machines (2024) has players train real neural-network companions in real time,
+    which its developers describe as deep reinforcement learning, but its creatures do not say what they
+    think they were rewarded for. The stored 3 stands.

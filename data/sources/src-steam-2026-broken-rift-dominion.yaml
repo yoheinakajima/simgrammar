@@ -1,0 +1,15 @@
+id: src-steam-2026-broken-rift-dominion
+type: source
+name: 'Broken Rift: Dominion'
+kind: store-page
+authors:
+- Last Exit Diner
+venue: Steam
+date: '2026'
+url: https://store.steampowered.com/app/5122860/
+accessed: '2026-11-01'
+notes: A 4X with a playable demo; the store page lists a planned release of 3 November 2026. A packaged
+  offline language model writes faction diplomacy from structured game state; deterministic rules decide
+  outcomes.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

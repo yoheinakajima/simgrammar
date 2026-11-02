@@ -1,0 +1,14 @@
+id: src-dfwiki-2026-scholar
+type: source
+name: Scholar
+kind: encyclopedia
+authors:
+- Dwarf Fortress Wiki contributors
+venue: Dwarf Fortress Wiki
+date: '2026'
+url: https://dwarffortresswiki.org/index.php/Scholar
+accessed: '2026-11-01'
+notes: Scholars research topics by pondering and discussion, and form master and apprentice relationships
+  that pass topics on.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

@@ -31,7 +31,7 @@ precedent:
 - eco
 - a-tale-in-the-desert
 - victoria-3
-novelty: 4
+novelty: 3
 feasibility: 3
 impact: 3
 horizon: 1-2y
@@ -51,10 +51,29 @@ falsifiable_signal:
     Steam user reviews; documentation shows free-text law input mapped to changes in simulation rules
     or parameters. Technique class: any parser counts, a keyword or grammar-based one included, so this
     is a feature test; it shows language models landed only if the documentation says one maps the laws.'
-sources: []
+claims:
+- text: EQUILIBRIUM (Steam early access, 2026) analyzes a law typed in plain language and turns it into
+    a structured government dossier.
+  sources:
+  - src-steam-2026-equilibrium
+  confidence: high
+  quote: When a player types a directive or law in natural language (e.g., "Abolish the luxury car tax"),
+    the AI Engine analyzes the request in real time and generates a structured governmental dossier
+  locator: AI Generated Content Disclosure
+- text: EQUILIBRIUM confines the model's output to developer-defined fields and clamps its numeric effects
+    in the simulation engine, the typed compilation this opportunity proposes.
+  sources:
+  - src-steam-2026-equilibrium
+  confidence: high
+  quote: 'Guardrails: AI output is constrained to a fixed set of structured fields defined by the developer.
+    All numeric effects are clamped within bounds enforced by the simulation engine'
+  locator: AI Generated Content Disclosure
+sources:
+- src-steam-2026-equilibrium
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

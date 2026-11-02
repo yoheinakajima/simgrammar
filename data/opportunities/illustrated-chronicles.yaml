@@ -46,10 +46,19 @@ falsifiable_signal:
     the player can export or share. Technique class: any automatic writer counts, templates filled from
     the event log included, so this is a feature test; it shows language models landed only if the notes
     say one writes the history.'
-sources: []
+claims:
+- text: Crusader Kings II's Charlemagne expansion added an annual chronicle of the player's game.
+  sources:
+  - src-steam-2014-crusader-kings-2-charlemagne
+  confidence: high
+  quote: Annual Chronicle in the style of the Saxon chronicle
+  locator: About This Content, Main features
+sources:
+- src-steam-2014-crusader-kings-2-charlemagne
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

@@ -28,7 +28,7 @@ precedent:
 - manor-lords
 - islanders
 - crusader-kings-3
-novelty: 4
+novelty: 3
 feasibility: 4
 impact: 3
 horizon: now
@@ -47,7 +47,25 @@ falsifiable_signal:
     page or developer material lists events triggered by player placement decisions that affect specific
     named inhabitants. Technique class: any event system counts, authored triggers included, so this is
     a feature test.'
-sources: []
+claims:
+- text: Heard of the Story?, a city builder, says each building changes its villagers' lives, linking
+    what the player places to named inhabitants.
+  sources:
+  - src-steam-2023-heard-of-the-story
+  confidence: high
+  quote: Each building changes the life of your villagers one step at a time. Could the Lion & Crow be
+    your friend's next favourite tavern?
+  locator: About This Game
+- text: Its villager dialogue is specific to each villager's experiences and the world state, without
+    discrete events triggered by placement.
+  sources:
+  - src-steam-2023-heard-of-the-story
+  confidence: high
+  quote: ~600 different dialogue phrases where (for most of these) each is dynamic and specific to the
+    experiences and knowledge of the villager and your world state
+  locator: 'Early Access: What is the current state of the Early Access version?'
+sources:
+- src-steam-2023-heard-of-the-story
 assertions:
 - 'cooccur.free-placement.triggered-event-chains <= 3'
 - 'derived.free-placement.prevalence_rank <= 5'
@@ -61,3 +79,4 @@ provenance:
   - 2026-10-31-tag-audit
   - 2026-10-31-tag-audit-follow-up
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

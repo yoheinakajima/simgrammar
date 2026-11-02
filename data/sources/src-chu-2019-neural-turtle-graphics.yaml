@@ -1,0 +1,23 @@
+id: src-chu-2019-neural-turtle-graphics
+type: source
+name: Neural Turtle Graphics for Modeling City Road Layouts
+kind: preprint
+authors:
+- Hang Chu
+- Daiqing Li
+- David Acuna
+- Amlan Kar
+- Maria Shugrina
+- Xinkai Wei
+- Ming-Yu Liu
+- Antonio Torralba
+- Sanja Fidler
+venue: arXiv (ICCV 2019)
+date: '2019-10-04'
+url: https://arxiv.org/abs/1910.02055
+arxiv: '1910.02055'
+accessed: '2026-11-01'
+notes: A road-layout generator trained on OpenStreetMap; users choose a city style and sketch parts of
+  the layout.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

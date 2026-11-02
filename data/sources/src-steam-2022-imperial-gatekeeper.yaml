@@ -1,0 +1,15 @@
+id: src-steam-2022-imperial-gatekeeper
+type: source
+name: The Imperial Gatekeeper
+kind: store-page
+authors:
+- Tengsten
+- Kagura Games
+venue: Steam
+date: '2022-09-02'
+url: https://store.steampowered.com/app/1933650/The_Imperial_Gatekeeper
+accessed: '2026-11-01'
+notes: A checkpoint inspection game whose applicants are randomly generated and which scores the player
+  on accuracy and speed.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

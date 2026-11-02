@@ -1,0 +1,14 @@
+id: src-mfive-2025-ai-influence
+type: source
+name: AI Influence [AI Diplomacy]
+kind: store-page
+authors:
+- MFive
+venue: Steam Workshop (Mount & Blade II, Bannerlord)
+date: '2025-10-10'
+url: https://steamcommunity.com/sharedfiles/filedetails/?id=3584621421
+accessed: '2026-11-01'
+notes: A Bannerlord mod in which language-model rulers make statements, run negotiation cycles, and decide
+  war and peace.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

@@ -1,0 +1,14 @@
+id: src-steam-2024-little-learning-machines
+type: source
+name: Little Learning Machines
+kind: store-page
+authors:
+- Transitional Forms
+venue: Steam
+date: '2024-03-06'
+url: https://store.steampowered.com/app/1993710/Little_Learning_Machines/
+accessed: '2026-11-01'
+notes: Players train robot companions whose behavior is a neural network trained in real time; the developers'
+  2023 workshop paper calls it real-time deep reinforcement learning.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

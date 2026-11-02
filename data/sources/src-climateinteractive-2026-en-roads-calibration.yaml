@@ -1,0 +1,14 @@
+id: src-climateinteractive-2026-en-roads-calibration
+type: source
+name: Initialization, Calibration, Model Testing (En-ROADS Technical Reference)
+kind: docs
+authors:
+- Climate Interactive
+venue: Climate Interactive
+date: 2026-10
+url: https://docs.climateinteractive.org/projects/en-roads-reference-guide/en/latest/pages/calibration.html
+accessed: '2026-11-01'
+notes: En-ROADS initializes and calibrates to named historical data sources; the reference guide publishes
+  comparisons with history but names no Bayesian method or goodness-of-fit metric on the pages read.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

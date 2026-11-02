@@ -1,0 +1,14 @@
+id: src-exfret-2022-factorio-randomizer
+type: source
+name: exfret's randomizer
+kind: store-page
+authors:
+- exfret
+venue: Factorio Mod Portal
+date: '2022'
+url: https://mods.factorio.com/mod/propertyrandomizer
+accessed: '2026-11-01'
+notes: Randomizes recipe ingredients and technology prerequisites at game start, tuned so the game stays
+  completable; about 9,050 downloads when read.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

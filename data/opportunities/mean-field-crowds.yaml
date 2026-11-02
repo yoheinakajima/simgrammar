@@ -26,7 +26,7 @@ precedent:
 - simcity-2013
 - cities-skylines
 - planet-coaster
-novelty: 4
+novelty: 3
 feasibility: 3
 impact: 3
 horizon: 3-5y
@@ -45,10 +45,21 @@ falsifiable_signal:
     documentation names a mean-field, continuum, or equilibrium-field method used at runtime for the main
     traffic or population model. Technique class: classical continuum and equilibrium-field crowd models
     count, not only learned mean-field solvers, so this is a feature test.'
-sources: []
+claims:
+- text: Planet Coaster's principal programmer says the game simulates its guest crowd's motion with fluid
+    dynamics, a continuum model running at play time.
+  sources:
+  - src-frontier-2016-owen-mccarthy-qa
+  confidence: medium
+  quote: having a background in programming physics simulations, I loved the idea of using fluid dynamics
+    to simulate crowd motion as I think it gives a very natural look to the guests
+  locator: first post, Q&A answer on crowd simulation
+sources:
+- src-frontier-2016-owen-mccarthy-qa
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

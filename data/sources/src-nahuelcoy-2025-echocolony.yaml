@@ -1,0 +1,14 @@
+id: src-nahuelcoy-2025-echocolony
+type: source
+name: EchoColony, AI-Powered Colonist Conversations for RimWorld
+kind: repository
+authors:
+- Carlos Nahuelcoy
+venue: GitHub
+date: '2025'
+url: https://github.com/CarlosNahuelcoy/EchoColony
+accessed: '2026-11-01'
+notes: A RimWorld mod for typed conversations with colonists, answered by a language model from each colonist's
+  mood, traits, relationships, and memories.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

@@ -45,10 +45,28 @@ falsifiable_signal:
     documentation describes recording model outputs into a replayable log, and at least one shipped title
     with at least 1,000 Steam user reviews uses it. Technique class: a conventional event log counts,
     so this is a feature test of infrastructure for model outputs, not of a learned technique.'
-sources: []
+claims:
+- text: Temporal records the result of non-deterministic code once in an event history and returns the
+    recorded result on replay, the replay mechanism this opportunity proposes, outside games.
+  sources:
+  - src-temporal-2026-event-history
+  confidence: high
+  quote: A Side Effect is a way to execute a short, non-deterministic code snippet, such as generating
+    a UUID, that executes the provided function once and records its result into the Workflow Execution
+    Event History. A Side Effect does not re-execute upon replay, but instead returns the recorded result.
+  locator: What is a Side Effect?
+- text: Temporal can reset a run by copying its event history up to a chosen point, a fork-from-here operation.
+  sources:
+  - src-temporal-2026-event-history
+  confidence: high
+  quote: The Event History is copied from the original execution up to and including the reset point.
+  locator: What is a Reset?
+sources:
+- src-temporal-2026-event-history
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

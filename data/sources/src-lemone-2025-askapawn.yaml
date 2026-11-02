@@ -1,0 +1,14 @@
+id: src-lemone-2025-askapawn
+type: source
+name: OpenRimWorldAI.AskAPawn
+kind: store-page
+authors:
+- LoneLemone
+venue: Steam Workshop (RimWorld)
+date: '2025-01-21'
+url: https://steamcommunity.com/sharedfiles/filedetails/?id=3412825218
+accessed: '2026-11-01'
+notes: Lets the player put any typed question to a pawn, answered by a language model through the OpenRimWorldAI
+  base mod, which sends colony data to the model.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

@@ -1,0 +1,14 @@
+id: src-keiwan-2026-evolution
+type: source
+name: Evolution
+kind: store-page
+authors:
+- Keiwan Donyagard
+venue: itch.io
+date: '2026'
+url: https://keiwan.itch.io/evolution
+accessed: '2026-11-01'
+notes: A released sandbox in which neural networks trained by a genetic algorithm drive physics creatures
+  of joints, bones, and muscles. The page gives no release date.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

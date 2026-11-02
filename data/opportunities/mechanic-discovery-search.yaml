@@ -27,7 +27,7 @@ precedent:
 - factorio
 - dwarf-fortress
 - spacechem
-novelty: 5
+novelty: 3
 feasibility: 2
 impact: 4
 horizon: 3-5y
@@ -46,10 +46,36 @@ falsifiable_signal:
     a developer statement or paper attributes the origin of a shipped rule to automated search over rule
     sets. Technique class: automated search over rule sets only, evolutionary or guided by a language
     model, so this is a technique test.'
-sources: []
+claims:
+- text: Yavalath was invented by a computer program, Browne's Ludi system.
+  sources:
+  - src-browne-2026-yavalath
+  confidence: high
+  quote: Yavalath is an abstract board game for two or three players, invented by a computer program called
+    LUDI.
+  locator: First sentence
+- text: Yavalath and its sister game Pentalath were commercially published, so a shipped game's rules
+    have been credited to automated search.
+  sources:
+  - src-browne-2026-yavalath
+  confidence: high
+  quote: making it the first - and still only - computer-generated game to be commercially published,
+    together with its sister game Pentalath
+  locator: Opening paragraphs (page is undated; it cites events up to November 2013)
+- text: ANGELINA's Mechanic Miner invented the mechanics used for the puzzles of the released game A Puzzling
+    Present (2012).
+  sources:
+  - src-imperial-2012-angelina-puzzling-present
+  confidence: high
+  quote: it can create new game mechanics all by itself, as it did for the puzzles in A Puzzling Present
+  locator: Body, paragraph on Mechanic Miner
+sources:
+- src-browne-2026-yavalath
+- src-imperial-2012-angelina-puzzling-present
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

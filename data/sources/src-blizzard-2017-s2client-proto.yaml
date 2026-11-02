@@ -1,0 +1,13 @@
+id: src-blizzard-2017-s2client-proto
+type: source
+name: 'StarCraft II Client: protocol definitions (s2client-proto)'
+kind: repository
+authors:
+- Blizzard Entertainment
+venue: GitHub
+date: 2017-08
+url: https://github.com/Blizzard/s2client-proto
+accessed: '2026-11-01'
+notes: Blizzard's official API for scripted and machine-learning bots, with headless Linux builds.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

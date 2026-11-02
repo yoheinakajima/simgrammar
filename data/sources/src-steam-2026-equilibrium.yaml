@@ -1,0 +1,15 @@
+id: src-steam-2026-equilibrium
+type: source
+name: EQUILIBRIUM
+kind: store-page
+authors:
+- Obliquon Corporation
+venue: Steam
+date: '2026-09-21'
+url: https://store.steampowered.com/app/4661850/
+accessed: '2026-11-01'
+notes: Early access from 2026-09-21. Typed laws and directives are turned by a language model into a structured
+  dossier in developer-defined fields whose numeric effects the engine clamps, followed by a simulated
+  parliamentary vote.
+provenance:
+  created: 2026-11-01-es-v3-prior-art
