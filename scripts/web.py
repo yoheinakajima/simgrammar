@@ -11,9 +11,11 @@ Pages:
   watch/episode-NN/                  one page per episode: its summary, the player and its scenes, the records it names as cards
                                      with the times each is on screen, and the transcript behind a disclosure
   find/index.html                    every chapter, episode, short, record and source on one filterable page
-  data/index.html                    downloads, provenance log, contract
+  about/index.html                   how the atlas is made: downloads, commands, research log, vocabularies
+  developers/index.html              the published files for programs and agents, with llms.txt, openapi.json, the schemas,
+                                     and the .well-known discovery files beside it (scripts/discovery.py)
   og/<type>/<id>.png, og/*.png       a link-preview image per page (scripts/og.py)
-  paper.md, references.bib, manifest.json, figures/*.svg, llms.txt, CNAME, robots.txt, sitemap.xml, 404.html, assets/*
+  paper.md, references.bib, manifest.json, figures/*.svg, CNAME, robots.txt, sitemap.xml, 404.html, assets/*
 
 Everything here is a deterministic function of data/, report/, vocab/, schema/, book/, media/, and web/; icons come from
 the build's dist/visual (ADR-0006). The video files are not: the Pages workflow fetches the ones media/published.yaml lists
@@ -30,6 +32,7 @@ from pathlib import Path
 
 from markdown_it import MarkdownIt
 
+import discovery
 from lib import ROOT, counted, get_path, narration_digest, read_yaml, vocab_terms
 from report_render import GITHUB_HANDLE_RE, VOCAB_COLUMNS, _decl_rows, _fmt, link_label, render, table_value
 
@@ -39,7 +42,7 @@ WEB_SRC = ROOT / "web"
 READER_NAME = {"opportunity": ("bet", "bets")}
 NAV = [("game", "Games", "game/"), ("mechanic", "Mechanics", "mechanic/"), ("technique", "Techniques", "technique/"), ("opportunity", "Bets", "opportunity/"),
        ("watch", "Watch", "watch/"), ("book", "Book", "book/"), ("paper", "Paper", "paper/")]
-UTILITY = [("find", "find", "find/"), ("source", "sources", "source/"), ("about", "about", "about/")]
+UTILITY = [("find", "find", "find/"), ("source", "sources", "source/"), ("about", "about", "about/"), ("developers", "developers", "developers/")]
 FAVICON = "free-placement"   # the icon the browser tab shows
 # The front page's lead, also its link-preview description: what the atlas is for a reader, where the paper's subtitle says it for a scholar.
 LEAD = ("Every simulation game is assembled from a shared set of parts: production chains, needs, markets, weather, raids. Naming the parts shows "
@@ -239,9 +242,9 @@ class Web:
         """Generated projections are not committed; the Pages workflow publishes them under /dist/ beside the site."""
         return f"{base}dist/{path}"
 
-    def page(self, *, title, desc, body, depth, nav, path, image="og/site.png", base=None, noindex=False):
+    def page(self, *, title, desc, body, depth, nav, path, image="og/site.png", base=None, noindex=False, head=""):
         """A complete page. Links climb `depth` levels to the site root; `base` overrides that (the 404 page passes "/",
-        since Pages serves it at whatever address was asked for). Flex items in the chrome are separated by whitespace
+        since Pages serves it at whatever address was asked for). `head` is extra markup for the head (the home page's JSON-LD). Flex items in the chrome are separated by whitespace
         so that copied text and screen readers do not run one item's last word into the next item's first."""
         base = "../" * depth if base is None else base
         fam = " ".join([f'<li><a href="{esc(u)}">{esc(n)}</a></li>' for n, u in self.site.get("family", [])]
@@ -273,7 +276,7 @@ class Web:
 {"".join(f'<link rel="preload" href="{base}assets/fonts/{f}.woff2" as="font" type="font/woff2" crossorigin>' for f in PRELOAD)}
 <link rel="stylesheet" href="{base}assets/register.css?v={v['register.css']}">
 <link rel="alternate" type="text/markdown" href="{base}paper.md" title="The paper as markdown">
-<script src="{base}assets/simgrammar.js?v={v['simgrammar.js']}" defer></script>
+<script src="{base}assets/simgrammar.js?v={v['simgrammar.js']}" defer></script>{chr(10) + head if head else ""}
 </head>
 <body>
 <a class="skip-link" href="#content">Skip to content</a>
@@ -494,12 +497,7 @@ class Web:
         tocs = "".join(f'<a href="#{hid}" data-internal>{esc(t)}</a>' for hid, t in toc)
         authors = ", ".join(self.analysis["byline"])
         authors_html = self.byline_html("../")
-        # BibTeX names: "Last, First" for a personal name, braces for a one-word handle or the group name so they stay whole
-        bib_names = " and ".join(f"{a.rsplit(' ', 1)[1]}, {a.rsplit(' ', 1)[0]}" if " " in a and a != "SimGrammar contributors" else f"{{{a}}}"
-                                 for a in self.analysis["byline"])
-        bib = (f"@misc{{nakajima{meta['date'][:4]}grammar,\n  title = {{{meta['title']}: {meta['subtitle']}}},\n  author = {{{bib_names}}},\n"
-               f"  year = {{{meta['date'][:4]}}},\n  version = {{{meta['version']}}},\n" + (f"  doi = {{{meta['doi']}}},\n" if meta.get("doi") else "") +
-               f"  url = {{{self.site['url']}paper/}},\n  note = {{Dataset {self.short}; full sha256 in manifest.json}}\n}}")
+        bib = self.bibtex()
         nruns = len(self.ents.get("run", []))
         doi_url = f"https://doi.org/{meta['doi']}" if meta.get("doi") else ""
         doi_span = f' <span>doi <a href="{esc(doi_url)}">{esc(meta["doi"])}</a></span>' if doi_url else ""
@@ -645,7 +643,7 @@ class Web:
 <p class="small faint">four findings from the paper; each links to the section that makes the case</p>
 {self.mosaic(base)}"""
         body = header + game_sec + watch + tech_sec + op_sec + book_sec + paper_sec
-        return self.page(title=f"{meta['title']} · simgrammar", desc=LEAD, body=body, depth=0, nav="", path="")
+        return self.page(title=f"{meta['title']} · simgrammar", desc=LEAD, body=body, depth=0, nav="", path="", head=discovery.jsonld(self))
 
     # ------------------------------------------------------------------ shorts and the book
     @staticmethod
@@ -1543,7 +1541,7 @@ class Web:
                 f'<h1>How the atlas is made, and why you can check it</h1><p class="dek">An atlas is only useful if you can trust it. This one is built so that any number '
                 f'on any page can be traced to the records and sources behind it, checked, and corrected, by anyone.</p>'
                 f'<div class="meta"><span><b>{self.byline_html("../")}</b></span><span><a href="../paper/#appendix-d-contributors" data-internal>all contributors</a></span></div>'
-                f'<div class="twins"><b>start with</b><a href="{esc(self.gh("CONTRIBUTING.md"))}">CONTRIBUTING.md</a><a href="{esc(self.gh("AGENTS.md"))}">AGENTS.md</a><a href="{esc(self.gh("CONTRACT.md"))}">CONTRACT.md</a><a href="../llms.txt" data-internal>llms.txt</a></div></div>'
+                f'<div class="twins"><b>start with</b><a href="{esc(self.gh("CONTRIBUTING.md"))}">CONTRIBUTING.md</a><a href="{esc(self.gh("AGENTS.md"))}">AGENTS.md</a><a href="{esc(self.gh("CONTRACT.md"))}">CONTRACT.md</a><a href="../llms.txt" data-internal>llms.txt</a><a href="../developers/" data-internal>developers</a></div></div>'
                 + self.section("why it is built this way", f'<div class="register" data-size="wide">{wrows}</div>')
                 + self.section("downloads", f'<div class="register" data-size="wide">{frows}</div>', "generated projections, published beside this site")
                 + self.section("commands", f'<div class="register" data-kind="cmds">{crows}</div>', "from the repository root")
@@ -1671,6 +1669,16 @@ class Web:
         """A chapter's short name for an eyebrow or breadcrumb: "chapter 3", or the back matter's own name."""
         return f"chapter {int(stem[:2])}" if re.match(r"(0[1-9]|1[0-9])-", stem) else stem[3:].replace("-", " ")
 
+    def bibtex(self):
+        """The paper's citation as BibTeX, for its cite section and the developers page."""
+        meta = self.meta
+        # BibTeX names: "Last, First" for a personal name, braces for a one-word handle or the group name so they stay whole
+        bib_names = " and ".join(f"{a.rsplit(' ', 1)[1]}, {a.rsplit(' ', 1)[0]}" if " " in a and a != "SimGrammar contributors" else f"{{{a}}}"
+                                 for a in self.analysis["byline"])
+        return (f"@misc{{nakajima{meta['date'][:4]}grammar,\n  title = {{{meta['title']}: {meta['subtitle']}}},\n  author = {{{bib_names}}},\n"
+                f"  year = {{{meta['date'][:4]}}},\n  version = {{{meta['version']}}},\n" + (f"  doi = {{{meta['doi']}}},\n" if meta.get("doi") else "") +
+                f"  url = {{{self.site['url']}paper/}},\n  note = {{Dataset {self.short}; full sha256 in manifest.json}}\n}}")
+
     def byline_html(self, base):
         """The byline's names, each linked to the contributors table (paper appendix D) and opening the contributor's card on
         hover; "SimGrammar contributors", once there are more contributors than the byline names, links to the table alone."""
@@ -1765,19 +1773,6 @@ class Web:
         reg = f'<div class="register" data-size="wide">{"".join(rows)}</div>'
         return f'<details class="disclosure" data-filter-open><summary>show all {len(rows)}</summary>{reg}</details>' if title == "sources" else reg
 
-    def llms_txt(self):
-        m, man = self.meta, self.manifest
-        lines = [f"# simgrammar · {m['title']}", "", f"> {m['subtitle']}. A versioned dataset of simulation game mechanics with provenance, and the paper projected from it.", "",
-                 f"dataset sha256: {man['dataset_sha256']}", f"contract: {man['contract_version']} · paper v{m['version']} ({m['date']})", "",
-                 "## Read", f"- {self.site['url']}paper/: the paper", f"- {self.site['url']}paper.md: the paper as markdown", f"- {self.site['url']}references.bib: bibliography", f"- {self.site['url']}manifest.json: counts and hashes",
-                 f"- {self.site['url']}book/: the book, one chapter a page", f"- {self.site['url']}watch/: the episodes and shorts, with transcripts", f"- {self.site['url']}find/: every page of the site in one list", "",
-                 "## Data", f"- {self.site['url']}dist/simgrammar-dist.zip: every projection in one archive",
-                 f"- {self.site['url']}dist/tables/games.csv (and mechanics, techniques, opportunities, sources, edges, game_mechanic_matrix): csv tables",
-                 f"- {self.site['url']}dist/entities/games.json (and the other types): full json records",
-                 f"- {self.site['url']}dist/graph/nodes.jsonl, edges.jsonl: the graph", f"- {self.site['url']}about/: how the atlas is made, every download, the research log, the vocabularies", "",
-                 "## Contribute", f"- {self.site['repo']}/blob/main/AGENTS.md: procedure for humans and agents", f"- {self.site['repo']}/blob/main/CONTRACT.md: invariants and validator rules", ""]
-        return "\n".join(lines)
-
     def not_found(self):
         """Pages serves 404.html at the address that was asked for, at any depth, so every link on it is root-absolute.
         It is not a page to index, and its canonical address is the site root."""
@@ -1824,7 +1819,7 @@ def build_web(ents, edges, analysis, vocabs, registry, schemas, ctx, manifest, m
             if stem != "00-contents":
                 outs[f"web/book/{stem}/index.html"] = w.book_chapter(stem)
     outs["web/404.html"] = w.not_found()
-    outs["web/llms.txt"] = w.llms_txt()
+    outs.update(discovery.files(w))   # llms.txt, the developers page, openapi.json, the schemas, and the .well-known files
     # the paper's entity links point into dist/wiki; on the site they point at the record pages
     outs["web/paper.md"] = re.sub(r"\]\(\.\./wiki/([a-z]+)/([a-z0-9-]+)\.md\)", lambda m: f"]({meta['site']['url']}{m.group(1)}/{m.group(2)}/)", paper_md)
     outs["web/references.bib"] = references_bib
