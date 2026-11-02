@@ -44,7 +44,7 @@ URL = re.compile(r"https?://[^\s<>()\[\]]*[^\s<>()\[\].,;:!?'\"]")
 WIKI = re.compile(r"^(?:\.\./)+wiki/(\w+)/([a-z0-9-]+)\.md$")
 TEX_ESC = {"\\": r"\textbackslash{}", "{": r"\{", "}": r"\}", "$": r"\$", "&": r"\&", "#": r"\#", "^": r"\^{}", "_": r"\_",
            "%": r"\%", "~": r"\textasciitilde{}", "<": r"\textless{}", ">": r"\textgreater{}", "|": r"\textbar{}",
-           "ρ": r"\ensuremath{\rho}", "Σ": r"\ensuremath{\Sigma}", "−": r"\ensuremath{-}", "÷": r"\ensuremath{\div}",
+           "ρ": r"\ensuremath{\rho}", "κ": r"\ensuremath{\kappa}", "Σ": r"\ensuremath{\Sigma}", "−": r"\ensuremath{-}", "÷": r"\ensuremath{\div}",
            "≤": r"\ensuremath{\leq}", "≥": r"\ensuremath{\geq}", "→": r"\ensuremath{\rightarrow}"}
 FIG_REF = re.compile(r"^#fig-([a-z0-9-]+)$")  # a prose link to a figure's anchor, which the PDF prints as "Figure N"
 # sentences of a web caption that tell a reader how to work the interactive figure; the PDF drops them (its figures are
