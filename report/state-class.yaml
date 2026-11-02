@@ -1,0 +1,289 @@
+# The state class of every live mechanic: simulation state, presentation, control, or meta-structure (Explore Science
+# review finding D6). The admission tests (CONTRACT.md I12) let interface, control, and goal and session structures in
+# beside the rules that model a world, and §5.1 had only a family-level proxy for telling them apart (nonstate_families in
+# report/analysis.yaml). This file classes each mechanic on its own, by the rules below, so §5.1, §5.3, and §5.4 can re-run
+# on the simulation-state subset.
+#
+# Made by run 2026-11-01-es-v3-state-classes (operator yoheinakajima, model claude-opus-5-5, Claude Code). The rater wrote
+# the rules while reading the definitions in data/mechanics/, then classed every mechanic from its definition against
+# them, and fixed every class before any statistic on the subset was computed. One rater made every call; no second
+# coder has repeated them, so agreement on the classes is unmeasured. The rules are written to
+# be quoted word for word on a blind coding sheet: they name no mechanic except the worked examples, which a sample for a
+# second coder should leave out.
+#
+# scripts/analyze.py (_state_class) reads this file. The build fails when a live mechanic has no entry, when an entry
+# names a mechanic that is not live or appears twice, when an entry names a class not listed under `classes`, when a
+# worked example is not live or its entry gives another class, or when `made_by.run` is not a run in log/runs/.
+# An entry carries `why` wherever the call is not obvious from the definition; the rest follow directly from the rules.
+made_by:
+  run: 2026-11-01-es-v3-state-classes
+  operator: yoheinakajima
+  model: claude-opus-5-5
+procedure: >-
+  Class a mechanic by what its update rule writes, as its definition describes it. Count the variables the definition
+  names as the state the mechanic owns, and any other variable its rule changes on every cycle or on every use. Do not
+  count a variable that only some of the games using the mechanic write, or one written only to charge a cost. Sort each
+  counted variable into one of the four classes below. The mechanic takes the first class, in the order simulation state,
+  control, meta-structure, presentation, that any of its counted variables belongs to. How the player reaches the
+  mechanic, and which family it belongs to, do not decide its class.
+classes:
+- id: simulation-state
+  label: Simulation state
+  definition: >-
+    A variable of the modelled world that the mechanic's rule computes from other world variables, from chance, or
+    from elapsed time, and that other rules of the simulation read: a stock or a flow, a price, a need or a mood, a
+    relationship, a body or a disease, a position or a motion the player does not steer directly, a field such as heat
+    or pollution, terrain, weather, an event in progress, or the world's starting conditions. A variable the player
+    sets or spends is still simulation state when the rule also changes it on its own.
+  examples:
+  - mechanic: needs-decay
+    why: Each agent's need stocks fall every tick and actions restore them; mood, action selection, and health read them.
+  - mechanic: budget-treasury
+    why: The player sets funding and spends money, but the balance also changes each period by taxes, upkeep, wages,
+      and interest, so it is not a pool that only the player's actions spend.
+- id: control
+  label: Control
+  definition: >-
+    The player's means of acting on the simulation, and the pace at which simulated time runs against the player's
+    time: orders, designations, queues, and priorities; programs and other standing instructions the player writes or
+    wires up, and the state of running them; settings, allocations, and adopted policies whose effect follows from the
+    choice alone; structures and terrain edits written where the player puts them, once checked and paid for; the
+    mapping from the player's input to a body or machine the player steers, and its motion under that input; a pool
+    that only the player's own actions spend, however it fills; and how fast simulated time runs or when it advances,
+    whether the player sets that or a clock outside the game does.
+  examples:
+  - mechanic: variable-speed
+    why: It writes the time scale the player picks, paused or one of several multipliers; every other mechanic's
+      update runs at the tick rate it sets.
+  - mechanic: free-placement
+    why: It writes each structure where the player puts it, once the footprint is checked and the cost paid; pathing,
+      coverage, and adjacency read the layout, but they are other mechanics.
+- id: meta-structure
+  label: Meta-structure
+  definition: >-
+    The frame around play rather than the modelled world: goals, objectives, and win or loss conditions, and scores,
+    ratings, and records of how well a player has done, where what they pay out is score, unlocks, or the end of a
+    run rather than a change to the modelled world; unlocks of what a player may build or use, and the progress and
+    choices that lead to them; the session, meaning how the game is saved, kept and shared among players, or ended and
+    started again; and content or rules brought in from outside the session, such as player-made modifications and
+    shared creations. A standing or a rating that characters or markets in the modelled world react to is simulation
+    state.
+  examples:
+  - mechanic: modding-api
+    why: It loads content and rules from outside the session and lets scripts change them; nothing in the modelled
+      world computes what it writes.
+  - mechanic: milestone-unlocks
+    why: It records which thresholds have been reached and unlocks buildings and areas; progress comes from growth,
+      but what the rule writes is an unlock.
+- id: presentation
+  label: Presentation
+  definition: >-
+    What the player is shown: a selection, a view or map mode, a panel, a summary, a record kept for the player to
+    browse, an alert, an explanation, a forecast, or what each player can see of the world, all computed from
+    variables that other mechanics own and read by no other rule of the simulation.
+  examples:
+  - mechanic: data-overlays
+    why: It recolors the map by a field other mechanics own and stores only which map mode is shown and the color ramp.
+  - mechanic: fog-of-war
+    why: Its visibility state decides what each player sees of positions and changes that other mechanics own; no
+      rule of the modelled world reads it.
+mechanics:
+- {id: adaptive-threat-scaling, class: simulation-state}
+- {id: adjacency-scoring, class: simulation-state, why: "Its values feed production yields and desirability as well as scores, and a world rule reading them decides."}
+- {id: advertising-awareness, class: simulation-state}
+- {id: advisors, class: presentation}
+- {id: agent-inspection, class: presentation}
+- {id: agent-pathfinding, class: simulation-state}
+- {id: agent-skills, class: simulation-state}
+- {id: alerts-feed, class: presentation, why: "The option to pause or slow the game on an alert exists only in some games, so the alert list decides."}
+- {id: animal-husbandry, class: simulation-state}
+- {id: aspiration-wants, class: simulation-state, why: "The wants are each agent's own, generated from its traits and needs, and their meter shifts mood, behavior, and in one form lifespan."}
+- {id: async-shared-region, class: simulation-state, why: "What it exchanges between players' cities (resources, services, pollution) enters each simulation as boundary conditions."}
+- {id: attribute-match-engine, class: simulation-state}
+- {id: auctions, class: simulation-state}
+- {id: autonomy-levels, class: control, why: "It writes a setting that filters which actions agents may choose; the choosing is another mechanic's."}
+- {id: blueprints, class: control, why: "Stamping writes build orders that agents or the player fulfill; exporting a blueprint to other players comes after it."}
+- {id: board-confidence, class: simulation-state, why: "Confidence is held by a modelled evaluator and moves budgets as well as the player's tenure."}
+- {id: budget-treasury, class: simulation-state}
+- {id: byproducts-waste, class: simulation-state}
+- {id: care-dependent-development, class: simulation-state}
+- {id: career-ladder, class: simulation-state, why: "It models a character's job level, performance, and pay, which other mechanics read; it is not a goal set for the player."}
+- {id: causal-tooltips, class: presentation}
+- {id: citizen-satisfaction, class: simulation-state}
+- {id: collection-goals, class: meta-structure}
+- {id: combination-discovery, class: meta-structure, why: "Its rule writes the set of elements the player has found, which is the goal; a model that fills in new recipes does so only in some games."}
+- {id: comparative-histograms, class: meta-structure, why: "It keeps each player's best scores and the population's distribution of them, a score structure; the histogram is how it is shown."}
+- {id: contagion, class: simulation-state}
+- {id: content-sharing, class: meta-structure, why: "It uploads player creations to a shared catalog and imports them into other players' games: content from outside the session."}
+- {id: contracts-orders, class: simulation-state, why: "Offers are generated from simulation state and pay out in money and reputation, which other mechanics read."}
+- {id: conveyor-transport, class: simulation-state}
+- {id: corruption-leakage, class: simulation-state}
+- {id: creature-care, class: simulation-state}
+- {id: creature-learning, class: simulation-state}
+- {id: crime-policing, class: simulation-state}
+- {id: crisis-countdown, class: simulation-state, why: "The countdown schedules a world event (cold, an attack, a flood) whose effects other mechanics take up; ending the scenario is one variant."}
+- {id: crop-cultivation, class: simulation-state}
+- {id: crowd-preferences, class: simulation-state}
+- {id: culture-religion-conversion, class: simulation-state}
+- {id: customer-value-choice, class: simulation-state}
+- {id: daily-action-budget, class: control, why: "The day's energy or time slots are a pool that only the player's actions spend, refilled at the start of each day."}
+- {id: daily-schedules, class: simulation-state, why: "The timetable is authored or generated as often as the player sets it, and each hour it shapes what agents may do."}
+- {id: data-overlays, class: presentation}
+- {id: dated-tech-timeline, class: meta-structure, why: "It writes which models a company may buy, by date; the units already bought, and their aging, belong to other mechanics."}
+- {id: day-night-cycle, class: simulation-state}
+- {id: decoration-beauty, class: simulation-state}
+- {id: delegation-to-ai, class: control, why: "It owns the assignment, goals, and permissions the player gives an AI manager, whose actions it issues on the player's behalf."}
+- {id: delivery-time-payment, class: simulation-state}
+- {id: deposit-depletion, class: simulation-state}
+- {id: design-performance-rating, class: simulation-state, why: "Its metrics set income and guest demand in the canonical form as well as passing or ranking a design, and a world rule reading them decides."}
+- {id: designation-orders, class: control}
+- {id: diagnose-repair, class: simulation-state, why: "Each machine's hidden part faults come with the job, not from the player, and tests and removal order work against them."}
+- {id: diagnosis-treatment, class: simulation-state}
+- {id: dilemma-cards, class: simulation-state, why: "The deck draws by world state and each option shifts world meters; the player's choice is the input, not what it writes."}
+- {id: direct-avatar, class: control, why: "It writes the avatar's position and motion only as the player steers it, subject to collision and terrain."}
+- {id: dynasty-succession, class: simulation-state, why: "The succession law assigns titles and assets among characters; the switch of the player's control comes with it."}
+- {id: education-workforce, class: simulation-state}
+- {id: elections, class: simulation-state}
+- {id: embodied-skill-control, class: control}
+- {id: equity-buyouts, class: simulation-state}
+- {id: execution-budget, class: control, why: "It meters the player's programs; the allowance is a pool that only those programs spend."}
+- {id: faction-diplomacy, class: simulation-state}
+- {id: falling-sand-materials, class: simulation-state}
+- {id: fire-spread, class: simulation-state}
+- {id: flight-aerodynamics, class: simulation-state}
+- {id: fluid-gas-simulation, class: simulation-state}
+- {id: fluid-pipe-network, class: simulation-state}
+- {id: fog-of-war, class: presentation}
+- {id: food-web, class: simulation-state}
+- {id: forecasting, class: presentation}
+- {id: free-placement, class: control}
+- {id: generative-content, class: simulation-state, why: "Its output is parsed into game state (items, combination results, rules) or continues a story that is the game's state."}
+- {id: god-powers, class: control, why: "The power pool is spent only by the player's casts, and each cast writes an edit at the target that other systems then propagate."}
+- {id: goods-consumption, class: simulation-state}
+- {id: gossip-propagation, class: simulation-state}
+- {id: habitat-suitability, class: simulation-state}
+- {id: hand-crafting, class: simulation-state, why: "The player starts each craft, but the recipe converts stocks of components into items, so it writes stocks rather than an order."}
+- {id: hauling-jobs, class: simulation-state}
+- {id: heat-transfer, class: simulation-state}
+- {id: history-chronicle, class: presentation, why: "The records are kept for the player to browse; feeding them back into play happens only in some games."}
+- {id: history-generation, class: simulation-state}
+- {id: hydrology, class: simulation-state}
+- {id: immigration-attractiveness, class: simulation-state}
+- {id: injury-body-model, class: simulation-state}
+- {id: interest-groups, class: simulation-state}
+- {id: labor-market, class: simulation-state}
+- {id: land-value, class: simulation-state}
+- {id: lifecycle-aging, class: simulation-state}
+- {id: loans-debt, class: simulation-state}
+- {id: loss-on-death, class: simulation-state}
+- {id: machine-boosting, class: simulation-state, why: "Modules and clock settings are chosen by the player, but the rule computes cycle time, a productivity bar that fills per cycle, and power draw."}
+- {id: material-interactions, class: simulation-state}
+- {id: megaproject-sink, class: meta-structure, why: "It writes progress toward phases that pay out unlocks or an ending; the goods delivered are its cost."}
+- {id: memories-thoughts, class: simulation-state}
+- {id: milestone-unlocks, class: meta-structure}
+- {id: military-operations, class: simulation-state}
+- {id: modding-api, class: meta-structure}
+- {id: modular-assembly, class: simulation-state, why: "The player chooses the parts, but the rule derives the assembled thing's mass, thrust, or abilities from them, or simulates it."}
+- {id: mood-breakdown, class: simulation-state}
+- {id: natural-language-interaction, class: simulation-state, why: "It takes the player's free text, but what it writes is a character's interpretation and reply, which update the character's state."}
+- {id: natural-selection, class: simulation-state}
+- {id: needs-decay, class: simulation-state}
+- {id: negotiation, class: simulation-state}
+- {id: offscreen-life-progression, class: simulation-state}
+- {id: opinion-modifiers, class: simulation-state}
+- {id: orbital-mechanics, class: simulation-state}
+- {id: periodic-ticks, class: simulation-state, why: "It batches the world's own updates on a fixed period that the player does not set, which is not the pace of time against the player's."}
+- {id: permadeath, class: meta-structure, why: "The death is decided by other mechanics; what this one writes is the save that keeps it from being undone."}
+- {id: persistent-world, class: meta-structure, why: "It keeps the world on a server and shared among players while they are away; the world's changes come from other mechanics."}
+- {id: personality-traits, class: simulation-state, why: "Traits have no dynamics of their own, but they are drawn at generation and read by needs, utility, and opinion rules."}
+- {id: planetary-climate, class: simulation-state}
+- {id: player-driven-market, class: simulation-state, why: "Players post the orders, but the book matches them against each other and prices follow, so it writes trades and prices."}
+- {id: player-legislation, class: control, why: "Players write the laws and vote them in; enforcement applies their conditions and charges to other players' actions."}
+- {id: player-organizations, class: simulation-state, why: "Organizations hold shared assets, tax their members' income each period, and act as parties to diplomacy and war."}
+- {id: player-programming, class: control}
+- {id: policy-influence-network, class: simulation-state}
+- {id: policy-toggles, class: control, why: "It writes which policies are adopted; their modifiers follow from the choice, and costs and upkeep are charges."}
+- {id: political-capital, class: control, why: "The stock is spent only on the player's actions; unlike a treasury it pays no upkeep and cannot be borrowed or traded."}
+- {id: pollution-spread, class: simulation-state}
+- {id: population-strata, class: simulation-state}
+- {id: power-allocation, class: control, why: "The split of a fixed budget among subsystems is the player's setting, and each subsystem's output follows from it."}
+- {id: power-grid, class: simulation-state}
+- {id: procedural-build-assist, class: simulation-state, why: "The player adds or removes coarse blocks, but local rules choose each cell's structure from its neighbors, so the result is not what was placed."}
+- {id: procedural-characters, class: simulation-state}
+- {id: procedural-checklists, class: simulation-state, why: "The cockpit controls are the player's, but the modelled subsystems respond to them, out-of-order steps included."}
+- {id: procedural-terrain, class: simulation-state}
+- {id: product-development, class: simulation-state, why: "The player picks the features, but quality accrues from staff skill and time and the market scores the result."}
+- {id: production-chain, class: simulation-state}
+- {id: programming-by-demonstration, class: control}
+- {id: projectile-ballistics, class: simulation-state}
+- {id: public-transit, class: simulation-state}
+- {id: pvp-security-zones, class: simulation-state, why: "A player's standing sets how modelled enforcers respond and where the player can travel safely."}
+- {id: quality-tiers, class: simulation-state}
+- {id: raid-defense, class: simulation-state}
+- {id: rail-signaling, class: simulation-state}
+- {id: random-disasters, class: simulation-state}
+- {id: rci-demand, class: simulation-state}
+- {id: real-time-clock, class: control, why: "It sets how far simulated time runs against the real clock; the catch-up it triggers is done by other mechanics."}
+- {id: real-world-data-feeds, class: simulation-state}
+- {id: relationship-values, class: simulation-state}
+- {id: renewable-regrowth, class: simulation-state}
+- {id: reputation, class: simulation-state}
+- {id: request-provider-logistics, class: simulation-state}
+- {id: resource-extraction, class: simulation-state}
+- {id: rigid-body-physics, class: simulation-state}
+- {id: rival-firms, class: simulation-state}
+- {id: road-network, class: simulation-state}
+- {id: romance-family, class: simulation-state}
+- {id: room-recognition, class: simulation-state}
+- {id: rule-checking-inspection, class: simulation-state, why: "Cases and their discrepancies are generated by chance, and verdicts pay wages or cost earnings."}
+- {id: scenario-objectives, class: meta-structure, why: "The starting state is written once; on every evaluation the rule writes the goal's status."}
+- {id: scouting-knowledge, class: presentation, why: "Its knowledge levels decide how precisely each player sees attributes that other mechanics own; scouting effort spent on them is a cost."}
+- {id: seasonal-world-reset, class: meta-structure, why: "It writes when a shared world's season ends and what carries over when it is wiped and started again, which is the session."}
+- {id: seasons, class: simulation-state}
+- {id: service-coverage, class: simulation-state}
+- {id: service-queues, class: simulation-state}
+- {id: signal-circuits, class: control, why: "The circuits are standing instructions the player wires up; their signals are the state of running them."}
+- {id: smart-objects, class: simulation-state}
+- {id: social-exchanges, class: simulation-state}
+- {id: soft-body-deformation, class: simulation-state}
+- {id: spoilage, class: simulation-state}
+- {id: stability-unrest, class: simulation-state}
+- {id: staff-hiring, class: simulation-state}
+- {id: stat-combat-resolution, class: simulation-state}
+- {id: stats-dashboards, class: presentation}
+- {id: stimulus-attraction, class: simulation-state}
+- {id: storage-capacity, class: simulation-state}
+- {id: storyteller-director, class: simulation-state}
+- {id: stress-accumulation, class: simulation-state}
+- {id: structural-integrity, class: simulation-state}
+- {id: subsystem-damage, class: simulation-state}
+- {id: supply-demand-pricing, class: simulation-state}
+- {id: supply-lines, class: simulation-state}
+- {id: surface-work-tools, class: simulation-state, why: "The tool is the player's, but how much dirt or paint it removes depends on falloff, angle, and each layer's hardness."}
+- {id: survival-meters, class: simulation-state}
+- {id: taxation, class: simulation-state, why: "The rate is the player's setting, but the rule converts the tax base into revenue each period and slows growth as the rate rises."}
+- {id: tech-tree, class: meta-structure, why: "Research progress accumulates from output, but what the rule writes is progress toward unlocks and the player's choice of which to pursue."}
+- {id: terraforming, class: control, why: "The edit follows the player's brush and is charged per cell; slope limits only spread it to neighbors, and water flow and buildability are other mechanics."}
+- {id: terrain-deformation, class: simulation-state}
+- {id: territorial-control, class: simulation-state}
+- {id: track-laying, class: control, why: "Each piece is written where the player puts it once grade and clearance are checked and the cost charged; vehicles running on it are other mechanics."}
+- {id: trade-routes, class: simulation-state}
+- {id: traffic-congestion, class: simulation-state}
+- {id: trait-inheritance, class: simulation-state}
+- {id: travel-mode-choice, class: simulation-state}
+- {id: triggered-event-chains, class: simulation-state}
+- {id: turn-structure, class: control, why: "It decides when simulated time advances, at the end of the players' turns; the world's resolution in each turn is other mechanics."}
+- {id: unit-commands, class: control}
+- {id: utility-action-selection, class: simulation-state, why: "It owns scoring weights rather than world state, but each cycle it writes the action an agent takes, which the world then carries out."}
+- {id: variable-speed, class: control}
+- {id: vehicle-dynamics, class: simulation-state}
+- {id: vehicle-route-scheduling, class: simulation-state, why: "The order list is the player's, but the rule moves each vehicle between stops and loads and unloads cargo under it."}
+- {id: vertical-layers, class: simulation-state}
+- {id: villager-requests, class: simulation-state, why: "Requests come from modelled characters and pay in money and relationship points that other mechanics read, not in score or unlocks."}
+- {id: voxel-destruction, class: simulation-state}
+- {id: walker-service-delivery, class: simulation-state}
+- {id: war-score-peace, class: simulation-state}
+- {id: wear-breakdown, class: simulation-state}
+- {id: weather, class: simulation-state}
+- {id: work-priorities, class: control, why: "It writes the player's table of which agents take which jobs first; the agents' choosing and working are other mechanics."}
+- {id: zoning, class: simulation-state, why: "The player paints the zones, but on every update the rule grows, upgrades, or abandons buildings on them from demand and access."}
