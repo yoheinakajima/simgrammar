@@ -4,12 +4,13 @@ name: Placement that tells stories
 summary: City builders where where and what the player builds triggers specific, state-aware story events
   about the inhabitants of those buildings.
 opportunity_type: new-mechanic
-thesis: 'Building placement and triggered event chains are both common but share only three catalog
-  games, Surviving Mars, Frostpunk, and Frostpunk 2, and in all three the events concern the colony or
-  the city as a whole rather than where any building stands. City builders tell almost no stories about what players
-  build, and event-driven games rarely have spatial building. Events keyed to placement,
-  adjacency, and the inhabitants affected (a tavern next to the temple, a mill that floods a
-  farmer''s field) give layout a narrative consequence. Constrained generation can instantiate
+thesis: 'Building placement and triggered event chains are both common but share only three catalog games,
+  Surviving Mars, Frostpunk, and Frostpunk 2, and in all three the events concern the colony or the city
+  as a whole rather than where any building stands. City builders seldom tell stories about what players
+  build: where one does (Heard of the Story?), villagers'' lives and dialogue respond to buildings, but
+  no event fires from a placement or its neighbors, and event-driven games rarely have spatial building.
+  Events keyed to placement, adjacency, and the inhabitants affected (a tavern next to the temple, a mill
+  that floods a farmer''s field) give layout a narrative consequence. Constrained generation can instantiate
   such events from templates at scale while keeping effects inside the rules.'
 design_sketch: When the player places or removes a building, the event system evaluates templates against
   neighbors, inhabitants, and history; a few fire as short vignettes with choices whose effects are typed

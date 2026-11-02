@@ -43,7 +43,7 @@ Each record carries an epistemic status. `asserted` means written from domain kn
 
 {{table:evidence-by-type}}
 
-Status and citing are different counts. {{stat:n_records_citing}} records cite at least one source, more than are sourced or verified, because the contested record cites both sides and {{stat:n_asserted_citing}} asserted records already cite a source in a claim but have not been promoted.{{assert:n_records_citing > n_sourced_or_verified}} So every technique is sourced or verified,{{assert:n_technique_asserted == 0}} every game cites at least one source,{{assert:n_game_no_sources == 0}} and {{stat:n_game_sourced_or_verified}} of the {{count:game}} games are sourced or verified; every opportunity is asserted, because an opportunity is an argument with no source to cite.{{assert:n_opportunity_asserted == n_opportunity}}
+Status and citing are different counts. {{stat:n_records_citing}} records cite at least one source, more than are sourced or verified, because the contested record cites both sides and {{stat:n_asserted_citing}} asserted records already cite a source in a claim but have not been promoted.{{assert:n_records_citing > n_sourced_or_verified}} So every technique is sourced or verified,{{assert:n_technique_asserted == 0}} every game cites at least one source,{{assert:n_game_no_sources == 0}} and {{stat:n_game_sourced_or_verified}} of the {{count:game}} games are sourced or verified; every opportunity is asserted, because an opportunity is an argument: the sources it cites document prior art, other work its novelty is measured against (§9.1), not the claim that its design would work.{{assert:n_opportunity_asserted == n_opportunity}}{{assert:n_opportunity_no_sources == 0}}
 
 ### 2.5 Production
 
