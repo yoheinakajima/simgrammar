@@ -59,17 +59,18 @@ The first set has 79 icons:
 
 A `**Frame.**` line under a Picture line names a frame template and its arguments. The grammar is `scripts/visual/frames.py`.
 
-There are eleven templates: anatomy, chain, compare, count, timeline, formula, scale, record, moment, toysim, and mockup. Each has variants:
+There are twelve templates: anatomy, chain, compare, count, timeline, formula, scale, record, moment, toysim, mockup, and site. Each has variants:
 
 - **anatomy**: a game's parts (core, all, the parts it was first to use, or a list), a hub of objects, or a blank row.
 - **chain**: a causal chain in one or two rows, with signs and loops, or a fan from one node.
 - **compare**: two drawn columns, or two games with their families, shared parts, or own core parts.
-- **count**: bars, tiles, histograms, a Venn of two mechanics, a set, units, figures from a source, a tally of a vocab field, piles, a spread over years, one stat, a ranked table, or packages of mechanics.
-- **timeline**: first appearances, the gap to a second game, the bets due on a date or by year, or techniques by year.
+- **count**: bars, tiles, histograms, a Venn of two mechanics, a set, units, figures from a source, a tally of a vocab field, piles, a spread over years, one stat, a ranked table, packages of mechanics, the catalog's totals, or every icon in this vocabulary. Bars may name games that use each mechanic.
+- **timeline**: first appearances, the gap to a second game, the bets due on a date or by year, techniques by year, or every catalog game by year.
 - **formula**: terms, groups, and constants with units, or a composite from `vocab/rubrics.yaml`.
 - **scale**: one rubric scale, or rulers that place several mechanics.
 - **record**: a mechanic, bet, technique, run, or game record; several bets; a line of a script's source; or a card of lines.
 - **mockup**: a window, terminal, document, or stand-in, always labelled mock-up, re-enactment, or stand-in.
+- **site**: a screenshot of this project's own site as the same build renders it (`dist/web`), added for the intro (run 2026-11-01-intro-video). It is not drawn, and it shows no other site.
 
 A Picture may carry several Frame lines. Each one after the first has `at="..."`, the narration words where it takes over.
 

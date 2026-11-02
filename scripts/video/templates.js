@@ -156,7 +156,7 @@ T.bars = (f, cur, W, H) => {
   const v = VERT(), d = v ? pick([72, 48, 42], d => f.items.length * (d * PX() + 20) <= H) : (f.items.length <= 4 ? 72 : 48);
   const items = f.items.map(e => {
     const on = isOn(cur, e.id);
-    return `<div class="f-bitem f-u">${f.rank ? `<div class="f-rank${on ? " acc" : ""}">${e.rank}</div>` : ""}${ic(e, on, d)}<div class="f-btext"><div class="f-lab${on ? " acc" : ""}">${esc(e.label)}</div><div class="f-num${on ? " acc" : ""}">${cnt(e.n)}<small> of ${f.N} ${esc(f.of || "games")}</small></div>${bar(e.n, f.N, on)}</div></div>`;
+    return `<div class="f-bitem f-u">${f.rank ? `<div class="f-rank${on ? " acc" : ""}">${e.rank}</div>` : ""}${ic(e, on, d)}<div class="f-btext"><div class="f-lab${on ? " acc" : ""}">${esc(e.label)}</div><div class="f-num${on ? " acc" : ""}">${cnt(e.n)}<small> of ${f.N} ${esc(f.of || "games")}</small></div>${bar(e.n, f.N, on)}${e.games && e.games.length ? `<div class="f-mono f-bgames${on ? " acc" : ""}">${e.games.map(esc).join(" · ")}</div>` : ""}</div></div>`;
   }).join("");
   return `<div class="f-bars${v ? " v" : ""}${f.items.length <= 4 ? " few" : ""}">${items}</div>`;
 };
@@ -351,7 +351,7 @@ T.rulers = (f, cur, W, H) => {
     <div class="f-rends f-mono" style="width:${rw + 60}px"><span>1: ${esc(r.lo)}</span><span>${r.n}: ${esc(r.hi)}</span></div></div>`).join("")}</div>`;
 };
 
-T.cards = (f, cur, W, H) => `<div class="f-bcards${VERT() ? " v" : ""}">${f.cards.map(c => { const on = isOn(cur, c.id);
+T.cards = (f, cur, W, H) => `<div class="f-bcards${VERT() ? " v" : f.cards.length === 3 ? " three" : ""}">${f.cards.map(c => { const on = isOn(cur, c.id);
   return `<div class="f-bcard f-u${on ? " on" : ""}"><div class="f-lab">${esc(c.name)}</div><div class="f-bp">${esc(c.pred)}</div>${VERT() ? "" : c.crit.map(x => `<div class="f-mono">${esc(x)}</div>`).join("")}<div class="f-mono ink">resolves ${esc(c.due)}</div></div>`; }).join("")}</div>`;
 
 T.source = (f, cur, W, H) => `<div class="f-src${VERT() ? " v" : ""}"><div class="f-mono faint">${esc(f.file)}</div><div class="f-srcl f-u">${f.parts.map(p => p.tok ? `<span class="f-tok">${esc(p.text)}</span>` : esc(p.text)).join("")}</div><div class="f-mono ink">blue: tokens the build fills in and checks</div></div>`;
@@ -375,6 +375,90 @@ T.mockup = (f, cur, W, H) => {
     : f.kind === "standin" ? `<div class="f-stand"><div class="f-standpic">${f.subject ? `<div class="f-standsub">${esc(f.subject)}</div>` : ""}${chart}</div>${lines.map(l => `<div class="f-mline">${esc(l)}</div>`).join("")}</div>`
     : `${items}${chart}<div class="f-mlines">${lines.map((l, k) => `<div class="f-mline${k === 0 && lines.length > 1 ? " head" : ""}">${esc(l)}</div>`).join("")}</div>${f.button ? `<div class="f-mbtn">${esc(f.button)}</div>` : ""}`;
   return `<div class="f-mock${v ? " v" : ""} k-${f.kind}"><div class="f-mtag f-mono">${esc(f.label)}</div><div class="f-win f-u"><div class="f-wbar"><i></i><i></i><i></i><span>${esc(f.title)}</span></div><div class="f-wbody">${body}</div></div></div>`;
+};
+
+// the catalog in four numbers: games, mechanics, techniques, predictions; the one the narration has reached is in the accent
+T.totals = (f, cur, W, H) => `<div class="f-totals${VERT() ? " v" : ""}">${f.cells.map(c => { const on = isOn(cur, c.id);
+  return `<div class="f-tot f-u${on ? " on" : ""}"><div class="f-totn${on ? " acc" : ""}">${cnt(c.n)}</div><div class="f-totl">${esc(c.label)}</div><div class="f-mono">${esc(c.sub)}</div></div>`; }).join("")}</div>`;
+
+// every catalog game as one square on its release year, stacked; the named games are pinned with their names
+T.gameyears = (f, cur, W, H) => {
+  const v = VERT(), span = f.hi - f.lo + 1, by = {};
+  f.games.forEach(g => (by[g.year] = by[g.year] || []).push(g));
+  const most = Math.max(...Object.values(by).map(a => a.length));
+  const named = new Map(f.named.map(x => [x.id, x]));
+  const lab = x => { const on = isOn(cur, x.id); return `<div class="f-gyl f-u${on ? " on" : ""}"><span class="f-lab sm${on ? " acc" : ""}">${esc(x.label)}</span><span class="f-mono${on ? " acc" : ""}">${x.year}</span></div>`; };
+  const LH = v ? 40 : 34;   // one label line: the name, then the year
+  const ticks = []; for (let y = Math.ceil(f.lo / 10) * 10; y <= f.hi; y += 10) ticks.push(y);
+  if (v) {   // 9:16: years run down the page, the stacks grow right, the names sit right of the stacks
+    const top = 40, bot = 90, step = (H - top - bot) / span, sq = Math.max(6, Math.min(step - 3, 22)), axisX = 110;
+    const yOf = y => top + (y - f.lo) * step;
+    let sqs = "", pins = "", labs = "", ty = -1e9;
+    for (const [y, gs] of Object.entries(by)) gs.forEach((g, k) => {
+      const on = g.on && isOn(cur, g.g);
+      sqs += `<div class="f-gys f-u${g.on ? " named" : ""}${on ? " on" : ""}" style="left:${axisX + 12 + k * (sq + 3)}px;top:${yOf(+y)}px;width:${sq}px;height:${sq}px"></div>`;
+    });
+    const lx = axisX + 12 + most * (sq + 3) + 70;
+    f.named.forEach(x => {
+      const k = by[x.year].findIndex(g => g.g === x.id), sy = yOf(x.year) + sq / 2, ly = Math.max(sy - LH / 2, ty + LH + 10); ty = ly;
+      const sx = axisX + 12 + k * (sq + 3) + sq;
+      pins += `<line class="f-draw" x1="${sx + 4}" y1="${sy}" x2="${lx - 10}" y2="${ly + LH / 2}" stroke="${isOn(cur, x.id) ? "#0550ae" : "#a3a39a"}" stroke-width="2"/>`;
+      labs += `<div class="f-gyw" style="left:${lx}px;top:${ly}px">${lab(x)}</div>`;
+    });
+    const tk = ticks.map(y => `<div class="f-mono f-gyt" style="left:0;top:${yOf(y) - 6}px;width:${axisX - 14}px;text-align:right">${y}</div>`).join("");
+    return `<div class="f-gyears v" style="width:${W}px;height:${H}px"><div class="f-gyaxis" style="left:${axisX}px;top:${top}px;height:${H - top - bot}px"></div>${tk}${sqs}<svg width="${W}" height="${H}">${pins}</svg>${labs}
+      <div class="f-mono ink f-gycap">${f.N} games, ${f.lo} to ${f.hi}, one square each</div></div>`;
+  }
+  const left = 60, right = 60, bot = 110, step = (W - left - right) / span, sq = Math.max(6, Math.min(step - 3, 24));
+  const xOf = y => left + (y - f.lo) * step;
+  const base = H - bot, stackH = most * (sq + 3);
+  let sqs = "";
+  for (const [y, gs] of Object.entries(by)) gs.forEach((g, k) => {
+    const on = g.on && isOn(cur, g.g);
+    sqs += `<div class="f-gys f-u${g.on ? " named" : ""}${on ? " on" : ""}" style="left:${xOf(+y)}px;top:${base - (k + 1) * (sq + 3)}px;width:${sq}px;height:${sq}px"></div>`;
+  });
+  // names in lanes above the stacks, each pinned to its square: a lane is free when no name in it overlaps this one, no
+  // deeper name sits across this pin, and no shallower pin runs down through this name
+  const laneH = LH + 22, lw = x => 76 + 13.2 * x.label.length, placed = [];
+  let pins = "", labs = "";
+  f.named.forEach(x => {
+    const w = lw(x), cx = xOf(x.year) + sq / 2, lx = Math.min(Math.max(cx - 14, 0), W - w);
+    let lane = 0;
+    const free = L => placed.every(p => (p.lane !== L || lx >= p.r + 24 || lx + w + 24 <= p.l) && (p.lane <= L || cx < p.l - 8 || cx > p.r + 8) && (p.lane >= L || p.cx < lx - 8 || p.cx > lx + w + 8));
+    while (!free(lane)) lane++;
+    placed.push({ lane, l: lx, r: lx + w, cx, x, w });
+  });
+  const nl = Math.max(...placed.map(p => p.lane)) + 1, top0 = Math.max(10, base - stackH - 40 - nl * laneH);
+  placed.forEach(({ lane, l: lx, cx, x }) => {
+    const ly = top0 + lane * laneH, k = by[x.year].findIndex(g => g.g === x.id), sy = base - (k + 1) * (sq + 3);
+    pins += `<line class="f-draw" x1="${cx}" y1="${ly + LH + 4}" x2="${cx}" y2="${sy - 4}" stroke="${isOn(cur, x.id) ? "#0550ae" : "#a3a39a"}" stroke-width="2"/>`;
+    labs += `<div class="f-gyw" style="left:${lx}px;top:${ly}px">${lab(x)}</div>`;
+  });
+  const tk = ticks.map(y => `<div class="f-mono f-gyt" style="left:${xOf(y) - 40}px;top:${base + 16}px;width:${80 + sq}px;text-align:center">${y}</div>`).join("");
+  return `<div class="f-gyears" style="width:${W}px;height:${H}px"><div class="f-gyaxis h" style="left:${left - 10}px;top:${base + 4}px;width:${W - left - right + 20}px"></div>${tk}${sqs}<svg width="${W}" height="${H}">${pins}</svg>${labs}
+    <div class="f-mono ink f-gycap">${f.N} games, ${f.lo} to ${f.hi}, one square each</div></div>`;
+};
+
+// every icon the project has drawn, in one grid; the groups the narration names light up in the accent
+T.iconmap = (f, cur, W, H) => {
+  const v = VERT(), capH = v ? 120 : 64, n = f.icons.length;
+  let best = null;
+  for (let cols = 6; cols <= n; cols++) {
+    const rows = Math.ceil(n / cols), cell = Math.min(W / cols, (H - capH) / rows);
+    if (!best || cell > best.cell) best = { cols, rows, cell };
+  }
+  const d = Math.floor(best.cell * 0.84);
+  const cells = f.icons.map(e => { const on = isOn(cur, e.group);
+    const src = `${VISDIR}/icons/${e.ic}${on ? ".accent" : ""}@${PX()}x.png`;
+    return `<div class="f-imc f-u" style="width:${best.cell}px;height:${best.cell}px"><img class="f-imi" src="${src}" width="${d}" height="${d}" alt=""></div>`; }).join("");
+  return `<div class="f-iconmap${v ? " v" : ""}"><div class="f-imgrid" style="grid-template-columns:repeat(${best.cols},${best.cell}px)">${cells}</div>
+    <div class="f-imcap"><span class="f-num sm">${cnt(f.N)}</span><span class="f-mono ink">icons · ${f.counts.map(esc).join(" · ")}</span></div></div>`;
+};
+
+// the project's own site, as this build renders it: render.js takes the screenshot (f.shot) before the frames are drawn
+T.site = (f, cur, W, H) => {
+  const bh = H - 48, w = Math.min(W, Math.round(bh * f.vw / f.vh));
+  return `<div class="f-site"><div class="f-win f-u" style="width:${w}px"><div class="f-wbar"><i></i><i></i><i></i><span class="f-url">${esc(f.url)}</span></div><div class="f-wbody f-shot"><img src="${f.shot}" width="${w - 4}" height="${Math.round((w - 4) * f.vh / f.vw)}" alt=""></div></div></div>`;
 };
 
 function frameHTML(f, cur, W, H) { return (T[f.t] || (() => `<div class="f-mono">no template ${esc(f.t)}</div>`))(f, cur, W, H); }

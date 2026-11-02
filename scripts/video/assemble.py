@@ -1,8 +1,8 @@
 """Render the video series from the scripts in media/ and the narration takes listed in media/narration.yaml.
 
     make build                                   # dist/media (scripts with figures resolved) and dist/paper/figures
-    python scripts/video/assemble.py ep1         # or short1 .. short12, film, all
-    -> video-out/final/<name>.mp4   (video-out/ is gitignored; make build prunes anything it did not write in dist/)
+    python scripts/video/assemble.py ep1         # or short1 .. short12, film, intro, all
+    -> video-out/final/<name>.mp4               (intro: intro.mp4 at 16:9 and intro-vertical.mp4 at 9:16)   (video-out/ is gitignored; make build prunes anything it did not write in dist/)
 
 Each scene becomes stills (headless Chromium via Playwright, scripts/video/render.html) held for the length of its
 narration take; the takes are read from video-out/audio (or $SIMGRAMMAR_AUDIO) and normalized to -16 LUFS.
@@ -69,7 +69,8 @@ def segment_script(seg, states, chunks, vertical):
         if any(b['kind'] == 'voice' for b in s['blocks']):
             if os.path.exists(afile(src)): pcms[k] = pcm(afile(src)); durs[k] = len(pcms[k]) / SR
             else: print(f"no take for {src}; timed at 135 words a minute and left silent", file=sys.stderr)
-    st, au = build(key, sc, durs, header=seg['header'], drop_title=seg.get('drop_title'), drop_last=seg.get('drop_last'), only=seg.get('only'))
+    pace = {k: seg[k] for k in ('lead', 'tail', 'silent') if k in seg}   # the intro's tighter gaps around each take
+    st, au = build(key, sc, durs, header=seg['header'], drop_title=seg.get('drop_title'), drop_last=seg.get('drop_last'), only=seg.get('only'), **pace)
     states += st
     for a in au:
         if a['has_voice'] and a['key'] in pcms:
@@ -146,6 +147,11 @@ def short(n, key):
     t = S[key]['title']; t = t.split('. ', 1)[1] if '. ' in t else t
     return [{'type': 'short', 'key': key, 'header': f"SimGrammar · Short {n}", 'audio': os.path.join(AUD, 'shorts__' + os.path.basename(key)[:-3] + '.mp3')}]
 
+def intro(key):
+    """The intro: one take per scene, as the episodes, with short gaps between the scenes, then the end slate."""
+    return [{'type': 'script', 'key': key, 'header': 'SimGrammar', 'lead': 0.15, 'tail': 0.35},
+            {'type': 'slate', 'header': 'SimGrammar', 'title': DOMAIN, 'sub': 'Every game, mechanic, technique, and bet has a page, with its sources.', 'dur': 3.5}]
+
 if __name__ == '__main__':
     which = sys.argv[1]
     eps = sorted(k for k in S if k.startswith('episodes/'))
@@ -156,7 +162,12 @@ if __name__ == '__main__':
         n = int(which[5:]); make(f'short-{n:02d}', short(n, shs[n - 1]), vertical=True)
     elif which == 'film':
         make('the-film', film(eps))
+    elif which == 'intro':
+        k = sorted(k for k in S if k.startswith('intro/'))[0]
+        make('intro', intro(k)); make('intro-vertical', intro(k), vertical=True)
     elif which == 'all':
         for n in range(1, len(eps) + 1): make(f'episode-{n:02d}', episode(n, eps[n - 1]))
         for n in range(1, len(shs) + 1): make(f'short-{n:02d}', short(n, shs[n - 1]), vertical=True)
         make('the-film', film(eps))
+        for k in sorted(k for k in S if k.startswith('intro/'))[:1]:
+            make('intro', intro(k)); make('intro-vertical', intro(k), vertical=True)

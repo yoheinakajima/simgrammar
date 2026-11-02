@@ -95,6 +95,8 @@ def fields_words(fields):
 def names(i, extra=()):
     """Words in narration that point at element i (its label, record name and aliases, the vocab aliases)."""
     D = data(); out = {label(i)} | set(extra)
+    if i in D['G']:
+        out |= {D['G'][i]['name']} | {a for a in D['G'][i].get('aliases') or [] if len(a) >= 5}
     if i in D['M']:
         out |= {D['M'][i]['name']} | {a for a in D['M'][i].get('aliases') or [] if len(a) >= 5}
     if i in D['T']:
@@ -387,8 +389,15 @@ def resolve(text, scene_onscreen='', out_dir=None):
                  mech=mech, note=note, chip=chip, source=source, label='toy simulation of the rule')
     elif t == 'mockup':
         mockup(f, a, D)
+    elif t == 'site':
+        page = a['page']
+        if 'web' + page + 'index.html' not in _built and not os.path.exists(os.path.join(DIST, 'web', page.strip('/'), 'index.html')):
+            raise KeyError(f"no page {page} in the built site")
+        dom = yaml.safe_load(open(os.path.join(ROOT, 'report', 'meta.yaml'), encoding='utf-8'))['site']['domain']
+        f.update(page=page, scroll=int(a.get('scroll', 0)), url=dom + page.rstrip('/'), source=f"screenshot of {dom} as this build renders it")
     f['current'] = cur
-    f['names'] = {i: names(i) for i in f['elements']}
+    cues = f.pop('cues', None)
+    f['names'] = cues or {i: names(i) for i in f['elements']}
     return f
 
 
@@ -398,9 +407,12 @@ def count(f, a, D, NG, onscreen, out_dir):
         ids = [i for i, _ in FR.items(a['ids'])]
         by_exp = a.get('rank_by') == 'exposure'
         exp_order = sorted(D['M'], key=lambda m: (-D['M'][m]['_derived'].get('technique_exposure', 0), m))
+        withs = [[D['G'][g]['name'] for g, _ in FR.items(r)] for r in a['with'].split('|')] if a.get('with') else [[] for _ in ids]
         f.update(t='bars', N=NG, rank=bool(a.get('rank') or a.get('rank_by')),
-                 items=[el(i, lab, n=prev(i), rank=(exp_order.index(i) + 1) if by_exp else D['M'][i]['_derived'].get('prevalence_rank')) for i, lab in FR.items(a['ids'])],
-                 source='counts: catalog games using each mechanic · ranked by ' + ('how many techniques reach it' if by_exp else 'how many games use it'))
+                 items=[el(i, lab, n=prev(i), rank=(exp_order.index(i) + 1) if by_exp else D['M'][i]['_derived'].get('prevalence_rank'), games=w)
+                        for (i, lab), w in zip(FR.items(a['ids']), withs)],
+                 source='counts: catalog games using each mechanic · ranked by ' + ('how many techniques reach it' if by_exp else 'how many games use it')
+                 + (' · named: catalog games that use it' if a.get('with') else ''))
         f['elements'] = ids
     elif k == 'tiles':
         fam = a['family']
@@ -496,6 +508,36 @@ def count(f, a, D, NG, onscreen, out_dir):
                                      'outcome': D['B'][b]['_derived'].get('prediction_status', '')} for i, b in enumerate(order)],
                  N=len(D['B']), source='bets by priority: the ranked bets · outcome: each prediction\'s status')
         f['elements'] = order
+    elif k == 'totals':
+        yrs = [g['year'] for g in D['G'].values()]
+        due = sorted(str(b['falsifiable_signal']['resolve_by']) for b in D['B'].values())
+        fams = {m['family'] for m in D['M'].values()}
+        links = sum(len(tq.get('affects') or []) for tq in D['T'].values())
+        f.update(t='totals', cells=[
+            {'id': 'game', 'n': NG, 'label': 'simulation games', 'sub': f"released {min(yrs)} to {max(yrs)}"},
+            {'id': 'mechanic', 'n': len(D['M']), 'label': 'mechanics', 'sub': f"in {len(fams)} families"},
+            {'id': 'technique', 'n': len(D['T']), 'label': 'AI and ML techniques', 'sub': f"{links} links to mechanics"},
+            {'id': 'prediction', 'n': len(D['B']), 'label': 'predictions', 'sub': f"due {due[0][:4]} to {due[-1][:4]}" if due else ''}],
+                 source='counts: the catalog records · years: release years and the predictions\' resolve-by dates')
+        f['elements'] = ['game', 'mechanic', 'technique', 'prediction']
+        f['cues'] = {g: [w] for g, w in FR.items(a.get('cues', ''))}
+    elif k == 'icons':
+        order = {'mechanic': 0, 'family': 0, 'subgenre': 1, 'technique-category': 2, 'technique': 2, 'noun': 3, 'term': 4}
+        fam = lambda i: D['M'][i]['family'] if i in D['M'] else i
+        ics = sorted(D['icons'], key=lambda i: (order.get(D['icons'][i]['kind'], 9), fam(i) if D['icons'][i]['kind'] in ('mechanic', 'family') else '',
+                                               D['icons'][i]['kind'] != 'family', i))
+        kinds = {}
+        for i in ics:
+            kinds[D['icons'][i]['kind']] = kinds.get(D['icons'][i]['kind'], 0) + 1
+        group = lambda kd: {'technique-category': 'technique', 'family': 'mechanic'}.get(kd, kd)
+        # tiles name their picture 'ic': the map shows the vocabulary, not each record (publish.py counts 'id' and 'icon')
+        f.update(t='iconmap', icons=[{'ic': i, 'group': group(D['icons'][i]['kind'])} for i in ics], N=len(ics),
+                 counts=[f"{kinds.get('mechanic', 0)} mechanics", f"{kinds.get('family', 0)} families", f"{kinds.get('subgenre', 0)} genres",
+                         f"{kinds.get('technique', 0) + kinds.get('technique-category', 0)} techniques and their kinds",
+                         f"{kinds.get('noun', 0) + kinds.get('term', 0)} other subjects"],
+                 source='every icon in the visual vocabulary, drawn for this project · grouped by what it names')
+        f['elements'] = sorted({group(D['icons'][i]['kind']) for i in ics})
+        f['cues'] = {g: [w] for g, w in FR.items(a.get('cues', ''))}
     elif k == 'packages':
         rows = []
         for r in FR.rows(a['rows']):
@@ -543,6 +585,16 @@ def timeline(f, a, D, NG):
             run += ys[y]; rows.append({'year': y, 'n': ys[y], 'cum': run})
         last = max(str(b['falsifiable_signal']['resolve_by']) for b in D['B'].values())
         f.update(t='dueyears', rows=rows, N=len(D['B']), last=fmt_date(last), source='bets by the year their predictions resolve')
+    elif kind == 'games':
+        ids = [i for i, _ in FR.items(a['ids'])]
+        G = sorted(D['G'].values(), key=lambda g: (g['year'], g['id']))
+        # each square keeps its game under 'g', not 'id': only the named games count as records on screen (publish.py)
+        f.update(t='gameyears', games=[{'g': g['id'], 'year': g['year'], 'on': g['id'] in ids} for g in G],
+                 named=[el(i, D['G'][i]['name'], year=D['G'][i]['year']) for i in ids], lo=G[0]['year'], hi=G[-1]['year'], N=NG,
+                 source='every catalog game by release year · named: catalog game records')
+        for x in f['named']:
+            x.pop('icon')   # a game is drawn as its name and a mark on the axis, not as a picture
+        f['elements'] = ids
     elif kind == 'techniques':
         by = {}
         for tq in sorted(D['T'].values(), key=lambda x: (x.get('year') or 0, x['id'])):

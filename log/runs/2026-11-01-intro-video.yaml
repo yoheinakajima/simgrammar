@@ -1,0 +1,34 @@
+id: 2026-11-01-intro-video
+type: run
+kind: maintenance
+date: '2026-11-01'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Write and render a fast intro video for the project, with every number read from the dataset,
+  and publish it from the media repository.
+method: >-
+  Changed no records or sources. Wrote media/intro/intro.md, a six-scene intro (16:9 for the home page, 9:16 for social
+  posts) whose numbers are all tokens: the catalog totals, the year range, the share of games with a pause button, and
+  the prediction window. That window needed two stats, added to scripts/analyze.py at the operator's direction: whole
+  calendar years from report/meta.yaml's date to the first and last resolve-by date (1 and 4 for this dataset). Its
+  sentences that name the oldest and newest game and the first and last bet carry assertions. New frames: count
+  kind=totals, count kind=icons (every icon in media/visual, 386), bars with=games that use each mechanic (E040 checks
+  each game uses it), timeline kind=games (every catalog game by year), and site, a screenshot of simgrammar.com as the
+  same build renders it, served from dist/web under its address with no network; posters come from
+  fetch_published.py. Phone-size screenshots first timed out waiting on lazy images inside closed blocks; render.js now
+  waits only for pictures in view. The intro takes one take per scene with short gaps and an end slate. A silent draft
+  timed at 16.15 characters a second was approved; each scene was then voiced twice with Marcus on eleven_v4 in flow
+  9Gjpr3tlYAMkxWsf9i5l (2,084 credits) and the take nearer that pace kept (scene 2's two takes were the same length; the
+  first is listed). The takes ran slower than the pace, so the videos are 78.4 s. publish.py now writes an intro entry
+  (both formats, scenes, poster from the icon map) and fetch_published.py fetches it; web.py puts the 16:9 render under
+  the home page title with its transcript. Timeline squares and map tiles no longer count as records on screen, and
+  'credit' joined the aliases too broad for narration: it put loans-debt on episode 2's "gets the credit" line and on
+  this script's bets line; episode 2's published scenes keep that link until its next render. Re-running publish.py
+  with ffmpeg 6 changed every poster's bytes, so it was run with the default ffmpeg 9 that made the published posters;
+  the other 24 entries are unchanged. make check, make determinism, and a local preview of the home page (desktop and
+  phone, playing in place) passed.
+contract_version: '1.2'
+proposals: []

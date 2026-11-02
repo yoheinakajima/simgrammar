@@ -1,4 +1,4 @@
-"""Grammar of **Frame.** lines in media/episodes, media/shorts, and media/mega (ADR-0006).
+"""Grammar of **Frame.** lines in media/episodes, media/shorts, media/mega, and media/intro (ADR-0006).
 
 A Frame line sits under a Picture line and names one frame template and its arguments:
 
@@ -17,8 +17,12 @@ The templates and their variants:
     chain     nodes=<rows> [signs] [verbs] [loops] [fan]         a causal chain; fan: the first node feeds all the others
     compare   a= b= a_items= b_items=                            two drawn columns
               games=<id>,<id> [show=family|shared|own]           two games: their families, shared parts, or own core parts
-    count     kind=bars|tiles|roles|venn|set|units|figures|tally|piles|spread|stat|ranked|packages (see TEMPLATES)
-    timeline  ids=<mechanics> | kind=gap|due|due-years|techniques
+    count     kind=bars|tiles|roles|venn|set|units|figures|tally|piles|spread|stat|ranked|packages|totals|icons (see TEMPLATES)
+              bars with=<games|...>: the games named under each bar, one row of game ids per mechanic, each using it
+              totals and icons cues=<group:word,...>: the narration word that lights each group (game, mechanic, technique,
+              prediction; or an icon kind)
+    timeline  ids=<mechanics> | kind=gap|due|due-years|techniques | kind=games ids=<games>   games: the catalog by release year
+    site      page=<path> [scroll=<px>]                          a screenshot of the project's own site as this build renders it
     formula   result= terms= [from=] [rule=]                     terms may be numbers with a unit label (250:points) and ( ) groups
     scale     field=<mechanic>.<field> | ids= fields=            one rubric scale, or rulers placing several mechanics
     record    mechanic= | bet= | technique= | run= | game= | bets= | script= find= | lines= (a blank or rules card)
@@ -37,7 +41,7 @@ DATE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
 
 # key -> kind of value. Kinds: game, games, mechanic, mechanics, elements, family, icon, items, rows, signs, words, loops,
 # text, lines, phrase, field, fields, gamemech, from, terms, panels, bet, bets, technique, techniques, run, source, stat,
-# date, enum:<a|b>, number, flag
+# date, enum:<a|b>, number, flag, gamerows, page
 COMMON = {"at": "phrase", "current": "words"}
 TEMPLATES: dict[str, dict] = {
     "anatomy": {"keys": {"game": "game", "parts": "words", "hub": "icon", "spokes": "items", "weights": "enum:illustrative",
@@ -48,14 +52,15 @@ TEMPLATES: dict[str, dict] = {
     "compare": {"keys": {"a": "text", "b": "text", "a_items": "items", "b_items": "items", "from": "gamemech", "games": "games",
                          "show": "enum:family|shared|own"},
                 "one_of": [("a", "b", "a_items", "b_items"), ("games",)]},
-    "count": {"keys": {"kind": "enum:bars|tiles|roles|venn|set|units|figures|tally|piles|spread|stat|ranked|packages",
+    "count": {"keys": {"kind": "enum:bars|tiles|roles|venn|set|units|figures|tally|piles|spread|stat|ranked|packages|totals|icons",
                        "ids": "elements", "family": "family", "lit": "enum:affected|none", "rank": "flag", "rank_by": "enum:prevalence|exposure",
                        "a": "text", "b": "text", "a_ids": "techniques", "b_ids": "techniques", "groups": "words", "dates": "flag",
                        "total": "number", "on": "number", "also": "number", "unit": "icon", "labels": "words", "from": "from",
                        "rows": "lines", "cols": "words", "of": "enum:technique|opportunity|record|link", "field": "text",
-                       "where": "enum:in-play|shipped", "names": "flag", "id": "mechanic", "stat": "stat", "label": "text", "n": "number"},
+                       "where": "enum:in-play|shipped", "names": "flag", "id": "mechanic", "stat": "stat", "label": "text", "n": "number",
+                       "with": "gamerows", "cues": "words"},
               "required": ("kind",)},
-    "timeline": {"keys": {"ids": "mechanics", "kind": "enum:first|gap|due|due-years|techniques", "date": "date", "bet": "bet"}},
+    "timeline": {"keys": {"ids": "mechanics", "kind": "enum:first|gap|due|due-years|techniques|games", "date": "date", "bet": "bet"}},
     "formula": {"keys": {"result": "items", "terms": "terms", "from": "from", "rule": "enum:opportunity_priority"}, "required": ("result", "terms")},
     "scale": {"keys": {"field": "field", "ids": "mechanics", "fields": "fields"}, "one_of": [("field",), ("ids", "fields")]},
     "record": {"keys": {"mechanic": "mechanic", "bet": "bet", "bets": "bets", "technique": "technique", "run": "run", "game": "game",
@@ -68,12 +73,14 @@ TEMPLATES: dict[str, dict] = {
     "mockup": {"keys": {"kind": "enum:ui|terminal|doc|standin", "title": "text", "lines": "lines", "items": "items", "bet": "bet",
                         "from": "from", "subject": "text", "chart": "enum:fan|timer", "button": "text", "label": "enum:mock-up|re-enactment|stand-in"},
                "required": ("kind",)},
+    "site": {"keys": {"page": "page", "scroll": "number"}, "required": ("page",)},
 }
 # the count kinds and the keys each needs
 COUNT_NEEDS = {"bars": ("ids",), "tiles": ("family",), "venn": ("a", "b"), "set": ("ids",), "units": ("total", "on", "from"),
                "figures": ("rows", "cols", "from"), "tally": ("of", "field"), "piles": ("a", "b", "a_ids", "b_ids"), "spread": ("id",),
                "stat": ("stat",), "ranked": ("of",), "packages": ("rows",)}
-TIMELINE_NEEDS = {"first": ("ids",), "gap": ("ids",), "due": (), "due-years": (), "techniques": ()}
+TIMELINE_NEEDS = {"first": ("ids",), "gap": ("ids",), "due": (), "due-years": (), "techniques": (), "games": ("ids",)}
+PAGE = re.compile(r"^/(?:[a-z0-9][a-z0-9-]*/)*$")   # a site path, as the site links it: /, /mechanic/power-grid/
 
 
 class FrameError(ValueError):
@@ -138,6 +145,8 @@ def parse(text: str) -> tuple[str, dict[str, str]]:
             raise FrameError(f"'{k}' must be a number, not '{v}'")
         if kind == "date" and not DATE.match(v):
             raise FrameError(f"'{k}' must be a date YYYY-MM-DD, not '{v}'")
+        if kind == "page" and not PAGE.match(v):
+            raise FrameError(f"'{k}' is a site path that starts and ends with /, not '{v}'")
     return head, args
 
 
@@ -215,7 +224,7 @@ def icon_refs(template: str, args: dict[str, str]) -> list[str]:
             refs += [i for _, i, _ in terms(v) if not numeric(i)]
         elif kind == "panels":
             refs += [i for ics, _ in panels(v) for i in ics]
-        elif kind in ("mechanics", "elements"):
+        elif kind in ("mechanics", "elements") and not (template == "timeline" and args.get("kind") == "games"):
             refs += [i for r in v.split("|") for i, _ in items(r)]
     if template == "anatomy" and "game" in args and args.get("parts", "core") not in ("core", "all", "firsts"):
         refs += [i for i, _ in items(args["parts"])]

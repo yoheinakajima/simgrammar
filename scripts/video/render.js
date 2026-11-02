@@ -16,6 +16,38 @@ const { chromium } = require('playwright'); const fs = require('fs'); const path
   await p.evaluate(fs => Promise.all(fs.map(f => document.fonts.load(f))), faces);
   const missing = await p.evaluate(fs => fs.filter(f => !document.fonts.check(f) || ![...document.fonts].some(x => x.status === 'loaded' && f.includes(x.family.replace(/"/g, '')))), faces);
   if (missing.length) throw new Error('fonts not loaded: ' + missing.join(', '));
+  // site frames (templates.js T.site): screenshot the project's own site as this build renders it (dist/web), served
+  // under its real address with no network, at a desktop size for 16:9 and a phone size for 9:16
+  const webDir = path.resolve(figDir, '..', '..', 'web'), shots = new Map();
+  for (const s of states) {
+    if (!s.frame || s.frame.t !== 'site') continue;
+    const key = `${s.frame.page}|${s.frame.scroll}`;
+    if (!shots.has(key)) {
+      const [vw, vh, dpr] = vert ? [460, 900, 3] : [1120, 630, 2];
+      const ctx = await b.newContext({ viewport: { width: vw, height: vh }, deviceScaleFactor: dpr });
+      const host = 'https://' + s.frame.url.split('/')[0], missing = [];
+      await ctx.route('**/*', async route => {
+        const u = new URL(route.request().url());
+        if (u.origin !== host) return route.abort();
+        let rel = decodeURIComponent(u.pathname); if (rel.endsWith('/')) rel += 'index.html';
+        const f = path.join(webDir, rel);
+        if (!f.startsWith(webDir) || !fs.existsSync(f)) { missing.push(rel); return route.fulfill({ status: 404, body: '' }); }
+        return route.fulfill({ path: f });
+      });
+      const sp = await ctx.newPage();
+      await sp.goto(host + s.frame.page, { waitUntil: 'networkidle' });
+      await sp.evaluate(() => document.fonts.ready);
+      if (s.frame.scroll) { await sp.evaluate(y => window.scrollTo(0, y), s.frame.scroll); await sp.waitForTimeout(300); }
+      // the pictures in view have loaded (a lazy one below the fold or inside a closed block never starts)
+      await sp.waitForFunction(() => [...document.images].filter(im => { const r = im.getBoundingClientRect(); return r.height > 0 && r.top < innerHeight && r.bottom > 0; }).every(im => im.complete));
+      if (missing.length) throw new Error(`site page ${s.frame.page}: not in the build: ${missing.slice(0, 4).join(', ')} (posters: python scripts/video/fetch_published.py dist/web --from video-out/publish)`);
+      const f = path.join(outDir, `site-${shots.size}.png`);
+      await sp.screenshot({ path: f });
+      await ctx.close();
+      shots.set(key, { shot: 'file://' + f, vw, vh });
+    }
+    Object.assign(s.frame, shots.get(key));
+  }
   const grid = JSON.parse(fs.readFileSync(gridFile, 'utf8'));
   await p.evaluate(g => { GRID = g; NCOL = g.ncol; NGAME = g.rows.length; MAXN = g.maxn; }, grid);
   // Motion (ADR-0006): a new frame builds in, a changed frame or a moved highlight cross-dissolves. The steps are 1/30 s

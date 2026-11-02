@@ -20,7 +20,7 @@ from . import raster
 
 ROOT = Path(__file__).resolve().parents[2]
 VISUAL = ROOT / "media" / "visual"
-SCRIPT_DIRS = ("media/episodes", "media/shorts", "media/mega")
+SCRIPT_DIRS = ("media/episodes", "media/shorts", "media/mega", "media/intro")
 KINDS = ("mechanic", "family", "subgenre", "technique", "technique-category", "noun", "term")
 SCENE = re.compile(r"^## (\d+)\. (.+?)(?: \((.+?)\))?\s*$|^## (\d+:\d\d) to (\d+:\d\d)\. (.+?)\s*$")
 TOKEN = re.compile(r"\{\{[^}]*\}\}")
@@ -180,10 +180,32 @@ def check(F, ents: dict, vocabs: dict) -> None:
                                 bad(f"no live game '{g}'")
                     if t == "chain" and "from" in args and args["from"] not in games:
                         bad(f"no live game '{args['from']}'")
-                    if t in ("timeline", "scale") and "ids" in args or (t == "count" and args.get("kind") in ("bars",)):
+                    if t == "timeline" and args.get("kind") == "games":
+                        for i, _ in FR.items(args.get("ids", "")):
+                            if i not in games:
+                                bad(f"no live game '{i}'")
+                    elif t in ("timeline", "scale") and "ids" in args or (t == "count" and args.get("kind") in ("bars",)):
                         for i, _ in FR.items(args.get("ids", "")):
                             if i not in mechs:
                                 bad(f"no live mechanic '{i}'")
+                    if "with" in args:
+                        ids = [i for i, _ in FR.items(args.get("ids", ""))]
+                        rows_ = args["with"].split("|")
+                        if t != "count" or args.get("kind") != "bars" or len(rows_) != len(ids):
+                            bad("with= goes on count kind=bars, one row of games per id")
+                        for mid, r in zip(ids, rows_):
+                            for g, _ in FR.items(r):
+                                if g not in games:
+                                    bad(f"no live game '{g}' in with=")
+                                elif mid not in [u.get("id") for u in games[g].get("mechanics", [])]:
+                                    bad(f"'{g}' does not use '{mid}' (with=)")
+                    if "cues" in args:
+                        groups = {"totals": {"game", "mechanic", "technique", "prediction"}, "icons": set(KINDS)}.get(args.get("kind"), set())
+                        for g, word in FR.items(args["cues"]):
+                            if g not in groups or not word:
+                                bad(f"cues= pairs one of {', '.join(sorted(groups)) or 'nothing (count kind=totals or icons only)'} with a narration word, not '{g}:{word}'")
+                            elif word not in voice:
+                                bad(f"cue word \"{word}\" is not in this scene's narration")
                     if t == "count" and args.get("kind") == "venn":
                         for k in ("a", "b"):
                             if args[k] not in mechs:

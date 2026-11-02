@@ -1,7 +1,8 @@
 """Project the dataset into a static website (dist/web), styled with Register (web/register.css).
 
 Pages:
-  index.html                         the paper, rendered from report/src with interactive figures, and the grammar mosaic
+  index.html                         the paper, rendered from report/src with interactive figures, and the grammar mosaic;
+                                     the intro video under the title when media/published.yaml lists one
   <type>/index.html                  one index per entity type: mechanics as icon tiles, games as parts boards, opportunities
                                      by horizon, each with its sortable table as the plain-text twin; techniques and sources a table
   <type>/<id>/index.html             one page per entity, with its icon, its parts board (games), the shorts that show it,
@@ -136,6 +137,17 @@ class Web:
             for sc in scenes:
                 for i, t in sorted(sc["shows"].items(), key=lambda kv: (kv[1], kv[0])):
                     self.moments[i].append((ep, t, sc["name"]))
+        # the intro (media/intro): one script rendered at 16:9 and at 9:16; the home page plays the 16:9 render
+        self.intro = {}
+        for iv in self.published.get("intro", []):
+            md = self.built.get(f"media/intro/{iv['script']}", "")
+            said = self.episode_voice(md)
+            unknown = [i for i in iv.get("shows", []) + [i for sc in iv["scenes"] for i in sc["shows"]] if i not in self.by_id]
+            missing = [sc["name"] for sc in iv["scenes"] if sc["name"] not in said]
+            if not md or unknown or missing:
+                raise SystemExit(f"media/published.yaml: {iv['key']} names a script this build did not render, scenes it lacks {missing}, or unknown records {unknown}")
+            self.intro[iv["format"]] = {**iv, "voice": [v for sc in iv["scenes"] for v in said[sc["name"]]],
+                                        "changed": [sc["name"] for sc in iv["scenes"] if narration_digest(" ".join(said[sc["name"]])) != sc["said"]]}
         # the sources the videos cite: an episode's by scene, a short's anywhere in it
         self.ep_cites, self.short_cites = defaultdict(list), defaultdict(list)
         for ep in self.episodes:
@@ -644,8 +656,23 @@ class Web:
 <div class="numbers"><div class="number" hidden></div>{nums}</div>
 <p class="small faint">four findings from the paper; each links to the section that makes the case</p>
 {self.mosaic(base)}"""
-        body = header + game_sec + watch + tech_sec + op_sec + book_sec + paper_sec
+        body = header.replace('<div class="numbers">', self.intro_block(base) + '<div class="numbers">', 1) + game_sec + watch + tech_sec + op_sec + book_sec + paper_sec
         return self.page(title=f"{meta['title']} · simgrammar", desc=LEAD, body=body, depth=0, nav="", path="")
+
+    def intro_block(self, base):
+        """The intro under the home page's title: its poster plays in place (simgrammar.js), and without script it links the
+        file. The transcript is its plain-text twin, read from this build's script, so it says when the render words a scene
+        differently because the dataset has moved on."""
+        iv, vert = self.intro.get("16:9"), self.intro.get("9:16")
+        if not iv:
+            return ""
+        changed = (f'<p class="small">The video, rendered from an earlier build, words {counted(len(iv["changed"]), "scene")} differently: '
+                   'the dataset has changed since. The transcript is current.</p>') if iv["changed"] else ""
+        return (f'<figure class="image" data-ratio="16/9"><a class="frame" href="{base}media/intro/{esc(iv["file"])}" data-play data-internal>'
+                f'<img src="{base}media/intro/{esc(iv["poster"])}" width="960" height="540" alt="SimGrammar in about a minute, opening frame">'
+                f'<span class="plate">play · {self.mmss(iv["seconds"])}</span></a><figcaption><span class="provenance">captions in the picture</span>'
+                + (f'<span>vertical · <a href="{base}media/intro/{esc(vert["file"])}">9:16 file</a></span>' if vert else "") + '</figcaption></figure>'
+                f'<details class="disclosure"><summary>transcript</summary>{"".join(f"<p>{self.voice_html(v, base)}</p>" for v in iv["voice"])}</details>{changed}')
 
     # ------------------------------------------------------------------ shorts and the book
     @staticmethod

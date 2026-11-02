@@ -10,12 +10,14 @@ Zenodo archives every release of this repository as a version of the paper, so v
 repository that Zenodo does not archive; --repo records it in media/published.yaml (repo:), and the Pages workflow
 downloads from there.
 
-The shorts and the episodes are published; the film stays off the site. Each entry names the video file and its sha256,
+The shorts, the episodes, and the intro (16:9 and 9:16) are published; the film stays off the site. Each entry names the video file and its sha256,
 its length, a poster frame and its sha256, and the records the video shows: the frame elements and cards in its rendered
 states.json that are records, most shown first, at most twelve. A short's poster is a frame at 2.5 s. An episode's poster
 is its title card, and its thumb the frame with the most records on screen; it also lists its scenes from the render, each
 with its start, the records it shows and when each first appears, and a digest of what its narration says
-(lib.narration_digest), so the site can tell when the dataset has moved on from a render. The site reads this file
+(lib.narration_digest), so the site can tell when the dataset has moved on from a render. The intro's entries carry
+the same scenes, and their poster is the icon map once it has drawn in: its caption is one line, so the site's play
+label does not cover it. The site reads this file
 (scripts/web.py), and the Pages workflow fetches the files from the release and checks every sha256
 (scripts/video/fetch_published.py). Re-run it after re-rendering and publish under a new release name.
 """
@@ -144,6 +146,23 @@ def main():
                     'rendered': datetime.date.fromtimestamp(mp4.stat().st_mtime).isoformat(),
                     'poster': poster.name, 'poster_sha256': sha256(poster), 'thumb': thumb.name, 'thumb_sha256': sha256(thumb),
                     'shows': shows(states, recs), 'scenes': scs})
+    intro = []
+    for script in sorted((ROOT / 'media' / 'intro').glob('*.md'))[:1]:
+        for key, fmt, width in (('intro', '16:9', 960), ('intro-vertical', '9:16', 540)):
+            mp4 = V / 'final' / f'{key}.mp4'
+            states = json.loads((V / 'out' / key / 'states.json').read_text(encoding='utf-8'))
+            scs, _ = scenes(states, recs)
+            t, at = 0.0, POSTER_AT
+            for st in states:
+                if (st.get('frame') or {}).get('t') == 'iconmap':
+                    at = t + 2.0
+                    break
+                t += st['dur']
+            poster = stage / f'{key}.jpg'
+            shutil.copy2(mp4, stage / mp4.name)
+            frame(mp4, at, poster, width)
+            intro.append({'key': key, 'script': script.name, 'format': fmt, 'file': mp4.name, 'sha256': sha256(mp4), 'seconds': seconds(mp4),
+                          'poster': poster.name, 'poster_sha256': sha256(poster), 'shows': shows(states, recs), 'scenes': scs})
     head = ('# Videos published on the website (scripts/web.py). The files are not in git: they are assets of the GitHub release\n'
             '# named here, which the Pages workflow fetches and checks against each sha256 (scripts/video/fetch_published.py).\n'
             '# Written by scripts/video/publish.py from the renders in video-out; shows lists the records each video puts on screen.\n'
@@ -158,8 +177,13 @@ def main():
         f'     sha256: {r["sha256"]},\n     poster: {r["poster"]}, poster_sha256: {r["poster_sha256"]},\n'
         f'     thumb: {r["thumb"]}, thumb_sha256: {r["thumb_sha256"]},\n     shows: [{", ".join(r["shows"])}],\n     scenes: [\n'
         + ''.join(f'       {json.dumps(sc, ensure_ascii=False)},\n' for sc in r['scenes']) + '     ]}\n' for r in eps)
+    if intro:
+        body += 'intro:\n' + ''.join(
+            f'  - {{key: {r["key"]}, script: {r["script"]}, format: \'{r["format"]}\', file: {r["file"]}, seconds: {r["seconds"]},\n'
+            f'     sha256: {r["sha256"]},\n     poster: {r["poster"]}, poster_sha256: {r["poster_sha256"]},\n     shows: [{", ".join(r["shows"])}],\n     scenes: [\n'
+            + ''.join(f'       {json.dumps(sc, ensure_ascii=False)},\n' for sc in r['scenes']) + '     ]}\n' for r in intro)
     (ROOT / 'media' / 'published.yaml').write_text(head + body, encoding='utf-8')
-    print(f'media/published.yaml: {len(rows)} shorts and {len(eps)} episodes for release {a.release}; files staged in {stage}')
+    print(f'media/published.yaml: {len(rows)} shorts, {len(eps)} episodes, and {len(intro)} intro renders for release {a.release}; files staged in {stage}')
 
 
 if __name__ == '__main__':

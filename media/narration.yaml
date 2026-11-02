@@ -5,14 +5,16 @@
 # 2026-10-31-tag-audit), then 19 more (run 2026-10-31-tag-audit-follow-up),
 # and 17 after the Explore Science review of v0.3 (run 2026-10-31-es-review-revoice),
 # then 1 after its re-review (run 2026-11-01-ep11-revoice); for those, the take listed is the one whose length was nearer the series' pace.
-# Episodes and the film are one take per scene
+# The intro's 6 takes (run 2026-11-01-intro-video) are the ones nearer the shorts' pace, characters / 16.15 seconds; where the
+# two takes of a line came out the same length, the first is listed.
+# Episodes, the intro, and the film are one take per scene
 # with a Voice line, and shorts one take for the whole short. A key like mega/the-film.md#ep10.4 is episode 10,
 # scene 4 as the film re-voices it (Film wording in the film script). A take is stale once its script line changes;
 # python scripts/video/narration.py missing lists the lines that have no take on disk, with the text to voice.
 # The audio is not committed. scripts/video/assemble.py reads it from video-out/audio/<name>.mp3, where <name> is
 # the key with / and # replaced by __ and .md dropped (episodes/01-same-parts.md#3 -> episodes__01-same-parts__3).
 voice: {name: Marcus, voice_id: 6WjhCXzqp2hnSqFtrG8P, model: eleven_v4}
-flows: {episodes: 9Gjpr3tlYAMkxWsf9i5l, film: 9Gjpr3tlYAMkxWsf9i5l, shorts: yrAjUmYMO7QksVZLJUWu}
+flows: {episodes: 9Gjpr3tlYAMkxWsf9i5l, film: 9Gjpr3tlYAMkxWsf9i5l, shorts: yrAjUmYMO7QksVZLJUWu, intro: 9Gjpr3tlYAMkxWsf9i5l}
 takes:
   - {key: "episodes/01-same-parts.md#1", session: AYrjdPSbCufT2sxTTgsl, generation: Ub9ka6AZEUa4iiuzFv91, seconds: 26.44}
   - {key: "episodes/01-same-parts.md#3", session: smAlOFnWjepwIAAf55Zu, generation: dslFOW4ZBrNu3YI6kvgX, seconds: 49.28}
@@ -163,3 +165,9 @@ takes:
   - {key: "shorts/010-desync.md", session: dvksYFFDKDSIc1GUr6d8, generation: 5sUmZIUb5RSZNNzxYUrw, seconds: 31.48}
   - {key: "shorts/011-same-day.md", session: WhYNLcG81fE1BZtU4m2P, generation: uV6b5LUEEotyXP0ZLZv1, seconds: 31.09}
   - {key: "shorts/012-skipped-parts.md", session: tsPQFidCD9Lf64cnACZG, generation: FQkZdI49aBfTyA1Naib7, seconds: 29.28}
+  - {key: "intro/intro.md#1", session: EYoGUEs2TeHENSNIxIXD, generation: QAVpqrobldqfDyOYZIIj, seconds: 14.80}
+  - {key: "intro/intro.md#2", session: OiZqi3ot7yjsk6mMXlv5, generation: sfuUxuJRGE2kt9QJGQ07, seconds: 10.88}
+  - {key: "intro/intro.md#3", session: fLEY1vWXJMNlL3GYbbgD, generation: QpUiTIaZuMmAvkk86KhB, seconds: 14.32}
+  - {key: "intro/intro.md#4", session: 1dqyxFqfEquo0RKqeykr, generation: pxTHBFhN5ujmUCF2OWr6, seconds: 5.68}
+  - {key: "intro/intro.md#5", session: 23hWsKDIyUT5oNQIgAMw, generation: Icdf27TcYNDbtfzP48bf, seconds: 18.00}
+  - {key: "intro/intro.md#6", session: R091HsnjuxhZW3knSw6F, generation: OaVd5GkCPZ0gaaPuLrP2, seconds: 8.24}

@@ -3,8 +3,8 @@ import json, os, re
 D = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'dist', 'entities') + os.sep
 SUBG = lambda s: (s or '').replace('-', ' ')
 STOP_GAMES = {'foundation', 'eco'}
-# Record aliases too broad for narration: "AI research" is not a tech tree, "shares a family" not equity buyouts.
-STOP_ALIASES = {'research', 'shares', 'supply', 'reports', 'event log', 'letters', 'graphs', 'logistics'}
+# Record aliases too broad for narration: "AI research" is not a tech tree, "shares a family" not equity buyouts, "gets the credit" not a loan.
+STOP_ALIASES = {'research', 'shares', 'supply', 'reports', 'event log', 'letters', 'graphs', 'logistics', 'credit'}
 
 
 EXTRA = {  # informal names the narration uses -> (kind, id)

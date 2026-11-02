@@ -1,4 +1,4 @@
-"""Put the videos media/published.yaml lists into a built site under media/shorts/ and media/episodes/, checking every sha256.
+"""Put the videos media/published.yaml lists into a built site under media/shorts/, media/episodes/, and media/intro/, checking every sha256.
 
     python scripts/video/fetch_published.py _site                               from the GitHub release (the Pages workflow)
     python scripts/video/fetch_published.py dist/web --from video-out/publish   from local files, to preview the site
@@ -26,7 +26,7 @@ def main():
     # the release may live in another repository (repo: in published.yaml), because Zenodo archives every release of this one
     repo = pub.get('repo') or yaml.safe_load((ROOT / 'report' / 'meta.yaml').read_text(encoding='utf-8'))['site']['repo']
     bad, n = [], 0
-    for group in ('shorts', 'episodes'):
+    for group in ('shorts', 'episodes', 'intro'):
         out = a.site / 'media' / group
         out.mkdir(parents=True, exist_ok=True)
         for s in pub.get(group, []):

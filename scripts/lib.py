@@ -407,7 +407,7 @@ def get_path(obj: dict, dotted: str) -> Any:
 
 # Prose that is rendered from the dataset and checked like the paper: tokens resolve (E019), links and citations
 # resolve (E020), no literal dataset counts (E021), assertions hold (E029), no placeholders (E027).
-PROSE_DIRS = {"report/src": "paper", "book/src": "book", "media/episodes": "episodes", "media/shorts": "shorts", "media/mega": "mega", "media/subtitles/ja": "subtitles"}
+PROSE_DIRS = {"report/src": "paper", "book/src": "book", "media/episodes": "episodes", "media/shorts": "shorts", "media/mega": "mega", "media/intro": "intro", "media/subtitles/ja": "subtitles"}
 
 
 def prose_files() -> list[Path]:

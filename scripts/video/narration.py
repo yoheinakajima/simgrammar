@@ -3,7 +3,7 @@
     python scripts/video/narration.py missing     # jobs with no take in video-out/audio, as JSON
     python scripts/video/narration.py all         # every job
 
-Episodes and the film's own scenes get one take per scene with a Voice line; scenes the film re-voices
+Episodes, the intro, and the film's own scenes get one take per scene with a Voice line; scenes the film re-voices
 (media/mega/the-film.md, "Film wording") get keys like mega/the-film.md#ep10.4; a short gets one take for
 the whole short. speech() respells what the voice model misreads: roman numerals and all-caps names."""
 import json, os, re, sys

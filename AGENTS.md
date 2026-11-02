@@ -124,7 +124,7 @@ Never type a dataset count ("140 games") into prose (E021). When a sentence inte
 
 ### The videos
 
-`scripts/video` renders the episodes, shorts, and film from the scripts in `media/`. A `**Frame.**` line under a Picture line chooses the frame that shows it, from the icons in `media/visual/` (ADR-0006, `media/visual/README.md`). A Frame's numbers come from the dataset at render time; any number the line itself states must appear in the text of the record or source it cites with `from=` (E040). Draw a missing icon in the SVG subset before a Frame names it (E041); the build stops when a frame would draw any element without one, including the parts and terms it takes from the data (E042). Icons draw generic subjects only, and nothing in a frame copies a game's art, logo, cover, characters, or UI.
+`scripts/video` renders the episodes, shorts, film, and intro from the scripts in `media/`. A `**Frame.**` line under a Picture line chooses the frame that shows it, from the icons in `media/visual/` (ADR-0006, `media/visual/README.md`). A Frame's numbers come from the dataset at render time; any number the line itself states must appear in the text of the record or source it cites with `from=` (E040). Draw a missing icon in the SVG subset before a Frame names it (E041); the build stops when a frame would draw any element without one, including the parts and terms it takes from the data (E042). Icons draw generic subjects only, and nothing in a frame copies a game's art, logo, cover, characters, or UI.
 
 ## 7. Never
 
