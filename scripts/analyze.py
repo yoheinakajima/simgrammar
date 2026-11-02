@@ -869,6 +869,10 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         stats["pair_coverage_restricted_null_mean_pct"] = _r(float(ncr.mean()), 1)
         stats["pair_coverage_restricted_null_lo_pct"] = _r(float(np.percentile(ncr, 2.5)), 1)
         stats["pair_coverage_restricted_null_hi_pct"] = _r(float(np.percentile(ncr, 97.5)), 1)
+    # the state classes of report/state-class.yaml (review D6): the file is checked against the live mechanics here, and
+    # the §5.1 head and the pair coverage above are recomputed on the simulation-state subset (helpers _state_class*)
+    state_cls = _state_class(mechs, ents.get("run", []))
+    is_state = _state_class_pairs(state_cls, cfg, mechs, games, gm, derived, pair_count, N, fam_terms, stats, tables)
 
     # ---------------- white space: common mechanics that rarely meet
     ws = cfg["whitespace"]
@@ -1318,6 +1322,8 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             tables["family-robustness"] = {"description": f"Each family of games that section 5.4 names, by the games it names, then each link it names between two families (the games of both), checked against other methods and inputs. min_cocluster: the lowest share of subsamples in which any two of the games share a cluster at k={k_chosen}; min_consensus: the same over every k from {ck0} to {ck1}. average: average linkage at k={k_chosen} puts them in one cluster and min_cocluster is at least {st_cfg['together']}; ward: Ward's method on a classical scaling of the same distances, cut at k={k_chosen}, puts them in one cluster; complete: complete linkage, cut at {stats['cluster_complete_n']} clusters, does; methods: how many of the three do. without_asserted: average linkage without the asserted mechanics puts them in one cluster; lumped: average linkage does with each mechanic merged with those it specializes or requires.",
                                            "columns": ["kind", "grouping", "games", "min_cocluster", "min_consensus", "average", "ward", "complete", "methods", "without_asserted", "lumped"],
                                            "rows": frows, "link_columns": ["games"]}
+        # the same partition without the mechanics report/state-class.yaml does not class as simulation state (review D6)
+        _state_class_clusters(is_state, cfg, games, gm, labels, k_chosen, range(k_near, k_chosen + 1), stats)
         shared["cocluster"] = cocluster
 
     # ---------------- family x subgenre
@@ -2510,6 +2516,267 @@ def _merge_mechanics(gm, root) -> dict:
             nm[r] = "core" if role == "core" or nm.get(r) == "core" else "supporting"
         out[g] = nm
     return out
+
+
+# ---------------- state classes: simulation state, presentation, control, meta-structure (review finding D6)
+# The admission tests let interface, control, and goal and session structures in beside the rules that model a world.
+# report/state-class.yaml classes every live mechanic by written rules (§2.1, Appendix E); these helpers check that file
+# against the data and re-run the §5.1 head, the §5.3 pair coverage, and the §5.4 clustering on the mechanics it classes
+# as simulation state, so each can be read beside the full set.
+
+STATE_CLASS_FILE = ROOT / "report" / "state-class.yaml"
+
+
+def _state_class(mechs, runs) -> dict:
+    """Read report/state-class.yaml and fail the build when it falls out of step with the data: a live mechanic with no
+    entry, an entry for a mechanic that is not live or listed twice, a class the file does not define, a worked example
+    whose entry gives another class, or a maker run that does not exist."""
+    doc = read_yaml(STATE_CLASS_FILE) or {}
+    where = "report/state-class.yaml"
+    classes = doc.get("classes") or []
+    ids = [c.get("id") for c in classes]
+    if len(ids) != len(set(ids)) or not ids or any(not c.get("definition") for c in classes):
+        raise ValueError(f"{where}: classes must be distinct ids, each with a definition")
+    run = (doc.get("made_by") or {}).get("run")
+    if run not in {r.id for r in runs}:
+        raise ValueError(f"{where}: made_by.run {run!r} is not a run in log/runs/")
+    live_ids = {m.id for m in mechs}
+    of, why, seen = {}, {}, Counter(e.get("id") for e in doc.get("mechanics") or [])
+    for e in doc.get("mechanics") or []:
+        mid, c = e.get("id"), e.get("class")
+        if mid not in live_ids:
+            raise ValueError(f"{where}: {mid!r} is not a live mechanic")
+        if seen[mid] > 1:
+            raise ValueError(f"{where}: {mid} has {seen[mid]} entries")
+        if c not in ids:
+            raise ValueError(f"{where}: {mid} names class {c!r}; the classes are {', '.join(ids)}")
+        of[mid] = c
+        if e.get("why"):
+            why[mid] = str(e["why"])
+    missing = sorted(live_ids - set(of))
+    if missing:
+        raise ValueError(f"{where}: live mechanics with no state class: {', '.join(missing)}")
+    for c in classes:
+        for ex in c.get("examples") or []:
+            if of.get(ex.get("mechanic")) != c["id"]:
+                raise ValueError(f"{where}: worked example {ex.get('mechanic')!r} of {c['id']} is not classed {c['id']}")
+    return {"classes": classes, "ids": ids, "of": of, "why": why, "procedure": str(doc.get("procedure", "")).strip(),
+            "made_by": doc.get("made_by") or {}}
+
+
+def _curveball_coverage(rows, n_cols, restricted, samples, burnin, thin, seed):
+    """Pair coverage over null catalogs that keep every game's size and every mechanic's prevalence: the curveball trades
+    of the co-occurrence block (Strona et al. 2014), on the game rows given (lists of column indices). Returns the
+    coverage of every pair, and of the pairs `restricted` marks, in each null catalog, in percent."""
+    import random as _rnd
+    rng = _rnd.Random(seed)
+    rows = [sorted(r) for r in rows]
+
+    def trade(k):
+        for _ in range(k):
+            i, j = rng.sample(range(len(rows)), 2)
+            a, b = set(rows[i]), set(rows[j])
+            only_a, only_b = sorted(a - b), sorted(b - a)
+            if not only_a or not only_b:
+                continue
+            pool = only_a + only_b
+            rng.shuffle(pool)
+            rows[i] = sorted((a & b) | set(pool[: len(only_a)]))
+            rows[j] = sorted((a & b) | set(pool[len(only_a):]))
+    iu = np.triu_indices(n_cols, 1)
+    cov, cov_r = [], []
+    trade(burnin)
+    for _ in range(samples):
+        trade(thin)
+        X = np.zeros((len(rows), n_cols), dtype=np.int32)
+        for r, cols in enumerate(rows):
+            X[r, cols] = 1
+        up = (X.T @ X)[iu]
+        cov.append(100 * float((up > 0).mean()))
+        cov_r.append(100 * float((up[restricted] > 0).mean()) if restricted.any() else 0.0)
+    return np.array(cov), np.array(cov_r)
+
+
+def _state_class_pairs(sc, cfg, mechs, games, gm, derived, pair_count, N, fam_terms, stats, tables):
+    """§5.1 and §5.3 on the simulation-state subset: the classes' sizes and uses, how well the family proxy
+    (nonstate_families) matches them, the head of the prevalence distribution, the share of uses that no technique edge
+    reaches (the §8.2 figure), and pair coverage against its own fixed-margin null. Called from the co-occurrence block."""
+    scfg = cfg.get("state_class") or {}
+    keep = set(scfg.get("keep") or ["simulation-state"])
+    of, labels = sc["of"], {c["id"]: c.get("label", c["id"]) for c in sc["classes"]}
+    is_state = {m.id: of[m.id] in keep for m in mechs}
+    prev = {m.id: derived[m.id]["prevalence"] for m in mechs}
+    core_n = Counter(mid for g in games for mid, r in gm[g.id].items() if r == "core")
+    total_uses = max(sum(prev.values()), 1)
+    # the classes: how many mechanics, how many uses, and how many sit in the families the proxy leaves out
+    ns_f = set(cfg.get("nonstate_families") or [])
+    crow = []
+    for c in sc["classes"]:
+        ms = [m for m in mechs if of[m.id] == c["id"]]
+        key = c["id"].replace("-", "_")
+        stats[f"n_state_class_{key}"] = len(ms)
+        stats[f"pct_uses_state_class_{key}"] = _r(100 * sum(prev[m.id] for m in ms) / total_uses, 0)
+        crow.append({"class": c.get("label", c["id"]), "definition": " ".join(str(c["definition"]).split()),
+                     "examples": [x["mechanic"] for x in c.get("examples") or []], "mechanics": len(ms),
+                     "uses": sum(prev[m.id] for m in ms), "pct_uses": stats[f"pct_uses_state_class_{key}"],
+                     "in_proxy_families": sum(1 for m in ms if m.data.get("family") in ns_f)})
+    tables["state-classes"] = {
+        "description": "The four state classes of report/state-class.yaml with the definition each counted variable is sorted by, the worked "
+                       "examples, the number of live mechanics in each class and their game uses, and how many of them belong to the "
+                       f"{len(ns_f)} families §5.1 and §8.2 leave out as a family-level proxy ({stats.get('nonstate_family_names', '')}).",
+        "columns": ["class", "definition", "examples", "mechanics", "uses", "pct_uses", "in_proxy_families"], "rows": crow, "link_columns": ["examples"]}
+    tables["state-class-mechanics"] = {
+        "description": "Every live mechanic's state class from report/state-class.yaml, with its family, the number of catalog games that use it, and "
+                       "the rationale the file gives where the call is not obvious from the definition.",
+        "columns": ["mechanic", "family", "class", "games", "why"], "link_columns": ["mechanic"],
+        "rows": [{"mechanic": m.id, "family": fam_terms.get(m.data.get("family"), {}).get("label", m.data.get("family")), "class": labels[of[m.id]],
+                  "games": prev[m.id], "why": sc["why"].get(m.id, "")} for m in sorted(mechs, key=lambda m: (sc["ids"].index(of[m.id]), -prev[m.id], m.id))]}
+    stats["state_class_procedure"] = " ".join(sc["procedure"].split())
+    stats["n_state_class_why"] = len(sc["why"])
+    stats["n_state_class_nonstate"] = sum(1 for m in mechs if not is_state[m.id])
+    stats["pct_mechanics_state_class_nonstate"] = _r(100 * stats["n_state_class_nonstate"] / max(len(mechs), 1), 0)
+    # the family proxy against the classes, mechanic by mechanic (state against not), with Cohen's kappa
+    px = {m.id: m.data.get("family") not in ns_f for m in mechs}
+    T = np.array([[sum(1 for m in mechs if is_state[m.id] == a and px[m.id] == b) for b in (True, False)] for a in (True, False)])
+    stats["n_state_class_proxy_agree"] = int(np.trace(T))
+    stats["pct_state_class_proxy_agree"] = _r(100 * np.trace(T) / max(T.sum(), 1), 0)
+    stats["kappa_state_class_proxy"] = _r(_kappa_nominal(T), 2)
+    stats["n_state_class_proxy_keeps_nonstate"] = int(T[1, 0])   # the proxy keeps them; the classes do not
+    stats["n_state_class_proxy_drops_state"] = int(T[0, 1])      # the proxy drops them; the classes keep them
+    dis = sorted((m for m in mechs if is_state[m.id] != px[m.id]), key=lambda m: (not px[m.id], -prev[m.id], m.id))
+    ex_why = {x["mechanic"]: " ".join(str(x.get("why", "")).split()) for c in sc["classes"] for x in c.get("examples") or []}
+    stats["n_state_class_proxy_keeps_nonstate_uses"] = sum(prev[m.id] for m in dis if px[m.id])
+    tables["state-class-proxy"] = {
+        "description": "Mechanics on which the family proxy and the state classes disagree: first those whose family the proxy keeps as "
+                       "state-owning but whose class is not simulation state, then those in a family the proxy leaves out whose class is "
+                       "simulation state; by games within each. Why: the rationale report/state-class.yaml gives for the call.",
+        "columns": ["mechanic", "family", "class", "games", "why"], "link_columns": ["mechanic"],
+        "rows": [{"mechanic": m.id, "family": fam_terms.get(m.data.get("family"), {}).get("label", m.data.get("family")),
+                  "class": labels[of[m.id]], "games": prev[m.id], "why": sc["why"].get(m.id) or ex_why.get(m.id, "")} for m in dis]}
+    # §5.1: the head of the prevalence distribution on the simulation-state subset, beside the table's other readings
+    st_ms = sorted((m for m in mechs if is_state[m.id]), key=lambda m: (-prev[m.id], m.id))
+    if "prevalence-sensitivity" in tables and st_ms:
+        tables["prevalence-sensitivity"]["rows"].append({
+            "variant": "simulation-state mechanics only", "mechanics": len(st_ms), "uses": sum(prev[m.id] for m in st_ms),
+            "most_used": ", ".join(f"{m.data['name']} ({prev[m.id]})" for m in st_ms[:6])})
+        tables["prevalence-sensitivity"]["description"] += (" The last row keeps only the mechanics report/state-class.yaml classes as simulation "
+                                                            "state (§2.1), the mechanic-by-mechanic reading the family proxy stands in for.")
+        stats["most_prevalent_state_class_mechanic"] = st_ms[0].data["name"]
+        stats["most_prevalent_state_class_mechanic_share_pct"] = _r(100 * prev[st_ms[0].id] / max(N, 1), 0)
+        stats["n_mechanics_state_class_variant"] = len(st_ms)
+        stats["pct_uses_state_class_variant"] = _r(100 * sum(prev[m.id] for m in st_ms) / total_uses, 0)
+    tables["state-class-head"] = {"description": "The most used simulation-state mechanics (report/state-class.yaml), by the number of catalog games that use each.",
+                                  "columns": ["mechanic", "family", "games", "core_in"], "link_columns": ["mechanic"],
+                                  "rows": [{"mechanic": m.id, "family": fam_terms.get(m.data.get("family"), {}).get("label", m.data.get("family")),
+                                            "games": prev[m.id], "core_in": core_n.get(m.id, 0)} for m in st_ms[:15]]}
+    top10 = [m for m in mechs if derived[m.id]["prevalence_rank"] <= 10]
+    stats["n_top10_prevalence"] = len(top10)
+    stats["n_top10_prevalence_nonstate_class"] = sum(1 for m in top10 if not is_state[m.id])
+    stats["pct_top10_prevalence_nonstate_class"] = _r(100 * stats["n_top10_prevalence_nonstate_class"] / max(len(top10), 1), 0)
+    stats["n_top10_prevalence_presentation_class"] = sum(1 for m in top10 if of[m.id] == "presentation")
+    top6 = sorted(mechs, key=lambda m: (-prev[m.id], m.id))[:6]
+    stats["n_top6_prevalence_nonstate_class"] = sum(1 for m in top6 if not is_state[m.id])
+    # §8.2's unreached share (uses on mechanics no technique edge reaches) on the same subset
+    st_ids = [m.id for m in st_ms]
+    zero = {m.id for m in mechs if derived[m.id]["technique_exposure"] == 0}
+    stats["pct_uses_on_zero_exposure_state_class"] = _r(100 * sum(prev[x] for x in st_ids if x in zero) / max(sum(prev[x] for x in st_ids), 1), 0)
+    stats["pct_core_uses_on_zero_exposure_state_class"] = _r(100 * sum(core_n.get(x, 0) for x in st_ids if x in zero) / max(sum(core_n.get(x, 0) for x in st_ids), 1), 0)
+    stats["n_mechanics_zero_exposure_state_class"] = sum(1 for x in st_ids if x in zero)
+    full_pct = 100 * sum(prev[x] for x in zero) / total_uses
+    stats["pct_uses_on_zero_exposure_state_class_diff"] = _r(stats["pct_uses_on_zero_exposure_state_class"] - _r(full_pct, 0), 0)
+    # Finding 2's two shares (§5.2) on the same subset, as plain counts: mechanics first seen by 2000, and the uses of
+    # games since 2010 that fall on them
+    early = [derived[x]["earliest_year"] for x in st_ids if derived[x]["earliest_year"]]
+    stats["pct_mechanics_seen_by_2000_state_class"] = _r(100 * sum(1 for y in early if y <= 2000) / max(len(early), 1), 0)
+    late = [g for g in games if isinstance(g.data.get("year"), int) and g.data["year"] >= 2010]
+    late_uses = [x for g in late for x in gm[g.id] if is_state.get(x)]
+    stats["pct_uses_since_2010_on_pre2001_state_class"] = _r(100 * sum(1 for x in late_uses if (derived[x]["earliest_year"] or 9999) <= 2000) / max(len(late_uses), 1), 0)
+    # §5.3: pair coverage among simulation-state mechanics, against a fixed-margin null on the games' simulation-state
+    # tags alone (each game keeps its count of them, each mechanic its prevalence)
+    cc = cfg["cooccurrence"]
+    smids = [x for x in st_ids if prev[x] > 0]
+    pos = {x: i for i, x in enumerate(smids)}
+    rows = [[pos[x] for x in gm[g.id] if x in pos] for g in games]
+    n_pairs = len(smids) * (len(smids) - 1) // 2
+    obs = sum(1 for (a, b) in pair_count if a in pos and b in pos)
+    rmin = cc["restricted_min_games"]
+    elig = np.array([prev[x] >= rmin for x in smids])
+    iu = np.triu_indices(len(smids), 1)
+    restricted = elig[iu[0]] & elig[iu[1]]
+    obs_r = sum(1 for (a, b) in pair_count if a in pos and b in pos and prev[a] >= rmin and prev[b] >= rmin)
+    stats["n_mechanics_state_class_used"] = len(smids)
+    stats["n_possible_pairs_state_class"] = n_pairs
+    stats["pair_coverage_state_class_pct"] = _r(100 * obs / max(n_pairs, 1), 1)
+    stats["n_possible_pairs_restricted_state_class"] = int(restricted.sum())
+    stats["pair_coverage_restricted_state_class_pct"] = _r(100 * obs_r / max(int(restricted.sum()), 1), 1)
+    if len(rows) > 1 and n_pairs:
+        nc, ncr = _curveball_coverage(rows, len(smids), restricted, int(scfg.get("null_samples", cc["null_samples"])),
+                                      int(scfg.get("null_burnin", cc["null_burnin"])), int(scfg.get("null_thin", cc["null_thin"])),
+                                      scfg.get("null_seed", cc["null_seed"]))
+        S_, o_ = len(nc), 100 * obs / n_pairs
+        stats["pair_coverage_state_class_null_mean_pct"] = _r(float(nc.mean()), 1)
+        stats["pair_coverage_state_class_null_lo_pct"] = _r(float(np.percentile(nc, 2.5)), 1)
+        stats["pair_coverage_state_class_null_hi_pct"] = _r(float(np.percentile(nc, 97.5)), 1)
+        stats["p_pair_coverage_state_class"] = _r(min(1.0, 2 * min((1 + int((nc <= o_).sum())) / (S_ + 1), (1 + int((nc >= o_).sum())) / (S_ + 1))), 3)
+        stats["n_pairs_short_of_null_state_class"] = int(round((float(nc.mean()) - o_) / 100 * n_pairs))
+        stats["pair_coverage_restricted_state_class_null_mean_pct"] = _r(float(ncr.mean()), 1)
+        stats["pair_coverage_restricted_state_class_null_lo_pct"] = _r(float(np.percentile(ncr, 2.5)), 1)
+        stats["pair_coverage_restricted_state_class_null_hi_pct"] = _r(float(np.percentile(ncr, 97.5)), 1)
+    # the lift ranking among simulation-state pairs: lift does not depend on the other mechanics, so this is the full
+    # ranking with every pair that involves a non-state mechanic taken out
+    top_n = cc["top_n"]
+    allrows = (tables.get("cooccurrence-all") or {}).get("rows") or []
+    srows = [r for r in allrows if is_state.get(r["mechanic_a"]) and is_state.get(r["mechanic_b"])]
+    tables["cooccurrence-top-state"] = {"description": f"Mechanic pairs ranked by lift, as in cooccurrence-top, among pairs of mechanics report/state-class.yaml classes as simulation state, support >= {cc['min_support']} games.",
+                                        "columns": ["mechanic_a", "mechanic_b", "games", "lift", "jaccard"], "rows": srows[:top_n], "link_columns": ["mechanic_a", "mechanic_b"]}
+    stats["n_cooccurrence_top_state_class"] = sum(1 for r in allrows[:top_n] if is_state.get(r["mechanic_a"]) and is_state.get(r["mechanic_b"]))
+    stats["cooccurrence_top_n"] = min(top_n, len(allrows))
+    stats["pct_cooccurrence_top_state_class"] = _r(100 * stats["n_cooccurrence_top_state_class"] / max(stats["cooccurrence_top_n"], 1), 0)
+    return is_state
+
+
+def _state_class_clusters(is_state, cfg, games, gm, labels, k_chosen, near, stats):
+    """§5.4 on the simulation-state subset: re-cluster with every non-state mechanic left out (same distance, weights, and
+    k; inverse-prevalence weights are unchanged, since prevalence and N are), and compare with the configured partition
+    and with subgenre labels. Called from the clustering block, which passes its labels and the k range it reports."""
+    cl = cfg["clustering"]
+    gids = [g.id for g in games]
+    gm_s = {g: {m: r for m, r in gm[g].items() if is_state.get(m)} for g in gids}
+    D = _wj_distance(gm_s, gids, cl["core_weight"], bool(cl.get("idf")))
+    Z = linkage(squareform(D, checks=False), method="average")
+    L = fcluster(Z, t=k_chosen, criterion="maxclust")
+    sub_lab = [g.data.get("subgenre") for g in games]
+    stats["n_games_no_state_class_mechanic"] = sum(1 for g in gids if not gm_s[g])
+    stats["cluster_ari_state_class"] = _r(_ari(labels, L), 2)
+    stats["cluster_ami_state_class"] = _r(_ami(labels, L), 2)
+    stats["cluster_subgenre_ami_state_class"] = _r(_ami(L, sub_lab), 2)
+    stats["cluster_subgenre_ari_state_class"] = _r(_ari(L, sub_lab), 2)
+    amis = [_r(_ami(fcluster(Z, t=kk, criterion="maxclust"), sub_lab), 2) for kk in near]
+    stats["cluster_subgenre_ami_state_class_near_min"] = min(amis)
+    stats["cluster_subgenre_ami_state_class_near_max"] = max(amis)
+    _, codes = np.unique(np.asarray(sub_lab, dtype=object).astype(str), return_inverse=True)
+    n_sub = int(codes.max()) + 1
+    n_cl = len(set(L.tolist()))
+    stats["n_clusters_state_class"] = n_cl
+    stats["n_clusters_cross_subgenre_state_class"] = _n_mixed(L, codes, n_sub)
+    for s_ in cl.get("mixed_shares", []):
+        k_ = int(round(100 * float(s_)))
+        stats[f"n_clusters_mixed_{k_}_state_class"] = _n_mixed(L, codes, n_sub, float(s_))
+        stats[f"pct_clusters_mixed_{k_}_state_class"] = _r(100 * stats[f"n_clusters_mixed_{k_}_state_class"] / n_cl, 0)
+    # the families §5.4 and book chapter 4 name, and the links §5.4 names: how many keep all their named games in one cluster
+    # at k, with and without the non-state mechanics (grouping_<slug>_one_cluster[_state_class] is 1 when they do)
+    gidx = {g: i for i, g in enumerate(gids)}
+    one = lambda L_, ids: len({int(L_[gidx[x]]) for x in ids}) == 1  # noqa: E731
+    for where in ("paper", "links", "book"):
+        defs = {s: ids for s, ids in sorted(((cl.get("groupings") or {}).get(where) or {}).items()) if ids and all(x in gidx for x in ids)}
+        for slug, ids in defs.items():
+            key = "grouping_" + slug.replace("-", "_")
+            stats[key + "_one_cluster"] = int(one(labels, ids))
+            stats[key + "_one_cluster_state_class"] = int(one(L, ids))
+        stats[f"n_groupings_{where}_one_cluster"] = sum(1 for ids in defs.values() if one(labels, ids))
+        stats[f"n_groupings_{where}_one_cluster_state_class"] = sum(1 for ids in defs.values() if one(L, ids))
+        stats[f"n_groupings_{where}_split_state_class"] = sum(1 for ids in defs.values() if one(labels, ids) and not one(L, ids))
+        stats[f"n_groupings_{where}_joined_state_class"] = sum(1 for ids in defs.values() if not one(labels, ids) and one(L, ids))
 
 
 # ---------------- second coder: agreement on three coding decisions (review findings D3, D4, D6)

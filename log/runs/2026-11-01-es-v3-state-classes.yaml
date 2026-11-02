@@ -1,0 +1,43 @@
+id: 2026-11-01-es-v3-state-classes
+type: run
+kind: maintenance
+date: '2026-11-01'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Class every live mechanic as simulation state, presentation, control, or meta-structure by written
+  rules (review D6), and re-run the prevalence head, pair co-occurrence, and game clustering on the simulation-state
+  subset.
+method: >-
+  Read finding D6 (third Explore Science review), section 2.1, sections 5.1, 5.3 and 5.4, Appendix E, the family
+  vocabulary, and the definition of each of the 199 live mechanics. Wrote the state-class rules (a procedure and
+  four class definitions: simulation state, control, meta-structure, presentation, with two worked examples each,
+  none from the second-coding sample in report/analysis.yaml) while reading the definitions, then classed every
+  mechanic in the new report/state-class.yaml, with a one-line rationale on 62 calls; every class was fixed before
+  any subset statistic was computed. Result: 152 simulation state, 24 control, 13 meta-structure, 10 presentation.
+  One rater made every call; no second coder, so agreement is unmeasured.
+
+  Added to scripts/analyze.py, in its own helpers (_state_class, _curveball_coverage, _state_class_pairs,
+  _state_class_clusters) called from the co-occurrence and clustering blocks: a check that fails the build when a
+  live mechanic has no entry, an entry is not live or appears twice, a class is unknown, a worked example is classed
+  otherwise, or the maker run does not exist (tested on six broken copies); class counts and uses, and a table of
+  every mechanic's class; agreement with the four-family proxy (181 of 199, kappa 0.73; the proxy keeps 15 non-state
+  mechanics, building placement and modding support the most used, and drops 3 state ones); a fifth
+  prevalence-sensitivity row (treasury leads at 31 percent; 5 of the top 6 are not state); the unreached share on
+  the subset (49 percent of uses against 50); pair coverage on the subset against its own curveball null, same
+  settings, new seed (26.4 percent against 34.6, p 0.004; restricted 31.9 against 42.0); the lift ranking among
+  state pairs (21 of the top 30 stay); the 2000 and post-2010 shares as raw counts (66 and 81 percent); and
+  re-clustering on the subset at k 22 (ARI 0.57 to the configured partition, below the subsample 10th percentile;
+  subgenre AMI 0.45; 20 of 22 paper families and 15 of 18 book groupings stay in one cluster, the ones that split
+  held by control parts; 5 of 6 links join, against 3). New block state_class in report/analysis.yaml. No full-set
+  stat, table, or derived value changed except the added row.
+
+  Rewrote section 2.1 (the classes), 5.1 (head by class, proxy agreement, subset head, unreached share), 5.3 (subset
+  coverage, lift, the two shares), 5.4 (the subset clustering; the sentence that changing which mechanics enter
+  moves the partition no more than resampling was narrowed), Appendix E (the classes table and the disagreements),
+  and book chapters 1 and 4, each with assertions. Did not re-run the section 5.2 baselines on the subset. make
+  check and make determinism pass.
+contract_version: '1.2'
+proposals: []

@@ -203,6 +203,16 @@ techniques:
 # head of the prevalence distribution (prevalence-sensitivity, "state-owning families only") and §8.2 out of the
 # unreached share, both from this one list, so the two checks cannot drift apart (review E12, E37).
 nonstate_families: [information-legibility, time-pacing, control-automation, progression-goals]
+state_class:
+  # Review D6: the family list above is a proxy. report/state-class.yaml classes every live mechanic as simulation state,
+  # presentation, control, or meta-structure by written rules, and the build fails when it falls out of step with the
+  # data. §5.1 (the head of the prevalence distribution and the unreached share of §8.2), §5.3 (pair coverage and the
+  # lift ranking), and §5.4 (the clustering at the configured k) are re-run on the mechanics in the classes below and
+  # read beside the full set. Nothing here changes a full-set number.
+  keep: [simulation-state]
+  # The subset's own fixed-margin null for pair coverage: the curveball trades, samples, burn-in, and thinning of
+  # `cooccurrence`, on each game's simulation-state tags alone, from its own seed so the chain is not the full set's.
+  null_seed: 20261101
 exposure:
   # §8.2 robustness. The exposure weights are a deployment-weighted heuristic (vocab/rubrics.yaml composites); these
   # settings test how far the family ranking and the unreached share depend on them.
