@@ -1,0 +1,16 @@
+id: src-krafton-2025-inzoi-v0-3-0-patch-notes
+type: source
+name: '[v0.3.0 & DLC] Patch Notes (inZOI)'
+kind: news
+authors:
+- inZOI Studio
+- KRAFTON
+venue: Steam news (read through the Steam news API)
+date: '2025-08-20'
+url: https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=2456740&count=1&maxlength=0&enddate=1755669690&format=json
+accessed: '2026-11-01'
+notes: Smart Zoi inner thoughts now fire after actions and at meaningful moments such as marriage, childbirth,
+  and aging. The store news page is https://store.steampowered.com/news/app/2456740/view/1808601382400813,
+  which renders with JavaScript, so the API copy is cited.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

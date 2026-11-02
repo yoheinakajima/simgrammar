@@ -1,0 +1,14 @@
+id: src-hodges-2026-vivarium
+type: source
+name: Vivarium
+kind: store-page
+authors:
+- Matt Hodges
+venue: itch.io
+date: '2026'
+url: https://matthodges.itch.io/vivarium
+accessed: '2026-11-01'
+notes: A released web sandbox built on Lenia, with growth parameters that can drift so the ecosystem adapts;
+  status Released, HTML5.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

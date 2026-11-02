@@ -1,0 +1,15 @@
+id: src-wesnoth-2024-attack-prediction
+type: source
+name: src/attack_prediction.cpp, Battle for Wesnoth 1.18.0
+kind: repository
+authors:
+- Rusty Russell
+- The Battle for Wesnoth Project
+venue: GitHub
+date: '2024'
+url: https://raw.githubusercontent.com/wesnoth/wesnoth/1.18.0/src/attack_prediction.cpp
+accessed: '2026-11-01'
+notes: The attack-prediction code computes the distribution of combat outcomes, with a Monte Carlo implementation
+  of its combat matrix.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

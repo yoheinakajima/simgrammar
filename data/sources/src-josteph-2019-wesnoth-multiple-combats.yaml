@@ -1,0 +1,14 @@
+id: src-josteph-2019-wesnoth-multiple-combats
+type: source
+name: How do you predict the outcome of multiple combats?
+kind: news
+authors:
+- josteph
+venue: Wesnoth forums
+date: '2019-03-09'
+url: https://forums.wesnoth.org/viewtopic.php?p=641941
+accessed: '2026-11-01'
+notes: A forum post noting that the attack dialog shows the expected hitpoint histogram for one pending
+  combat.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

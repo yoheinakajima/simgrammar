@@ -49,10 +49,39 @@ falsifiable_signal:
     offers are chosen by a planner or game-state evaluation. Technique class: any generator of diplomatic
     language counts, templates included, with any planner or evaluation, so this is a feature test; it
     shows dialogue models landed only if the material says a language model writes the messages.'
-sources: []
+claims:
+- text: The AI Influence mod for Bannerlord has language-model rulers make statements, run negotiation
+    cycles, and decide on war and peace.
+  sources:
+  - src-mfive-2025-ai-influence
+  confidence: medium
+  quote: Rulers make public statements about world events Negotiation cycles drive diplomatic crises AI
+    decides when to declare war or propose peace
+  locator: Description, AI Diplomacy
+- text: 'Broken Rift: Dominion, a 4X with a public demo, uses a packaged offline language model that reads
+    structured game state to write its factions'' diplomacy.'
+  sources:
+  - src-steam-2026-broken-rift-dominion
+  confidence: high
+  quote: 'Broken Rift: Dominion includes a packaged offline language model used within its diplomacy and
+    faction-strategy systems. The model interprets structured game state to produce personality-consistent
+    diplomatic communications and strategic preferences.'
+  locator: AI Generated Content Disclosure
+- text: 'In Broken Rift: Dominion deterministic rules, not the model, decide legal actions and outcomes,
+    the planner-backed split this opportunity proposes.'
+  sources:
+  - src-steam-2026-broken-rift-dominion
+  confidence: high
+  quote: Deterministic simulation rules remain authoritative over costs, legal actions, targeting, combat,
+    and outcomes.
+  locator: About This Game, Face Empires That Think-and Remember
+sources:
+- src-mfive-2025-ai-influence
+- src-steam-2026-broken-rift-dominion
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

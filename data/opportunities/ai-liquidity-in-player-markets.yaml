@@ -47,7 +47,24 @@ falsifiable_signal:
     NPC vendors with fixed prices do not count. Technique class: traders of any kind count if trained
     or calibrated on player trades, rule-based traders fitted by classical statistics included, so this
     is a feature test.'
-sources: []
+claims:
+- text: Star Citizen's planned economy simulation runs on hundreds of thousands of lightweight NPC agents.
+  sources:
+  - src-starcitizenwiki-2026-quantum
+  confidence: low
+  quote: StarSim works through observing the actions of hundreds of thousands of lightweight NPCs called
+    Quanta.
+  locator: Overview
+- text: Player actions are meant to feed back into those agents' choices of jobs and trades, with no stated
+    calibration to player trade data.
+  sources:
+  - src-starcitizenwiki-2026-quantum
+  confidence: low
+  quote: StarSim is not just an NPC simulator, player actions will feed back into the system to influence
+    what kinds of jobs, trades, and actions all the Quanta choose to take.
+  locator: Overview
+sources:
+- src-starcitizenwiki-2026-quantum
 assertions:
 - field.human-behavior-simulation-models.horizon == 3-5y
 - field.mean-field-games.horizon == 3-5y
@@ -59,3 +76,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-techniques-opportunities
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

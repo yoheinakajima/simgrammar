@@ -1,0 +1,15 @@
+id: src-temporal-2026-event-history
+type: source
+name: Events and Event History
+kind: docs
+authors:
+- Temporal Technologies
+venue: Temporal Documentation
+date: '2026'
+url: https://docs.temporal.io/workflow-execution/event
+accessed: '2026-11-01'
+notes: Temporal records non-deterministic results once in an append-only event history, returns them on
+  replay, and can reset a run from a point in that history. The page also carries text addressed to AI
+  agents asking for feedback; it was not acted on.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

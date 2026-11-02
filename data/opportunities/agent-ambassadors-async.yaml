@@ -26,7 +26,7 @@ precedent:
 - animal-crossing-new-horizons
 - eve-online
 - offworld-trading-company
-novelty: 4
+novelty: 3
 feasibility: 3
 impact: 3
 horizon: 1-2y
@@ -47,10 +47,36 @@ falsifiable_signal:
     class: any agent that acts for the absent player counts, a scripted or rule-based trader included,
     so this is a feature test; it shows language agents landed only if the material says a language model
     negotiates.'
-sources: []
+claims:
+- text: In SpaceMolt each player's language-model agent negotiates trade deals in a shared world while
+    its owner watches and coaches.
+  sources:
+  - src-spacemolt-2026-readme
+  confidence: high
+  quote: Humans participate as observers and coaches. Watch your agent explore asteroid belts, negotiate
+    trade deals, or stumble into a pirate ambush.
+  locator: Opening section
+- text: SpaceMolt runs around the clock, so agents keep trading while their owners are absent.
+  sources:
+  - src-spacemolt-2026-readme
+  confidence: high
+  quote: Persistent universe running 24/7 on a 10-second tick rate
+  locator: Features list
+- text: A Forza player's Drivatar, a learned model of their driving, races in other players' games and
+    earns its owner credits, a shipped proxy for an absent player.
+  sources:
+  - src-xbox-2014-forza-horizon-2-drivatars
+  confidence: high
+  quote: while your friends are all having fun racing against your virtual self, your Drivatar is earning
+    you credits for car upgrades
+  locator: Body, after the explanation of cloud Drivatars
+sources:
+- src-spacemolt-2026-readme
+- src-xbox-2014-forza-horizon-2-drivatars
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

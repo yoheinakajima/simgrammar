@@ -28,6 +28,7 @@ precedent:
 - dwarf-fortress
 - oxygen-not-included
 - prison-architect
+- inzoi
 novelty: 3
 feasibility: 4
 impact: 3
@@ -48,10 +49,20 @@ falsifiable_signal:
     translated into the game''s existing work or priority settings. Technique class: any parser counts,
     a keyword or grammar-based one included, so this is a feature test; it shows language models landed
     only if the material says one translates the orders.'
-sources: []
+claims:
+- text: In inZOI typed text can steer a character's actions and thoughts through a small language model,
+    a life-sim form of intent-level orders.
+  sources:
+  - src-steam-2025-inzoi
+  confidence: high
+  quote: character actions and thoughts can be influenced with text using SLM technology
+  locator: AI Generated Content Disclosure
+sources:
+- src-steam-2025-inzoi
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

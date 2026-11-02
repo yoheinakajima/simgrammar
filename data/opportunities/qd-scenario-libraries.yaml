@@ -41,10 +41,21 @@ falsifiable_signal:
   criteria: 'Content first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews;
     developer documentation names quality-diversity or MAP-Elites generation for shipped scenarios or
     levels. Technique class: quality-diversity search only, so this is a technique test.'
-sources: []
+claims:
+- text: ELIMINATION, a released word puzzle, generates all its levels with a constrained evolutionary
+    algorithm, a shipped generated level library that does not use quality-diversity search.
+  sources:
+  - src-khalifa-2019-elimination
+  confidence: high
+  quote: Elimination is a word puzzle game for browsers and mobile devices, where all levels are generated
+    by a constrained evolutionary algorithm with no human intervention.
+  locator: Abstract
+sources:
+- src-khalifa-2019-elimination
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

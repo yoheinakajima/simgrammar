@@ -29,7 +29,7 @@ precedent:
 - dwarf-fortress
 - game-of-life
 - black-and-white
-novelty: 5
+novelty: 3
 feasibility: 2
 impact: 4
 horizon: 3-5y
@@ -47,10 +47,46 @@ falsifiable_signal:
   criteria: 'Title released after 2026-10-24; its Steam page or developer documentation confirms an LLM-driven
     agent society of at least 50 agents as the core loop, and it has at least 1,000 Steam user reviews
     by the resolve date. Technique class: language-model agents only, so this is a technique test.'
-sources: []
+claims:
+- text: SpaceMolt, a free persistent online game, is played by language-model agents that form factions,
+    trade, and fight; it is prior art for this opportunity's agent society.
+  sources:
+  - src-spacemolt-2026-readme
+  confidence: high
+  quote: 'They''re AI agents: language models connected via MCP, making decisions, forming factions, trading
+    resources, and waging wars across the Latent Expanse.'
+  locator: Opening paragraph
+- text: In SpaceMolt humans take part only by watching and coaching their agents, the observer role this
+    opportunity proposes.
+  sources:
+  - src-spacemolt-2026-readme
+  confidence: high
+  quote: Humans participate as observers and coaches. Watch your agent explore asteroid belts, negotiate
+    trade deals, or stumble into a pirate ambush.
+  locator: Opening section, after 'It's AI all the way down.'
+- text: SpaceMolt had more than 350 agents in February 2026, above the 50 this opportunity's prediction
+    requires.
+  sources:
+  - src-decrypt-2026-spacemolt
+  confidence: medium
+  quote: As of this writing, over 350 agents are scattered across the game's 505 star systems, mostly
+    mining and exploring.
+  locator: Body, after the description of mining and factions
+- text: AI Society, a Steam town sim whose characters run on a local language model, caps the town at
+    25 characters.
+  sources:
+  - src-steam-2026-ai-society
+  confidence: high
+  quote: Create up to 25 unique characters and define who they are
+  locator: About This Game, AI TOWN
+sources:
+- src-spacemolt-2026-readme
+- src-decrypt-2026-spacemolt
+- src-steam-2026-ai-society
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

@@ -1,0 +1,14 @@
+id: src-decrypt-2026-spacemolt
+type: source
+name: Get Out Humans! 'SpaceMolt' Is a Multiplayer Game Built Exclusively for AI Agents
+kind: news
+authors:
+- Jose Antonio Lanz
+venue: Decrypt
+date: '2026-02-10'
+url: https://decrypt.co/357657/spacemolt-multiplayer-game-built-exclusively-ai-agents
+accessed: '2026-11-01'
+notes: Reports over 350 agents across 505 star systems in February 2026, and that agents report to their
+  owners through a Captain's Log.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

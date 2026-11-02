@@ -47,10 +47,25 @@ falsifiable_signal:
     player''s live inputs. Third-party apps do not count. Technique class: any generator counts, rule-based
     templates read by a speech synthesizer included, so this is a feature test; it shows voice models
     landed only if the material says one writes or speaks the feedback.'
-sources: []
+claims:
+- text: FS Flying School, a third-party flight-simulator add-on, has talking flight instructors.
+  sources:
+  - src-justflight-2015-fs-flying-school-pro
+  confidence: high
+  quote: Four talking Flight Instructors with different personalities, genders and nationalities
+  locator: Features list
+- text: Its instructor warns of mistakes the pilot is about to make, feedback from the live flight.
+  sources:
+  - src-justflight-2015-fs-flying-school-pro
+  confidence: high
+  quote: Your instructor will provide you with advanced warning of mistakes that you are about to make
+  locator: Features list
+sources:
+- src-justflight-2015-fs-flying-school-pro
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

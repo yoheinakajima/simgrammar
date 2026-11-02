@@ -1,0 +1,14 @@
+id: src-steam-2014-crusader-kings-2-charlemagne
+type: source
+name: 'Expansion: Crusader Kings II, Charlemagne'
+kind: store-page
+authors:
+- Paradox Development Studio
+- Paradox Interactive
+venue: Steam
+date: '2014-10-14'
+url: https://store.steampowered.com/app/292982/Expansion_Crusader_Kings_II_Charlemagne/
+accessed: '2026-11-01'
+notes: Adds an annual chronicle of the player's game written from game events.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

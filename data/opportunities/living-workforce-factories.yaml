@@ -53,7 +53,26 @@ falsifiable_signal:
     (aging, training, succession) in a factory or automation game, and it has at least 1,000 Steam user
     reviews by the resolve date. Technique class: any method counts, conventional agent simulation included,
     so this is a feature test.'
-sources: []
+claims:
+- text: Workers & Resources follows each citizen from childhood to death, with education and employment.
+  sources:
+  - src-steam-2026-workers-and-resources
+  confidence: high
+  quote: Follow your citizens from childhood to the end of their lives, providing them with essential
+    goods such as food and clothes (and alcohol) while simultaneously ensuring they have access to opportunities
+    in the form of education and employment.
+  locator: About This Game
+- text: In Workers & Resources schooling opens jobs and unlocks production capabilities, so the production
+    network depends on a renewed, educated workforce.
+  sources:
+  - src-steam-2026-workers-and-resources
+  confidence: high
+  quote: Education is provided through schools and universities, with higher levels of education opening
+    up additional employment opportunities for your people, unlocking access to new technologies and production
+    capabilities in your nation.
+  locator: About This Game
+sources:
+- src-steam-2026-workers-and-resources
 assertions:
 - 'cooccur.lifecycle-aging.production-chain <= 3'
 - 'derived.production-chain.prevalence_rank <= 10'
@@ -66,3 +85,4 @@ provenance:
   - 2026-10-31-tag-audit
   - 2026-10-31-tag-audit-follow-up
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

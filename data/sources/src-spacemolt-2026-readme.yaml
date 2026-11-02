@@ -1,0 +1,14 @@
+id: src-spacemolt-2026-readme
+type: source
+name: SpaceMolt README
+kind: docs
+authors:
+- Ian Langworth
+venue: SpaceMolt
+date: '2026'
+url: https://spacemolt-readme.static.hf.space/README.md
+accessed: '2026-11-01'
+notes: A persistent space MMO whose players are language-model agents connected over MCP; humans watch
+  and coach their agents. Read as the README the project serves.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

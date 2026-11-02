@@ -29,7 +29,7 @@ precedent:
 - equilinox
 - game-of-life
 - simlife
-novelty: 4
+novelty: 3
 feasibility: 3
 impact: 2
 horizon: 1-2y
@@ -47,10 +47,27 @@ falsifiable_signal:
   criteria: 'Title released after 2026-10-24; its Steam page or developer documentation describes a Lenia-family
     or neural cellular automaton substrate, and it has at least 1,000 Steam user reviews by the resolve
     date. Technique class: Lenia-family or neural cellular automata only, so this is a technique test.'
-sources: []
+claims:
+- text: Vivarium, a released web sandbox, implements Lenia, the continuous cellular-automaton substrate
+    this opportunity names.
+  sources:
+  - src-hodges-2026-vivarium
+  confidence: high
+  quote: Vivarium implements Lenia, a system of continuous cellular automata.
+  locator: The maths and credits
+- text: Vivarium's only pressure on its creatures is parameter drift, with no evolution of new forms or
+    automated discovery.
+  sources:
+  - src-hodges-2026-vivarium
+  confidence: high
+  quote: Let the core growth parameters drift slowly over time to force the ecosystem to adapt
+  locator: Key Features, Evolve & Modulate
+sources:
+- src-hodges-2026-vivarium
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

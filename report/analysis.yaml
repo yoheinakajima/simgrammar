@@ -243,3 +243,19 @@ opportunities:
   # Review E25: a validation experiment states a compute budget when it names one of these (tokens per hour, a
   # latency in ms, first-token time, VRAM, frame time, or a per-player-hour figure).
   budget_pattern: 'tokens? per|\bms\b|first token|VRAM|frame-time|player-hour'
+prior_art:
+  # Review E31: the prior-art search behind each opportunity's novelty score lives in this file, one entry per live
+  # opportunity (its header gives the rules). The build fails when an entry is missing or out of step with a record.
+  file: report/audits/prior-art.yaml
+  # The highest novelty anchor (vocab/rubrics.yaml) that prior art of a given kind and closeness allows. A game or
+  # official release that already does the design leaves "known idea, rarely executed well" (2); one that does the
+  # prediction's defining feature, or a narrower form, and any mod, leaves "new combination with partial precedents"
+  # (3); prototypes, research, work outside games, and anything only adjacent leave "no shipped precedent; adjacent
+  # research exists" (4); nothing found leaves 5. Read as anchors, with the lower taken between two (CONTRACT.md I5).
+  ceiling:
+    game: {design: 2, feature: 3, adjacent: 4, none: 5}
+    official: {design: 2, feature: 3, adjacent: 4, none: 5}
+    mod: {design: 3, feature: 3, adjacent: 4, none: 5}
+    prototype: {design: 4, feature: 4, adjacent: 4, none: 5}
+    research: {design: 4, feature: 4, adjacent: 4, none: 5}
+    outside: {design: 4, feature: 4, adjacent: 4, none: 5}

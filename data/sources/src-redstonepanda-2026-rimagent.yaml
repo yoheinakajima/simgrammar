@@ -1,0 +1,14 @@
+id: src-redstonepanda-2026-rimagent
+type: source
+name: 'RimAgent: Orca Deepseek (Beta)'
+kind: store-page
+authors:
+- RedstonePanda
+venue: Steam Workshop (RimWorld)
+date: '2026-05-31'
+url: https://steamcommunity.com/sharedfiles/filedetails/?id=3736679812
+accessed: '2026-11-01'
+notes: A storyteller mod whose language model reads colony summaries, pawn information, and the available
+  incidents and chooses story events from the colony's state.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

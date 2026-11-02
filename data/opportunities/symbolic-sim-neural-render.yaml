@@ -29,7 +29,7 @@ precedent:
 - tiny-glade
 - cities-skylines
 - islanders
-novelty: 5
+novelty: 3
 feasibility: 2
 impact: 4
 horizon: 3-5y
@@ -50,10 +50,36 @@ falsifiable_signal:
     developer documentation shows that gameplay state is symbolic and that the main viewport is produced
     frame by frame by a learned generative renderer. Technique class: learned generative renderers only,
     so this is a technique test.'
-sources: []
+claims:
+- text: DLSS 5 renders each output frame with a generative model, one frame in and one frame out.
+  sources:
+  - src-nvidia-2026-dlss-5
+  confidence: high
+  quote: Unlike video generation models that operate on batch frame sequences, DLSS 5 operates on a strict
+    one-frame-in, one-frame-out model.
+  locator: DLSS 5 Introduces 3D-Guided Neural Rendering (temporal stability paragraph)
+- text: DLSS 5 conditions on the engine's rendered colour and motion vectors, not on symbolic game state,
+    so it still needs a conventional renderer and art.
+  sources:
+  - src-nvidia-2026-dlss-5
+  confidence: high
+  quote: DLSS 5 takes a frame's color and motion vectors as input to deliver lifelike lighting and materials
+    that are deterministic, temporally stable and anchored to the game's content
+  locator: DLSS 5 Introduces 3D-Guided Neural Rendering
+- text: The Oasis 2.0 mod transforms Minecraft's view in real time over the game's own symbolic world,
+    the restyling use this opportunity proposes.
+  sources:
+  - src-decart-2025-oasis-2
+  confidence: high
+  quote: Within a few seconds, your Minecraft world will now transform in real-time.
+  locator: How to Play Oasis 2.0
+sources:
+- src-nvidia-2026-dlss-5
+- src-decart-2025-oasis-2
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prior-art

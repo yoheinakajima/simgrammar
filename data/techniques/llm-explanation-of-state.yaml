@@ -51,7 +51,7 @@ key_results:
   - src-gallotta-2024-llms-games-survey
   confidence: medium
 maturity: prototype
-trl: 5
+trl: 6
 runtime:
 - client-realtime
 - server-realtime
@@ -104,3 +104,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-llm-agents
+  reviewed:
+  - 2026-11-01-es-v3-prior-art

@@ -1,0 +1,15 @@
+id: src-starcitizenwiki-2026-quantum
+type: source
+name: Quantum (Star Citizen Wiki)
+kind: encyclopedia
+authors:
+- Star Citizen Wiki contributors
+venue: Star Citizen Wiki
+date: '2026'
+url: https://starcitizen.tools/Quanta
+accessed: '2026-11-01'
+notes: Describes Star Citizen's planned economy simulation run by lightweight NPC agents (Quanta) whose
+  job and trade choices respond to players. The wiki flags the page as possibly outdated; the system is
+  in development.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

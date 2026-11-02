@@ -58,7 +58,7 @@ key_results:
     game rules and levels simultaneously
   locator: Abstract
 maturity: prototype
-trl: 5
+trl: 6
 runtime:
 - offline-authoring
 - design-assist
@@ -113,3 +113,4 @@ provenance:
   created: 2026-10-24-techniques-rl-design
   reviewed:
   - 2026-10-25-source-claims-pilot
+  - 2026-11-01-es-v3-prior-art

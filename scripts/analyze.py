@@ -1909,6 +1909,8 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         outcomes[r["outcome"] if r else "open"] += 1
     for k in ["open"] + list(vocab_terms(vocabs, "prediction_outcome")):
         stats[f"n_predictions_{k}"] = outcomes.get(k, 0)
+    # the prior-art search behind each novelty score (review E31), checked against the records
+    _prior_art(opps, by_id, [r["opportunity"] for r in orows], cfg, derived, stats, tables)
 
     # ---------------- raters: agreement between independent ratings, and calibration results
     runs = {r.id: r for r in ents.get("run", [])}
@@ -2649,6 +2651,108 @@ def _second_coding(ents, vocabs, cfg, stats, tables):
             "description": "The four admission tests as the second coder applied them: on the sampled mechanics the vocabulary admits, how many "
                            "codes pass each test, and the same on the candidates it left as proposals.",
             "columns": ["test", "admitted", "admitted_pass", "candidates", "candidates_pass"], "rows": test_rows}
+
+
+# ---------------- prior art: the search behind each opportunity's novelty score (review finding E31)
+
+PRIOR_ART_KINDS = ("game", "official", "mod", "prototype", "research", "outside")
+PRIOR_ART_CLOSENESS = ("design", "feature", "adjacent", "none")
+
+
+def _prior_art(opps, by_id, order, cfg, derived, stats, tables):
+    """Read report/audits/prior-art.yaml (one entry per live opportunity: the queries, where they ran, the closest prior
+    art found, and the verdict) and fail the build when it falls out of step with the records. The ceiling is the
+    highest novelty anchor the prior art allows, looked up from its kind and closeness in report/analysis.yaml
+    (prior_art.ceiling) and taken as the lowest over every work an entry lists; the entry's `closest` must be the work
+    that sets it. A record's stored novelty must equal the entry's, must not exceed the ceiling, and must not exceed
+    the score before the search: the search can lower a score, never raise it. Shipped prior art (a ceiling of 3 or
+    less) must be cited by the record, so the claim and its quote sit on the record's page."""
+    pcfg = cfg.get("prior_art") or {}
+    path = ROOT / str(pcfg.get("file", "report/audits/prior-art.yaml"))
+    table = pcfg.get("ceiling") or {}
+    if not path.exists():
+        raise ValueError(f"{path.relative_to(ROOT)}: missing; every live opportunity needs a prior-art entry (review E31)")
+    entries = (read_yaml(path) or {}).get("entries") or []
+    live = {o.id: o for o in opps}
+    seen, rows = {}, []
+
+    def ceiling(w, where):
+        k, c = w.get("kind"), w.get("closeness")
+        if k not in PRIOR_ART_KINDS or c not in PRIOR_ART_CLOSENESS:
+            raise ValueError(f"{where}: kind must be one of {PRIOR_ART_KINDS} and closeness one of {PRIOR_ART_CLOSENESS}, got {k!r}, {c!r}")
+        if not str(w.get("url", "")).startswith(("http://", "https://")):
+            raise ValueError(f"{where}: {w.get('name')!r} needs the url of the page opened")
+        return int(table[k][c])
+
+    for e in entries:
+        oid = e.get("opportunity")
+        where = f"{path.relative_to(ROOT)}: {oid}"
+        if oid in seen:
+            raise ValueError(f"{where}: two entries")
+        if oid not in live:
+            raise ValueError(f"{where}: not a live opportunity (deprecated or unknown); entries follow the records")
+        seen[oid] = e
+        o = live[oid].data
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(e.get("date", ""))):
+            raise ValueError(f"{where}: date must be YYYY-MM-DD")
+        if e.get("coverage") not in ("full", "partial") or (e["coverage"] == "partial" and not e.get("coverage_note")):
+            raise ValueError(f"{where}: coverage must be full, or partial with a coverage_note saying which searches were not run")
+        if not e.get("queries") and e.get("where") != ["direct"]:
+            raise ValueError(f"{where}: no queries recorded; an entry with none says where: [direct] (pages opened directly)")
+        cl = e.get("closest") or {}
+        works = [cl] + list(e.get("also") or [])
+        ceils = [ceiling(w, where) for w in works]
+        cap = min(ceils)
+        if ceils[0] != cap:
+            raise ValueError(f"{where}: `closest` must be the work that sets the ceiling ({cap}); a work under `also` sets it lower")
+        src = cl.get("source")
+        if src is not None and src not in by_id:
+            raise ValueError(f"{where}: closest.source {src} is not a live source")
+        if cap <= 3 and src not in (o.get("sources") or []):
+            raise ValueError(f"{where}: shipped prior art ({cl.get('name')}) must be cited by the record, with a quoted claim")
+        if e.get("novelty") != o["novelty"]:
+            raise ValueError(f"{where}: novelty {e.get('novelty')} differs from the record's {o['novelty']}; a changed score needs a new search entry")
+        if o["novelty"] > cap:
+            raise ValueError(f"{where}: stored novelty {o['novelty']} exceeds the ceiling {cap} the prior art allows")
+        if o["novelty"] > int(e.get("novelty_before", 0)):
+            raise ValueError(f"{where}: novelty {o['novelty']} is above novelty_before {e.get('novelty_before')}; the search never raises a score")
+        derived[oid].update({"prior_art_ceiling": cap, "novelty_before": e["novelty_before"], "prior_art_coverage": e["coverage"]})
+        rows.append({"opportunity": oid, "closest_prior_art": cl.get("name"), "kind": cl["kind"], "year": cl.get("year") or "",
+                     "closeness": cl["closeness"], "ceiling": cap, "novelty_before": e["novelty_before"], "novelty": o["novelty"],
+                     "coverage": e["coverage"]})
+    missing = sorted(set(live) - set(seen))
+    if missing:
+        raise ValueError(f"{path.relative_to(ROOT)}: no prior-art entry for {', '.join(missing)}")
+    pos = {x: i for i, x in enumerate(order)}
+    rows.sort(key=lambda r: pos.get(r["opportunity"], len(pos)))
+    tables["prior-art"] = {"description": "The prior-art search behind each opportunity's novelty score, in priority order (report/audits/prior-art.yaml holds the queries, the places searched, the pages opened, and the verdicts). "
+                                          "Closest prior art: the work that sets the ceiling. Kind: game, official (update, expansion, or developer tool), mod, prototype, research, or outside games. "
+                                          "Closeness: design (does the opportunity's core design), feature (does its prediction's defining feature, or a narrower form), or adjacent. "
+                                          "Ceiling: the highest novelty anchor that prior art allows (report/analysis.yaml, prior_art.ceiling). Coverage: partial where a web, scholarly, or storefront search was not run.",
+                           "columns": ["opportunity", "closest_prior_art", "kind", "year", "closeness", "ceiling", "novelty_before", "novelty", "coverage"],
+                           "rows": rows, "link_columns": ["opportunity"]}
+    stats["n_prior_art_entries"] = len(rows)
+    stats["n_prior_art_coverage_full"] = sum(1 for r in rows if r["coverage"] == "full")
+    stats["n_prior_art_coverage_partial"] = sum(1 for r in rows if r["coverage"] == "partial")
+    shipped = [r for r in rows if r["ceiling"] <= 3]
+    stats["n_prior_art_shipped"] = len(shipped)  # a game, official release, or mod does the design, the feature, or a narrower form
+    stats["n_prior_art_shipped_game"] = sum(1 for r in shipped if r["kind"] in ("game", "official"))
+    stats["n_prior_art_shipped_mod"] = sum(1 for r in shipped if r["kind"] == "mod")
+    stats["n_prior_art_design_shipped"] = sum(1 for r in rows if r["ceiling"] == 2)
+    stats["n_prior_art_adjacent_only"] = sum(1 for r in rows if r["ceiling"] == 4)
+    stats["n_prior_art_none"] = sum(1 for r in rows if r["ceiling"] == 5)
+    low = [r for r in rows if r["novelty"] < r["novelty_before"]]
+    stats["n_novelty_lowered"] = len(low)
+    for k in (3, 4, 5):
+        stats[f"n_novelty_lowered_from_{k}"] = sum(1 for r in low if r["novelty_before"] == k)
+    stats["n_novelty_lowered_two_anchors"] = sum(1 for r in low if r["novelty_before"] - r["novelty"] >= 2)
+    stats["n_novelty_kept"] = len(rows) - len(low)
+    stats["n_novelty_below_ceiling"] = sum(1 for r in rows if r["novelty"] < r["ceiling"])
+    stats["n_novelty_high_before"] = sum(1 for r in rows if r["novelty_before"] >= 4)
+    stats["n_novelty_high"] = sum(1 for r in rows if r["novelty"] >= 4)
+    stats["n_novelty_high_lowered"] = sum(1 for r in low if r["novelty_before"] >= 4)
+    stats["n_novelty_lowered_partial_coverage"] = sum(1 for r in low if r["coverage"] == "partial")
+    stats["n_novelty_kept_partial_coverage"] = sum(1 for r in rows if r["coverage"] == "partial" and r["novelty"] == r["novelty_before"])
 
 
 # ======================================================================= SVG
