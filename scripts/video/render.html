@@ -410,6 +410,27 @@ body.v .f-ln{font-size:40px;width:52px}body.v .f-lt{font-size:36px}body.v .f-rai
 .f-plate{display:flex;flex-direction:column;gap:10px}
 .f-note3{font-size:19px;max-width:1300px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 body.v .f-note3{font-size:22px}
+/* intro frames: totals, games by year, the icon map, the site */
+.f-totals{display:grid;grid-template-columns:repeat(4,1fr);gap:36px;height:100%;align-content:center}
+.f-tot{border-top:4px solid var(--rule);padding-top:22px;display:flex;flex-direction:column;gap:10px}
+.f-tot.on{border-top-color:var(--accent)}
+.f-totn{font:600 176px/.95 var(--sans);letter-spacing:-.045em}.f-totl{font:600 34px/1.15 var(--sans)}
+.f-totals.v{grid-template-columns:1fr 1fr;gap:70px 44px}body.v .f-totn{font-size:168px}body.v .f-totl{font-size:42px}
+.f-gyears{position:relative}.f-gyears svg{position:absolute;left:0;top:0}
+.f-gys{position:absolute;background:var(--cell)}.f-gys.named{background:var(--ink)}.f-gys.on{background:var(--accent)}
+.f-gyaxis{position:absolute;background:var(--ink);width:2px}.f-gyaxis.h{height:2px;width:auto}
+.f-gyt{position:absolute}.f-gyw{position:absolute}
+.f-gyl{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+.f-gycap{position:absolute;right:0;top:0}.f-gyears.v .f-gycap{top:auto;bottom:0;left:0;right:auto}
+.f-iconmap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;height:100%}
+.f-imgrid{display:grid}.f-imc{display:flex;align-items:center;justify-content:center}
+.f-imcap{display:flex;align-items:baseline;gap:18px}.f-imcap .f-num.sm{width:auto}
+.f-iconmap.v .f-imcap{flex-direction:column;align-items:center;gap:6px;text-align:center}
+.f-site{height:100%;display:flex;justify-content:center}.f-site .f-win{flex:none;height:100%}
+.f-shot{overflow:hidden;padding:0;justify-content:flex-start}.f-shot img{display:block}
+.f-bgames{max-width:420px}.f-bars.v .f-bgames{max-width:none}
+.f-bcards.three{grid-template-columns:repeat(3,1fr);align-items:stretch}
+body.v .f-bcards{gap:34px}body.v .f-bcard{padding:28px 30px;gap:14px}body.v .f-bcard .f-lab{font-size:42px}body.v .f-bp{font-size:32px}body.v .f-bcards .f-mono{font-size:26px}
 </style><script src="templates.js"></script></head><body>
 <div id="hd"><div class="l"></div><div class="r"></div></div>
 <div id="main"><div id="os"></div><div id="stage"></div></div>

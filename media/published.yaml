@@ -3,7 +3,7 @@
 # Written by scripts/video/publish.py from the renders in video-out; shows lists the records each video puts on screen.
 # An episode's scenes give each scene's start in seconds, the records it shows with when each first appears, and said,
 # a digest of its narration as rendered (lib.narration_digest).
-release: videos-2026-11-01
+release: videos-2026-11-01b
 repo: https://github.com/yoheinakajima/simgrammar-media
 shorts:
   - {key: short-01, script: 001-five-most-common.md, file: short-01.mp4, seconds: 43.4,
@@ -271,4 +271,29 @@ episodes:
        {"name": "Evidence, and who checks it", "start": 276.2, "said": "920ec90eae95", "shows": {"utopia": 276.2}},
        {"name": "What the checks can't see", "start": 338.0, "said": "649c1492aa94", "shows": {}},
        {"name": "Close", "start": 372.2, "said": "60a2eccfba9d", "shows": {}},
+     ]}
+intro:
+  - {key: intro, script: intro.md, format: '16:9', file: intro.mp4, seconds: 78.4,
+     sha256: a836b79198204def152766d34938ea1cd8ae86b885f1c610f20f82d0b360ffe0,
+     poster: intro.jpg, poster_sha256: 69a26241c68419abe537a0d065a0b4b8d3edf3bc199c9877c56e7a4ec12bd3aa,
+     shows: [civilization, factorio, the-sims, tech-tree, hamurabi, minecraft, paralives, simcity-1989, stardew-valley, needs-decay, production-chain, branch-preview-forecasts],
+     scenes: [
+       {"name": "The atlas", "start": 0.0, "said": "9f21415508cf", "shows": {}},
+       {"name": "Every game, by year", "start": 15.3, "said": "7f85b84bc8af", "shows": {"civilization": 15.3, "factorio": 15.3, "hamurabi": 15.3, "minecraft": 15.3, "paralives": 15.3, "simcity-1989": 15.3, "stardew-valley": 15.3, "the-sims": 15.3}},
+       {"name": "The parts", "start": 26.7, "said": "51ed1f8a47ba", "shows": {"needs-decay": 26.7, "production-chain": 26.7, "tech-tree": 26.7, "factorio": 31.0, "anno-1800": 31.9, "the-sims": 33.6, "rimworld": 34.5, "civilization": 36.2, "variable-speed": 37.1}},
+       {"name": "The icons", "start": 41.5, "said": "c0effecf782a", "shows": {}},
+       {"name": "The bets", "start": 47.7, "said": "8f90a4dccae3", "shows": {"branch-preview-forecasts": 47.7, "causal-why-query": 47.7, "mechanic-discovery-search": 47.7}},
+       {"name": "The site", "start": 66.2, "said": "2c721439d58f", "shows": {}},
+     ]}
+  - {key: intro-vertical, script: intro.md, format: '9:16', file: intro-vertical.mp4, seconds: 78.4,
+     sha256: 14eb6b9c6be598c97ef6f5ae0218f053d23719942dad9106b3e4ffb6ca6cc94d,
+     poster: intro-vertical.jpg, poster_sha256: f3c17c631d91809664b1118e9ff471ecfadcf0482b5950d8288291d6ced32643,
+     shows: [civilization, factorio, the-sims, tech-tree, hamurabi, minecraft, paralives, simcity-1989, stardew-valley, needs-decay, production-chain, branch-preview-forecasts],
+     scenes: [
+       {"name": "The atlas", "start": 0.0, "said": "9f21415508cf", "shows": {}},
+       {"name": "Every game, by year", "start": 15.3, "said": "7f85b84bc8af", "shows": {"civilization": 15.3, "factorio": 15.3, "hamurabi": 15.3, "minecraft": 15.3, "paralives": 15.3, "simcity-1989": 15.3, "stardew-valley": 15.3, "the-sims": 15.3}},
+       {"name": "The parts", "start": 26.7, "said": "51ed1f8a47ba", "shows": {"needs-decay": 26.7, "production-chain": 26.7, "tech-tree": 26.7, "factorio": 31.0, "anno-1800": 31.9, "the-sims": 33.6, "rimworld": 34.5, "civilization": 36.2, "variable-speed": 37.1}},
+       {"name": "The icons", "start": 41.5, "said": "c0effecf782a", "shows": {}},
+       {"name": "The bets", "start": 47.7, "said": "8f90a4dccae3", "shows": {"branch-preview-forecasts": 47.7, "causal-why-query": 47.7, "mechanic-discovery-search": 47.7}},
+       {"name": "The site", "start": 66.2, "said": "2c721439d58f", "shows": {}},
      ]}

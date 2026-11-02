@@ -51,7 +51,7 @@ def film_wording(path=None):
 
 def parse_all():
     out = {}
-    for p in sorted(glob.glob(ROOT + "/episodes/*.md")) + [ROOT + "/mega/the-film.md"] + sorted(glob.glob(ROOT + "/shorts/*.md")):
+    for p in sorted(glob.glob(ROOT + "/episodes/*.md")) + [ROOT + "/mega/the-film.md"] + sorted(glob.glob(ROOT + "/shorts/*.md")) + sorted(glob.glob(ROOT + "/intro/*.md")):
         d = parse(p); out[os.path.relpath(p, ROOT)] = d
     os.makedirs(OUT, exist_ok=True)
     json.dump(out, open(os.path.join(OUT, "scripts.json"), "w"), ensure_ascii=False, indent=1)
