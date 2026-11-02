@@ -44,9 +44,9 @@ falsifiable_signal:
     in a formal planning consultation.
   resolve_by: '2029-12-31'
   criteria: 'Public planning document or press release dated after 2026-10-24 that names the tool, states
-    that it simulates resident responses, and records its use in an official consultation. Technique class:
-    any simulation of resident responses counts, classical agent-based models included, so this is a feature
-    test.'
+    that it simulates resident responses, and records its use in an official consultation of a city with at
+    least 100,000 residents. Technique class: any simulation of resident responses counts, classical
+    agent-based models included, so this is a feature test.'
 sources: []
 status: asserted
 provenance:
@@ -54,3 +54,4 @@ provenance:
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prediction-baselines

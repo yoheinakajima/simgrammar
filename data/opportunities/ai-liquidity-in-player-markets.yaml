@@ -42,11 +42,11 @@ falsifiable_signal:
   prediction: A persistent online game will add AI traders to its player-driven market, with their behavior
     fitted to observed player trading.
   resolve_by: '2029-06-30'
-  criteria: 'Announced or shipped after 2026-10-24 in a persistent online game with a player-driven market;
-    developer material states that AI market participants were trained or calibrated on player trade data.
-    NPC vendors with fixed prices do not count. Technique class: traders of any kind count if trained
-    or calibrated on player trades, rule-based traders fitted by classical statistics included, so this
-    is a feature test.'
+  criteria: 'Announced or shipped after 2026-10-24 in a persistent online game with a player-driven market
+    and at least 1,000 Steam user reviews or a console release; developer material states that AI market
+    participants were trained or calibrated on player trade data. NPC vendors with fixed prices do not
+    count. Technique class: traders of any kind count if trained or calibrated on player trades, rule-based
+    traders fitted by classical statistics included, so this is a feature test.'
 sources: []
 assertions:
 - field.human-behavior-simulation-models.horizon == 3-5y
@@ -59,3 +59,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-techniques-opportunities
   - 2026-10-31-es-review-v2-fixes
+  - 2026-11-01-es-v3-prediction-baselines
