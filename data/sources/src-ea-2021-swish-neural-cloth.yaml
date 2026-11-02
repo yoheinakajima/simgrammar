@@ -1,0 +1,15 @@
+id: src-ea-2021-swish-neural-cloth
+type: source
+name: 'SIGGRAPH 21: Swish, Neural Network Cloth Simulation in Madden NFL 21'
+kind: docs
+authors:
+- Chris Lewin
+- EA SEED
+venue: Electronic Arts, SEED
+date: '2021'
+url: https://www.ea.com/seed/news/swish-neural-network-cloth-sim-in-madden-nfl-21
+accessed: '2026-11-01'
+notes: Madden NFL 21 shipped a neural-network cloth simulation for jersey deformation and wrinkles, which
+  EA calls the first neural cloth simulation in a shipped game; it is visual only.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

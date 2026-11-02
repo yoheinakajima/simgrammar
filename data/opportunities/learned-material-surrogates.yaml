@@ -65,9 +65,18 @@ claims:
   quote: existing data-driven methods fall short of the extreme memory and performance constraints imposed
     by modern interactive applications like AAA games and virtual reality
   locator: Abstract
+- text: Madden NFL 21 shipped Swish, a neural-network cloth simulation for jersey wrinkles, a visual-only
+    learned surrogate the prediction does not count.
+  sources:
+  - src-ea-2021-swish-neural-cloth
+  confidence: high
+  quote: Swish was used to generate realistic cloth deformation and wrinkles for NFL player jerseys in
+    Madden NFL 21. To our knowledge, this is the first neural cloth simulation featured in a shipped game.
+  locator: Introduction
 sources:
 - src-epic-2026-ml-deformer
 - src-holden-2019-subspace-neural-physics
+- src-ea-2021-swish-neural-cloth
 status: asserted
 provenance:
   created: 2026-10-24-synthesis

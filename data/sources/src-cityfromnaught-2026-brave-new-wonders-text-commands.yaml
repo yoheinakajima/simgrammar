@@ -1,0 +1,15 @@
+id: src-cityfromnaught-2026-brave-new-wonders-text-commands
+type: source
+name: 'Deep Dive: Text Commands, Automation Logic, and the Archipelago (Brave New Wonders)'
+kind: news
+authors:
+- City From Naught Inc.
+venue: Steam news (read through the Steam news API)
+date: '2026-06-05'
+url: https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=2403830&count=1&maxlength=0&enddate=1780690604&feeds=steam_community_announcements&format=json
+accessed: '2026-11-01'
+notes: Typed commands are parsed into a visual behaviour graph that the player reviews, can edit, and
+  sees in the inspector while workers follow it; unsupported actions are flagged and ambiguous commands
+  shown as a best guess. The store news page renders with JavaScript, so the API copy is cited.
+provenance:
+  created: 2026-11-01-es-v3-prior-art

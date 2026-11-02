@@ -56,8 +56,17 @@ claims:
   quote: 'Teaching is performed using a reinforcement learning system: if the creature does something
     the player does not want, it can be discouraged with a slap.'
   locator: Gameplay, creature
+- text: Civilization III's city governors learn from the player accepting or overriding their suggestions,
+    a shipped delegate trained on the player's own choices.
+  sources:
+  - src-apolyton-2001-soren-johnson-civ3-interview
+  confidence: medium
+  quote: a learning algorithm was implemented to allow the user to train the AI by either accepting the
+    governor's suggestions or making different choices
+  locator: Answer to 'How smart will the governors be this time?'
 sources:
 - src-wikipedia-black-and-white
+- src-apolyton-2001-soren-johnson-civ3-interview
 status: asserted
 provenance:
   created: 2026-10-24-synthesis

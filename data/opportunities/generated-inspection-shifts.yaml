@@ -62,9 +62,18 @@ claims:
   confidence: high
   quote: earn evaluation points by being accurate and quick to advance your career
   locator: About This Game
+- text: Lucas Pope says Papers, Please fills every unscripted entrant with random data based on the current
+    game rules.
+  sources:
+  - src-alexander-2013-papers-please-design
+  confidence: high
+  quote: Anything that's not specified for a particular person is filled in with random data based on
+    the current game rules.
+  locator: Scripted encounters, random encounters
 sources:
 - src-wikipedia-papers-please
 - src-steam-2022-imperial-gatekeeper
+- src-alexander-2013-papers-please-design
 status: asserted
 provenance:
   created: 2026-10-24-synthesis
