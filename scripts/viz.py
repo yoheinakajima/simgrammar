@@ -156,7 +156,7 @@ def build(shared, live, by_id, derived, tables, stats, vocabs, cfg) -> dict:
     out["vacant-lots"] = vacant_lots(shared, live, by_id, derived, tables, fam, cfg)
     out["technique-flows"] = technique_flows(live, by_id, derived, vocabs, fam)
     out["layer-profile"] = layer_profile(tables, fam, sub, cfg)
-    out["constraint-profile"] = constraint_profile(live, fam)
+    out["constraint-profile"] = constraint_profile(live, fam, shared.get("family_score_intervals") or {})
     out["technique-landscape"] = technique_landscape(live, vocabs)
     out["determinism-runtime"] = determinism_runtime(live, vocabs)
     out["opportunity-priorities"] = opportunity_priorities(live, tables)
@@ -1001,7 +1001,9 @@ def layer_profile(tables, fam, sub, cfg):
                   min_width=720)
 
 
-def constraint_profile(live, fam):
+def constraint_profile(live, fam, intervals):
+    """intervals: {family: {score: (low, high)}}, the bootstrap over each family's mechanics (analyze._family_sensitivity).
+    The mark rule is analyze._ceiling_mark's; a mark whose interval crosses its line is drawn hollow."""
     mechs = [m for m in sorted(live["mechanic"], key=lambda m: m.id) if not m.data.get("deprecated")]
     scores = [("authoring_cost", "authoring cost", "higher costs more to author"), ("compute_cost", "compute cost", "higher costs more to run"),
               ("tuning_difficulty", "tuning difficulty", "higher is harder to balance"), ("legibility", "legibility", "higher is easier to read")]
@@ -1009,11 +1011,15 @@ def constraint_profile(live, fam):
     means = {f: {s: float(np.mean([m.data[s] for m in mechs if m.data["family"] == f])) for s, _, _ in scores} for f in fams}
     count = {f: sum(1 for m in mechs if m.data["family"] == f) for f in fams}
     fams = sorted(fams, key=lambda f: (-means[f]["compute_cost"] - means[f]["authoring_cost"], f))
+    iv = lambda f, s: (intervals.get(f) or {}).get(s) or (means[f][s], means[f][s])  # noqa: E731
+    hot = lambda s, v: v < 3.3 if s == "legibility" else v >= 3  # noqa: E731
     LBL, TOP, PW, GAP, RH = 200, 52, 146, 26, 19
     W = LBL + len(scores) * (PW + GAP) + 10
     H = TOP + RH * len(fams) + 24
-    body = [svg_open("constraint-profile", W, H, "Ceiling scores by family",
-                     "Mean rubric score of each family's mechanics on authoring cost, compute cost, tuning difficulty, and legibility, on a 1 to 5 scale.")]
+    HK = H + 20  # the key sits under the axis numbers
+    body = [svg_open("constraint-profile", W, HK, "Ceiling scores by family",
+                     "Mean rubric score of each family's mechanics on authoring cost, compute cost, tuning difficulty, and legibility, on a 1 to 5 scale, "
+                     "with a 95 percent bootstrap interval over the family's mechanics.")]
     for k, (s, lab, note) in enumerate(scores):
         x0 = LBL + k * (PW + GAP)
         sx = lambda v, x0=x0: x0 + (v - 1) / 4 * PW
@@ -1022,24 +1028,41 @@ def constraint_profile(live, fam):
         for v in range(1, 6):
             body.append(f'<line x1="{f1(sx(v))}" y1="{TOP - 8}" x2="{f1(sx(v))}" y2="{H - 22}" style="stroke:{T["rule"]};stroke-width:{0.9 if v == 3 else 0.5}"/>')
             body.append(text(sx(v), H - 10, v, 8, "faint", "middle"))
+        cut = 3.3 if s == "legibility" else 3  # the mark's line, dashed
+        body.append(f'<line x1="{f1(sx(cut))}" y1="{TOP - 8}" x2="{f1(sx(cut))}" y2="{H - 22}" style="stroke:{T["accent"]};stroke-width:0.8;stroke-dasharray:3 3;opacity:0.6"/>')
         for i, f in enumerate(fams):
             y = TOP + i * RH + RH / 2
             v = means[f][s]
-            body.append(f'<line x1="{f1(sx(1))}" y1="{f1(y)}" x2="{f1(sx(v))}" y2="{f1(y)}" style="stroke:{T["rule2"]};stroke-width:1"/>')
-            hot = (s != "legibility" and v >= 3) or (s == "legibility" and v < 3.3)
-            body.append(f'<circle cx="{f1(sx(v))}" cy="{f1(y)}" r="3.6" style="fill:{T["accent"] if hot else T["ink"]}">'
-                        f'<title>{esc(fam[f]["label"])}: mean {lab} {v:.1f} over {counted(count[f], 'mechanic')}</title></circle>')
+            lo, hi = iv(f, s)
+            body.append(f'<line x1="{f1(sx(1))}" y1="{f1(y)}" x2="{f1(sx(v))}" y2="{f1(y)}" style="stroke:{T["rule"]};stroke-width:1"/>')
+            body.append(f'<line x1="{f1(sx(lo))}" y1="{f1(y)}" x2="{f1(sx(hi))}" y2="{f1(y)}" style="stroke:{T["muted"]};stroke-width:1.4"/>')
+            for e in (lo, hi):
+                body.append(f'<line x1="{f1(sx(e))}" y1="{f1(y - 3)}" x2="{f1(sx(e))}" y2="{f1(y + 3)}" style="stroke:{T["muted"]};stroke-width:1"/>')
+            mark, firm = hot(s, v), hot(s, lo) == hot(s, hi)
+            fill = (T["accent"] if firm else T["paper"]) if mark else T["ink"]
+            edge = f';stroke:{T["accent"]};stroke-width:1.4' if mark and not firm else ""
+            body.append(f'<circle cx="{f1(sx(v))}" cy="{f1(y)}" r="3.6" style="fill:{fill}{edge}">'
+                        f'<title>{esc(fam[f]["label"])}: mean {lab} {v:.1f} over {counted(count[f], "mechanic")}, interval {lo:.1f} to {hi:.1f}</title></circle>')
     for i, f in enumerate(fams):
         y = TOP + i * RH + RH / 2
         body.append(text(LBL - 10, y + 3, f'{fam[f]["label"].lower()} · {count[f]}', 9, "ink2", "end"))
+    marks = [(f'<circle cx="5" cy="5" r="3.6" style="fill:{T["accent"]}"/>', "marked, interval clear of the dashed line"),
+             (f'<circle cx="5" cy="5" r="3.6" style="fill:{T["paper"]};stroke:{T["accent"]};stroke-width:1.4"/>', "marked, interval crosses it"),
+             (f'<circle cx="5" cy="5" r="3.6" style="fill:{T["ink"]}"/>', "not marked"),
+             (f'<line x1="0" y1="5" x2="10" y2="5" style="stroke:{T["muted"]};stroke-width:1.4"/>', "95% interval")]
+    key, _ = svg_key(LBL, HK - 6, marks)
+    body.append(key)
     body.append("</svg>")
-    trows = [{"family": fam[f]["label"], "mechanics": count[f], **{s: round(means[f][s], 2) for s, _, _ in scores}} for f in fams]
+    trows = [{"family": fam[f]["label"], "mechanics": count[f],
+              **{k: v for s, _, _ in scores for k, v in ((s, round(means[f][s], 2)), (f"{s}_interval", f"{iv(f, s)[0]:g} to {iv(f, s)[1]:g}"))}} for f in fams]
     return _plain("Ceiling scores by family", f"{counted(len(fams), 'family')} · {counted(len(mechs), 'mechanic')}", "".join(body),
                   "Mean rubric score of each family's mechanics on four of the five ceilings; determinism is a property of techniques and has its own figure. "
-                  "Blue marks a family at 3 or above on a cost, or below 3.3 on legibility. Families are ordered by combined compute and authoring cost.",
+                  "Whiskers are 95 percent intervals from resampling each family's mechanics. Blue marks a family at 3 or above on a cost, or below 3.3 on legibility "
+                  "(the dashed lines), and is hollow where the interval crosses that line. Families are ordered by combined compute and authoring cost.",
                   "mechanic rubric scores · dist/entities/mechanics.json",
-                  {"columns": ["family", "mechanics"] + [s for s, _, _ in scores], "rows": trows, "link_columns": [],
-                   "note": "Mean score per family, 1 to 5."}, min_width=720)
+                  {"columns": ["family", "mechanics"] + [k for s, _, _ in scores for k in (s, f"{s}_interval")], "rows": trows, "link_columns": [],
+                   "note": "Mean score per family, 1 to 5, with its 95 percent interval over the family's mechanics."}, min_width=720,
+                  legend_html=_key([(lab, m) for m, lab in marks]))
 
 
 def technique_landscape(live, vocabs):

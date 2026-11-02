@@ -1695,6 +1695,8 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
                        f"{_r(100 * qlo, 0):g}th to {_r(100 * qhi, 0):g}th percentile over {R} seeded draws that move every maturity level by up to one step and every weight by up to {_r(100 * sp, 0):g} percent. Rank is by summed exposure; mean rank by exposure per mechanic.",
         "columns": ["family", "edges", "rank", "rank_by_edges", "rank_across_variants", "rank_interval", "mean_rank", "mean_rank_across_variants", "mean_rank_interval"],
         "rows": fe_rows}
+    # how far the family readings (§5.5, §6, §8.2) depend on the family each mechanic was given (review D3)
+    _family_sensitivity(mechs, fam_terms, cfg, shared, tables, stats, base_mx)
 
     # where the techniques reach: the share of uses left unreached under other denominators (review E12, E14)
     def _pct(ms, w):
@@ -2651,8 +2653,310 @@ def _second_coding(ents, vocabs, cfg, stats, tables):
             "columns": ["test", "admitted", "admitted_pass", "candidates", "candidates_pass"], "rows": test_rows}
 
 
+# ---------------- family sensitivity: how far §5.5, §6, and §8.2 rest on the family each mechanic was given (review D3)
+
+CEILING_SCORES = ("authoring_cost", "compute_cost", "tuning_difficulty", "legibility")  # the four scores the ceilings figure (§6) plots
+
+
+def _ceiling_mark(score, v) -> bool:
+    """The ceilings figure's mark (viz.constraint_profile): a family mean at 3 or above on a cost, or below 3.3 on legibility."""
+    return v < 3.3 if score == "legibility" else v >= 3
+
+
+def _wording_affinity(mechs) -> dict:
+    """How alike each mechanic's wording is to each family's other mechanics: tf-idf over its name, aliases, summary, and
+    definition (lowercase words of three or more letters, sublinear counts, log inverse document frequency over the
+    mechanics), and the cosine between the mechanic and the sum of a family's members. Its own family's sum leaves it
+    out, so it never counts toward its own family. Words in every record get weight zero, so no stop list is needed."""
+    ids = [m.id for m in mechs]
+    words = {m.id: re.findall(r"[a-z]{3,}", " ".join([m.data.get("name", ""), *(m.data.get("aliases") or []), m.data.get("summary", ""),
+                                                      m.data.get("definition", "")]).lower()) for m in mechs}
+    df = Counter(w for ws in words.values() for w in set(ws))
+    col = {w: j for j, w in enumerate(sorted(df))}
+    X = np.zeros((len(ids), len(col)))
+    for i, x in enumerate(ids):
+        for w, c in sorted(Counter(words[x]).items()):
+            X[i, col[w]] = (1 + math.log(c)) * math.log(len(ids) / df[w])
+    X /= np.maximum(np.linalg.norm(X, axis=1, keepdims=True), 1e-12)
+    fam = [m.data["family"] for m in mechs]
+    tot = {f: X[[i for i, g in enumerate(fam) if g == f]].sum(0) for f in sorted(set(fam))}
+    out = {}
+    for i, x in enumerate(ids):
+        sims = {}
+        for f, v in tot.items():
+            c = v - X[i] if fam[i] == f else v
+            nc = float(np.linalg.norm(c))
+            if nc > 1e-9:
+                sims[f] = round(float(X[i] @ c) / nc, 9)
+        out[x] = sims
+    return out
+
+
+def _family_sensitivity(mechs, fam_terms, cfg, shared, tables, stats, mx):
+    """Each mechanic's family was assigned by the run that made it, and no second coder has repeated the assignment (§2.6),
+    so two readings that depend on families are re-run here without adding a judgment (report/analysis.yaml,
+    family_sensitivity).
+
+    Reassignment. Every mechanic gets two runner-up families from the records themselves: by wording, the other family
+    whose mechanics' text is most like its own (_wording_affinity), and by use, the other family whose mechanics share
+    the most games with it (mean Jaccard over that family's mechanics; the wording runner-up when it shares none). A
+    mechanic is on a boundary when its wording is at least as close to its runner-up as to its own family, and on a named
+    boundary when, in addition, either family is one the review named. The §5.5 white-space screen and the §8.2 family
+    ranks are re-run with every named-boundary mechanic moved to one runner-up, then to the other, and over seeded draws
+    that move each one to its wording runner-up with a stated probability (a second set of draws moves any boundary
+    mechanic). Exposure per mechanic does not depend on families, so only the grouping changes.
+
+    Intervals. A percentile bootstrap over the mechanics within each family, for exposure per mechanic and its rank
+    (§8.2) and for the four scores the ceilings figure plots (§6, drawn by viz.constraint_profile from shared). With
+    four to six mechanics a family's bootstrap understates the spread of its mean, so these intervals are if anything
+    too narrow. mx: exposure per mechanic under the stated weights."""
+    fs = cfg.get("family_sensitivity") or {}
+    ws = cfg["whitespace"]
+    ids = [m.id for m in mechs]
+    if not ids:
+        return
+    fam0 = {m.id: m.data["family"] for m in mechs}
+    fams = [f for f in fam_terms if f in set(fam0.values())]
+    members = {f: [x for x in ids if fam0[x] == f] for f in fams}
+    lab = lambda f: fam_terms[f]["label"]  # noqa: E731
+    span = lambda a, b: f"{a}" if a == b else f"{a} to {b}"  # noqa: E731
+    named = set(fs.get("boundary_families") or [])
+
+    # runner-up families
+    sims = _wording_affinity(mechs)
+    word_ru, margin = {}, {}
+    for x in ids:
+        alt = sorted((f for f in sims[x] if f != fam0[x]), key=lambda f: (-sims[x][f], f))
+        word_ru[x], margin[x] = alt[0], round(sims[x].get(fam0[x], 0.0) - sims[x][alt[0]], 9)
+    pc, prev = shared["pair_count"], shared["prev"]
+
+    def _jac(a, b):
+        c = pc.get((a, b) if a < b else (b, a), 0)
+        d = prev.get(a, 0) + prev.get(b, 0) - c
+        return c / d if d else 0.0
+    use_ru = {}
+    for x in ids:
+        aff = {f: round(float(np.mean([_jac(x, y) for y in members[f]])), 9) for f in fams if f != fam0[x]}
+        best = min(aff, key=lambda f: (-aff[f], f))
+        use_ru[x] = best if aff[best] > 0 else word_ru[x]
+    contested = [x for x in ids if margin[x] <= 0]
+    boundary = [x for x in contested if fam0[x] in named or word_ru[x] in named]
+    stats["n_mechanics_wording_own_family"] = sum(1 for x in ids if margin[x] > 0)
+    stats["n_mechanics_family_boundary"] = len(contested)
+    stats["n_mechanics_named_boundary"] = len(boundary)
+    stats["n_mechanics_named_boundary_inside"] = sum(1 for x in boundary if fam0[x] in named)
+    stats["n_named_boundary_families"] = len(named)
+    nb_names = [lab(f).lower().replace("&", "and") for f in fams if f in named]
+    stats["named_boundary_family_names"] = ", ".join(nb_names[:-1]) + (", or " if len(nb_names) > 2 else " or ") + nb_names[-1] if len(nb_names) > 1 else "".join(nb_names)
+    stats["n_mechanics_runner_ups_agree"] = sum(1 for x in boundary if word_ru[x] == use_ru[x])
+    p = float(fs.get("move_probability", 0.5))
+    D = int(fs.get("draws", 1000))
+    stats["family_move_probability_pct"] = _r(100 * p, 0)
+    stats["family_reassignment_draws"] = D
+
+    def _moved(xs, dest):
+        fm = dict(fam0)
+        fm.update({x: dest[x] for x in xs})
+        return fm
+    schemes = {"wording": _moved(boundary, word_ru), "use": _moved(boundary, use_ru)}
+    rng = np.random.default_rng(int(fs.get("seed", 20261101)))
+    U = rng.random((D, len(contested)))
+    in_named = np.array([x in set(boundary) for x in contested], dtype=bool)
+    draws = {"named": [_moved([x for x, u, b in zip(contested, U[d], in_named) if b and u < p], word_ru) for d in range(D)],
+             "all": [_moved([x for x, u in zip(contested, U[d]) if u < p], word_ru) for d in range(D)]}
+
+    # §5.5 white space: the screen's other conditions (prevalence, observed count, tension) and the order by gap do not
+    # depend on families, so the list under a family map is the pool below with the family conditions applied
+    common, tension, N = shared["common"], shared["tension_pairs"], len(shared["games"])
+    excl = set(ws.get("exclude_families") or [])
+    pool = []
+    for a, b in combinations(sorted(common), 2):
+        obs = pc.get((a, b), 0)
+        if (a, b) not in tension and obs <= ws["max_observed"]:
+            pool.append((-_r(prev[a] * prev[b] / N - obs, 2), a, b))
+    pool = [(a, b) for _, a, b in sorted(pool)]
+
+    def _listed(fm):
+        return [(a, b) for a, b in pool if fm[a] not in excl and fm[b] not in excl and not (ws["exclude_same_family"] and fm[a] == fm[b])]
+    base = _listed(fam0)
+    if base != [(r["mechanic_a"], r["mechanic_b"]) for r in shared["whitespace_all"]]:
+        raise RuntimeError("analyze.py: the family-sensitivity white-space screen no longer reproduces the white-space list")
+    top_n = ws["top_n"]
+    base_set, top = set(base), base[:top_n]
+    for name, fm in schemes.items():
+        L = _listed(fm)
+        stats[f"n_whitespace_kept_{name}"] = len(base_set & set(L))
+        stats[f"n_whitespace_added_{name}"] = len(set(L) - base_set)
+        stats[f"n_whitespace_top_kept_{name}"] = len(set(top) & set(L[:top_n]))
+        stats[f"pct_whitespace_kept_{name}"] = _r(100 * len(base_set & set(L)) / max(len(base), 1), 0)
+    kept = {}
+    for scope, maps in draws.items():
+        k_list, k_top, n_kept, n_added = Counter(), Counter(), [], []
+        for fm in maps:
+            L = _listed(fm)
+            S = set(L)
+            k_list.update(base_set & S)
+            k_top.update(set(top) & set(L[:top_n]))
+            n_kept.append(len(base_set & S))
+            n_added.append(len(S - base_set))
+        kept[scope] = k_list
+        sfx = "" if scope == "named" else "_all"
+        stats[f"n_whitespace_top_always_kept{sfx}"] = sum(1 for pr in top if k_list[pr] == D)
+        stats[f"n_whitespace_top_sometimes_dropped{sfx}"] = sum(1 for pr in top if k_list[pr] < D)
+        stats[f"min_whitespace_top_kept_pct{sfx}"] = _r(100 * min(k_list[pr] for pr in top) / D, 0) if top else None
+        stats[f"n_whitespace_top_kept_95{sfx}"] = sum(1 for pr in top if k_list[pr] >= 0.95 * D)
+        stats[f"pct_whitespace_kept_mean{sfx}"] = _r(100 * float(np.mean(n_kept)) / max(len(base), 1), 0)
+        stats[f"n_whitespace_added_mean{sfx}"] = _r(float(np.mean(n_added)), 0)
+        stats[f"pct_whitespace_top_kept_in_top_mean{sfx}"] = _r(100 * sum(k_top.values()) / max(D * len(top), 1), 0)
+    stats["n_whitespace_top_boundary"] = sum(1 for a, b in top if a in set(boundary) or b in set(boundary))
+    t = tables["whitespace"]
+    for r in t["rows"]:
+        r["kept"] = _r(100 * kept["named"][(r["mechanic_a"], r["mechanic_b"])] / D, 0)
+    t["columns"] = t["columns"] + ["kept"]
+    t["description"] += (f" Kept = percent of {D} seeded reassignments, each moving every mechanic on a named family boundary (§8.2) to its "
+                         f"runner-up family with probability {p:g}, in which the pair still passes the screen.")
+
+    # §8.2 family ranks under reassignment: rank 1 = most exposed, by summed exposure and by exposure per mechanic
+    def _ranks(fm):
+        tot, n = defaultdict(float), Counter()
+        for x in ids:
+            tot[fm[x]] += mx[x]
+            n[fm[x]] += 1
+        mean = {f: tot[f] / n[f] for f in n}
+        rk = lambda v: {f: i + 1 for i, f in enumerate(sorted(v, key=lambda f: (-round(v[f], 9), f)))}  # noqa: E731
+        return rk(dict(tot)), rk(mean)
+
+    def _rho(a, b):
+        ks = sorted(set(a) & set(b))
+        return float(spearmanr([a[k] for k in ks], [b[k] for k in ks])[0]) if len(ks) > 2 else float("nan")
+    ntop = int((cfg.get("exposure") or {}).get("top_families", 4))
+    core_f = list((cfg.get("exposure") or {}).get("economic_core") or [])
+    core_min = int((cfg.get("exposure") or {}).get("economic_core_min_rank", 16))
+    t0, m0 = _ranks(fam0)
+    first0 = min(m0, key=m0.get)
+    top0 = {f for f, r in t0.items() if r <= ntop}
+    last0 = max(t0, key=t0.get)
+
+    def _reads(tr, mr):
+        """The §8.2 readings under one family map: the same top families in total, the same family first per mechanic,
+        the economic core at or below its stated place per mechanic, and the same family last in total."""
+        return {"top": {f for f, r in tr.items() if r <= ntop} == top0, "first": min(mr, key=mr.get) == first0,
+                "core": all(mr.get(f, 0) >= core_min for f in core_f), "last": max(tr, key=tr.get) == last0}
+    for name, fm in schemes.items():
+        tr, mr = _ranks(fm)
+        stats[f"rho_family_exposure_reassigned_{name}"] = _r(_rho(t0, tr), 2)
+        stats[f"rho_family_mean_exposure_reassigned_{name}"] = _r(_rho(m0, mr), 2)
+        for k, v in _reads(tr, mr).items():
+            stats[f"family_reassigned_{name}_{k}"] = int(v)
+        stats[f"top_mean_exposed_family_reassigned_{name}"] = lab(min(mr, key=mr.get))
+        top_now = {f for f, r in tr.items() if r <= ntop}
+        stats[f"dropped_top_family_reassigned_{name}"] = ", ".join(lab(f) for f in fams if f in top0 - top_now)
+        stats[f"entered_top_family_reassigned_{name}"] = ", ".join(lab(f) for f in fams if f in top_now - top0)
+    qlo, qhi = 50 * (1 - float(fs.get("interval", 0.95))), 50 * (1 + float(fs.get("interval", 0.95)))
+    stats["pct_family_interval"] = _r(qhi - qlo, 0)
+    q = lambda v: (int(np.percentile(v, qlo, method="lower")), int(np.percentile(v, qhi, method="higher")))  # noqa: E731
+    rank_draws = {}
+    for scope, maps in draws.items():
+        tot_d, mean_d, rho_t, rho_m, reads, out_top = defaultdict(list), defaultdict(list), [], [], Counter(), Counter()
+        for fm in maps:
+            tr, mr = _ranks(fm)
+            for f in fams:
+                tot_d[f].append(tr.get(f, len(fams)))
+                mean_d[f].append(mr.get(f, len(fams)))
+            rho_t.append(_rho(t0, tr))
+            rho_m.append(_rho(m0, mr))
+            reads.update(k for k, v in _reads(tr, mr).items() if v)
+            out_top.update(f for f in top0 if tr.get(f, len(fams)) > ntop)
+        rank_draws[scope] = (tot_d, mean_d)
+        sfx = "" if scope == "named" else "_all"
+        # the correlation that the stated share of draws (the interval) reaches or exceeds
+        stats[f"rho_family_exposure_reassigned_low{sfx}"] = _r(float(np.percentile(rho_t, 2 * qlo)), 2)
+        stats[f"rho_family_mean_exposure_reassigned_low{sfx}"] = _r(float(np.percentile(rho_m, 2 * qlo)), 2)
+        for k in ("top", "first", "core", "last"):
+            stats[f"pct_family_reassigned_{k}{sfx}"] = _r(100 * reads[k] / D, 0)
+        # the leading family that most often leaves the top places, and how often
+        f_out = min(top0, key=lambda f: (-out_top[f], f))
+        stats[f"most_dropped_top_family_reassigned{sfx}"] = lab(f_out)
+        stats[f"pct_most_dropped_top_family_reassigned{sfx}"] = _r(100 * out_top[f_out] / D, 0)
+
+    # bootstrap over the mechanics within each family: exposure per mechanic, its rank, and the ceiling scores
+    B = int(fs.get("bootstrap", 2000))
+    rng_b = np.random.default_rng(int(fs.get("seed", 20261101)) + 1)
+    col = {x: i for i, x in enumerate(ids)}
+    pick = {f: np.array([col[x] for x in members[f]])[rng_b.integers(0, len(members[f]), (B, len(members[f])))] for f in fams}
+    ev = np.array([mx[x] for x in ids], float)
+    boot = {f: ev[pick[f]].mean(1) for f in fams}
+    boot_rank = defaultdict(list)
+    first_b = 0
+    for d in range(B):
+        order = sorted(fams, key=lambda f: (-round(float(boot[f][d]), 9), f))
+        for i, f in enumerate(order):
+            boot_rank[f].append(i + 1)
+        first_b += order[0] == first0
+    stats["family_bootstrap"] = B
+    stats["pct_family_bootstrap_first"] = _r(100 * first_b / B, 0)
+    small = int(fs.get("small_family", 6))
+    stats["small_family_max_mechanics"] = small
+    stats["n_families_small"] = sum(1 for f in fams if len(members[f]) <= small)
+    stats["min_family_mechanics"] = min(len(v) for v in members.values())
+    sc = {s: np.array([m.data[s] for m in mechs], float) for s in CEILING_SCORES}
+    score_iv, marks, firm = {}, Counter(), defaultdict(list)
+    for f in fams:
+        score_iv[f] = {}
+        for s in CEILING_SCORES:
+            bs = sc[s][pick[f]].mean(1)
+            # rounded as printed, so the figure (viz.constraint_profile), its twin, and these counts apply the rule to the same values
+            lo, hi = round(float(np.percentile(bs, qlo)), 2), round(float(np.percentile(bs, qhi)), 2)
+            score_iv[f][s] = (lo, hi)
+            v = float(sc[s][[col[x] for x in members[f]]].mean())
+            mark, clear = _ceiling_mark(s, v), _ceiling_mark(s, lo) == _ceiling_mark(s, hi)
+            marks["cells"] += 1
+            marks["marked"] += mark
+            marks["marked_clear"] += mark and clear
+            marks["unmarked_clear"] += (not mark) and clear
+            marks["marked_small"] += mark and len(members[f]) <= small
+            marks["marked_clear_small"] += mark and clear and len(members[f]) <= small
+            if mark and clear:
+                firm[s].append(lab(f).lower().replace("&", "and"))
+    shared["family_score_intervals"] = score_iv
+    for k in ("cells", "marked", "marked_clear", "unmarked_clear", "marked_small", "marked_clear_small"):
+        stats[f"n_ceiling_{k}"] = marks[k]
+    stats["n_ceiling_uncertain"] = marks["cells"] - marks["marked_clear"] - marks["unmarked_clear"]
+    stats["n_ceiling_marked_crossing"] = marks["marked"] - marks["marked_clear"]
+    # the marks whose interval clears the line, as prose: "tuning difficulty in a, b, and c; authoring cost in d"
+    and_list = lambda xs: xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + ("," if len(xs) > 2 else "") + " and " + xs[-1]  # noqa: E731
+    stats["ceiling_marks_clear_names"] = "; ".join(f"{s.replace('_', ' ')} in {and_list(firm[s])}" for s in sorted(firm, key=lambda s: (-len(firm[s]), s)))
+
+    rows = []
+    for f in sorted(fams, key=lambda f: m0[f]):
+        ms = members[f]
+        lo, hi = float(np.percentile(boot[f], qlo)), float(np.percentile(boot[f], qhi))
+        tot_d, mean_d = rank_draws["named"]
+        k_ = f.replace("-", "_")
+        row = {"family": f, "mechanics": len(ms), "boundary": sum(1 for x in boundary if fam0[x] == f),
+               "mean_exposure": _r(float(np.mean([mx[x] for x in ms])), 2), "mean_exposure_interval": span(f"{_r(lo, 2):g}", f"{_r(hi, 2):g}"),
+               "mean_rank": m0[f], "mean_rank_bootstrap": span(*q(boot_rank[f])), "mean_rank_reassigned": span(*q(mean_d[f])),
+               "rank": t0[f], "rank_reassigned": span(*q(tot_d[f]))}
+        stats[f"family_mean_rank_{k_}"], stats[f"family_rank_{k_}"] = m0[f], t0[f]
+        stats[f"n_family_named_boundary_{k_}"] = row["boundary"]
+        stats[f"n_family_boundary_{k_}"] = sum(1 for x in contested if fam0[x] == f)
+        stats[f"family_mean_exposure_low_{k_}"], stats[f"family_mean_exposure_high_{k_}"] = _r(lo, 2), _r(hi, 2)
+        stats[f"family_mean_rank_boot_low_{k_}"], stats[f"family_mean_rank_boot_high_{k_}"] = q(boot_rank[f])
+        stats[f"family_mean_rank_reassigned_low_{k_}"], stats[f"family_mean_rank_reassigned_high_{k_}"] = q(mean_d[f])
+        stats[f"family_rank_reassigned_low_{k_}"], stats[f"family_rank_reassigned_high_{k_}"] = q(tot_d[f])
+        rows.append(row)
+    tables["family-exposure-intervals"] = {
+        "description": f"Per mechanic family, ordered by exposure per mechanic. Boundary: the family's mechanics on a named boundary, which the reassignments may move out. "
+                       f"Interval and bootstrap: the {_r(qhi - qlo, 0):g} percent interval of exposure per mechanic, and of the family's place by it, over {B} resamples "
+                       f"of the mechanics within each family. Reassigned: the {_r(qhi - qlo, 0):g} percent interval of the family's place, per mechanic and in total, "
+                       f"over {D} seeded draws that move each named-boundary mechanic to its runner-up family with probability {p:g}. Rank 1 is the most exposed.",
+        "columns": ["family", "mechanics", "boundary", "mean_exposure", "mean_exposure_interval", "mean_rank", "mean_rank_bootstrap", "mean_rank_reassigned",
+                    "rank", "rank_reassigned"],
+        "rows": rows}
+
+
 # ======================================================================= SVG
-_FONT = "style=\"font-family:var(--mono,'IBM Plex Mono',ui-monospace,Menlo,monospace);font-size:10px\""
+_FONT ="style=\"font-family:var(--mono,'IBM Plex Mono',ui-monospace,Menlo,monospace);font-size:10px\""
 
 
 def _svg(w, h, body):
