@@ -11,3 +11,5 @@ video-out/
 pdf-out/
 # Second-coder sheets (python scripts/coding.py packet); kept out of dist/ for the same reason, and out of commits.
 coding-out/
+# The panel's blind packet and its filled sheets (python scripts/panel.py packet); the recorder keeps what counts.
+panel-out/

@@ -2089,6 +2089,10 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
 
     # ---------------- second coder: agreement on family, admission, and effect codes (review D3, D4, D6; _second_coding)
     _second_coding(ents, vocabs, cfg, stats, tables)
+    # ---------------- the panel's other sheets: independent second readings, then the cross-model check, never pooled
+    # (review E2, E17, E31, D8; _panel_independent, _cross_model)
+    _panel_independent(ents, vocabs, cfg, stats, tables)
+    _cross_model(ents, vocabs, cfg, stats, tables)
 
     # ---------------- adoption over time
     by_decade = Counter()
@@ -3652,6 +3656,451 @@ def _family_sensitivity(mechs, fam_terms, cfg, shared, tables, stats, mx):
         "columns": ["family", "mechanics", "boundary", "mean_exposure", "mean_exposure_interval", "mean_rank", "mean_rank_bootstrap", "mean_rank_reassigned",
                     "rank", "rank_reassigned"],
         "rows": rows}
+# ---------------- the panel: blind second readings of the sheets scripts/panel.py writes (review E2, E17, E31, D8)
+#
+# Two sources, analysed by the same code and never pooled: independent verification runs (_panel_independent: codes in
+# report/coding/<kind>/, ratings in the records; stats second_coding_*, tables second-coding-panel-*), and cross-model
+# runs by the records' operator on another model (_cross_model: report/cross-model/; stats xm_*, tables cross-model-*).
+# Each compares a second reading with the dataset's first: a record's code, or its original score (the creating run's
+# rating when the field has ratings, since a stored value may already be a lower median). Several second readers of one
+# kind are pooled as _second_coding pools coders: kappa over every (first, second) pair, alpha over each item's readings.
+
+def _xm_weights(n_items: int, strata: list, rng, n_boot: int) -> np.ndarray:
+    """Bootstrap weights (n_boot, n_items): each resample draws items with replacement within each stratum (lists of
+    item indices), so a stratified sample is resampled as it was drawn."""
+    W = np.zeros((n_boot, n_items))
+    for us in strata:
+        us = np.asarray(us)
+        np.add.at(W, (np.arange(n_boot)[:, None], us[rng.integers(0, len(us), (n_boot, len(us)))]), 1)
+    return W
+
+
+def _xm_pct(a, q: float):
+    a = np.asarray(a, float)
+    a = a[np.isfinite(a)]
+    return _r(np.percentile(a, q), 2) if len(a) else None
+
+
+def _xm_key(p: str, key: str, what: str) -> str:
+    """A panel stat's name: prefix, measure, what it measures, and an interval bound last (xm_kappa_trl_low), as the
+    other interval stats are named."""
+    for bound in ("_low", "_high"):
+        if key.endswith(bound):
+            return f"{p}{key[: -len(bound)]}_{what}{bound}"
+    return f"{p}{key}_{what}"
+
+
+def _kappa_quadratic_stack(O) -> np.ndarray | float:
+    """Quadratic-weighted kappa from a confusion matrix of two raters' anchor levels (rows the first rater's), or a stack
+    of them; nan where chance disagreement is zero. Equals _kappa_quadratic on the pairs the matrix counts."""
+    O = np.asarray(O, float)
+    K = O.shape[-1]
+    n = O.sum((-1, -2))
+    E = O.sum(-1)[..., :, None] * O.sum(-2)[..., None, :] / np.where(n > 0, n, 1)[..., None, None]
+    w = (np.subtract.outer(np.arange(K), np.arange(K)) ** 2).astype(float)
+    de = (w * E).sum((-1, -2))
+    k = np.where(de > 0, 1 - (w * O).sum((-1, -2)) / np.where(de > 0, de, 1), np.nan)
+    return float(k) if k.ndim == 0 else k
+
+
+def _xm_nominal(units, cats, rng, n_boot: int, q: float, stratify: bool):
+    """Agreement on a nominal code, units being (item, first code, [second codes]): Cohen's kappa over every pair,
+    Krippendorff's alpha (nominal) over each item's codes, intervals over items (within strata of the first code when the
+    sample was stratified by it). Returns the row and the pooled confusion matrix (rows the first code)."""
+    ix = {c: i for i, c in enumerate(cats)}
+    K, U = len(cats), len(units)
+    P, C = np.zeros((U, K, K)), np.zeros((U, K, K))
+    for u, (_, first, vals) in enumerate(units):
+        for v in vals:
+            P[u, ix[first], ix[v]] += 1
+        C[u] = _coincidence([ix[first] + 1] + [ix[v] + 1 for v in vals], K)
+    groups = defaultdict(list)
+    for u, (_, first, _vals) in enumerate(units):
+        groups[first if stratify else ""].append(u)
+    W = _xm_weights(U, [g for _, g in sorted(groups.items())], rng, n_boot)
+    bk = _kappa_nominal(np.einsum("bu,ukl->bkl", W, P))
+    ba = _alpha_nominal(np.einsum("bu,ukl->bkl", W, C))
+    Ps = P.sum(0)
+    return ({"items": U, "pairs": int(Ps.sum()), "agree": _r(np.trace(Ps) / Ps.sum(), 2),
+             "kappa": _r(_kappa_nominal(Ps), 2), "kappa_low": _xm_pct(bk, q), "kappa_high": _xm_pct(bk, 100 - q),
+             "alpha": _r(_alpha_nominal(C.sum(0)), 2), "alpha_low": _xm_pct(ba, q), "alpha_high": _xm_pct(ba, 100 - q)}, Ps)
+
+
+def _xm_ordinal(units, K: int, rng, n_boot: int, q: float):
+    """Agreement on an ordinal score (anchor levels 1..K), units being (item, first score, [second scores]):
+    quadratic-weighted kappa over the pairs and Krippendorff's alpha (ordinal) over each item's scores, with intervals
+    over items; exact and within-one shares of the pairs, Spearman's rho between first and second, and the mean shift
+    (second minus first). Returns the row and the pooled confusion matrix."""
+    U = len(units)
+    P, C = np.zeros((U, K, K)), np.zeros((U, K, K))
+    pairs = []
+    for u, (_, first, vals) in enumerate(units):
+        for v in vals:
+            P[u, first - 1, v - 1] += 1
+            pairs.append((first, v))
+        C[u] = _coincidence([first] + list(vals), K)
+    W = _xm_weights(U, [list(range(U))], rng, n_boot)
+    bk = _kappa_quadratic_stack(np.einsum("bu,ukl->bkl", W, P))
+    ba = _alpha_ordinal(np.einsum("bu,ukl->bkl", W, C))
+    f, s = (np.array(x, float) for x in zip(*pairs))
+    return ({"items": U, "pairs": len(pairs), "exact": _r(np.mean(f == s), 2), "within_one": _r(np.mean(np.abs(f - s) <= 1), 2),
+             "kappa": _r(_kappa_quadratic_stack(P.sum(0)), 2), "kappa_low": _xm_pct(bk, q), "kappa_high": _xm_pct(bk, 100 - q),
+             "alpha": _r(_alpha_ordinal(C.sum(0)), 2), "alpha_low": _xm_pct(ba, q), "alpha_high": _xm_pct(ba, 100 - q),
+             "rank_rho": _r(_spearman(f, s), 2), "shift": _r(float(np.mean(s - f)), 2)}, P.sum(0))
+
+
+def _panel_agreement(ents, vocabs, cfg, raters, stats, tables, p: str, t: str, who: str, decisions, note: str = ""):
+    """Agreement between the dataset's first reading and second readers on the panel sheets. raters: [{"run", "operator",
+    "model", "codes": {decision: {item: value}}, "ratings": {field: {item: value}}, "calibration": {...} or None}];
+    p prefixes the stats, t the tables, `who` names the second reader in the table descriptions and `note` says what kind
+    of reading it is; `decisions` are the code decisions analysed here (the independent path leaves admission, family and
+    effect to _second_coding)."""
+    import panel  # local import: scripts/panel.py owns the samples and the answer formats
+    pc, sc = cfg.get("panel") or {}, cfg.get("second_coding") or {}
+    n_boot, q = int(pc.get("bootstrap", 2000)), 100 * (1 - float(pc.get("interval", 0.95))) / 2
+    seed = int(pc.get("seed", 0))
+    rng = lambda k: np.random.default_rng([seed, k])  # noqa: E731  (one stream per section, so adding one moves no other)
+    first = panel.first_values(ents, vocabs, pc, sc)
+    rub = vocabs["rubrics"]
+    by_id = {e.id: e for tl, lst in ents.items() if tl != "run" for e in lst}
+    ivl = f"{round(100 - 2 * q)}% bootstrap interval over the items ({n_boot} resamples)"
+    tables[f"{t}-raters"] = {
+        "description": f"The runs behind {who}: what each read and recorded from the blind sheets of scripts/panel.py. {note}".strip(),
+        "columns": ["run", "operator", "model", "codes", "ratings", "calibration"],
+        "rows": [{"run": r["run"], "operator": r["operator"], "model": r.get("model_id") or r["model"], "codes": sum(len(v) for v in r["codes"].values()),
+                  "ratings": sum(len(v) for v in (r.get("ratings") or {}).values()), "calibration": "yes" if r.get("calibration") else "no"} for r in raters]}
+
+    # -- nominal codes, every decision panel.py labels: admission, family, effect (cross-model only), maturity, horizon, ...
+    labels = panel.code_labels(vocabs)
+    stream = lambda name: int(hashlib.sha256(name.encode()).hexdigest()[:8], 16)  # noqa: E731  (a stream per decision, by name)
+
+    def code(d, v):
+        return ("admit" if all(v[x] == "pass" for x in ("nameable", "atomic", "tunable", "removable")) else "reject") if d == "admission" else v
+    code_rows, cat_rows, conf_rows = [], [], []
+    for d in labels:
+        if d not in decisions:
+            continue
+        units = [(i, f, [code(d, r["codes"][d][i]) for r in raters if i in (r["codes"].get(d) or {})]) for i, f in sorted(first[d].items())]
+        units = [u for u in units if u[2] and u[1] in labels[d]]
+        if not units:
+            continue
+        # a sample stratified by its first code (second-coding-v1) is resampled within those strata
+        row, Ps = _xm_nominal(units, list(labels[d]), rng(stream(d)), n_boot, q, stratify=panel.KINDS[panel.DECISION_KIND[d]].stratified)
+        code_rows.append({"decision": d, "raters": sum(1 for r in raters if r["codes"].get(d)), **row})
+        for key in ("agree", "kappa", "kappa_low", "kappa_high", "alpha", "alpha_low", "alpha_high"):
+            stats[_xm_key(p, key, d)] = row[key]
+        stats[f"{p}n_coded_{d}"] = row["items"]
+        n = Ps.sum()
+        for c, i in ((c, i) for i, c in enumerate(labels[d])):
+            both, fi, se = Ps[i, i], Ps[i].sum(), Ps[:, i].sum()
+            if fi or se:
+                T = np.array([[both, fi - both], [se - both, n - fi - se + both]])
+                cat_rows.append({"decision": d, "category": labels[d][c], "first": int(fi), "second": int(se), "both": int(both), "kappa": _r(_kappa_nominal(T), 2)})
+        cats = list(labels[d])
+        conf_rows += [{"decision": d, "first": labels[d][cats[a]], "second": labels[d][cats[b]], "n": int(Ps[a, b])}
+                      for a in range(len(cats)) for b in range(len(cats)) if Ps[a, b]]
+    if code_rows:
+        tables[f"{t}-codes"] = {
+            "description": f"Agreement between the dataset's code and {who}, per decision. Agree is the share of pairs that match; kappa is "
+                           "Cohen's (unweighted) and alpha Krippendorff's (nominal), each with low and high bounding a "
+                           f"{ivl}, resampled within each first code for a sample stratified by it (second-coding-v1, state-v1). For admission the "
+                           "first code is whether the vocabulary admits the item, and the second reader admits an item that passes all four tests.",
+            "columns": ["decision", "raters", "items", "pairs", "agree", "kappa", "kappa_low", "kappa_high", "alpha", "alpha_low", "alpha_high"],
+            "rows": code_rows}
+        tables[f"{t}-code-categories"] = {
+            "description": f"Per category of each code: pairs the dataset (first) and {who} (second) put in it, both, and Cohen's kappa for that category against the rest.",
+            "columns": ["decision", "category", "first", "second", "both", "kappa"], "rows": cat_rows}
+        tables[f"{t}-code-confusion"] = {
+            "description": f"How often each pair of codes was chosen, first the dataset's and second {who}'s. Pairs with no items are omitted.",
+            "columns": ["decision", "first", "second", "n"], "rows": conf_rows}
+
+    # -- ratings: TRL, the six mechanic scales, novelty, feasibility, impact (ordinal, against the original score)
+    rate_rows, rconf = [], []
+    second: dict[str, dict] = {}   # field -> item -> the lower median of the second readers' scores
+    for f in panel.FIELD_KIND:
+        units = [(i, v, [r["ratings"][f][i] for r in raters if i in (r.get("ratings") or {}).get(f, {})]) for i, v in sorted(first[f].items())]
+        units = [u for u in units if u[2] and isinstance(u[1], int)]
+        if not units:
+            continue
+        second[f] = {i: lower_median(vals) for i, _, vals in units}
+        K = max(int(x) for x in rub["scales"][f]["levels"])
+        row, Pc = _xm_ordinal(units, K, rng(stream("rating:" + f)), n_boot, q)
+        rate_rows.append({"field": f, "raters": sum(1 for r in raters if (r.get("ratings") or {}).get(f)), **row})
+        for key in ("exact", "within_one", "kappa", "kappa_low", "kappa_high", "alpha", "alpha_low", "alpha_high", "rank_rho", "shift"):
+            stats[_xm_key(p, key, f)] = row[key]
+        stats[f"{p}n_rated_{f}"] = row["items"]
+        rconf += [{"field": f, "first": a + 1, "second": b + 1, "n": int(Pc[a, b])} for a in range(K) for b in range(K) if Pc[a, b]]
+    for kind, fields in (("maturity", ("trl",)), ("rubric", panel.MECH_SCALES), ("opportunity", panel.OPP_SCALES)):
+        al = [r["alpha"] for r in rate_rows if r["field"] in fields and r["alpha"] is not None]
+        if len(fields) > 1 and al:
+            stats[f"{p}alpha_{kind}_min"], stats[f"{p}alpha_{kind}_max"] = min(al), max(al)
+    if rate_rows:
+        tables[f"{t}-ratings"] = {
+            "description": f"Agreement between the original score (the creating run's) and {who}, per rubric field. Exact and within one are "
+                           "shares of pairs; kappa is quadratic-weighted and alpha Krippendorff's (ordinal), each with low and high bounding a "
+                           f"{ivl}; rank rho is Spearman's between first and second; shift is second minus first, on average.",
+            "columns": ["field", "raters", "items", "pairs", "exact", "within_one", "kappa", "kappa_low", "kappa_high", "alpha", "alpha_low",
+                        "alpha_high", "rank_rho", "shift"], "rows": rate_rows}
+        tables[f"{t}-rating-confusion"] = {
+            "description": f"How often each pair of anchors was chosen, first the original score and second {who}'s. Pairs with no items are omitted.",
+            "columns": ["field", "first", "second", "n"], "rows": rconf}
+
+    # -- maturity and TRL together: §7.1 maps each maturity to a TRL range (report/analysis.yaml techniques.trl_by_maturity)
+    rng_map = {m: tuple(v) for m, v in ((cfg.get("techniques") or {}).get("trl_by_maturity") or {}).items()}
+    if "maturity" in decisions and rng_map:
+        items_rows, outside, mism, mism_fixed = [], 0, 0, 0
+        for r in raters:
+            mc, tr, hc = r["codes"].get("maturity") or {}, (r.get("ratings") or {}).get("trl") or {}, r["codes"].get("horizon") or {}
+            for i in sorted(set(mc) | set(tr) | set(hc)):
+                lo_hi = rng_map.get(mc.get(i))
+                if lo_hi and i in tr and not lo_hi[0] <= tr[i] <= lo_hi[1]:
+                    outside += 1
+                st = rng_map.get(first["maturity"].get(i))
+                if st and isinstance(first["trl"].get(i), int) and not st[0] <= first["trl"][i] <= st[1] and i in tr:
+                    mism += 1
+                    mism_fixed += st[0] <= tr[i] <= st[1]
+                items_rows.append({"run": r["run"], "technique": i, "maturity": first["maturity"].get(i), "maturity_second": mc.get(i),
+                                   "trl": first["trl"].get(i), "trl_second": tr.get(i), "horizon": first["horizon"].get(i), "horizon_second": hc.get(i)})
+        if items_rows:
+            stats[f"{p}n_trl_outside_maturity"] = outside   # the second reader's own TRL outside its own maturity's range
+            stats[f"{p}n_stored_trl_mismatch_rated"] = mism  # techniques whose stored TRL is outside the stored maturity's range ...
+            stats[f"{p}n_stored_trl_mismatch_rated_in_range"] = mism_fixed  # ... and how many of those the second TRL puts back inside it
+            tables[f"{t}-maturity-items"] = {
+                "description": f"Each technique's maturity, TRL and horizon in the dataset beside {who}'s.",
+                "columns": ["run", "technique", "maturity", "maturity_second", "trl", "trl_second", "horizon", "horizon_second"], "rows": items_rows}
+
+    # -- recall (E2): the recorded edges of each sampled mechanic against the techniques a second reader lists
+    if "recall" in decisions and any(r["codes"].get("recall") for r in raters):
+        rec = first["recall"]
+        mechs = sorted(m for m in rec if any(m in (r["codes"].get("recall") or {}) for r in raters))
+        per = {m: {"recorded": 0, "coded": 0, "matched": 0, "extra": 0, "readers": 0} for m in mechs}
+        edge_rows, mech_rows, eff_units = [], [], defaultdict(list)
+        for r in raters:
+            for m in mechs:
+                if m not in (r["codes"].get("recall") or {}):
+                    continue
+                got = {e["technique"]: e["effect"] for e in r["codes"]["recall"][m]}
+                R = rec[m]
+                hit, miss, extra = sorted(set(R) & set(got)), sorted(set(R) - set(got)), sorted(set(got) - set(R))
+                c = per[m]
+                c["recorded"] += len(R)
+                c["coded"] += len(got)
+                c["matched"] += len(hit)
+                c["extra"] += len(extra)
+                c["readers"] += 1
+                mech_rows.append({"run": r["run"], "mechanic": m, "recorded": len(R), "coded": len(got), "matched": len(hit),
+                                  "missed": " ".join(miss), "extra": " ".join(extra)})
+                for tid in sorted(set(R) | set(got)):
+                    edge_rows.append({"run": r["run"], "mechanic": m, "technique": tid, "recorded_effect": R.get(tid, ""), "second_effect": got.get(tid, ""),
+                                      "status": "matched" if tid in R and tid in got else ("missed" if tid in R else "extra")})
+                for tid in hit:
+                    eff_units[f"{tid}/{m}"].append(got[tid])
+        tot = {k: sum(per[m][k] for m in mechs) for k in ("recorded", "coded", "matched", "extra", "readers")}
+        arr = {k: np.array([per[m][k] for m in mechs], float) for k in ("recorded", "coded", "matched", "extra", "readers")}
+        W = _xm_weights(len(mechs), [list(range(len(mechs)))], rng(stream("recall")), n_boot)   # resample mechanics, keeping each one's edges together
+
+        def ratio(num, den):
+            return np.divide(W @ arr[num], W @ arr[den], out=np.full(n_boot, np.nan), where=(W @ arr[den]) > 0)
+        b_rec, b_cat = ratio("matched", "recorded"), ratio("matched", "coded")
+        b_ext = (W @ arr["extra"]) / (W @ arr["readers"])
+        shown = {e.split("/")[1] for e in (sc.get("sample") or {}).get("edges") or []}
+        pool = sum(1 for m in panel._live(ents, "mechanic") if m.id not in shown)
+        stats[f"{p}n_recall_mechanics"] = len(mechs)
+        stats[f"{p}recall_pool"] = pool
+        for k in ("recorded", "coded", "matched", "extra"):
+            stats[f"{p}n_recall_{k}"] = tot[k]
+        stats[f"{p}n_recall_missed"] = tot["recorded"] - tot["matched"]
+        # two directions: the share of the dataset's edges the second reader found (recall of the recorded edges), and the
+        # share of the second reader's edges the dataset records (catalog recall, taking the second reading as the reference),
+        # each pooled over mechanics with an interval that resamples mechanics
+        for key, num, den, b in (("recall_recorded", "matched", "recorded", b_rec), ("catalog_recall", "matched", "coded", b_cat)):
+            stats[f"{p}{key}"] = _r(tot[num] / tot[den], 2) if tot[den] else None
+            stats[f"{p}pct_{key}"] = int(round(100 * tot[num] / tot[den])) if tot[den] else None
+            stats[f"{p}{key}_low"], stats[f"{p}{key}_high"] = _xm_pct(b, q), _xm_pct(b, 100 - q)
+        ext = tot["extra"] / tot["readers"]
+        stats[f"{p}recall_extra_per_mechanic"] = _r(ext, 2)
+        stats[f"{p}recall_extra_per_mechanic_low"], stats[f"{p}recall_extra_per_mechanic_high"] = _xm_pct(b_ext, q), _xm_pct(b_ext, 100 - q)
+        # scaled to the pool the sample was drawn from: edges a second reader would add across those mechanics
+        stats[f"{p}recall_extra_pool"] = int(round(ext * pool))
+        stats[f"{p}recall_extra_pool_low"] = int(round(np.nanpercentile(b_ext, q) * pool))
+        stats[f"{p}recall_extra_pool_high"] = int(round(np.nanpercentile(b_ext, 100 - q) * pool))
+        stats[f"{p}n_recall_mechanics_none_listed"] = sum(1 for row in mech_rows if row["coded"] == 0)
+        stats[f"{p}n_recall_mechanics_none_recorded"] = sum(1 for m in mechs if not rec[m])
+        units = [(e, rec[e.split("/")[1]][e.split("/")[0]], vals) for e, vals in sorted(eff_units.items())]
+        if units:
+            row, _ = _xm_nominal(units, list(labels["effect"]), rng(stream("recall:effect")), n_boot, q, stratify=False)
+            for key in ("agree", "kappa", "kappa_low", "kappa_high", "alpha"):
+                stats[_xm_key(p, key, "recall_effect")] = row[key]
+            stats[f"{p}n_recall_effect_pairs"] = row["pairs"]
+        tables[f"{t}-recall"] = {
+            "description": f"For each sampled mechanic, the technique edges the dataset records and those {who} listed from the mechanic's and every "
+                           "technique's description: matched, missed (recorded, not listed) and extra (listed, not recorded). Recall of the recorded "
+                           "edges is matched over recorded and catalog recall matched over listed, each pooled over mechanics with an interval that "
+                           "resamples mechanics. The sample leaves out mechanics with an edge in the second-coding effect sample.",
+            "columns": ["run", "mechanic", "recorded", "coded", "matched", "missed", "extra"], "rows": mech_rows}
+        tables[f"{t}-recall-edges"] = {
+            "description": f"Every recorded or listed edge of the sampled mechanics: the dataset's effect, {who}'s, and whether the edge was matched, missed or extra.",
+            "columns": ["run", "mechanic", "technique", "recorded_effect", "second_effect", "status"], "rows": edge_rows}
+
+    # -- the rubric sample (D8): the §5.6 score correlations recomputed under each reading, on the same mechanics
+    pairs = [(a, b) for a in CALIBRATION_SCALES for b in CALIBRATION_SCALES if f"rho_{a}_{b}_family_low" in stats]  # the score-correlations pairs
+    ms = sorted(i for i in first["legibility"] if all(i in second.get(f, {}) for f in CALIBRATION_SCALES))
+    if pairs and len(ms) >= 5:
+        Wm = _xm_weights(len(ms), [list(range(len(ms)))], rng(stream("rubric:correlations")), n_boot).astype(int)
+        draws = np.array([np.repeat(np.arange(len(ms)), w) for w in Wm])   # each resample as index lists, for the rank correlation
+        corr_rows = []
+        for a, b in pairs:
+            fa, fb = (np.array([first[f][i] for i in ms], float) for f in (a, b))
+            sa, sb = (np.array([second[f][i] for i in ms], float) for f in (a, b))
+            bs = _spearman_rows(sa[draws], sb[draws]) if draws.size else np.array([])
+            row = {"pair": f"{a} × {b}", "mechanics": len(ms), "rho_all_stored": stats.get(f"rho_{a}_{b}"),
+                   "rho_first": _r(_spearman(fa, fb), 2), "rho_second": _r(_spearman(sa, sb), 2),
+                   "second_low": _xm_pct(bs, q), "second_high": _xm_pct(bs, 100 - q)}
+            corr_rows.append(row)
+            for k in ("rho_first", "rho_second", "second_low", "second_high"):
+                stats[f"{p}rho_{a}_{b}_{k.replace('rho_', '')}"] = row[k]
+        stats[f"{p}n_rubric_correlation_mechanics"] = len(ms)
+        tables[f"{t}-rubric-correlations"] = {
+            "description": f"The score correlations of §5.6 on the rubric sample: Spearman's rho over all mechanics on the stored scores, then on the "
+                           f"sampled mechanics under the original rater's scores (first) and under {who}'s (second), with low and high bounding a "
+                           f"{round(100 - 2 * q)}% bootstrap interval over those mechanics ({n_boot} resamples).",
+            "columns": ["pair", "mechanics", "rho_all_stored", "rho_first", "rho_second", "second_low", "second_high"], "rows": corr_rows}
+    cal = load_calibration(load_registry()) or {}
+    gold = cal.get("mechanics") or {}
+    cal_rows, cal_pairs = [], []
+    for r in raters:
+        c = r.get("calibration")
+        if not c or not gold:
+            continue
+        ag = calibration_agreement(gold, c.get("scores") or {})
+        cal_rows.append({"run": r["run"], "model": r.get("model_id") or r["model"], "scores": ag["n"], "exact": ag["exact"], "within_one": ag["within_one"], "kappa": ag["kappa_quadratic"]})
+        cal_pairs += [(m, f, c["scores"][m][f]) for m in sorted(gold) for f in CALIBRATION_SCALES if isinstance((c["scores"].get(m) or {}).get(f), int)]
+    if cal_rows:
+        thr = (load_registry().get("contribution") or {}).get("calibration_min_within_one", 0.8)
+        stats[f"{p}calibration_within_one"] = min(x["within_one"] for x in cal_rows)
+        stats[f"{p}calibration_exact"] = min(x["exact"] for x in cal_rows)
+        stats[f"{p}calibration_kappa"] = min(x["kappa"] for x in cal_rows if x["kappa"] is not None) if any(x["kappa"] is not None for x in cal_rows) else None
+        stats[f"{p}n_calibration_passed"] = sum(1 for x in cal_rows if x["within_one"] is not None and x["within_one"] >= thr)
+        cal_alpha = {}
+        for f in CALIBRATION_SCALES:
+            units = [[gold[m][f]] + [v for mm, ff, v in cal_pairs if mm == m and ff == f] for m in sorted(gold)]
+            units = [u for u in units if len(u) > 1]
+            if units:
+                cal_alpha[f] = _r(_alpha_ordinal(sum(_coincidence(u, 5) for u in units)), 2)
+                stats[f"{p}alpha_calibration_{f}"] = cal_alpha[f]
+        if cal_alpha:
+            stats[f"{p}alpha_calibration_min"], stats[f"{p}alpha_calibration_max"] = min(cal_alpha.values()), max(cal_alpha.values())
+        tables[f"{t}-calibration"] = {
+            "description": f"{who.capitalize()} on the calibration set ({cal.get('id')}), scored first from calibrate.py's sheet, against its frozen scores: "
+                           "exact and within-one agreement and quadratic-weighted kappa, as calibration-results reports for raters.",
+            "columns": ["run", "model", "scores", "exact", "within_one", "kappa"], "rows": cal_rows}
+
+    # -- opportunities (E31): the priority composite under each reading, and the ranking the lower median would store
+    if all(f in second for f in panel.OPP_SCALES):
+        w = rub["composites"]["opportunity_priority"]["weights"]
+        pri = lambda s: (s["impact"] ** w["w_impact"]) * (s["feasibility"] ** w["w_feasibility"]) * (s["novelty"] ** w["w_novelty"])  # noqa: E731
+        opps = sorted(i for i in first["novelty"] if all(i in second[f] for f in panel.OPP_SCALES) and all(isinstance(first[f][i], int) for f in panel.OPP_SCALES))
+        # first: the original scores, which are the stored ones until a second rating is recorded in the record (a cross-model
+        # check never records one); stored: what §9.1 ranks now; second: the second readers alone; lower median: the original
+        # and every second reading combined as a field with these ratings would store them (E037)
+        orig = {o: pri({f: first[f][o] for f in panel.OPP_SCALES}) for o in opps}
+        stored = {o: pri({f: by_id[o].data[f] for f in panel.OPP_SCALES}) for o in opps}
+        sec = {o: pri({f: second[f][o] for f in panel.OPP_SCALES}) for o in opps}
+        low = {o: pri({f: lower_median([first[f][o]] + [r["ratings"][f][o] for r in raters if o in (r.get("ratings") or {}).get(f, {})])
+                       for f in panel.OPP_SCALES}) for o in opps}
+
+        def ranks(d):
+            order = sorted(d, key=lambda o: (-round(d[o], 9), o))
+            return {o: k + 1 for k, o in enumerate(order)}
+        r1, rs, r2, rl = ranks(orig), ranks(stored), ranks(sec), ranks(low)
+        n_top = int(pc.get("top_n", 15))
+        top = lambda rk: {o for o, k in rk.items() if k <= n_top}  # noqa: E731
+        x, y, z = (np.array([d[o] for o in opps]) for d in (orig, sec, low))
+        Wo = _xm_weights(len(opps), [list(range(len(opps)))], rng(stream("opportunity:priority")), n_boot).astype(int)
+        draws = np.array([np.repeat(np.arange(len(opps)), wv) for wv in Wo])
+        bs = _spearman_rows(x[draws], y[draws])
+        stats[f"{p}n_opportunities_rated"] = len(opps)
+        stats[f"{p}top_n"] = n_top
+        stats[f"{p}rho_priority"] = _r(_spearman(x, y), 2)          # original composite against the second readers'
+        stats[f"{p}rho_priority_low"], stats[f"{p}rho_priority_high"] = _xm_pct(bs, q), _xm_pct(bs, 100 - q)
+        stats[f"{p}rho_priority_lower_median"] = _r(_spearman(x, z), 2)
+        stats[f"{p}n_top_overlap"] = len(top(r1) & top(r2))
+        stats[f"{p}n_top_overlap_lower_median"] = len(top(r1) & top(rl))
+        stats[f"{p}top_opportunity_second"] = min(r2, key=r2.get)
+        stats[f"{p}top_opportunity_lower_median"] = min(rl, key=rl.get)
+        tables[f"{t}-opportunity-ranking"] = {
+            "description": f"The opportunity ranking of §9.1 under three readings of the scores: first (the original rater's, which stays the stored "
+                           f"ranking until a second rating is recorded in the record), second ({who}'s alone), and lower median (the original score and "
+                           "every second reading combined as a field with ratings stores them); stored rank is the rank §9.1 shows. Priority is the "
+                           "weighted geometric mean of vocab/rubrics.yaml; ranks break ties by id. " +
+                           ("The lower-median ranking is a sensitivity reading from a cross-model check by the records' own operator, never the stored "
+                            "ranking: no record changes." if p == "xm_" else "Once these ratings are in the records, the lower-median ranking is the stored one."),
+            "columns": ["opportunity", "stored_rank", "first_priority", "first_rank", "second_priority", "second_rank", "lower_median_priority", "lower_median_rank"],
+            "rows": [{"opportunity": o, "stored_rank": rs[o], "first_priority": _r(orig[o], 2), "first_rank": r1[o], "second_priority": _r(sec[o], 2),
+                      "second_rank": r2[o], "lower_median_priority": _r(low[o], 2), "lower_median_rank": rl[o]} for o in sorted(opps, key=lambda o: r1[o])],
+            "link_columns": ["opportunity"]}
+
+
+def _cross_model(ents, vocabs, cfg, stats, tables):
+    """A cross-model check of every panel sheet (scripts/panel.py record --cross-model): the records' own operator ran
+    another model on the blind packet. It is reported as a check across models, never as independent agreement (I14,
+    E035), and nothing is reported until a file exists in report/cross-model/."""
+    import panel
+    raters = panel.load_cross_model(ents, vocabs, cfg.get("panel") or {}, cfg.get("second_coding") or {})
+    stats["n_cross_model_runs"] = len(raters)
+    if raters:
+        _panel_agreement(ents, vocabs, cfg, raters, stats, tables, "xm_", "cross-model", "the cross-model reader", list(panel.DECISION_KIND),
+                         note="A cross-model reader is another model run on the blind packet by the records' own operator, so its "
+                              "agreement is a check across models, not independent agreement (CONTRACT.md I14, E035).")
+
+
+def _panel_independent(ents, vocabs, cfg, stats, tables):
+    """Independent second readings of the panel sheets beyond coding.py's three: recall, maturity and horizon codes from
+    report/coding/<kind>/ (scripts/panel.py checks them), and TRL, mechanic and opportunity ratings from the records, from
+    any verification run independent of the creator that rated at least `panel.min_share` of a panel sample. The sample
+    sizes are always stated; agreement only once a reading exists."""
+    import panel
+    pc, sc = cfg.get("panel") or {}, cfg.get("second_coding") or {}
+    first = panel.first_values(ents, vocabs, pc, sc)
+    shown = {e.split("/")[1] for e in (sc.get("sample") or {}).get("edges") or []}
+    stats["n_panel_recall_mechanics"] = len(first["recall"])
+    stats["n_panel_recall_pool"] = sum(1 for m in panel._live(ents, "mechanic") if m.id not in shown)
+    stats["n_panel_recall_recorded_edges"] = sum(len(v) for v in first["recall"].values())
+    stats["n_panel_recall_mechanics_no_edge"] = sum(1 for v in first["recall"].values() if not v)
+    stats["n_panel_rubric_mechanics"] = len(first["legibility"])
+    stats["n_panel_techniques"] = len(first["maturity"])
+    stats["n_panel_opportunities"] = len(first["novelty"])
+    stats["n_panel_state_mechanics"] = len(first["state"])
+    for c, n in sorted(Counter(first["state"].values()).items()):
+        stats[f"n_panel_state_{c.replace('-', '_')}"] = n
+    # codes (and the TRL readings a record's ratings cannot hold) from the codes files, then ratings from the records
+    raters = {r["run"]: {**r, "ratings": dict(r.get("ratings") or {}), "calibration": None} for r in panel.load_panel_codings(ents, vocabs, pc, sc)}
+    runs = {r.id: r for r in ents.get("run", [])}
+    share = float(pc.get("min_share", 0.5))
+    by_id = {e.id: e for tl, lst in ents.items() if tl != "run" for e in lst}
+    for kind, fields in (("maturity", ("trl",)), ("rubric", panel.MECH_SCALES), ("opportunity", panel.OPP_SCALES)):
+        items = sorted(first[fields[0]])
+        got: dict[str, dict] = defaultdict(lambda: defaultdict(dict))
+        for i in items:
+            rec = by_id[i]
+            creator = runs.get((rec.data.get("provenance") or {}).get("created"))
+            for rt in rec.data.get("ratings") or []:
+                rr = runs.get(rt.get("run"))
+                if rt.get("field") in fields and rr is not None and rr.id != (creator.id if creator else None) and independent(rr, creator):
+                    got[rr.id][rt["field"]][i] = rt["value"]
+        for rid, fl in sorted(got.items()):
+            if len({i for v in fl.values() for i in v}) >= share * len(items):
+                rr = runs[rid]
+                r = raters.setdefault(rid, {"run": rid, "operator": rr.data.get("operator"), "model": panel._model(rr),
+                                            "model_id": (rr.data.get("agent") or {}).get("model") or "", "codes": {}, "ratings": {}, "calibration": None})
+                r["ratings"].update({f: dict(v) for f, v in fl.items()})
+                if kind == "rubric" and rr.data.get("calibration") and not panel.calibration_barred(ents, rr, "independent"):
+                    r["calibration"] = rr.data["calibration"]
+    stats["n_second_coding_panel_runs"] = len(raters)
+    if raters:
+        _panel_agreement(ents, vocabs, cfg, [raters[k] for k in sorted(raters)], stats, tables, "second_coding_", "second-coding-panel",
+                         "the independent second reader", [d for d in panel.DECISION_KIND if d not in panel.CODING_KINDS],
+                         note="Each is a verification run independent of the runs that made what it read (E035).")
 
 
 # ======================================================================= SVG
