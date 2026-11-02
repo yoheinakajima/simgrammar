@@ -1,0 +1,60 @@
+id: 2026-11-01-es-v3-prediction-baselines
+type: run
+kind: maintenance
+date: '2026-11-01'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Pre-specify a reference class, a generic-diffusion baseline, and a catalog base rate for every
+  falsifiable prediction, and add a size threshold to the three criteria that lacked one (Explore Science
+  review F2).
+method: >-
+  Read the prediction and criteria of all 42 live opportunities and wrote report/predictions.yaml, one entry each:
+  the reference class a resolver counts (Steam tags checked against store.steampowered.com/tag/browse on 2026-11-01,
+  plus the review bar of the criteria), the generic-diffusion version of the event, what a confirmation must show to
+  count for the thesis, and a base-rate spec over the catalog (reference-class games by subgenre or mechanic, the
+  precursor mechanics or techniques, and the techniques that would count). Five entries add a store-wide rate from two
+  existing source records, src-totallyhuman-2025-steam-genai-count and src-totallyhuman-2025-steam-ai-revenue: fetched
+  both pages on 2026-11-01, extracted the text, and found each quote verbatim. No source was created.
+
+  scripts/analyze.py gains _prediction_baselines: it fails the build on a live prediction with no entry, an entry for a
+  missing or deprecated opportunity, an unknown id or field, a review count in a reference class that the criteria do
+  not state, or an amendment whose added text the criteria lack. A test with a renamed key, a deprecated id and a wrong
+  count failed as intended. It writes the derived fields behind the new declared table prediction-baselines, the
+  tables prediction-base-rates and prediction-outside-rates, and stats. On this data: median precursor share 20
+  percent; 5 predictions with the precursor in at least half the class, 4 with none; 12 catalog games deploy a learned
+  technique and 31 reference classes hold one, but only 6 hold a game deploying a technique that would count, all
+  released before 2026. report/analysis.yaml lists the classical techniques the learned column leaves out.
+
+  Size bars: ai-liquidity-in-player-markets, calibrated-serious-sims and participatory-planning-sandboxes had none. Each
+  gained one by inserting a clause; a script checked that only the criteria and provenance.reviewed changed, that the
+  rest of each criteria text survived, and that each stays under 500 characters (473, 492, 349). To fit, "at least one
+  goodness-of-fit metric" became "a goodness-of-fit metric", the same requirement. Each amendment only adds a
+  condition, so it can make a prediction harder to confirm and never easier; no prediction had resolved. The records
+  have no sources, so reviewed here means the run read and amended the criteria; no claim was re-checked. The other 39
+  records are unchanged. The console-release alternative in 10 criteria was left as written.
+
+  Rewrote section 11 (generic diffusion, base rates, size bars), added a sentence to 2.5, updated book chapters 10 and
+  12 and tasks/resolve-prediction.md, which now has resolvers read the entry and count the reference class.
+
+  Failed: the first build stopped because the market amendment's added text said "with" where the criteria say "and";
+  the new check caught it. The PDF compiled, but no page renderer was installed to look at the new tables.
+contract_version: '1.2'
+proposals:
+- kind: rule
+  target: AGENTS.md section 3, Opportunity test
+  detail: A new opportunity now also needs an entry in report/predictions.yaml (reference class, generic diffusion,
+    thesis, base rate), or the build fails. The opportunity test in AGENTS.md should say so, so a contributor who adds
+    one learns the rule before meeting the error.
+- kind: other
+  target: scripts/web.py and scripts/build.py, opportunity record pages
+  detail: The baseline reaches record pages only as computed facts under "across the catalog". The falsifiable
+    prediction section could show the reference class, the generic-diffusion version, and what counts for the thesis
+    beside the criteria, so a resolver reading the record sees them.
+- kind: other
+  target: report/predictions.yaml
+  detail: The model that wrote the predictions also wrote their baselines and base-rate specs. A reader independent of
+    both should check them before the first predictions come due, starting with the reference classes and with the
+    precursor chosen for each (section 11.1, item 7).
