@@ -216,6 +216,87 @@ second_coding:
       simulation-based-inference/traffic-congestion, story-sifting/triggered-event-chains,
       subspace-neural-physics/soft-body-deformation, voyager-skill-libraries/agent-skills,
       voyager-skill-libraries/delegation-to-ai, wave-function-collapse/zoning]
+panel:
+  # Review findings E2, E17, E31, D8 (with D3, D4, D6 through second_coding above): the technique edges, the technique
+  # maturity, TRL and horizon labels, the opportunity scores, and most mechanic scores were each made by one rater. The
+  # panel (scripts/panel.py, tasks/second-rating.md) gives a second coder blind sheets for all of them: each sheet gives
+  # the written rules or anchors, the vocabulary's definitions, and each item's own text, never its stored code or score
+  # or a field that restates one. A packet holds every sheet with an instructions file, so a coder with no repository and
+  # no web access can fill it. Two ways to record it, never pooled: an independent verification run (codes in
+  # report/coding/, scores as ratings in the records, analyze.py second_coding_* stats), and a cross-model run by the
+  # records' operator on another model (report/cross-model/, xm_* stats), which is a check across models and not
+  # independent agreement. analyze.py reports agreement once answers exist, and only sample sizes before.
+  # Samples are drawn once, on the date given, by `python scripts/panel.py draw`, and listed here so a later data change
+  # does not move them; `draw --check` redraws and compares. Random draws rank their pool by sha256(seed:kind:id) and take
+  # the first n, so raising n keeps the earlier items.
+  seed: 20261101
+  bootstrap: 2000          # resamples for every interval below (over the sheet's items; recall over mechanics)
+  interval: 0.95
+  top_n: 15                # §9.1's ranking: how many of the top opportunities the second rater's composite keeps (E31)
+  min_share: 0.5           # independent ratings in the records count for a panel sample when one run rated at least this share
+                           # of it, so ratings from a ten-record rate-scores task stay in rater-agreement alone
+  chunk:                   # items per sheet file, so each file stays under about 70 kB, the size of coding.py's sheets, and
+    recall: 15             # fits one model context; the recall sheet's technique texts sit in one reference file beside
+    maturity: 12           # its parts
+    rubric: 20
+    opportunity: 14
+  recall:
+    # E2: mechanics drawn at random from the live mechanics, leaving out every mechanic that has an edge in the
+    # second-coding effect sample, since the effect sheet shows those edges. Recall estimates therefore describe that pool.
+    id: recall-v1
+    drawn: '2026-11-01'
+    n: 30
+    mechanics: [async-shared-region, blueprints, board-confidence, care-dependent-development, customer-value-choice,
+      dated-tech-timeline, diagnose-repair, dynasty-succession, elections, flight-aerodynamics, fluid-pipe-network,
+      history-generation, immigration-attractiveness, interest-groups, lifecycle-aging, modding-api,
+      policy-influence-network, power-grid, procedural-build-assist, procedural-terrain, product-development,
+      rail-signaling, random-disasters, renewable-regrowth, road-network, seasonal-world-reset, service-queues,
+      storyteller-director, utility-action-selection, wear-breakdown]
+  rubric:
+    # D8: mechanics drawn at random from the live mechanics outside the calibration set, which the rubric sheet scores
+    # first (calibrate.py's sheet, E036), so the second rater's calibration agreement is reported beside the sample's.
+    id: rubric-v1
+    drawn: '2026-11-01'
+    n: 40
+    mechanics: [alerts-feed, aspiration-wants, async-shared-region, auctions, blueprints, budget-treasury, career-ladder,
+      combination-discovery, customer-value-choice, delivery-time-payment, diagnosis-treatment, equity-buyouts,
+      goods-consumption, gossip-propagation, heat-transfer, history-chronicle, loans-debt, machine-boosting,
+      memories-thoughts, military-operations, orbital-mechanics, player-programming, political-capital, pollution-spread,
+      power-allocation, pvp-security-zones, random-disasters, rci-demand, relationship-values, renewable-regrowth,
+      request-provider-logistics, rigid-body-physics, road-network, seasons, spoilage, storage-capacity,
+      surface-work-tools, trait-inheritance, vertical-layers, walker-service-delivery]
+  maturity:
+    # E17: every live technique, on maturity (technique_maturity), TRL (the trl rubric) and horizon.
+    id: maturity-v1
+    drawn: '2026-11-01'
+    techniques: [alphaevolve-algorithm-discovery, automated-playtesting, automated-rule-generation,
+      cicero-strategic-dialogue, constrained-decoding, continuous-alife-and-asal, deep-rl-npc-policies,
+      differentiable-simulation, diffusion-game-engines, gaussian-splatting, generalist-game-agents, generated-3d-worlds,
+      generative-agents, genie-world-models, graph-network-simulators, human-behavior-simulation-models,
+      imperfect-information-solvers, learned-level-generation, learned-motion-synthesis, llm-agent-societies,
+      llm-explanation-of-state, llm-game-master, llm-rule-adjudication, massively-parallel-simulation, mean-field-games,
+      ml-weather-models, model-based-planning-muzero, monte-carlo-tree-search, muse-wham, neural-cellular-automata,
+      neural-rendering-shaders, on-device-language-models, open-ended-environment-generation,
+      open-interactive-video-models, physical-world-foundation-models, physics-based-character-control,
+      quality-diversity-search, real-time-video-restyling, realtime-voice-models, satellite-world-reconstruction,
+      simulation-based-inference, story-sifting, subspace-neural-physics, text-to-3d-assets, voyager-skill-libraries,
+      wave-function-collapse]
+  opportunity:
+    # E31: every live opportunity, on novelty, feasibility and impact; its horizon is left off the sheet, since it
+    # restates feasibility in time.
+    id: opportunity-v1
+    drawn: '2026-11-01'
+    opportunities: [agent-ambassadors-async, ai-liquidity-in-player-markets, bottleneck-explainer,
+      branch-preview-forecasts, calibrated-serious-sims, causal-why-query, content-elastic-events,
+      drama-aware-storyteller, dream-replay-layer, event-sourced-sim-runtime, explained-delegation,
+      generated-inspection-shifts, generated-recipe-graphs, generative-decoration-catalogs, human-calibrated-customers,
+      illustrated-chronicles, intent-level-orders, language-modding, learned-build-assist, learned-material-surrogates,
+      learned-weather-layer, living-workforce-factories, llm-society-terrarium, local-first-ai-sims, mean-field-crowds,
+      mechanic-discovery-search, natural-language-legislation, negotiating-faction-ai, neural-npc-motion,
+      open-ended-evolution-sandbox, parallel-autobalance, participatory-planning-sandboxes,
+      placement-that-tells-stories, qd-scenario-libraries, salience-gated-llm-agents, scientists-not-tech-trees,
+      sim-instructor-coach, sims-as-agent-benchmarks, specification-programming-games, symbolic-sim-neural-render,
+      teachable-sim-companion, trainable-creatures-revival]
 book:
   rare_max_games: 10     # a mechanic used by at most this many catalog games counts as rare in the book's prose (chapter 1)
   subgenre_min_games: 6  # subgenres with at least this many games get a row in the subgenre-spend table (chapter 2)

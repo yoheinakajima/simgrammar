@@ -118,6 +118,13 @@ def _blocks(path: Path, start: str, end: str) -> list[str]:
     return [b.strip() for b in text[i:j].split("\n\n") if b.strip()][1:]
 
 
+def effect_rule() -> list[str]:
+    """The coding rule of §8.1, up to the sentence on when it was written down: the sheets give the rule, not its history."""
+    para = next(b for b in _blocks(IMPACT, "### 8.1", "### 8.2") if b.startswith("**Coding rule.**"))
+    cut = para.find(" The order was written down")
+    return [para[:cut] if cut > 0 else para]
+
+
 def rule_examples() -> set[str]:
     """Records §2.1 names. Its rules use them as worked examples, so their families are given away."""
     return {m.group(1) for b in _blocks(METHOD, "### 2.1", "### 2.2") for m in LINK_RE.finditer(b)}
@@ -232,6 +239,8 @@ def check_coding(path: Path, data: dict, ents, vocabs, cfg: dict, items: dict) -
         if not _plain(c.get("rationale")) or re.search(r"\b(todo|tbd|fixme)\b", str(c.get("rationale")), re.I):
             raise ValueError(f"{rel}: codes[{i}] ({d}, {item}) needs a rationale naming the rule or test that decided it")
         for other in coder_runs(ents, d, item):
+            if other == rid:  # the coder's own run, once it also rated the record (tasks/second-rating.md)
+                continue
             if not independent(run, runs.get(other)):
                 raise ValueError(f"{rel}: run '{rid}' codes {d} of '{item}' but is not independent of run '{other}', which created, reviewed, "
                                  "or proposed it: a coder has a different operator, and a different model when both runs are agents (E035, as for ratings)")
@@ -343,15 +352,13 @@ def sheets(ctx, ents, vocabs, cfg: dict | None = None, run: str | None = None) -
         "items": {m: {**mech_row(m), "code": None, "rationale": None} for m in order(items["family"])}}
     eff = vocab_terms(vocabs, "effect")
     rt = vocab_terms(vocabs, "runtime")
-    para = next(b for b in _blocks(IMPACT, "### 8.1", "### 8.2") if b.startswith("**Coding rule.**"))
-    rule = para[: para.index(" The order was written down")]
     pairs = [i.split("/") for i in order(items["effect"])]
     out["effect"] = {
         "sample": sp["id"], "decision": "effect",
         "instructions": ("Label each edge with one effect, using the coding rule below and the effect definitions. An edge is a "
                          "technique (under techniques) changing a mechanic (under mechanics), and its note says what changes. "
                          "Write the effect id in code and, in rationale, the clause of the rule that decided it. " + NO_PEEKING),
-        "rule": _rendered([rule], ctx),
+        "rule": _rendered(effect_rule(), ctx),
         "effects": {e: f"{t['label']}: {t['definition']}" for e, t in eff.items()},
         "techniques": {t: {"name": by_id[t].data["name"], "summary": _plain(by_id[t].data["summary"]), "mechanism": _plain(by_id[t].data.get("mechanism")),
                            "runtime": [rt.get(r, {}).get("label", r) for r in by_id[t].data.get("runtime") or []]}

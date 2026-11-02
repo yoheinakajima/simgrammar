@@ -1,0 +1,44 @@
+id: 2026-11-01-es-v3-panel
+type: run
+kind: maintenance
+date: '2026-11-01'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'Build the panel for blind second coding and rating: recall, maturity, opportunity, and rubric
+  sheets beside the three coding sheets, a self-contained packet for a blind model, a recorder for cross-model
+  and independent runs, and their analysis (review findings E2, E17, E31, D8, D3, D4).'
+method: 'Read the review''s open findings, CONTRACT.md, AGENTS.md, tasks/second-coding.md, tasks/rate-scores.md,
+  scripts/coding.py, calibrate.py, analyze.py (_second_coding, rater agreement), validate.py (E035 to E037),
+  pr_scope.py, the run, rating and technique schemas, and the second rater''s run. Wrote scripts/panel.py:
+  a registry of sheet kinds (coding.py''s three, recall, maturity, rubric with the calibration set first,
+  opportunity), seeded draws recorded in report/analysis.yaml (panel), a packet command writing every sheet
+  with INSTRUCTIONS.md and a manifest, and a recorder with two modes. Cross-model: a maintenance run whose
+  model differs from every agent run that made or re-read an item, written to report/cross-model/. Independent:
+  a verification run; codes to report/coding/ (coding.py''s file for its three, report/coding/<kind>/ for
+  the rest), scores into the records as ratings with the creator''s original score and the lower median,
+  the calibration into the run file. Added analyze.py _panel_independent and _cross_model, one agreement
+  routine for both, never pooled: nominal kappa and alpha, quadratic kappa and ordinal alpha, bootstrap
+  intervals, confusion tables, recall in both directions, the score correlations, the priority composite
+  and the lower-median ranking. Tested only on scratch copies with fake answers (never committed): both
+  modes recorded, the written ratings passed E004, E035, E036 and E037, two cross-model runs pooled, builds
+  were identical under two hash seeds, and the recorder named every planted fault. Found that a rating''s
+  value is capped at 5 by the schema, so TRL readings stay in the codes file (proposal). Made coding.py''s
+  §8.1 rule extraction a function and let a coder''s own run pass its independence check once it has also
+  rated a record. Wrote tasks/second-rating.md, updated tasks/second-coding.md, AGENTS.md and .gitignore.
+  No records, sources or report prose changed; no paid model run.'
+contract_version: '1.2'
+proposals:
+- kind: schema
+  target: common.schema.json#/$defs/rating
+  detail: 'A rating''s value refs $defs/score (1 to 5), but trl is a rubric field on a nine-level scale,
+    so no verification run can rate TRL 6 to 9 in a record, and the three prototypes the paper lists at TRL
+    5 (§7.1) cannot be corrected the way AGENTS.md prescribes. E037 already checks a rating against its
+    scale''s anchors, so the value could be any integer from 1 to 9. scripts/panel.py keeps independent TRL
+    readings in report/coding/maturity/ until then, and writes them into the records once the schema allows.'
+- kind: other
+  target: tasks/README.md
+  detail: 'The briefs table should list tasks/second-rating.md (run kind verification, the whole panel
+    in one run, needs the bulk label) beside second-coding.md; that file is outside this run''s slice.'
