@@ -1,0 +1,1444 @@
+# Effect audit: every live technique-to-mechanic `affects` edge checked against the precedence rules of section 8.1
+# (review D4, second bullet). analyze.py (_edge_audits) reads this file; the build fails when a live edge has no entry,
+# an entry names an edge that does not exist, or an entry's effect differs from the record's.
+#
+# Rules. Section 8.1 gives each edge one effect: the first of these that the edge's note supports, in this order:
+# replaces-substrate (the technique computes the mechanic's state or decisions in place of its existing rule while the
+# mechanic keeps its role in play), enables-new (the note claims an output the old rule could not produce at any cost),
+# explains (the output is addressed to the player's understanding of the mechanic's state or causes), deepens (the same
+# mechanic gains fidelity, scale, or variety at runtime), accelerates (the same output for less runtime compute),
+# cuts-authoring-cost (it makes content the mechanic consumes), tunes (it sets or tests the mechanic's parameters).
+# Three readings decide the close cases. A technique that only supplies a mechanic's inputs (profiles, parameters) does
+# not replace its substrate. Where a note claims new possibilities as well as a new engine, enables-new is read as the
+# role changing, so replaces-substrate does not apply. For the three technique-native mechanics of section 8.3
+# (generative-content, natural-language-interaction, gossip-propagation), whose catalog games already run on the
+# technique family, a further result of that family deepens the mechanic rather than replacing its substrate.
+#
+# Fields. effect: the label stored now. compliant: whether the label as first coded met the rules (true or false).
+# was: the first-coded label, when this audit corrected it. secondary: another effect the note also supports, or null.
+# ahead: present when the stored label still does not meet the written order; the label the order would put first.
+# added: the edge was added by the keyword sweep (edge-sweep.yaml), so it has no first-coded label.
+#
+# Corrections. A label was corrected when the note does not support it (an enables-new edge whose note claims no new
+# form, a design-time change coded as a runtime one) or when the note states outright a label that comes before it
+# (explanation addressed to the player, a form the old rule 'no longer' limits). One boundary was not corrected: an
+# edge whose note says the technique computes the mechanic in place of a named rule and also that the mechanic gets
+# richer (or cheaper). The written order puts replaces-substrate first; the labels were coded deepens (or accelerates)
+# for the richer behavior. The disagreement is systematic, so it is a question about which of the two states the
+# convention, not a set of isolated slips, and those edges keep their label with replaces-substrate ahead, for a
+# second rater to settle; where another label also comes before the stored one whatever the boundary, the label was
+# corrected to it and replaces-substrate stays ahead. Other edges left non-compliant say which label arguably comes
+# first and why the note does not settle it.
+#
+# Made by run 2026-11-01-es-v3-edge-audits (operator yoheinakajima, model claude-opus-5-5), the same rater that wrote the edges and the
+# rules, reading only each edge's note. It tests whether the labels follow the written rules, not whether another
+# rater would agree with them.
+run: 2026-11-01-es-v3-edge-audits
+edges:
+- technique: alphaevolve-algorithm-discovery
+  mechanic: agent-pathfinding
+  effect: accelerates
+  compliant: true
+  secondary: null
+  reason: "the same routes with fewer node expansions, the same output for less runtime compute; the search itself is unchanged"
+- technique: alphaevolve-algorithm-discovery
+  mechanic: comparative-histograms
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "pre-launch solutions set the histogram axes and flag degenerate puzzles, a test of the mechanic"
+- technique: alphaevolve-algorithm-discovery
+  mechanic: hauling-jobs
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "the dispatch heuristic is searched against simulated throughput before release, which sets the mechanic's rule"
+- technique: alphaevolve-algorithm-discovery
+  mechanic: player-programming
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "machine-evolved rival programs are opponents hand-written ones could not supply"
+- technique: alphaevolve-algorithm-discovery
+  mechanic: utility-action-selection
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "scoring functions are evolved against designer metrics before release"
+- technique: alphaevolve-algorithm-discovery
+  mechanic: vehicle-route-scheduling
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "load and stop-ordering heuristics are evolved against delivery-rate benchmarks, a search over the mechanic's rule"
+- technique: automated-playtesting
+  mechanic: adaptive-threat-scaling
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "agent pass rates set difficulty curves before release"
+- technique: automated-playtesting
+  mechanic: agent-pathfinding
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "agents test traversal for stuck spots and shortcuts"
+- technique: automated-playtesting
+  mechanic: career-ladder
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "agents measure the actions each career needs, a test of the ladder"
+- technique: automated-playtesting
+  mechanic: milestone-unlocks
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "replays measure when thresholds are reached, so pacing is set from distributions"
+- technique: automated-playtesting
+  mechanic: scenario-objectives
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "predicted pass rates order and adjust goals against a target curve"
+- technique: automated-playtesting
+  mechanic: stat-combat-resolution
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "playthroughs estimate win rates before release"
+- technique: automated-rule-generation
+  mechanic: generative-content
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "generated content extends to rule sets; earlier rule search already produced rule sets, so this adds variety"
+- technique: automated-rule-generation
+  mechanic: player-legislation
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "laws players propose become enforceable rule code, which a fixed law list could not offer"
+- technique: automated-rule-generation
+  mechanic: policy-toggles
+  effect: cuts-authoring-cost
+  compliant: false
+  was: enables-new
+  secondary: tunes
+  reason: "growing the policy list by search instead of writing each law is content made before release; the note claims no policy a hand-written list could not hold, and the playout screen is a balance test"
+- technique: automated-rule-generation
+  mechanic: scenario-objectives
+  effect: cuts-authoring-cost
+  compliant: true
+  secondary: tunes
+  reason: "end conditions are generated with the rules (content); the playout check also replaces hand-tuned thresholds"
+- technique: automated-rule-generation
+  mechanic: turn-structure
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "self-play measures first-player advantage and decisiveness"
+- technique: cicero-strategic-dialogue
+  mechanic: faction-diplomacy
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "free-text negotiation with committed joint moves is something treaty menus could not produce; the player-facing role changes, so it is not a substrate swap"
+- technique: cicero-strategic-dialogue
+  mechanic: natural-language-interaction
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "what the player types now changes the AI's plan; the mechanic already runs on language models in its catalog games, so this deepens it"
+- technique: cicero-strategic-dialogue
+  mechanic: negotiation
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "free-text proposals and counters are terms fixed offers could not produce"
+- technique: cicero-strategic-dialogue
+  mechanic: reputation
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "standing becomes a learned estimate computed by the AI rather than a scalar moved by scripted events, while its role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: cicero-strategic-dialogue
+  mechanic: war-score-peace
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: enables-new
+  reason: "peace terms negotiated in language are arguably a form fixed peace demands could not produce, as the record codes negotiation; the note claims no new form outright, so the label is left for a second rater"
+- technique: constrained-decoding
+  mechanic: dilemma-cards
+  effect: cuts-authoring-cost
+  compliant: true
+  secondary: null
+  reason: "cards are generated in the game's schema for designers to curate"
+- technique: constrained-decoding
+  mechanic: generative-content
+  effect: enables-new
+  compliant: true
+  secondary: accelerates
+  reason: "generated records written straight into typed state are a form text output could not give; dropping parse-and-retry also saves compute"
+- technique: constrained-decoding
+  mechanic: natural-language-interaction
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "free text maps reliably onto legal verbs, a more reliable form of a mechanic that already runs on language models"
+- technique: constrained-decoding
+  mechanic: player-legislation
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "plain-language laws compiled into the rule language are a form the rule editor alone did not offer; borderline, since the same laws were writable by hand"
+- technique: constrained-decoding
+  mechanic: utility-action-selection
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "an LLM fills the action-selection slot over the same action set"
+- technique: continuous-alife-and-asal
+  mechanic: generative-content
+  effect: enables-new
+  compliant: true
+  secondary: cuts-authoring-cost
+  reason: "prompt-to-rules search yields creature rule sets no earlier generator produced; at design time it also saves authoring"
+- technique: continuous-alife-and-asal
+  mechanic: natural-selection
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "selection acts on creatures that emerge from the physics, which declared fitness stats could not produce"
+- technique: continuous-alife-and-asal
+  mechanic: trait-inheritance
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "inheritance is computed by parameters mixing in space instead of an explicit crossover function, while its role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: deep-rl-npc-policies
+  mechanic: agent-pathfinding
+  effect: replaces-substrate
+  compliant: true
+  secondary: cuts-authoring-cost
+  reason: "a learned policy replaces hand-placed navigation links; designers also annotate less"
+- technique: deep-rl-npc-policies
+  mechanic: embodied-skill-control
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "skilled opponents at selectable levels raise the mechanic's ceiling"
+- technique: deep-rl-npc-policies
+  mechanic: vehicle-dynamics
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "AI drivers use the full tire and suspension model at champion level, so handling fidelity matters more; the vehicle model itself is unchanged"
+- technique: differentiable-simulation
+  mechanic: contagion
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "transmission parameters are calibrated to case data"
+- technique: differentiable-simulation
+  mechanic: design-performance-rating
+  effect: explains
+  compliant: true
+  secondary: null
+  reason: "gradients tell the player which part most changes the score, output addressed to the player's understanding"
+- technique: differentiable-simulation
+  mechanic: fluid-gas-simulation
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "emitter and vent settings are solved for a target flow, a parameter search"
+- technique: differentiable-simulation
+  mechanic: modular-assembly
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "assembled machines can learn to move during play, which fixed controllers could not do"
+- technique: differentiable-simulation
+  mechanic: soft-body-deformation
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "stiffness and damping are fitted to reference motion"
+- technique: differentiable-simulation
+  mechanic: vehicle-dynamics
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "constants are fitted to telemetry"
+- technique: diffusion-game-engines
+  mechanic: direct-avatar
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "movement is predicted frame by frame instead of computed by engine code"
+- technique: diffusion-game-engines
+  mechanic: generative-content
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "every frame and enemy is generated from play, in principle situations the source game never had"
+- technique: diffusion-game-engines
+  mechanic: procedural-terrain
+  effect: replaces-substrate
+  compliant: false
+  was: enables-new
+  secondary: null
+  reason: "terrain comes from the training game's learned distribution with no seed or noise function; the note names no output the old generator could not make, only a persistence limit"
+- technique: diffusion-game-engines
+  mechanic: rigid-body-physics
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "collision and gravity are learned from pixels instead of integrated"
+- technique: diffusion-game-engines
+  mechanic: voxel-destruction
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "block edits are predicted as pixels with no stored grid"
+- technique: gaussian-splatting
+  mechanic: decoration-beauty
+  effect: cuts-authoring-cost
+  compliant: true
+  secondary: null
+  reason: "props captured from photos instead of modelled by hand"
+- technique: gaussian-splatting
+  mechanic: soft-body-deformation
+  effect: replaces-substrate
+  compliant: false
+  was: enables-new
+  secondary: cuts-authoring-cost
+  reason: "MPM runs on the captured Gaussians in place of a node-beam or finite-element mesh; the deformation is of the same kind, and the saving is the mesh-building step"
+- technique: generalist-game-agents
+  mechanic: delegation-to-ai
+  effect: enables-new
+  compliant: true
+  secondary: explains
+  reason: "a goal-pursuing agent in any game is a new form; the note adds that it explains what it intends to do"
+- technique: generalist-game-agents
+  mechanic: natural-language-interaction
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "grounded conversation deepens the language channel; its explanations concern the agent's actions, not this mechanic's state"
+- technique: generalist-game-agents
+  mechanic: programming-by-demonstration
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "routines learned from one narrated demonstration are something literal step recording could not produce"
+- technique: generalist-game-agents
+  mechanic: tech-tree
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "agents test progression in unseen builds"
+- technique: generalist-game-agents
+  mechanic: unit-commands
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "open-ended orders beyond bound verbs are something fixed command menus could not offer"
+- technique: generated-3d-worlds
+  mechanic: procedural-build-assist
+  effect: replaces-substrate
+  compliant: false
+  was: enables-new
+  secondary: cuts-authoring-cost
+  reason: "the note calls it the same rough-input to detailed-output contract as existing build assist with a learned generator, a substrate swap; as an editor mode it also saves authoring"
+- technique: generated-3d-worlds
+  mechanic: procedural-terrain
+  effect: enables-new
+  compliant: true
+  secondary: cuts-authoring-cost
+  reason: "maps from a prompt or photo that persist and expand are something a seed and noise pipeline could not produce; made offline, they also save authoring"
+- technique: generated-3d-worlds
+  mechanic: rigid-body-physics
+  effect: cuts-authoring-cost
+  compliant: true
+  secondary: null
+  reason: "exported collider meshes give generated scenes collision geometry"
+- technique: generated-3d-worlds
+  mechanic: scenario-objectives
+  effect: cuts-authoring-cost
+  compliant: true
+  secondary: null
+  reason: "scenario maps made from a reference; objectives are still authored"
+- technique: generative-agents
+  mechanic: agent-inspection
+  effect: explains
+  compliant: true
+  secondary: null
+  reason: "readable memories and interviews address the player's understanding of why an agent acted"
+- technique: generative-agents
+  mechanic: aspiration-wants
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "wants generated from an agent's own memories are something a fixed table could not produce"
+- technique: generative-agents
+  mechanic: daily-schedules
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "agents write their own plans in place of routine tables"
+- technique: generative-agents
+  mechanic: gossip-propagation
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "spread through generated conversation; gossip already runs on conversation in most of its catalog games, so the richer content deepens it"
+- technique: generative-agents
+  mechanic: memories-thoughts
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "retrievable free-text memories and reflections are something a catalog of timed modifiers could not produce"
+- technique: generative-agents
+  mechanic: offscreen-life-progression
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "summarized memory streams compute off-screen histories, so replaces substrate arguably comes first; the note names no replaced rule and claims persistence, so the label is left for a second rater"
+- technique: generative-agents
+  mechanic: relationship-values
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "relationships are held as remembered interactions instead of a number"
+- technique: generative-agents
+  mechanic: social-exchanges
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "open-ended conversation and coordination need no catalog of moves"
+- technique: generative-agents
+  mechanic: utility-action-selection
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "the next action comes from a prompt instead of need-curve scores"
+- technique: genie-world-models
+  mechanic: direct-avatar
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "movement is rendered by the model from input"
+- technique: genie-world-models
+  mechanic: generative-content
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "whole playable scenes from player text are a new form of generated content"
+- technique: genie-world-models
+  mechanic: god-powers
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "free-form text events are a god power no fixed power list could offer"
+- technique: genie-world-models
+  mechanic: procedural-terrain
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "worlds from a prompt in any visual style are something a seed and noise pipeline could not produce"
+- technique: genie-world-models
+  mechanic: rigid-body-physics
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "object responses come from learned video dynamics instead of a physics engine"
+- technique: genie-world-models
+  mechanic: storyteller-director
+  effect: cuts-authoring-cost
+  compliant: true
+  secondary: null
+  reason: "a director's events are rendered from a prompt, removing per-event art"
+- technique: genie-world-models
+  mechanic: weather
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "promptable weather by text is something the weather system could not produce; borderline, since the change is visual only and nothing reads it"
+- technique: graph-network-simulators
+  mechanic: flight-aerodynamics
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "surrogate flow fields drive the flight model instead of fixed lift and drag tables, while its role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: graph-network-simulators
+  mechanic: fluid-gas-simulation
+  effect: accelerates
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "a learned surrogate computes the flow, so replaces substrate arguably comes before accelerates; the note claims the same flow at large speedups and names no replaced rule, so the label is left for a second rater"
+- technique: graph-network-simulators
+  mechanic: hydrology
+  effect: accelerates
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "the note calls the neural operator a replacement for per-cell iterative water-flow updates, a substrate swap; the one-pass speed is secondary, so replaces substrate comes first in the written order; the note also supports accelerates, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: graph-network-simulators
+  mechanic: material-interactions
+  effect: deepens
+  compliant: false
+  secondary: cuts-authoring-cost
+  ahead: replaces-substrate
+  reason: "one learned model computes mixed-material reactions in place of hand-written pairwise rules, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: graph-network-simulators
+  mechanic: soft-body-deformation
+  effect: accelerates
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "a learned surrogate computes the deformation, so replaces substrate arguably comes before accelerates; the note claims speed and names no replaced rule in the game, so the label is left for a second rater"
+- technique: graph-network-simulators
+  mechanic: structural-integrity
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "stress fields from a learned surrogate replace binary support checks, while the mechanic's role stays; graded failure is the deepening, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: human-behavior-simulation-models
+  mechanic: advertising-awareness
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "response is predicted by a model of human choice in place of a flat awareness multiplier, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: human-behavior-simulation-models
+  mechanic: crowd-preferences
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "profiles grounded in real people make visitors' preferences realistic; the technique supplies inputs, it does not compute the choices"
+- technique: human-behavior-simulation-models
+  mechanic: customer-value-choice
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "decisions sampled from a trained choice model instead of a utility formula"
+- technique: human-behavior-simulation-models
+  mechanic: dilemma-cards
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "predicted pick rates test cards before ship"
+- technique: human-behavior-simulation-models
+  mechanic: elections
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "an electorate built from survey-grounded agents computes the vote, so replaces substrate arguably comes first; the note claims fidelity and names no replaced rule, so the label is left for a second rater"
+- technique: human-behavior-simulation-models
+  mechanic: interest-groups
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "preferences derived from simulated members are a richer input to the same mechanic"
+- technique: human-behavior-simulation-models
+  mechanic: negotiation
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "acceptance follows a model of human bargaining in place of a single reservation price, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: human-behavior-simulation-models
+  mechanic: personality-traits
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "a text profile whose predicted behavior matches a real person stands in for a few trait tags, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: human-behavior-simulation-models
+  mechanic: travel-mode-choice
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "mode-choice weights are fitted to predicted choices"
+- technique: imperfect-information-solvers
+  mechanic: auctions
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "AI bidders play mixed strategies instead of a fixed fraction of value"
+- technique: imperfect-information-solvers
+  mechanic: fog-of-war
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "AI opponents now respect hidden state, so concealment matters; the fog rules themselves are unchanged"
+- technique: imperfect-information-solvers
+  mechanic: military-operations
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "equilibrium strategies would make the opponents' decisions, so replaces substrate arguably comes first; the note claims deception at calibrated rates and names no replaced rule, so the label is left for a second rater"
+- technique: imperfect-information-solvers
+  mechanic: negotiation
+  effect: enables-new
+  compliant: false
+  was: deepens
+  secondary: null
+  ahead: replaces-substrate
+  reason: "equilibrium strategies bluff and concede in ways scripted thresholds cannot, which the note claims outright, so enables new form comes before deepens; replaces substrate comes before both in the written order (they decide in place of scripted thresholds), on the boundary the header describes"
+- technique: imperfect-information-solvers
+  mechanic: rival-firms
+  effect: deepens
+  compliant: true
+  secondary: tunes
+  reason: "competitors that bluff add variety; the note adds measuring a pricing script's exploitability, a test"
+- technique: imperfect-information-solvers
+  mechanic: scouting-knowledge
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "AI opponents scout and hide, a real counterpart to the player's scouting"
+- technique: learned-level-generation
+  mechanic: adaptive-threat-scaling
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "a difficulty-conditioned generator builds the next map or wave in place of multiplying enemy counts, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: learned-level-generation
+  mechanic: generative-content
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "text-to-level models on the client extend generated content to playable space, in a mechanic that already runs on generation"
+- technique: learned-level-generation
+  mechanic: procedural-terrain
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "a trained generator replaces hand-written noise and placement rules"
+- technique: learned-level-generation
+  mechanic: scenario-objectives
+  effect: cuts-authoring-cost
+  compliant: true
+  secondary: null
+  reason: "scenario maps from a written description, checked by an agent playthrough"
+- technique: learned-motion-synthesis
+  mechanic: direct-avatar
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "a few megabytes of weights stand in for a motion-matching database, so replaces substrate arguably comes first; the note claims affordability and names no replaced rule, so the label is left for a second rater"
+- technique: learned-motion-synthesis
+  mechanic: generative-content
+  effect: enables-new
+  compliant: false
+  was: deepens
+  secondary: deepens
+  reason: "the note says the animation set is no longer fixed by the studio's mocap library, since players author motions from their own video: a form the library could not produce"
+- technique: llm-agent-societies
+  mechanic: elections
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "voters become LLM agents instead of a formula from satisfaction and blocs"
+- technique: llm-agent-societies
+  mechanic: gossip-propagation
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "spread through agent conversation at large scale; gossip already runs on conversation in most of its catalog games, so the scale and mutation deepen it"
+- technique: llm-agent-societies
+  mechanic: labor-market
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "roles that emerge from agents' goals are something job slots could not produce"
+- technique: llm-agent-societies
+  mechanic: needs-decay
+  effect: replaces-substrate
+  added: true
+  compliant: true
+  secondary: deepens
+  reason: "added by the keyword sweep: need levels are updated from the agent's behaviors, outside events, and psychological state and read by its language model, in place of fixed per-tick decay, while needs keep their role; the edge sits on the boundary the header describes and, being new, is coded by the written order"
+- technique: llm-agent-societies
+  mechanic: offscreen-life-progression
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "agent societies generate life events instead of fixed event tables"
+- technique: llm-agent-societies
+  mechanic: persistent-world
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "hundreds of autonomous agents keep a shared world populated, more scale and variety"
+- technique: llm-agent-societies
+  mechanic: player-legislation
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "NPC populations legislate, which was limited to human players"
+- technique: llm-agent-societies
+  mechanic: policy-influence-network
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "a policy's effect is measured on an agent population instead of read from authored edges"
+- technique: llm-agent-societies
+  mechanic: taxation
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "compliance becomes an agent decision in place of an automatic deduction at the set rate, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: llm-explanation-of-state
+  mechanic: advisors
+  effect: explains
+  compliant: false
+  was: deepens
+  secondary: null
+  ahead: replaces-substrate
+  reason: "answers to arbitrary questions about the situation are addressed to the player's understanding, so explains comes before deepens; replaces substrate comes before both in the written order (a language model answers in place of threshold-triggered messages, as the on-device record codes the same advisor), on the boundary the header describes"
+- technique: llm-explanation-of-state
+  mechanic: agent-inspection
+  effect: explains
+  compliant: true
+  secondary: null
+  reason: "a causal account of why an agent acted, addressed to the player"
+- technique: llm-explanation-of-state
+  mechanic: causal-tooltips
+  effect: explains
+  compliant: true
+  secondary: null
+  reason: "a ranked plain-language list of causes, addressed to the player"
+- technique: llm-explanation-of-state
+  mechanic: history-chronicle
+  effect: explains
+  compliant: false
+  was: deepens
+  secondary: deepens
+  reason: "retelling recorded events as biographies and recaps for the player is output addressed to the player's understanding of the record, which comes before deepens"
+- technique: llm-explanation-of-state
+  mechanic: stats-dashboards
+  effect: explains
+  compliant: true
+  secondary: null
+  reason: "graph changes annotated with narrated causes, addressed to the player"
+- technique: llm-game-master
+  mechanic: generative-content
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "the whole narrative becomes generated content, in a mechanic that already runs on generation"
+- technique: llm-game-master
+  mechanic: natural-language-interaction
+  effect: enables-new
+  compliant: false
+  was: deepens
+  secondary: deepens
+  reason: "any typed action is adjudicated instead of matched against a parser's verb list, so unanticipated approaches open narrative paths the parser could not"
+- technique: llm-game-master
+  mechanic: procedural-characters
+  effect: cuts-authoring-cost
+  compliant: true
+  secondary: null
+  reason: "NPC backstories and personalities generated from criteria, removing per-character writing"
+- technique: llm-game-master
+  mechanic: storyteller-director
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "events authored for the exact current state are something a finite incident catalog could not produce"
+- technique: llm-game-master
+  mechanic: triggered-event-chains
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "follow-up beats generated from story state instead of authored templates"
+- technique: llm-game-master
+  mechanic: villager-requests
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "requests tied to the story so far add variety beyond templates"
+- technique: llm-rule-adjudication
+  mechanic: collection-goals
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "open-ended discovery races for never-generated items"
+- technique: llm-rule-adjudication
+  mechanic: combination-discovery
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "an open recipe graph in place of a finite authored one"
+- technique: llm-rule-adjudication
+  mechanic: generative-content
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "generated results persist as shared rules, more durable generated content"
+- technique: llm-rule-adjudication
+  mechanic: hand-crafting
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "an unbounded recipe space is something a finite table could not produce"
+- technique: llm-rule-adjudication
+  mechanic: material-interactions
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "interactions between arbitrary materials are something an authored pair table could not cover"
+- technique: massively-parallel-simulation
+  mechanic: attribute-match-engine
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "millions of simulated matches check weight changes before shipping"
+- technique: massively-parallel-simulation
+  mechanic: creature-learning
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "a creature can learn to move during a session, which canned animation could not do"
+- technique: massively-parallel-simulation
+  mechanic: design-performance-rating
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "many randomized runs give a robustness distribution, more scale in the same rating"
+- technique: massively-parallel-simulation
+  mechanic: modular-assembly
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "a controller trained for each player-built body, which fixed controllers could not give"
+- technique: massively-parallel-simulation
+  mechanic: natural-selection
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "fitness is computed by simulating each individual's behavior in place of summed stat values, while selection keeps its role, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: massively-parallel-simulation
+  mechanic: rigid-body-physics
+  effect: accelerates
+  compliant: true
+  secondary: null
+  reason: "the same solver batched on the GPU, the same output for less compute"
+- technique: massively-parallel-simulation
+  mechanic: traffic-congestion
+  effect: accelerates
+  compliant: true
+  secondary: deepens
+  reason: "a million steps per second, the same simulation for less compute; agent-level traffic at city counts is the scale it buys"
+- technique: massively-parallel-simulation
+  mechanic: utility-action-selection
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "batched rollouts search utility weights against metrics"
+- technique: mean-field-games
+  mechanic: agent-pathfinding
+  effect: accelerates
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "one equilibrium policy replaces per-agent searches, a substrate swap; the saving with agent count is secondary, so replaces substrate comes first in the written order; the note also supports accelerates, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: mean-field-games
+  mechanic: crowd-preferences
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "visitors choose in equilibrium with expected queues in place of greedy choice, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: mean-field-games
+  mechanic: service-queues
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "queue choice computed as equilibrium behavior arguably swaps the joining rule, so replaces substrate comes first; the note names no replaced rule, so the label is left for a second rater"
+- technique: mean-field-games
+  mechanic: supply-demand-pricing
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "prices come from an equilibrium of many small producers and consumers in place of a fixed elasticity formula, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: mean-field-games
+  mechanic: traffic-congestion
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "trip routing becomes an equilibrium computed for the population"
+- technique: mean-field-games
+  mechanic: travel-mode-choice
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "mode split solved as a population equilibrium arguably swaps the per-trip cost comparison; the note names no replaced rule, so the label is left for a second rater"
+- technique: ml-weather-models
+  mechanic: forecasting
+  effect: enables-new
+  compliant: true
+  secondary: explains
+  reason: "calibrated ensembles give forecasts with real uncertainty, which a forecast drawn from the weather table could not; the forecast is also addressed to the player's understanding of the weather state"
+- technique: ml-weather-models
+  mechanic: planetary-climate
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "a fine-tuned earth-system model would compute the coupled climate, arguably a substrate swap; the note is hedged and names no replaced rule, so the label is left for a second rater"
+- technique: ml-weather-models
+  mechanic: pollution-spread
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "a learned forecast would carry plumes on simulated wind, which arguably swaps the diffusion rule; the note names no replaced rule, so the label is left for a second rater"
+- technique: ml-weather-models
+  mechanic: random-disasters
+  effect: enables-new
+  compliant: false
+  was: deepens
+  secondary: deepens
+  ahead: replaces-substrate
+  reason: "threats with forecastable lead time are something dice rolls could not produce, which the note claims, so enables new form comes before deepens; replaces substrate comes before both in the written order (storms emerge from atmospheric state in place of dice rolls), on the boundary the header describes"
+- technique: ml-weather-models
+  mechanic: weather
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "a learned global field computes weather in place of a per-region Markov chain, while weather keeps its role, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: model-based-planning-muzero
+  mechanic: creature-learning
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "the creature learns by planning in a learned model in place of reacting with a fixed network, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: model-based-planning-muzero
+  mechanic: military-operations
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "opponents plan with a learned value function and search where hand-written doctrine is brittle, a swap of the doctrine that governs units, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: model-based-planning-muzero
+  mechanic: policy-toggles
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "converged self-play measures each toggle's effect"
+- technique: model-based-planning-muzero
+  mechanic: rival-firms
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "competitor AI becomes a self-play policy instead of rewritten heuristics"
+- technique: model-based-planning-muzero
+  mechanic: tech-tree
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "self-play reveals dominant research orders"
+- technique: monte-carlo-tree-search
+  mechanic: delegation-to-ai
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "governors that search toward the player's goal arguably swap the scripted controller, so replaces substrate or enables new form comes first; the note names neither outright, so the label is left for a second rater"
+- technique: monte-carlo-tree-search
+  mechanic: faction-diplomacy
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "AI factions weigh options by simulating future turns in place of fixed opinion thresholds, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: monte-carlo-tree-search
+  mechanic: military-operations
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "tactical AI plans action sequences rather than following scripted doctrine, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: monte-carlo-tree-search
+  mechanic: rival-firms
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "rivals choose by rolling the economic model forward in place of bespoke heuristics, as the record codes the MuZero rival, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: monte-carlo-tree-search
+  mechanic: utility-action-selection
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "actions chosen by sampled futures instead of hand-tuned curves"
+- technique: muse-wham
+  mechanic: direct-avatar
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "movement and camera are rendered by the model from input"
+- technique: muse-wham
+  mechanic: generative-content
+  effect: tunes
+  compliant: false
+  was: enables-new
+  secondary: null
+  reason: "a designer's preview of how an inserted object would play is a test of a content change before it is built; the note claims no runtime form of generated content, so enables new form is not supported"
+- technique: muse-wham
+  mechanic: rigid-body-physics
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "movement and collisions follow learned dynamics"
+- technique: neural-cellular-automata
+  mechanic: falling-sand-materials
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "per-cell rules are learned from examples instead of hand-coded"
+- technique: neural-cellular-automata
+  mechanic: procedural-build-assist
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "a seed block that grows into a structure over time is a form instant detailing could not produce"
+- technique: neural-cellular-automata
+  mechanic: procedural-terrain
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "NCA generators replace hand-tuned noise and placement rules"
+- technique: neural-cellular-automata
+  mechanic: voxel-destruction
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "structures that heal from local rules are something respawning could not produce"
+- technique: neural-rendering-shaders
+  mechanic: day-night-cycle
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "dynamic lighting that follows player construction, presentation only"
+- technique: neural-rendering-shaders
+  mechanic: decoration-beauty
+  effect: deepens
+  compliant: true
+  secondary: accelerates
+  reason: "more distinct decor resident at once adds variety; the memory saving is the means"
+- technique: neural-rendering-shaders
+  mechanic: embodied-skill-control
+  effect: accelerates
+  compliant: true
+  secondary: null
+  reason: "more real frames on the same hardware, presentation only"
+- technique: on-device-language-models
+  mechanic: advisors
+  effect: replaces-substrate
+  compliant: true
+  secondary: explains
+  reason: "answers from an on-device model in place of threshold-triggered lines; the answers are also addressed to the player's understanding of the game's systems"
+- technique: on-device-language-models
+  mechanic: memories-thoughts
+  effect: enables-new
+  compliant: false
+  was: deepens
+  secondary: deepens
+  reason: "generated thoughts and reflections replace a list of authored mood modifiers, the change the generative-agents record codes as enables-new; deepens comes after it"
+- technique: on-device-language-models
+  mechanic: natural-language-interaction
+  effect: accelerates
+  compliant: true
+  secondary: null
+  reason: "the same conversation without server cost or round trips"
+- technique: on-device-language-models
+  mechanic: unit-commands
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "spoken open orders to a teammate, a channel menus could not offer"
+- technique: on-device-language-models
+  mechanic: utility-action-selection
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "a small model picks actions over the same action set"
+- technique: open-ended-environment-generation
+  mechanic: adaptive-threat-scaling
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "challenge scales with measured learning progress in place of wealth or time survived, while the mechanic's role stays, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: open-ended-environment-generation
+  mechanic: creature-learning
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "self-proposed practice adds a learning channel alongside player reward"
+- technique: open-ended-environment-generation
+  mechanic: procedural-terrain
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "terrain grows harder along mastered axes, more variety from the same generator"
+- technique: open-ended-environment-generation
+  mechanic: scenario-objectives
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "a model keeps writing new tasks with their checks, which a fixed list could not"
+- technique: open-ended-environment-generation
+  mechanic: villager-requests
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "generated requests with code checks add variety beyond templates"
+- technique: open-interactive-video-models
+  mechanic: content-sharing
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "sharing generated worlds as a prompt and seed image is a new form of shared creation; borderline, since sharing itself is unchanged"
+- technique: open-interactive-video-models
+  mechanic: direct-avatar
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "movement rendered from a camera-action space"
+- technique: open-interactive-video-models
+  mechanic: generative-content
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "content requested by typing during play"
+- technique: open-interactive-video-models
+  mechanic: procedural-terrain
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "a world from any image or sketch is something a noise pipeline could not produce"
+- technique: open-interactive-video-models
+  mechanic: rigid-body-physics
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "contact and motion from video priors"
+- technique: open-interactive-video-models
+  mechanic: vehicle-dynamics
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "handling reproduced from video instead of tire and suspension models"
+- technique: physical-world-foundation-models
+  mechanic: rigid-body-physics
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "learned video dynamics stand in for a physics engine"
+- technique: physical-world-foundation-models
+  mechanic: utility-action-selection
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "goal-image scoring in latent space instead of hand-written curves"
+- technique: physical-world-foundation-models
+  mechanic: vehicle-dynamics
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "scene video predicted under driving inputs with no tire model"
+- technique: physics-based-character-control
+  mechanic: direct-avatar
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "a physical body that adapts footing is computed in place of canned clips, while direct control keeps its role, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: physics-based-character-control
+  mechanic: injury-body-model
+  effect: replaces-substrate
+  compliant: false
+  was: enables-new
+  secondary: null
+  reason: "a wound would limit joint torque in place of an authored limp, while the injury keeps its role; the note says it is a projection, not a new form"
+- technique: physics-based-character-control
+  mechanic: rigid-body-physics
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "characters join the rigid-body simulation, more fidelity in the same mechanic"
+- technique: physics-based-character-control
+  mechanic: smart-objects
+  effect: cuts-authoring-cost
+  compliant: true
+  secondary: null
+  reason: "interactions performed on new furniture without bespoke animation"
+- technique: quality-diversity-search
+  mechanic: design-performance-rating
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "top designs per cell stress-test the rating formula"
+- technique: quality-diversity-search
+  mechanic: machine-boosting
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "searches expose dominant boosting layouts"
+- technique: quality-diversity-search
+  mechanic: modular-assembly
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "mapping the build space exposes dominant combinations before release"
+- technique: quality-diversity-search
+  mechanic: procedural-terrain
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "a shipped archive of maps stands in for a seed-to-map generator, arguably a substrate swap or content made before release; the note claims controlled variety, so the label is left for a second rater"
+- technique: quality-diversity-search
+  mechanic: rival-firms
+  effect: deepens
+  compliant: true
+  secondary: cuts-authoring-cost
+  reason: "distinct rival styles from an archive add variety; they also need no hand-tuned personas"
+- technique: quality-diversity-search
+  mechanic: scenario-objectives
+  effect: cuts-authoring-cost
+  compliant: true
+  secondary: null
+  reason: "scenario sets generated across a grid and filtered by playthroughs"
+- technique: real-time-video-restyling
+  mechanic: generative-content
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "the whole world's look changed by text at runtime"
+- technique: real-time-video-restyling
+  mechanic: procedural-build-assist
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "blocky builds shown as detailed structures in a prompted style, a visual-only form of build assist"
+- technique: realtime-voice-models
+  mechanic: natural-language-interaction
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "spoken full-duplex conversation is a channel dialogue wheels and typed input could not provide"
+- technique: realtime-voice-models
+  mechanic: procedural-characters
+  effect: cuts-authoring-cost
+  compliant: true
+  secondary: null
+  reason: "voices for generated characters without recording sessions"
+- technique: realtime-voice-models
+  mechanic: social-exchanges
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "delivery carries social meaning, more variety in the same exchange"
+- technique: realtime-voice-models
+  mechanic: unit-commands
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "spoken orders parsed into function calls, a more fluid form of a closed command set"
+- technique: satellite-world-reconstruction
+  mechanic: embodied-skill-control
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "real landmarks everywhere extend navigation by eye"
+- technique: satellite-world-reconstruction
+  mechanic: procedural-terrain
+  effect: replaces-substrate
+  compliant: true
+  secondary: null
+  reason: "the world reconstructed from imagery instead of a seed and noise"
+- technique: satellite-world-reconstruction
+  mechanic: real-world-data-feeds
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "real map data becomes scenery at planetary scale"
+- technique: simulation-based-inference
+  mechanic: adaptive-threat-scaling
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "scaling parameters inferred from telemetry targets"
+- technique: simulation-based-inference
+  mechanic: attribute-match-engine
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "parameters fitted to league data"
+- technique: simulation-based-inference
+  mechanic: contagion
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "parameters inferred from outbreak curves"
+- technique: simulation-based-inference
+  mechanic: food-web
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "rates inferred from target time series"
+- technique: simulation-based-inference
+  mechanic: supply-demand-pricing
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "parameters calibrated to price series"
+- technique: simulation-based-inference
+  mechanic: traffic-congestion
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "parameters fitted to observed counts"
+- technique: story-sifting
+  mechanic: gossip-propagation
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "relayed knowledge keeps its causal link to the original event, more fidelity in the same spread"
+- technique: story-sifting
+  mechanic: history-chronicle
+  effect: explains
+  compliant: false
+  was: deepens
+  secondary: deepens
+  reason: "sifting retrieves whole storylines instead of leaving the player to browse records, output addressed to the player's understanding of the record, which comes before deepens; the stored causal links are the deepening"
+- technique: story-sifting
+  mechanic: memories-thoughts
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "characters act on storylines recognized in their own memories, a new form"
+- technique: story-sifting
+  mechanic: storyteller-director
+  effect: enables-new
+  compliant: false
+  was: deepens
+  secondary: explains
+  reason: "a director that selects and frames storylines that already happened, instead of steering events, is a form the steering director could not produce, so the same mechanic does not simply deepen; framing past storylines is also addressed to the player's understanding"
+- technique: story-sifting
+  mechanic: triggered-event-chains
+  effect: explains
+  compliant: true
+  secondary: null
+  reason: "chains can be traced and named after the fact, output addressed to understanding"
+- technique: subspace-neural-physics
+  mechanic: embodied-skill-control
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "tissue and cloth react to tools in real time, richer feedback for the skill"
+- technique: subspace-neural-physics
+  mechanic: soft-body-deformation
+  effect: accelerates
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "a learned subspace model computes the deformation, so replaces substrate arguably comes before accelerates; the note claims the solver's quality at real-time speed and names no replaced rule, so the label is left for a second rater"
+- technique: text-to-3d-assets
+  mechanic: decoration-beauty
+  effect: cuts-authoring-cost
+  compliant: true
+  secondary: null
+  reason: "decor catalogs produced from prompts in seconds"
+- technique: text-to-3d-assets
+  mechanic: generative-content
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "runtime generation extends to placeable 3D props"
+- technique: text-to-3d-assets
+  mechanic: modular-assembly
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "part-split assets could supply new components on request; borderline, not yet shown"
+- technique: voyager-skill-libraries
+  mechanic: agent-skills
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "competence as an accumulating library adds new behaviors"
+- technique: voyager-skill-libraries
+  mechanic: delegation-to-ai
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "a controller acquires routines for situations designers did not code"
+- technique: voyager-skill-libraries
+  mechanic: player-programming
+  effect: enables-new
+  compliant: true
+  secondary: null
+  reason: "player code becomes a growing library written from language"
+- technique: voyager-skill-libraries
+  mechanic: production-chain
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "code-writing agents probe production chains as testers"
+- technique: voyager-skill-libraries
+  mechanic: programming-by-demonstration
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "demonstrated routines stored as reusable code skills"
+- technique: voyager-skill-libraries
+  mechanic: tech-tree
+  effect: tunes
+  compliant: true
+  secondary: null
+  reason: "exploration agents measure how a progression graph is traversed"
+- technique: wave-function-collapse
+  mechanic: procedural-build-assist
+  effect: deepens
+  compliant: true
+  secondary: null
+  reason: "constraint propagation is how this kind of build assist works, made richer over hundreds of modules"
+- technique: wave-function-collapse
+  mechanic: procedural-terrain
+  effect: deepens
+  compliant: false
+  secondary: null
+  ahead: replaces-substrate
+  reason: "tile maps come from constraint propagation over an example or adjacency table in place of noise thresholds, while terrain keeps its role, so replaces substrate comes first in the written order; the note also supports deepens, as coded, on the boundary the header describes, so the label is left for a second rater"
+- technique: wave-function-collapse
+  mechanic: zoning
+  effect: cuts-authoring-cost
+  compliant: true
+  secondary: null
+  reason: "buildings on zones assembled from modular sets rather than authored per lot"

@@ -65,7 +65,7 @@ risks:
 - player-trust
 affects:
 - id: advisors
-  effect: deepens
+  effect: explains
   note: Advisors can answer arbitrary player questions about the current situation and recommend actions
     in context, instead of speaking a fixed catalog of threshold-triggered messages.
 - id: agent-inspection
@@ -81,7 +81,7 @@ affects:
   note: Graph changes can be annotated with narrated causes drawn from the event log, such as which policy
     or disaster preceded a drop.
 - id: history-chronicle
-  effect: deepens
+  effect: explains
   note: Recorded events can be retold as biographies, recaps, or highlight summaries for the player, a
     commentator and reteller role.
 builds_on: []
@@ -104,3 +104,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-llm-agents
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

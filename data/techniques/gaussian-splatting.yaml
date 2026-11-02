@@ -59,7 +59,7 @@ risks:
 - ip-provenance
 affects:
 - id: soft-body-deformation
-  effect: enables-new
+  effect: replaces-substrate
   note: PhysGaussian deforms captured objects with MPM directly on the rendered Gaussians, so a scanned
     real object can bend, dent, or flow without building a node-beam or finite-element mesh first.
 - id: decoration-beauty
@@ -84,3 +84,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-world-models
+  reviewed:
+  - 2026-11-01-es-v3-edge-audits

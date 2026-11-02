@@ -103,6 +103,12 @@ affects:
   effect: replaces-substrate
   note: Unplayed households can be advanced by cheap language-agent societies that generate plausible
     life events instead of fixed event tables.
+- id: needs-decay
+  effect: replaces-substrate
+  note: Need levels can be updated from what an agent did, what happened to it, and its emotional state,
+    and kept as components its language model reads when it plans (AgentSociety's needs hierarchy,
+    Concordia's hunger and thirst components), instead of meters that only decay at fixed per-tick rates
+    and refill by fixed amounts.
 builds_on:
 - generative-agents
 deployed_in:
@@ -131,3 +137,4 @@ provenance:
   reviewed:
   - 2026-10-24-technique-links
   - 2026-10-24-review-fixes
+  - 2026-11-01-es-v3-edge-audits

@@ -95,7 +95,7 @@ affects:
   note: Competitors with private costs or plans can bluff in price wars and market entry, and designers
     can measure how exploitable a fixed AI pricing script is by computing a best response against it.
 - id: negotiation
-  effect: deepens
+  effect: enables-new
   note: Bargaining with hidden reservation values is an imperfect-information game; equilibrium strategies
     bluff and concede in ways scripted thresholds cannot.
 limitations:
@@ -120,3 +120,4 @@ provenance:
   created: 2026-10-24-techniques-rl-design
   reviewed:
   - 2026-10-24-technique-links
+  - 2026-11-01-es-v3-edge-audits

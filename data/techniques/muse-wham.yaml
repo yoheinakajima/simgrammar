@@ -62,7 +62,7 @@ affects:
     is that generated play respects controller input and the game's physics, which is measured statistically
     rather than enforced.
 - id: generative-content
-  effect: enables-new
+  effect: tunes
   note: Designers insert an object or character into a frame and the model generates plausible gameplay
     around it (persistency), giving a preview of how a content change might play before it is built.
 limitations:
@@ -80,3 +80,4 @@ provenance:
   created: 2026-10-24-techniques-world-models
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-11-01-es-v3-edge-audits
