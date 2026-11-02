@@ -1,0 +1,37 @@
+id: 2026-11-01-es-v3-rating-noise
+type: run
+kind: maintenance
+date: '2026-11-01'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: 'Answer review finding D8 without a new rater: simulate how many doubly rated mechanics a reliable
+  ordinal alpha needs, how random rating noise at the observed agreement moves the score correlations
+  of section 5.6 beside Spearman''s correction, and report the doubly rated mechanics'' families against
+  the vocabulary''s.'
+method: 'Read the v0.5 revision brief and finding D8 of the third Explore Science review, AGENTS.md, CONTRACT.md, the raters block and rubric helpers in scripts/analyze.py,
+    report/analysis.yaml rubric_scores, sections 2.6 and 5.6, and book chapters 5 and 13. Added to analyze.py a helper
+    _rating_noise with three parts, parameters and seeds in a new report/analysis.yaml rating_noise block. (1) Sample
+    size: a rating is a standard normal latent value cut at a scale''s stored cumulative shares over the live mechanics;
+    two raters'' latent values correlate at the value (solved by Gauss-Legendre quadrature and bisection) that gives
+    a stated population ordinal alpha, with no shift between raters. For each scale and true alpha (the best observed,
+    0.80, then 0.85 and 0.90), 200 simulated samples per n on a grid of 10 to 400, each with the paper''s bootstrap
+    (2000 resamples, 95% percentile), give the smallest n at which 80% of lower bounds clear 0.67: 120 to 150, 60
+    to 80, and 30 to 40 (table rating-sample-size). A two-rating alpha (_alpha_two) reproduces _alpha_ordinal to 1e-16
+    and was used for speed; simulated alphas and marginals matched their targets. (2) Perturbation: 1000 replicates
+    redraw every stored score as a reading with alpha against it at the lowest observed (0.09), each scale''s own,
+    and the highest (0.80), and recompute the five correlations of score-correlations; realised alpha is within 0.005
+    of target. Legibility-emergence -0.42 becomes median -0.27 at the highest, -0.12 at own, about 0 at the lowest;
+    emergence-tuning 0.61 becomes 0.40, 0.03, about 0. Spearman''s correction with alpha as reliability, capped at
+    1, is beside it (table rating-noise). Both assume independent errors across scales, so neither addresses a shared
+    rater habit; the own level overstates the effect on tuning and emergence, whose disagreement is mostly a shift.
+    (3) Selection: families of the ten doubly rated mechanics against the live vocabulary and the calibration set
+    (table rated-families): 6 of 21 families, information legibility and agents and behavior 3 each; total variation
+    65% against a 57% median for random tens (2000 seeded draws); stored legibility on 2 anchors, 52% of the vocabulary''s
+    SD. Prose: 5.6 gains four paragraphs and two tables and a revised conclusion; 2.6 gains a bullet, the family table, and the simulated sample size in place of "several times larger"; book chapters 5 and 13 gain the sample size and the noise result. Rating-noise adds about 2.5 s to the
+    analysis. Declined: a shift model in the noise simulation (the brief asks for random noise; the prose says what
+    that overstates). No records or sources changed; no voice lines edited.'
+contract_version: '1.2'
+proposals: []
