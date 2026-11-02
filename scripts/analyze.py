@@ -1909,6 +1909,8 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         outcomes[r["outcome"] if r else "open"] += 1
     for k in ["open"] + list(vocab_terms(vocabs, "prediction_outcome")):
         stats[f"n_predictions_{k}"] = outcomes.get(k, 0)
+    # baselines set before any prediction resolves (review F2): reference class, generic-diffusion version, and base rates
+    _prediction_baselines(ents, opps, games, techs, by_id, vocabs, cfg, derived, stats, tables)
 
     # ---------------- raters: agreement between independent ratings, and calibration results
     runs = {r.id: r for r in ents.get("run", [])}
@@ -2651,8 +2653,177 @@ def _second_coding(ents, vocabs, cfg, stats, tables):
             "columns": ["test", "admitted", "admitted_pass", "candidates", "candidates_pass"], "rows": test_rows}
 
 
+PREDICTION_FIELDS = {"reference_class", "generic_diffusion", "thesis", "base_rate", "amended"}
+PREDICTION_RATE_FIELDS = {"class", "precursor", "techniques", "of", "outside"}
+
+
+def _prediction_baselines(ents, opps, games, techs, by_id, vocabs, cfg, derived, stats, tables):
+    """Baselines for the falsifiable predictions, from report/predictions.yaml (its header states the rules).
+
+    Each live opportunity has one entry, written before any prediction resolved: the reference class a resolver counts,
+    what the same event looks like when it arrives by generic diffusion of AI or by classical methods, and what a
+    confirmation must show to count for the opportunity's thesis. The base rates come from the catalog: among the
+    catalog games of the reference class, how many already tag a precursor mechanic or deploy a precursor technique (the
+    feature before the window, or the static or classical form it must go beyond), how many deploy any catalogued
+    learned technique (generic diffusion inside the catalog), and how many deploy a technique that would count. The
+    catalog is a curated set, so these say how common something is among a genre's reference titles, not how likely the
+    event is. The build fails when the file and the data fall out of step: a live prediction without an entry, an entry
+    for a missing or deprecated opportunity, an unknown id, a review count the criteria do not state, or an amendment
+    whose added text the criteria do not contain."""
+    rel = "report/predictions.yaml"
+    spec = read_yaml(ROOT / "report" / "predictions.yaml") or {}
+    pcfg = cfg.get("predictions") or {}
+    classical = set(pcfg.get("classical_techniques") or [])
+    sub_terms = vocab_terms(vocabs, "subgenre")
+    det_terms = vocab_terms(vocabs, "determinism_impact")
+    mech_ids = {m.id for m in by_id.values() if m.type == "mechanic"}
+    tech_by_id = {t.id: t for t in techs}
+    src_ids = {s.id for s in by_id.values() if s.type == "source"}
+    deprecated = {o.id for o in ents.get("opportunity", []) if o.data.get("deprecated")}
+    live_ids = {o.id for o in opps}
+    errs = [f"no entry for live prediction {x}" for x in sorted(live_ids - set(spec))]
+    errs += [f"entry {x} names a {'deprecated' if x in deprecated else 'missing'} opportunity" for x in sorted(set(spec) - live_ids)]
+    # games each technique is deployed in, and the games deploying any learned technique (all but the classical ones)
+    deployed = {t.id: set(t.data.get("deployed_in") or []) for t in techs}
+    learned_games = set().union(*(g for t, g in deployed.items() if t not in classical)) if deployed else set()
+    by_game_tech = defaultdict(set)
+    for t, gs in deployed.items():
+        for g in gs:
+            by_game_tech[g].add(t)
+    uses = {g.id: {m["id"] for m in g.data.get("mechanics") or []} for g in games}
+    subs = {g.id: {g.data.get("subgenre")} | set(g.data.get("subgenre_secondary") or []) for g in games}
+    count_re = re.compile(r"\b\d{1,3}(?:,\d{3})+\b")
+
+    def ids_ok(where, xs, known, kind):
+        for x in xs or []:
+            if x not in known:
+                errs.append(f"{where}: unknown {kind} {x}")
+
+    rows, outside_rows = [], []
+    for o in opps:
+        e = spec.get(o.id)
+        if not isinstance(e, dict):
+            continue
+        w = f"{o.id}"
+        crit = str(o.data["falsifiable_signal"].get("criteria", ""))
+        for k in sorted(set(e) - PREDICTION_FIELDS):
+            errs.append(f"{w}: unknown field {k}")
+        for k in ("reference_class", "generic_diffusion", "thesis"):
+            if not str(e.get(k) or "").strip():
+                errs.append(f"{w}: {k} is empty")
+        for n in count_re.findall(str(e.get("reference_class") or "")):
+            if n not in crit:
+                errs.append(f"{w}: reference_class names {n}, which the criteria do not state")
+        br = e.get("base_rate") or {}
+        for k in sorted(set(br) - PREDICTION_RATE_FIELDS):
+            errs.append(f"{w}: unknown base_rate field {k}")
+        if not str(br.get("of") or "").strip():
+            errs.append(f"{w}: base_rate.of is empty")
+        cl, pre = br.get("class") or {}, br.get("precursor") or {}
+        if not (cl.get("all") or cl.get("subgenres") or cl.get("mechanics")):
+            errs.append(f"{w}: base_rate.class names no subgenre, mechanic, or all: true")
+        ids_ok(w, cl.get("subgenres"), sub_terms, "subgenre")
+        ids_ok(w, cl.get("mechanics"), mech_ids, "mechanic")
+        ids_ok(w, pre.get("mechanics"), mech_ids, "mechanic")
+        ids_ok(w, pre.get("techniques"), tech_by_id, "technique")
+        if pre.get("determinism_impact") and pre["determinism_impact"] not in det_terms:
+            errs.append(f"{w}: unknown determinism_impact {pre['determinism_impact']}")
+        counting = br.get("techniques") or o.data.get("applies") or []
+        ids_ok(w, counting, tech_by_id, "technique")
+        out = br.get("outside")
+        if out:
+            if out.get("source") not in src_ids:
+                errs.append(f"{w}: outside.source {out.get('source')} is not a source record")
+            for k in ("quote", "of"):
+                if not str(out.get(k) or "").strip():
+                    errs.append(f"{w}: outside.{k} is empty")
+        am = e.get("amended")
+        if am:
+            if not str(am.get("added") or "").strip() or str(am["added"]) not in crit:
+                errs.append(f"{w}: amended.added is not in the criteria")
+            try:
+                date.fromisoformat(str(am.get("date")))
+            except ValueError:
+                errs.append(f"{w}: amended.date is not a date")
+        if errs:
+            continue
+        cls = sorted(g for g in uses if cl.get("all") or subs[g] & set(cl.get("subgenres") or []) or uses[g] & set(cl.get("mechanics") or []))
+        pre_t = set(pre.get("techniques") or []) | {t for t, x in tech_by_id.items() if pre.get("determinism_impact") and x.data.get("determinism_impact") == pre["determinism_impact"]}
+        has_pre = [g for g in cls if uses[g] & set(pre.get("mechanics") or []) or by_game_tech[g] & pre_t]
+        has_ai = [g for g in cls if g in learned_games]
+        has_t = [g for g in cls if by_game_tech[g] & set(counting)]
+        n = len(cls)
+        share = round(100 * len(has_pre) / n) if n and pre else None
+        d = derived[o.id]
+        d["prediction_reference_class"] = " ".join(str(e["reference_class"]).split())
+        d["prediction_generic_diffusion"] = " ".join(str(e["generic_diffusion"]).split())
+        d["prediction_thesis"] = " ".join(str(e["thesis"]).split())
+        d["prediction_class_games"] = n
+        d["prediction_precursor_games"] = len(has_pre) if pre else None
+        d["prediction_precursor_pct"] = share
+        d["prediction_learned_games"] = len(has_ai)
+        d["prediction_technique_games"] = len(has_t)
+        rows.append({"opportunity": o.id, "resolve_by": (str(o.data["falsifiable_signal"]["resolve_by"]), o.data.get("name", o.id)), "test": d.get("prediction_test"),
+                     "games": n, "precursor": f"{len(has_pre)} ({share}%)" if pre else "", "learned": len(has_ai),
+                     "technique": len(has_t), "technique_in": sorted(has_t), "precursor_rate_of": " ".join(str(br["of"]).split()),
+                     "_share": share, "_amended": am})
+        if out:
+            outside_rows.append({"opportunity": o.id, "resolve_by": rows[-1]["resolve_by"], "outside_rate_of": " ".join(str(out["of"]).split()),
+                                 "quote": " ".join(str(out["quote"]).split()), "source": out["source"]})
+    if errs:
+        raise ValueError(f"{rel}: " + "; ".join(errs[:12]) + (f"; and {len(errs) - 12} more" if len(errs) > 12 else ""))
+    rows.sort(key=lambda r: r["resolve_by"])          # as the predictions table: by resolve-by date, then name
+    outside_rows.sort(key=lambda r: r["resolve_by"])
+    shares = [r["_share"] for r in rows if r["_share"] is not None]
+    stats["n_prediction_baselines"] = len(rows)
+    stats["n_prediction_baselines_outside"] = len(outside_rows)
+    stats["n_predictions_precursor_present"] = sum(1 for s in shares if s > 0)
+    stats["n_predictions_precursor_absent"] = sum(1 for s in shares if s == 0)
+    stats["n_predictions_precursor_majority"] = sum(1 for s in shares if s >= 50)
+    stats["median_prediction_precursor_pct"] = int(round(float(np.median(shares)))) if shares else 0
+    stats["n_predictions_learned_in_class"] = sum(1 for r in rows if r["learned"])
+    stats["n_predictions_learned_absent"] = sum(1 for r in rows if not r["learned"])
+    stats["n_predictions_technique_in_class"] = sum(1 for r in rows if r["technique"])
+    stats["n_predictions_technique_absent"] = sum(1 for r in rows if not r["technique"])
+    stats["n_predictions_technique_test_in_class"] = sum(1 for r in rows if r["technique"] and r["test"] == "technique")
+    # a class game that already deploys a counting technique cannot settle a bet if it predates the window
+    yr = {g.id: g.data.get("year") for g in games}
+    stats["n_prediction_technique_games_2026_on"] = len({g for r in rows for g in r["technique_in"] if not isinstance(yr.get(g), int) or yr[g] >= 2026})
+    stats["n_games_learned_technique"] = len(learned_games & set(uses))
+    # size bars: criteria that name a Steam review count (the planning prediction names a city size instead)
+    bar_re = re.compile(r"\d[\d,]* Steam user reviews")
+    stats["n_predictions_without_review_bar"] = sum(1 for o in opps if not bar_re.search(str(o.data["falsifiable_signal"].get("criteria", ""))))
+    # the amendments: how many criteria gained a size threshold, on what date, and how many predictions had resolved by then
+    am_dates = sorted({str(r["_amended"]["date"]) for r in rows if r["_amended"]})
+    stats["n_predictions_amended"] = sum(1 for r in rows if r["_amended"])
+    if am_dates:
+        stats["prediction_amendment_date"] = am_dates[-1]
+        stats["prediction_amendment_date_long"] = written_dates(am_dates[-1])[0]
+        stats["n_predictions_resolved_by_amendment"] = sum(
+            1 for o in opps if (o.data["falsifiable_signal"].get("resolution") or {}).get("date") and str(o.data["falsifiable_signal"]["resolution"]["date"]) <= am_dates[-1])
+    for r in rows:
+        r.pop("_share"), r.pop("_amended")
+    tables["prediction-base-rates"] = {
+        "description": "Base rates for each prediction from the catalog (report/predictions.yaml). Games: catalog games in the prediction's "
+                       "reference class, by subgenre or mechanic. Precursor: how many of them already have the precursor the last "
+                       "column describes, with the share. Learned: how many deploy any catalogued learned technique, the catalog's own "
+                       "generic diffusion. Technique: how many deploy a technique that would count (for a technique test, the class its criteria "
+                       "name; for a feature test, one the opportunity applies), and technique in names them. The catalog is chosen for lineage "
+                       "and mechanic coverage, not sampled from a store, so a rate here describes the genre's reference titles, not the chance "
+                       "of the event.",
+        "columns": ["opportunity", "test", "games", "precursor", "learned", "technique", "technique_in", "precursor_rate_of"],
+        "rows": rows, "link_columns": ["opportunity", "technique_in"]}
+    tables["prediction-outside-rates"] = {
+        "description": "Base rates from outside the catalog, for predictions where a store-wide count fits better: what the count is a rate "
+                       "of, the source's own words, and the source record.",
+        "columns": ["opportunity", "outside_rate_of", "quote", "source"], "rows": [{k: v for k, v in r.items() if k != "resolve_by"} for r in outside_rows],
+        "link_columns": ["opportunity", "source"]}
+    for r in rows:
+        r.pop("resolve_by")
+
+
 # ======================================================================= SVG
-_FONT = "style=\"font-family:var(--mono,'IBM Plex Mono',ui-monospace,Menlo,monospace);font-size:10px\""
+_FONT ="style=\"font-family:var(--mono,'IBM Plex Mono',ui-monospace,Menlo,monospace);font-size:10px\""
 
 
 def _svg(w, h, body):

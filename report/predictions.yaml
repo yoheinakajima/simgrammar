@@ -1,0 +1,601 @@
+# Baselines for the falsifiable predictions (report section 11; Explore Science review F2), set before any resolves.
+#
+# Who and when. Written on 2026-11-01 in run 2026-11-01-es-v3-prediction-baselines (operator yoheinakajima, model
+# claude-opus-5-5, Claude Code desktop app). No prediction had resolved. The same model wrote the predictions (run
+# 2026-10-24-synthesis) and classified them (run 2026-10-31-es-review-v2-fixes), so these entries are that model's
+# reading of its own bets, not an independent one.
+#
+# One entry per live opportunity, keyed by its id. scripts/analyze.py reads the file, and the build fails when a live
+# opportunity has no entry, an entry names an opportunity that is missing or deprecated, a text field is empty, a
+# base-rate id is not a catalog record or subgenre term, a review count that a reference class names is not in the
+# prediction's criteria, or an amendment's added text is not in them.
+#
+# What each field means.
+# - An entry never changes an outcome. The criteria alone decide confirmed, refuted, or ambiguous
+#   (tasks/resolve-prediction.md). The entry decides what a confirmation shows.
+# - reference_class: the titles, or the studios, vendors, or cities, that a resolver counts. Steam tags are the ones on
+#   store.steampowered.com/tag/browse on 2026-11-01. "The window" runs from 2026-10-24 to the resolve-by date.
+# - generic_diffusion: the same event arriving through general adoption of AI (art, voice, chat, or a language model
+#   added to an existing feature) or through classical methods, without the opportunity's mechanism.
+# - thesis: what the evidence must show for a confirmation to count for the opportunity's thesis rather than for
+#   generic diffusion. A confirmation without it is recorded as generic diffusion.
+# - base_rate, computed from the catalog by scripts/analyze.py:
+#     class      the catalog games of the reference class: games whose primary or secondary subgenre is listed, or that
+#                tag a listed mechanic (all: true takes every game);
+#     precursor  class games that already tag a listed mechanic or deploy a listed technique: the feature itself before
+#                the window, or the static or classical form the prediction must go beyond (optional);
+#     techniques the catalogued techniques whose deployment in a class game would count (default: those the
+#                opportunity applies); for a technique test, those in the class its criteria name;
+#     of         in words, what the precursor rate counts;
+#     outside    a count from an existing source record, with the quote that states it, checked on the live page on
+#                2026-11-01, where a count outside the catalog fits better.
+#   The catalog is chosen for lineage and mechanic coverage, not sampled from a store, so a catalog rate says how common
+#   a precursor is among a genre's reference titles. It is not the probability of the event.
+# - amended: the date a size threshold was added to the criteria and the text added. An amendment only adds a
+#   condition, so any title that meets the amended criteria also met the original ones: it can make a prediction harder
+#   to confirm, never easier.
+
+agent-ambassadors-async:
+  reference_class: Titles with at least 1,000 Steam user reviews, or console releases, tagged Massively Multiplayer,
+    MMORPG, Asynchronous Multiplayer, or Trading, that let players trade with each other and first ship the feature in
+    the window.
+  generic_diffusion: A language-model chat companion or AI-written dialogue in a multiplayer game, or standing market
+    orders that fill while their owner is offline. Neither negotiates for the absent player.
+  thesis: The agent bargains with other players, choosing offers or counteroffers for its owner while the owner is
+    offline. An order that fills at a price the owner set is a market, not a representative, and counts as generic.
+  base_rate:
+    class: {mechanics: [async-shared-region, persistent-world, player-driven-market]}
+    precursor: {mechanics: [delegation-to-ai, negotiation]}
+    of: Catalog games with shared regions, persistent worlds, or player markets that already hand decisions to AI
+      managers or run AI negotiation.
+
+ai-liquidity-in-player-markets:
+  reference_class: Persistent online games with a player-driven market, at least 1,000 Steam user reviews or a console
+    release, tagged Massively Multiplayer, MMORPG, Trading, or Economy, that announce or ship AI traders in the window.
+  generic_diffusion: Fixed-price NPC vendors, scripted market makers, or language-model shopkeepers that talk, none fitted
+    to trades players made.
+  thesis: Developer material says the AI traders' behavior was trained or calibrated on logged player trades, the
+    opportunity's fitted behavior model. A statement that "AI" supports the economy, with no fit to player data, is
+    generic.
+  base_rate:
+    class: {mechanics: [player-driven-market]}
+    precursor: {mechanics: [supply-demand-pricing, auctions]}
+    of: Catalog games with player order books whose prices already respond to supply and demand by rule, or that run
+      auctions, the classical market AI traders would join.
+  amended:
+    date: '2026-11-01'
+    added: and at least 1,000 Steam user reviews or a console release
+
+bottleneck-explainer:
+  reference_class: Titles tagged Automation or City Builder with at least 1,000 Steam user reviews, or official mod tools
+    for them, that first ship the feature in the window.
+  generic_diffusion: A language-model assistant that answers questions about the game from its wiki or general knowledge,
+    or a ratio calculator or throughput overlay. Neither re-runs the player's own network.
+  thesis: The named constraint is computed by perturbing or re-running the player's own save. That confirms the
+    opportunity's mechanism whatever the method; it shows differentiable simulation or language explanation landed only
+    if the material names one.
+  base_rate:
+    class: {subgenres: [factory-automation, city-builder]}
+    precursor: {mechanics: [stats-dashboards, data-overlays, causal-tooltips]}
+    of: Catalog factory and city-building games that already show production statistics, data overlays, or modifier
+      tooltips, the static displays the feature must go beyond.
+
+branch-preview-forecasts:
+  reference_class: Titles tagged City Builder, Colony Sim, or Grand Strategy with at least 1,000 Steam user reviews that
+    first ship the feature in the window.
+  generic_diffusion: A single projection of the budget or a resource runway, or a language model describing likely
+    outcomes without running the simulation.
+  thesis: Several forward runs from the live save, under different random draws, are shown before a decision. It shows a
+    learned surrogate or GPU-parallel simulation landed only if the material names one.
+  base_rate:
+    class: {subgenres: [city-builder, colony-sim, grand-strategy]}
+    precursor: {mechanics: [forecasting]}
+    of: Catalog city builders, colony sims, and grand strategy games that already project one future state, such as a
+      budget or resource runway.
+
+calibrated-serious-sims:
+  reference_class: Playable serious or educational simulations released in the window by any publisher, university, or
+    agency (Steam tags Education or Science, where on Steam) with at least 1,000 Steam user reviews or at least 100
+    players reported in a study.
+  generic_diffusion: An educational simulation with parameters set by hand or taken from the literature, or one that adds
+    a language-model tutor. Neither reports a fit to data.
+  thesis: The release reports the calibration method, the data it was fitted to, and a goodness-of-fit metric. It shows
+    simulation-based inference landed only if the method is neural simulation-based inference.
+  base_rate:
+    class: {all: true}
+    precursor: {mechanics: [real-world-data-feeds]}
+    of: Catalog games whose state is set or driven by real-world data, the nearest catalogued form of fitting a
+      simulation to data.
+  amended:
+    date: '2026-11-01'
+    added: with at least 1,000 Steam user reviews or at least 100 players reported in a study
+
+causal-why-query:
+  reference_class: Titles tagged Simulation or Strategy with at least 10,000 Steam user reviews that first ship the
+    feature in the window.
+  generic_diffusion: A language-model chatbot or help assistant that answers from a wiki, a manual, or general knowledge,
+    or AI characters that chat, without reading the player's save. The criteria already exclude the first.
+  thesis: The answer cites causes from the player's own save, traced through the game's state or event log. It shows a
+    language model landed only if the notes say one writes the answers.
+  base_rate:
+    class: {all: true}
+    precursor: {mechanics: [causal-tooltips, agent-inspection]}
+    of: Catalog games that already show why a value or a behavior came about, through modifier tooltips or agent
+      inspection panels, without free-text questions.
+
+content-elastic-events:
+  reference_class: Titles tagged Grand Strategy, Life Sim, Management, or Dynamic Narration with at least 1,000 Steam user
+    reviews that first ship runtime-generated events in the window.
+  generic_diffusion: Event text, names, or art generated before release and disclosed in the Steam content survey as
+    pre-generated, or generated flavor text attached to authored events.
+  thesis: Events are generated during play and must pass a fixed schema of triggers, options, and effects. It shows
+    language models landed only if the disclosure or documentation says one writes the events.
+  base_rate:
+    class: {subgenres: [grand-strategy, life-sim, management-tycoon, political-sim]}
+    precursor: {mechanics: [triggered-event-chains, dilemma-cards]}
+    of: Catalog grand strategy, life, management, and political sims that already fire authored event templates or
+      dilemma cards, the authored form the generator would extend.
+    outside:
+      source: src-totallyhuman-2025-steam-genai-count
+      quote: a little under 20% of all games released in 2025 have disclosed such use
+      of: Steam releases of 2025 that disclose generative AI in the content survey, for any use, as counted in July 2025.
+
+drama-aware-storyteller:
+  reference_class: Titles tagged Colony Sim or Survival with at least 1,000 Steam user reviews that first ship the event
+    director in the window.
+  generic_diffusion: Generated event text or character dialogue, which the criteria exclude, or a classical director that
+    paces events by a threat budget, as RimWorld's storytellers do.
+  thesis: A language model scores or ranks authored candidate events against the current story state at runtime, as the
+    criteria require.
+  base_rate:
+    class: {subgenres: [colony-sim, survival-sim]}
+    precursor: {mechanics: [storyteller-director, triggered-event-chains]}
+    techniques: [llm-game-master]
+    of: Catalog colony and survival sims that already pace events with a classical director or fire authored event
+      chains.
+    outside:
+      source: src-totallyhuman-2025-steam-ai-revenue
+      quote: 'Runtime Generative Systems: <5%'
+      of: Uses cited by the 45 Steam titles with generative AI disclosures and an estimated gross of 1 million dollars or
+        more, as counted in November 2025; runtime systems are under 5 percent.
+
+dream-replay-layer:
+  reference_class: Titles with at least 1,000 Steam user reviews, or console releases, tagged Simulation, Colony Sim, or
+    Life Sim, that first ship the feature in the window.
+  generic_diffusion: Key art, trailers, or cutscenes generated before release, which the criteria exclude, or replays of
+    recorded gameplay footage.
+  thesis: The visuals depict past events of the player's own run, drawn from its event log. It shows a world model landed
+    only if the material says one draws them.
+  base_rate:
+    class: {all: true}
+    precursor: {mechanics: [history-chronicle, history-generation]}
+    of: Catalog games that already keep a structured history of simulated events, the log the visuals would be drawn
+      from.
+
+event-sourced-sim-runtime:
+  reference_class: Engines, middleware, and open-source libraries released in the window, counted only when a shipped
+    title with at least 1,000 Steam user reviews uses them.
+  generic_diffusion: General logging or telemetry, or deterministic replay of conventional gameplay (lockstep netcode, a
+    replay system) that does not record model outputs.
+  thesis: The documentation describes recording generative model outputs into a log the game replays. It is a feature
+    test of infrastructure, so it shows no learned technique landed.
+  base_rate:
+    class: {all: true}
+    precursor: {determinism_impact: breaks}
+    of: Catalog games that already deploy a technique whose record says it breaks determinism, the titles such a layer
+      would serve.
+
+explained-delegation:
+  reference_class: Titles tagged Grand Strategy, 4X, or Management with at least 1,000 Steam user reviews that first ship
+    the feature in the window.
+  generic_diffusion: AI governors driven by fixed presets or difficulty settings, which the criteria exclude, or a
+    language-model advisor that comments without adapting.
+  thesis: Delegated subsystems change their policy from the specific player's recorded choices. It shows a learned or
+    planning technique landed only if the material names a model trained on those choices.
+  base_rate:
+    class: {subgenres: [grand-strategy, 4x-strategy, management-tycoon, business-economic-sim]}
+    precursor: {mechanics: [delegation-to-ai]}
+    of: Catalog strategy and management games that already hand subsystems to AI managers with fixed rules.
+
+generated-inspection-shifts:
+  reference_class: Titles tagged Job Simulator, or inspection and bureaucracy games, released in the window with at least
+    1,000 Steam user reviews.
+  generic_diffusion: A language model writing applicant dialogue or document text with no answer key computed from the
+    rules, or authored case lists.
+  thesis: Each case's correct outcome is computed from the game's rules, not authored per case. It shows a language model
+    landed only if the material says one writes the cases.
+  base_rate:
+    class: {subgenres: [job-sim]}
+    precursor: {mechanics: [rule-checking-inspection]}
+    of: Catalog job sims that already check documents or cargo against a rulebook, with authored cases.
+
+generated-recipe-graphs:
+  reference_class: Titles tagged Automation or Crafting with at least 1,000 Steam user reviews, or mods with at least
+    10,000 downloads on an official portal, released in the window.
+  generic_diffusion: Generated item art, names, or descriptions, or a randomizer that only reshuffles an authored graph's
+    numbers.
+  thesis: The recipe graph's structure, which inputs make which outputs, was produced or shaped by a generative tool. It
+    shows a catalogued technique landed only if the material names search with playtesting agents or a model proposing
+    recipes.
+  base_rate:
+    class: {mechanics: [production-chain, hand-crafting, combination-discovery]}
+    precursor: {mechanics: [generative-content]}
+    of: Catalog games with recipe graphs in which a generative model already creates content, such as recipes, at
+      runtime.
+
+generative-decoration-catalogs:
+  reference_class: Life or management sims other than inZOI, tagged Life Sim or Management, with at least 5,000 Steam user
+    reviews or a console release, that first ship the feature in the window.
+  generic_diffusion: Catalog objects or textures the developer generated before release, or generated 2D images and
+    patterns applied to existing objects.
+  thesis: Players generate new placeable 3D objects inside the game from text or images. It shows a learned model landed
+    only if the material says one makes the objects.
+  base_rate:
+    class: {subgenres: [life-sim, management-tycoon]}
+    precursor: {mechanics: [content-sharing]}
+    techniques: [text-to-3d-assets, gaussian-splatting]
+    of: Catalog life and management sims that already let players share objects and builds they made by hand.
+
+human-calibrated-customers:
+  reference_class: Titles tagged Management, City Builder, Shop Keeper, or Capitalism with at least 1,000 Steam user
+    reviews, released or patched in the window.
+  generic_diffusion: Language-model customers or citizens who chat or invent requests while demand stays hand-tuned, or a
+    general model prompted to play customers.
+  thesis: Demand or preference parameters come from a model fitted to, or checked against, data on human behavior. A
+    language model with no such fit meets the criteria as written but counts as generic.
+  base_rate:
+    class: {subgenres: [management-tycoon, city-builder, business-economic-sim]}
+    precursor: {mechanics: [customer-value-choice, crowd-preferences, citizen-satisfaction]}
+    of: Catalog management, city-building, and business games whose customers or citizens already choose by authored
+      preference or satisfaction rules.
+
+illustrated-chronicles:
+  reference_class: Titles tagged Colony Sim, City Builder, Grand Strategy, Life Sim, or Sandbox with at least 1,000 Steam
+    user reviews that first ship the feature in the window.
+  generic_diffusion: A screenshot or share button, generated share art, or a summary of play statistics that does not
+    draw on the run's event history.
+  thesis: An automatically written history of the run, drawn from its event log, that the player can export or share. It
+    shows a language model landed only if the notes say one writes it.
+  base_rate:
+    class: {subgenres: [colony-sim, city-builder, grand-strategy, life-sim, sandbox-world, rpg-sim]}
+    precursor: {mechanics: [history-chronicle]}
+    of: Catalog systemic games that already record significant events into a history the player can browse.
+
+intent-level-orders:
+  reference_class: Titles tagged Colony Sim or Management with at least 1,000 Steam user reviews that first ship the
+    feature in the window.
+  generic_diffusion: Voice or chat commands that trigger one immediate action, or a language-model companion that talks,
+    without standing orders written into the job system.
+  thesis: Free-text standing orders are translated into the game's existing work or priority settings and persist. It
+    shows a language model landed only if the material says one translates them.
+  base_rate:
+    class: {subgenres: [colony-sim, management-tycoon]}
+    precursor: {mechanics: [work-priorities, designation-orders]}
+    of: Catalog colony and management sims that already take standing orders through priority tables or designations.
+
+language-modding:
+  reference_class: Developers of simulation titles with at least 10,000 Steam user reviews and an official modding API
+    (Steam tag Moddable), shipping or endorsing the tool in the window.
+  generic_diffusion: Modders using a general-purpose coding assistant, or an official help bot that answers modding
+    questions without producing a working mod.
+  thesis: The developer ships or endorses a tool that turns a text description into working mod code or data. It shows a
+    language model landed only if the tool's material says one writes the mod.
+  base_rate:
+    class: {all: true}
+    precursor: {mechanics: [modding-api]}
+    of: Catalog games with an official modding API, the precondition the prediction names.
+
+learned-build-assist:
+  reference_class: Titles tagged City Builder with at least 1,000 Steam user reviews that first ship the feature in the
+    window.
+  generic_diffusion: Procedural brushes that grow detail by hand-written rules, as in Townscaper, or generated decoration
+    assets.
+  thesis: Documentation says a model trained on layout data generates the streets or districts from the player's strokes,
+    as the criteria require.
+  base_rate:
+    class: {subgenres: [city-builder]}
+    precursor: {mechanics: [procedural-build-assist]}
+    techniques: [learned-level-generation]
+    of: Catalog city builders that already turn coarse player input into detail by procedural rules.
+
+learned-material-surrogates:
+  reference_class: Titles with at least 1,000 Steam user reviews, or console releases, tagged Physics, Destruction,
+    Sandbox, or Simulation, released in the window.
+  generic_diffusion: Neural upscaling, frame generation, or learned visual effects on a classical solver, which change what
+    is drawn and not the material state.
+  thesis: A trained neural model computes physical material behavior during play, as the criteria require.
+  base_rate:
+    class: {subgenres: [physics-sandbox, construction-engineering, sandbox-world]}
+    precursor: {mechanics: [fluid-gas-simulation, voxel-destruction, falling-sand-materials, soft-body-deformation]}
+    techniques: [graph-network-simulators, subspace-neural-physics, neural-cellular-automata]
+    of: Catalog physics, construction, and sandbox games that already simulate fluids, destruction, or deformable
+      materials with classical solvers.
+
+learned-weather-layer:
+  reference_class: Titles tagged Farming Sim, Flight, or City Builder with at least 1,000 Steam user reviews, or console
+    releases, that first ship the feature in the window.
+  generic_diffusion: Live forecast feeds, scripted weather states, or neural rendering of clouds and sky.
+  thesis: A machine-learned emulator generates the weather that runs in the shipped game, as the criteria require.
+  base_rate:
+    class: {subgenres: [farming-sim, flight-sim, city-builder]}
+    precursor: {mechanics: [weather, real-world-data-feeds]}
+    techniques: [ml-weather-models]
+    of: Catalog farming, flight, and city-building games that already run weather states or real-world weather
+      feeds.
+
+living-workforce-factories:
+  reference_class: Titles tagged Automation released in the window that reach 1,000 Steam user reviews by the resolve-by
+    date.
+  generic_diffusion: Factory games that add language-model chatter or generated portraits for workers, without aging,
+    training, and succession.
+  thesis: The Steam page describes workers who age, train, and are replaced by a next generation. It shows generative
+    agents landed only if the page says language models drive the workers.
+  base_rate:
+    class: {subgenres: [factory-automation]}
+    precursor: {mechanics: [lifecycle-aging, education-workforce]}
+    of: Catalog factory and automation games whose workers already age or are schooled into a labor pool.
+
+llm-society-terrarium:
+  reference_class: Titles released in the window, tagged Simulation, God Game, or Artificial Intelligence, that reach
+    1,000 Steam user reviews by the resolve-by date.
+  generic_diffusion: A game with a handful of language-model characters, or a scripted agent society of many agents.
+    Neither has at least 50 language-model agents as its core loop.
+  thesis: The Steam page or documentation confirms a society of at least 50 language-model agents as the core loop, as the
+    criteria require.
+  base_rate:
+    class: {subgenres: [ai-native, god-game, artificial-life, social-sim]}
+    precursor: {mechanics: [utility-action-selection, memories-thoughts]}
+    techniques: [llm-agent-societies, generative-agents]
+    of: Catalog AI-native, god, artificial-life, and social games whose agents already choose actions by scored needs or
+      carry memories.
+    outside:
+      source: src-totallyhuman-2025-steam-ai-revenue
+      quote: 'Runtime Generative Systems: <5%'
+      of: Uses cited by the 45 Steam titles with generative AI disclosures and an estimated gross of 1 million dollars or
+        more, as counted in November 2025; runtime systems are under 5 percent.
+
+local-first-ai-sims:
+  reference_class: Titles of any genre with more than 1,000 Steam user reviews whose local-model feature first ships in
+    the window; five are needed.
+  generic_diffusion: Cloud-hosted language-model features that need a connection, or generative AI used before release.
+  thesis: Store pages or documentation confirm that the model runs on the player's machine at runtime without an internet
+    connection, in five titles, as the criteria require.
+  base_rate:
+    class: {all: true}
+    precursor: {techniques: [llm-game-master, generative-agents, realtime-voice-models, llm-rule-adjudication]}
+    techniques: [on-device-language-models]
+    of: Catalog games that already run a language or voice model at runtime, locally or not.
+    outside:
+      source: src-totallyhuman-2025-steam-ai-revenue
+      quote: 'Runtime Generative Systems: <5%'
+      of: Uses cited by the 45 Steam titles with generative AI disclosures and an estimated gross of 1 million dollars or
+        more, as counted in November 2025; runtime systems are under 5 percent.
+
+mean-field-crowds:
+  reference_class: Titles tagged City Builder with at least 1,000 Steam user reviews, released or patched in the window.
+  generic_diffusion: Agent-based traffic that routes each vehicle or citizen, or generated citizen chatter.
+  thesis: Documentation names a mean-field, continuum, or equilibrium-field method for the main traffic or population
+    model. It shows a learned mean-field solver landed only if the documentation names one.
+  base_rate:
+    class: {subgenres: [city-builder]}
+    precursor: {mechanics: [traffic-congestion, agent-pathfinding]}
+    of: Catalog city builders that already route traffic over a capacitated network or path agents one by one.
+
+mechanic-discovery-search:
+  reference_class: Titles with at least 1,000 Steam user reviews, or console releases, released in the window.
+  generic_diffusion: A developer crediting generative AI for art, text, or brainstormed ideas, or a language model that
+    suggests rules without a search over rule sets.
+  thesis: A developer statement or paper says a shipped rule came out of automated search over rule sets, as the criteria
+    require.
+  base_rate:
+    class: {all: true}
+    precursor: {techniques: [llm-rule-adjudication]}
+    techniques: [alphaevolve-algorithm-discovery, automated-rule-generation, quality-diversity-search]
+    of: Catalog games in which a model already decides the outcome of rules at runtime, the nearest catalogued form of
+      generated rules.
+
+natural-language-legislation:
+  reference_class: Titles tagged Political Sim, City Builder, or Grand Strategy with at least 1,000 Steam user reviews,
+    early access included, that first ship the feature in the window.
+  generic_diffusion: Language-model advisors or citizens who comment on laws picked from a fixed list, or free-text names
+    for preset laws.
+  thesis: A law the player writes in free text changes simulation rules or parameters. It shows a language model landed
+    only if the documentation says one maps the laws.
+  base_rate:
+    class: {subgenres: [political-sim, city-builder, grand-strategy]}
+    precursor: {mechanics: [policy-toggles, player-legislation]}
+    of: Catalog political, city-building, and grand strategy games that already enact laws from a fixed list or from
+      player votes.
+
+negotiating-faction-ai:
+  reference_class: Titles tagged Grand Strategy or 4X with at least 5,000 Steam user reviews that first ship the feature
+    in the window.
+  generic_diffusion: Generated diplomatic flavor text with no link to the offers, or chat with AI leaders whose offers no
+    planner chooses.
+  thesis: Diplomacy in language whose offers a planner or game-state evaluation chooses. It shows dialogue models landed
+    only if the material says a language model writes the messages.
+  base_rate:
+    class: {subgenres: [grand-strategy, 4x-strategy]}
+    precursor: {mechanics: [faction-diplomacy, negotiation]}
+    of: Catalog grand strategy and 4X games that already run menu diplomacy or offer-and-counteroffer negotiation.
+
+neural-npc-motion:
+  reference_class: Titles tagged Colony Sim, Management, City Builder, or Life Sim with at least 1,000 Steam user reviews
+    that first ship the feature in the window.
+  generic_diffusion: Motion matching, learned motion synthesis without physics, or machine learning used to author
+    animation before release.
+  thesis: Documentation names a trained control policy that drives a physics character for population agents, as the
+    criteria require.
+  base_rate:
+    class: {subgenres: [colony-sim, management-tycoon, city-builder, life-sim]}
+    precursor: {techniques: [learned-motion-synthesis]}
+    techniques: [physics-based-character-control, deep-rl-npc-policies]
+    of: Catalog colony, management, city-building, and life sims that already deploy learned motion synthesis without
+      physics, the generic form.
+
+open-ended-evolution-sandbox:
+  reference_class: Titles released in the window, tagged Simulation, Sandbox, Nature, or Science, that reach 1,000 Steam
+    user reviews by the resolve-by date.
+  generic_diffusion: Discrete cellular automata or particle toys, evolution sims with genomes on agents, or generated
+    creature art.
+  thesis: The Steam page or documentation describes a Lenia-family or neural cellular automaton substrate, as the criteria
+    require.
+  base_rate:
+    class: {subgenres: [artificial-life, ecosystem-evolution, physics-sandbox]}
+    precursor: {mechanics: [natural-selection, trait-inheritance, falling-sand-materials]}
+    techniques: [continuous-alife-and-asal, neural-cellular-automata]
+    of: Catalog artificial-life, evolution, and physics-sandbox games that already evolve populations or run discrete
+      cell rules.
+
+parallel-autobalance:
+  reference_class: Studios with a commercial simulation or strategy title of at least 1,000 Steam user reviews that publish
+    talks, blogs, or papers in the window; two are needed.
+  generic_diffusion: Statements that a studio uses generative AI in production (art, code assistants), or bots that test
+    for crashes and coverage rather than economy balance.
+  thesis: Two studios each describe automated agent play at scale used to balance a named title's economy. It shows a
+    catalogued technique landed only if the material names search over agent policies or GPU-parallel simulation.
+  base_rate:
+    class: {subgenres: [city-builder, grand-strategy, 4x-strategy, management-tycoon, business-economic-sim, factory-automation]}
+    precursor: {mechanics: [supply-demand-pricing, budget-treasury]}
+    of: Catalog simulation and strategy games with a priced market or a budget, the economies such balancing would tune.
+
+participatory-planning-sandboxes:
+  reference_class: Cities with at least 100,000 residents that hold official planning consultations in the window, as
+    public planning documents or press releases record them.
+  generic_diffusion: A city using a commercial city builder or a block-building game in workshops without simulated
+    residents, or a language-model chatbot that answers residents' questions about a plan.
+  thesis: The planning record names a tool that simulates residents' responses and records its use in an official
+    consultation. It shows a catalogued technique landed only if the record names calibration to data or language-model
+    residents.
+  base_rate:
+    class: {subgenres: [city-builder]}
+    precursor: {mechanics: [citizen-satisfaction, crowd-preferences]}
+    of: Catalog city builders whose residents already respond to the plan through a satisfaction or preference model, the
+      game-side capability; the rate says nothing about use by governments.
+  amended:
+    date: '2026-11-01'
+    added: of a city with at least 100,000 residents
+
+placement-that-tells-stories:
+  reference_class: Titles or expansions tagged City Builder with at least 1,000 Steam user reviews released in the window.
+  generic_diffusion: Generated citizen chatter, names, or social-media posts not triggered by where the player builds.
+  thesis: Store or developer material lists events that placement decisions trigger and that affect named inhabitants.
+    It shows a language model landed only if the material says one writes the events.
+  base_rate:
+    class: {subgenres: [city-builder]}
+    precursor: {mechanics: [triggered-event-chains, villager-requests]}
+    of: Catalog city builders that already fire authored event chains or inhabitant requests.
+
+qd-scenario-libraries:
+  reference_class: Titles tagged Simulation, Puzzle, or Programming with at least 1,000 Steam user reviews whose content
+    first ships in the window.
+  generic_diffusion: Seeded procedural levels, or scenarios a language model writes, without a quality-diversity search.
+  thesis: Documentation names quality-diversity or MAP-Elites generation for the shipped scenarios, as the criteria
+    require.
+  base_rate:
+    class: {subgenres: [programming-sim, construction-engineering, physics-sandbox]}
+    precursor: {mechanics: [procedural-terrain, scenario-objectives]}
+    techniques: [quality-diversity-search]
+    of: Catalog programming, construction, and physics-sandbox games that already ship authored scenarios or procedural
+      maps.
+
+salience-gated-llm-agents:
+  reference_class: Titles tagged Colony Sim or Life Sim with more than 1,000 Steam user reviews, released or patched in the
+    window; three are needed.
+  generic_diffusion: A language model called for every line of dialogue or every decision, or dialogue generated before
+    release.
+  thesis: Documentation, postmortems, or modders show model calls triggered by discrete events while routine behavior runs
+    on other systems, in three titles, as the criteria require.
+  base_rate:
+    class: {subgenres: [colony-sim, life-sim]}
+    precursor: {mechanics: [utility-action-selection]}
+    techniques: [generative-agents, on-device-language-models]
+    of: Catalog colony and life sims whose routine behavior already runs on scored needs, the non-model layer the gating
+      keeps.
+    outside:
+      source: src-totallyhuman-2025-steam-ai-revenue
+      quote: 'Runtime Generative Systems: <5%'
+      of: Uses cited by the 45 Steam titles with generative AI disclosures and an estimated gross of 1 million dollars or
+        more, as counted in November 2025; runtime systems are under 5 percent.
+
+scientists-not-tech-trees:
+  reference_class: Titles or expansions tagged Grand Strategy, 4X, Management, or Colony Sim with at least 1,000 Steam user
+    reviews released in the window.
+  generic_diffusion: A tech tree with named scientists as stat bonuses, or generated scientist dialogue.
+  thesis: Documentation says research progress depends on relationships between named researcher characters. It shows
+    generative agents landed only if the material says language models drive the researchers.
+  base_rate:
+    class: {subgenres: [grand-strategy, 4x-strategy, management-tycoon, colony-sim]}
+    precursor: {mechanics: [tech-tree]}
+    of: Catalog strategy, management, and colony games whose research already runs on a tech tree.
+
+sim-instructor-coach:
+  reference_class: Flight or racing simulators (Steam tags Flight, Racing, or Automobile Sim) with at least 5,000 Steam
+    user reviews, or console releases, that first ship an official instructor in the window.
+  generic_diffusion: Scripted radio or crew lines read by a speech synthesizer that do not depend on the player's inputs,
+    or third-party coaching apps, which the criteria exclude.
+  thesis: The official instructor speaks feedback generated from the player's live inputs. It shows voice models landed
+    only if the material says one writes or speaks the feedback.
+  base_rate:
+    class: {subgenres: [flight-sim, vehicle-sim]}
+    precursor: {mechanics: [procedural-checklists]}
+    of: Catalog flight and vehicle sims that already teach procedures through modelled checklists.
+
+sims-as-agent-benchmarks:
+  reference_class: Developers or publishers of simulation titles with at least 1,000 Steam user reviews that release an
+    official headless API or benchmark in the window.
+  generic_diffusion: Community wrappers or academic forks, which the criteria exclude, or a general modding API.
+  thesis: An official release meant for AI agents to play the simulation without a display. It is a feature test, so it
+    shows no learned technique landed.
+  base_rate:
+    class: {all: true}
+    precursor: {mechanics: [player-programming]}
+    of: Catalog games that already execute player-written code, the nearest catalogued form of a programmable interface.
+
+specification-programming-games:
+  reference_class: Titles tagged Programming with at least 1,000 Steam user reviews released in the window.
+  generic_diffusion: A programming game that adds an AI hint chatbot, or a coding game with no generated code in the loop.
+  thesis: Specifying, testing, or verifying generated code is the main mechanic on the Steam page. It shows a language
+    model landed only if the page says one writes the code.
+  base_rate:
+    class: {subgenres: [programming-sim]}
+    precursor: {mechanics: [player-programming]}
+    of: Catalog programming sims in which the player already writes the code.
+
+symbolic-sim-neural-render:
+  reference_class: Titles with at least 1,000 Steam user reviews, or console releases, released in the window.
+  generic_diffusion: Neural upscaling, frame generation, or restyling filters on a conventional renderer, or a video model
+    with no symbolic state.
+  thesis: Documentation shows symbolic gameplay state and a main viewport drawn frame by frame by a learned generative
+    renderer, as the criteria require.
+  base_rate:
+    class: {all: true}
+    precursor: {techniques: [neural-rendering-shaders, real-time-video-restyling]}
+    techniques: [diffusion-game-engines, genie-world-models, open-interactive-video-models]
+    of: Catalog games that already deploy neural rendering or video restyling on a conventional renderer, the generic
+      form.
+
+teachable-sim-companion:
+  reference_class: Titles tagged Automation or Sandbox with at least 1,000 Steam user reviews that first ship the feature
+    in the window.
+  generic_diffusion: A language-model companion that chats or follows one-off commands without keeping what it learned.
+  thesis: Skills learned from the player persist and are reused on new tasks. It shows a skill-library agent landed only
+    if the material says a language model or learned policy writes the skills.
+  base_rate:
+    class: {subgenres: [factory-automation, sandbox-world, programming-sim]}
+    precursor: {mechanics: [programming-by-demonstration]}
+    of: Catalog automation, sandbox, and programming games that already record a routine from the player and replay it.
+
+trainable-creatures-revival:
+  reference_class: Titles tagged God Game, Creature Collector, or Animals with at least 1,000 Steam user reviews, or
+    console releases, released in the window.
+  generic_diffusion: Pets that talk through a language model while their behavior does not learn, or single-layer
+    learners, which the criteria exclude.
+  thesis: Documentation says a deep network, language model, or deep reinforcement-learning policy controls the creature
+    and its parameters change with that player's feedback, as the criteria require.
+  base_rate:
+    class: {subgenres: [virtual-pet, god-game, artificial-life]}
+    precursor: {mechanics: [creature-learning]}
+    techniques: [model-based-planning-muzero, deep-rl-npc-policies, generalist-game-agents]
+    of: Catalog pet, god, and artificial-life games whose creatures already learn from reward, punishment, or neural
+      adaptation.

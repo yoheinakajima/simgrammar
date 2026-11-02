@@ -578,6 +578,25 @@ tables:
     arrive by its date in a qualifying title, which can reflect cost, studio schedules, or reception as well as a wrong
     thesis; a confirmed one can come from general adoption of AI, so it supports the thesis only as far as the criteria
     require the opportunity's own mechanism.
+- name: prediction-baselines
+  kind: rows
+  entity: opportunity
+  columns:
+  - name
+  - path: _derived.prediction_reference_class
+    label: reference class
+  - path: _derived.prediction_generic_diffusion
+    label: generic diffusion
+  - path: _derived.prediction_thesis
+    label: what counts for the thesis
+  sort:
+  - falsifiable_signal.resolve_by
+  - name
+  caption: 'Set before any prediction resolved (report/predictions.yaml). Reference class: what a resolver counts; the window
+    runs from 24 October 2026 to the resolve-by date, and Steam tags are as the store listed them on 1 November 2026.
+    Generic diffusion: the same event arriving through general adoption of AI or through classical methods, without the
+    opportunity''s mechanism. What counts for the thesis: what a confirmation''s evidence must show; a confirmation without
+    it is recorded as generic diffusion. The criteria alone decide the outcome.'
 
 # Book back matter (book/src/90-glossary.md and 91-catalog.md): one glossary table per mechanic family, and the catalog.
 - name: book-glossary-resources-production
