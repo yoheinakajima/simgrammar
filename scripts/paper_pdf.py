@@ -539,10 +539,10 @@ class Paper:
                 self.in_refs = plain(toks[i + 1].children).strip() == "References"
                 title = self.inline(toks[i + 1].children)
                 # one form for every numbered heading, the number in a box of fixed width so titles align in the contents:
-                # "2 Method", "2.1 Corpus", "Appendix B Technique catalog"
+                # "2 Method", "2.1 Corpus", "Appendix B Technique catalog"; the PDF bookmarks get the number and a space, not the box
                 box = "2.6em" if t.tag == "h3" else "1.7em"
-                title = re.sub(r"^(\d+(?:\.\d+)*)\.?\s+", lambda m: rf"\makebox[{box}][l]{{{m.group(1)}}}", title)
-                title = re.sub(r"^Appendix ([A-Z])\.\s+", r"Appendix \1\\enspace{}", title)
+                title = re.sub(r"^(\d+(?:\.\d+)*)\.?\s+", lambda m: rf"\texorpdfstring{{\makebox[{box}][l]{{{m.group(1)}}}}}{{{m.group(1)} }}", title)
+                title = re.sub(r"^Appendix ([A-Z])\.\s+", r"Appendix \1\\texorpdfstring{\\enspace{}}{ }", title)
                 cmd, toc = {"h1": ("section", 1), "h2": ("section", 1), "h3": ("subsection", 2)}.get(t.tag, ("subsubsection", 3))
                 out.append(f"\\{cmd}*{{{title}}}\\phantomsection\\addcontentsline{{toc}}{{{cmd}}}{{{title}}}\n\n")
                 i += 3

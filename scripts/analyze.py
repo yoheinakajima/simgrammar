@@ -163,6 +163,8 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     for t, lst in live.items():
         stats[f"n_{t}"] = len(lst)
     stats["n_edges"] = len(edges)
+    # a merge of two mechanics is recorded by deprecating one into the other (CONTRACT.md I2); a split has no record (fifth review C4)
+    stats["n_mechanic_deprecated"] = sum(1 for m in ents.get("mechanic", []) if m.data.get("deprecated"))
     stats["n_uses_edges"] = sum(len(v) for v in gm.values())
     mc = [derived[g.id]["mechanic_count"] for g in games] or [0]
     stats["mean_mechanics_per_game"] = _r(float(np.mean(mc)), 1)
@@ -777,6 +779,25 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         stats["rho_legibility_emergence_potential_excl_interface"] = _r(r, 2)
     im = [m for m in mechs if m.data["family"] in iface]
     stats["pct_interface_emergence_1"] = _r(100 * sum(1 for m in im if m.data["emergence_potential"] == 1) / len(im), 0) if im else None
+    # the coupling account of §4.1 against the recorded relations (fifth review D10): if coupling makes mechanics hard to read,
+    # mechanics joined to more others should score lower on legibility. A mechanic's coupling degree counts the requires,
+    # synergy, and tension edges that touch it; exploratory, since one pass with no written criteria recorded those edges
+    mset = {m.id: i for i, m in enumerate(mechs)}
+    cdeg = np.zeros(len(mechs))
+    for ed in edges:
+        if ed.type in ("requires", "synergy", "tension") and ed.source in mset and ed.target in mset:
+            cdeg[mset[ed.source]] += 1
+            cdeg[mset[ed.target]] += 1
+    if mechs and len(set(cdeg)) > 1:
+        stats["n_mechanics_no_coupling"] = int((cdeg == 0).sum())
+        stats["median_coupling_degree"] = _r(float(np.median(cdeg)), 1)
+        for f in ("legibility", "emergence_potential"):
+            if f in sv:
+                bf = np.array([_spearman(cdeg[ii], sv[f][ii]) for ii in draw_fam])
+                stats[f"rho_{f}_coupling_degree"] = _r(_spearman(cdeg, sv[f]), 2)
+                stats[f"rho_{f}_coupling_degree_family_low"] = _r(np.nanpercentile(bf, q_lo), 2)
+                stats[f"rho_{f}_coupling_degree_family_high"] = _r(np.nanpercentile(bf, q_hi), 2)
+                stats[f"rho_{f}_coupling_degree_within_family"] = _r(_spearman_within(cdeg, sv[f], members), 2)
     if mechs and techs:
         xs = [m.data["ai_leverage"] for m in mechs]
         ys = [derived[m.id]["technique_exposure"] for m in mechs]
@@ -805,6 +826,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     tables["cooccurrence-top"] = {"description": f"Mechanic pairs ranked by lift (observed / expected co-occurrence across games), support >= {cfg['cooccurrence']['min_support']} games.",
                                   "columns": ["mechanic_a", "mechanic_b", "games", "lift", "jaccard"], "rows": rows[: cfg["cooccurrence"]["top_n"]], "link_columns": ["mechanic_a", "mechanic_b"]}
     tables["cooccurrence-all"] = {"description": "All pairs meeting support.", "columns": ["mechanic_a", "mechanic_b", "games", "lift", "jaccard"], "rows": rows, "link_columns": ["mechanic_a", "mechanic_b"]}
+    stats["cooccurrence_min_support"] = cfg["cooccurrence"]["min_support"]
     stats["n_cooccurring_pairs"] = len(pair_count)
     stats["n_possible_pairs"] = len(mids) * (len(mids) - 1) // 2
     stats["pair_coverage_pct"] = _r(100 * len(pair_count) / max(stats["n_possible_pairs"], 1), 1)
@@ -822,6 +844,10 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     rmin = cc["restricted_min_games"]
     elig = np.array([prev[m] >= rmin for m in mids])
     in_restricted = elig[iu[0]] & elig[iu[1]]
+    # pairs the records say cannot or should not combine (fifth review D19): a tension edge joins them. No field in the
+    # schema binds two mechanics to exclusive values, so tension edges are the only recorded infeasibility; coverage is
+    # also reported over the pairs that remain, observed and null alike
+    feasible = np.array([tuple(sorted((mids[a_], mids[b_]))) not in tension_pairs for a_, b_ in zip(*iu)], dtype=bool)
     import random as _cb_random
     cb_rng = _cb_random.Random(cc["null_seed"])
 
@@ -836,7 +862,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             cb_rng.shuffle(pool_)
             cb_rows[i] = sorted((a_ & b_) | set(pool_[: len(only_a)]))
             cb_rows[j] = sorted((a_ & b_) | set(pool_[len(only_a):]))
-    null_cov, null_cov_r, null_ws = [], [], []
+    null_cov, null_cov_r, null_cov_f, null_ws = [], [], [], []
     if len(cb_rows) > 1 and mids:
         _trade(cc["null_burnin"])
         for _ in range(cc["null_samples"]):
@@ -848,12 +874,14 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             up = Cn[iu]
             null_cov.append(100 * float((up > 0).mean()))
             null_cov_r.append(100 * float((up[in_restricted] > 0).mean()) if in_restricted.any() else 0.0)
+            null_cov_f.append(100 * float((up[feasible] > 0).mean()) if feasible.any() else 0.0)
             null_ws.append(Cn[np.ix_(ws_common, ws_common)].astype(np.int16))
     shared["cooccurrence_null"] = {"common": [mids[i] for i in ws_common], "counts": np.array(null_ws)}
     if null_cov:
         S_ = len(null_cov)
         nc, ncr = np.array(null_cov), np.array(null_cov_r)
         stats["cooccurrence_null_samples"] = S_
+        stats["cooccurrence_null_burnin"], stats["cooccurrence_null_thin"] = cc["null_burnin"], cc["null_thin"]
         stats["pair_coverage_null_mean_pct"] = _r(float(nc.mean()), 1)
         stats["pair_coverage_null_lo_pct"] = _r(float(np.percentile(nc, 2.5)), 1)
         stats["pair_coverage_null_hi_pct"] = _r(float(np.percentile(nc, 97.5)), 1)
@@ -869,6 +897,14 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         stats["pair_coverage_restricted_null_mean_pct"] = _r(float(ncr.mean()), 1)
         stats["pair_coverage_restricted_null_lo_pct"] = _r(float(np.percentile(ncr, 2.5)), 1)
         stats["pair_coverage_restricted_null_hi_pct"] = _r(float(np.percentile(ncr, 97.5)), 1)
+        ncf = np.array(null_cov_f)
+        n_f = int(feasible.sum())
+        obs_f = 100 * sum(1 for (a, b) in pair_count if (a, b) not in tension_pairs and a in m_pos and b in m_pos) / max(n_f, 1)
+        stats["n_pairs_tension_excluded"] = int((~feasible).sum())
+        stats["pair_coverage_feasible_pct"] = _r(obs_f, 1)
+        stats["pair_coverage_feasible_null_mean_pct"] = _r(float(ncf.mean()), 1)
+        stats["pair_coverage_feasible_null_lo_pct"] = _r(float(np.percentile(ncf, 2.5)), 1)
+        stats["pair_coverage_feasible_null_hi_pct"] = _r(float(np.percentile(ncf, 97.5)), 1)
     # the state classes of report/state-class.yaml (review D6): the file is checked against the live mechanics here, and
     # the §5.1 head and the pair coverage above are recomputed on the simulation-state subset (helpers _state_class*)
     state_cls = _state_class(mechs, ents.get("run", []))
@@ -1322,6 +1358,19 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             tables["family-robustness"] = {"description": f"Each family of games that section 5.4 names, by the games it names, then each link it names between two families (the games of both), checked against other methods and inputs. min_cocluster: the lowest share of subsamples in which any two of the games share a cluster at k={k_chosen}; min_consensus: the same over every k from {ck0} to {ck1}. average: average linkage at k={k_chosen} puts them in one cluster and min_cocluster is at least {st_cfg['together']}; ward: Ward's method on a classical scaling of the same distances, cut at k={k_chosen}, puts them in one cluster; complete: complete linkage, cut at {stats['cluster_complete_n']} clusters, does; methods: how many of the three do. without_asserted: average linkage without the asserted mechanics puts them in one cluster; lumped: average linkage does with each mechanic merged with those it specializes or requires.",
                                            "columns": ["kind", "grouping", "games", "min_cocluster", "min_consensus", "average", "ward", "complete", "methods", "without_asserted", "lumped"],
                                            "rows": frows, "link_columns": ["games"]}
+            # the named families were named after the partition was seen, by two to four central games each (fifth review D3), so
+            # two checks that need no naming: the share of its cluster each named family's games make up, and, for every cluster
+            # of at least min_family_size games, whether its five most central games (lowest mean distance to the cluster) share a
+            # cluster in at least the `together` share of subsamples
+            size_of = {r["cluster"]: r["size"] for r in crow}
+            shares = [len(ids) / size_of[derived[ids[0]]["cluster"]] for ids in ((cl.get("groupings") or {}).get("paper") or {}).values()
+                      if ids and all(x in gidx for x in ids) and _one(labels, [gidx[x] for x in ids])]
+            if shares:
+                stats["pct_grouping_paper_cluster_share_median"] = _r(100 * float(np.median(shares)), 0)
+                stats["pct_grouping_paper_cluster_share_min"] = _r(100 * min(shares), 0)
+            big = [r for r in crow if r["size"] >= min_size]
+            stats["n_clusters_min_family_size"] = len(big)
+            stats["n_clusters_central5_together"] = sum(1 for r in big if min(float(C[gidx[a_], gidx[b_]]) for a_, b_ in combinations(r["members"][:5], 2)) >= st_cfg["together"])
         # the same partition without the mechanics report/state-class.yaml does not class as simulation state (review D6)
         _state_class_clusters(is_state, cfg, games, gm, labels, k_chosen, range(k_near, k_chosen + 1), stats)
         shared["cocluster"] = cocluster
@@ -1883,6 +1932,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     now_rt = [o for o in opps if o.data["horizon"] == "now" and derived[o.id]["runtime_model"]]
     stats["n_opportunity_now_runtime_model"] = len(now_rt)
     stats["n_opportunity_now_runtime_model_budget"] = sum(1 for o in now_rt if derived[o.id]["states_compute_budget"])
+    _priority_variants(opps, by_id, rated, wv0, capped, topn, top_ids, oids, R, sp, int(pcfg.get("seed", 20261031)) + 7, ocfg, derived, stats, tables)
     # what a resolution would show (review F1, F4): each prediction's criteria end in one sentence "Technique class: ..., so
     # this is a technique test" or "... a feature test". A technique test is one that only the technique class the
     # opportunity applies can meet; a feature test is one that classical, symbolic, or operations-research methods can meet
@@ -1899,13 +1949,20 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     stats["n_predictions_technique_test"] = kinds["technique"]
     stats["n_predictions_feature_test"] = kinds["feature"]
     stats["n_predictions_unclassified"] = kinds["unclassified"]
+    # the places each opportunity shares with every other at its priority (fifth review D11): the table reads in tied bands
+    opl = _places({r["opportunity"]: r["priority"] for r in orows})
+    for r in orows:
+        a_, b_ = opl[r["opportunity"]]
+        r["place"] = str(a_) if a_ == b_ else f"{a_} to {b_}"
+        derived[r["opportunity"]]["place_first"], derived[r["opportunity"]]["place_last"] = a_, b_
     # displayed to one decimal: three ordinal ratings do not support more (review E22); rows keep their unrounded order
     for r in orows:
         r["priority"] = _r(r["priority"], 1)
         derived[r["opportunity"]]["priority_shown"] = r["priority"]
-    tables["opportunities-ranked"]["columns"] = ["opportunity", "type", "priority", "impact", "feasibility", "novelty", "horizon", "rank_interval", "top_share"]
+    tables["opportunities-ranked"]["columns"] = ["opportunity", "type", "priority", "place", "impact", "feasibility", "novelty", "horizon", "rank_interval", "top_share"]
     tables["opportunities-ranked"]["description"] = (
         "Opportunities by composite priority (weighted geometric mean of impact, feasibility, and novelty; weights in vocab/rubrics.yaml), shown to one decimal; rows are ordered by the unrounded value. "
+        "Place: the places an opportunity shares with every other at its priority. "
         f"Rank interval: the {_r(100 * qlo, 0):g}th to {_r(100 * qhi, 0):g}th percentile of the opportunity's rank over {R} seeded draws that move each rating by up to one anchor and each weight by up to {_r(100 * sp, 0):g} percent. "
         f"Top share: the percentage of those draws in which it ranks in the top {topn}.")
     stats["n_predictions"] = len(opps)
@@ -2299,6 +2356,15 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     stats["n_mechanics_one_game"] = sum(1 for m in mechs if derived[m.id]["prevalence"] == 1)
     stats["min_design_levers"] = min((len(m.data.get("design_levers") or []) for m in mechs), default=0)
     stats["median_design_levers"] = _r(float(np.median([len(m.data.get("design_levers") or []) for m in mechs])), 1) if mechs else 0
+
+    # A Monte Carlo p-value cannot fall below 1/(B+1), or 2/(B+1) two-sided, for B null draws (fifth review D18): at that
+    # floor the paper prints it as an inequality, elsewhere as an equality. `<key>_shown` holds the relation and the value.
+    for key, draws, sides in (("p_pair_coverage", "cooccurrence_null_samples", 2), ("p_pair_coverage_state_class", "state_class_null_samples", 2),
+                              ("p_n_whitespace_pairs", "cooccurrence_null_samples", 1), ("p_cluster_subgenre_ari", "cluster_permutations", 1),
+                              ("p_cluster_subgenre_nmi", "cluster_permutations", 1), ("p_cluster_mixed", "cluster_permutations", 1)):
+        if isinstance(stats.get(key), (int, float)) and stats.get(draws):
+            floor = _r(sides / (stats[draws] + 1), 3)
+            stats[key + "_shown"] = f"≤ {stats[key]:g}" if stats[key] <= floor else f"= {stats[key]:g}"
 
     # ---------------- figures
     figures.update(_figures(mechs, derived, fam_terms, famrows, by_id, games, year))
@@ -2994,6 +3060,7 @@ def _state_class_pairs(sc, cfg, mechs, games, gm, derived, pair_count, N, fam_te
         stats["pair_coverage_state_class_null_lo_pct"] = _r(float(np.percentile(nc, 2.5)), 1)
         stats["pair_coverage_state_class_null_hi_pct"] = _r(float(np.percentile(nc, 97.5)), 1)
         stats["p_pair_coverage_state_class"] = _r(min(1.0, 2 * min((1 + int((nc <= o_).sum())) / (S_ + 1), (1 + int((nc >= o_).sum())) / (S_ + 1))), 3)
+        stats["state_class_null_samples"] = S_
         stats["n_pairs_short_of_null_state_class"] = int(round((float(nc.mean()) - o_) / 100 * n_pairs))
         stats["pair_coverage_restricted_state_class_null_mean_pct"] = _r(float(ncr.mean()), 1)
         stats["pair_coverage_restricted_state_class_null_lo_pct"] = _r(float(np.percentile(ncr, 2.5)), 1)
@@ -3192,6 +3259,81 @@ def _second_coding(ents, vocabs, cfg, stats, tables):
             "description": "The four admission tests as the second coder applied them: on the sampled mechanics the vocabulary admits, how many "
                            "codes pass each test, and the same on the candidates it left as proposals.",
             "columns": ["test", "admitted", "admitted_pass", "candidates", "candidates_pass"], "rows": test_rows}
+
+
+def _places(d: dict) -> dict:
+    """The first and last place each key shares with every other at its value, higher first: ties count, never broken by id."""
+    v = {k: round(float(x), 9) for k, x in d.items()}
+    return {k: (1 + sum(x > v[k] for x in v.values()), sum(x >= v[k] for x in v.values())) for k in d}
+
+
+def _priority_variants(opps, by_id, rated, wv0, capped, topn, top_ids, oids, R, sp, seed, ocfg, derived, stats, tables):
+    """How far the top of the opportunity list depends on how the composite is built (fifth review D2, D7, D14).
+
+    The stored top n is compared with the top n under equal weights, under a mean of the three ratings' ranks (no weights and
+    no product), with feasibility capped by the best listed technique's maturity, with feasibility capped for an opportunity
+    that calls a model during play and states no budget, and with both caps. Two draw tests follow: weights drawn from a flat
+    Dirichlet, and the independent one-anchor moves of §9.1 plus one shift per scale applied to every opportunity, as when
+    one rater reads a whole scale an anchor higher or lower. An opportunity tied into the top n counts as in it."""
+    S0 = np.array([[by_id[x].data[k] for k in rated] for x in oids], dtype=float)
+    fi = rated.index("feasibility")
+    cost_cap = int(ocfg.get("feasibility_cap_runtime_no_budget", 3))
+    cost = {o.id: min(o.data["feasibility"], cost_cap) if derived[o.id]["runtime_model"] and not derived[o.id]["states_compute_budget"] else o.data["feasibility"]
+            for o in opps}
+    stats["feasibility_cap_runtime_no_budget"] = cost_cap
+    stats["n_opportunity_cost_capped"] = sum(1 for o in opps if cost[o.id] < o.data["feasibility"])
+    stats["n_top_opportunities_cost_capped"] = sum(1 for x in top_ids if cost[x] < by_id[x].data["feasibility"])
+
+    def geo(S, w):
+        w = np.asarray(w, dtype=float)
+        return np.exp(np.log(S) @ (w / w.sum()))
+
+    def with_f(f):
+        S = S0.copy()
+        S[:, fi] = [f[x] for x in oids]
+        return S
+
+    mean_rank = -np.mean([rankdata(-S0[:, j]) for j in range(S0.shape[1])], axis=0)
+    variants = [("stored", "the stored weights and ratings", geo(S0, wv0)),
+                ("equal_weights", "the three ratings weighted equally", geo(S0, np.ones(len(wv0)))),
+                ("mean_rank", "the mean of the three ratings' ranks, with no weights and no product", mean_rank),
+                ("feasibility_capped", "feasibility capped by the best listed technique's maturity", geo(with_f(capped), wv0)),
+                ("cost_capped", f"feasibility capped at {cost_cap} for a model called during play with no stated budget", geo(with_f(cost), wv0)),
+                ("both_caps", "both caps", geo(with_f({x: min(capped[x], cost[x]) for x in oids}), wv0))]
+    lead, rows = oids[0], []
+    names = lambda xs: ", ".join(by_id[x].data["name"] for x in xs)  # noqa: E731
+    for key, label, pr in variants:
+        pl = _places(dict(zip(oids, pr)))
+        top = {x for x in oids if pl[x][0] <= topn}
+        kept = len(set(top_ids) & top)
+        first = sorted(x for x in oids if pl[x][0] == 1)
+        span_ = str(pl[lead][0]) if pl[lead][0] == pl[lead][1] else f"{pl[lead][0]} to {pl[lead][1]}"
+        stats[f"n_top_kept_{key}"] = kept
+        stats[f"rank_top_opportunity_{key}"], stats[f"rank_top_opportunity_{key}_last"] = pl[lead]
+        rows.append({"variant": label, "stored_top_kept": f"{kept} of {topn}", "top_opportunity_places": span_, "first": names(first)})
+    rng = np.random.default_rng(seed)
+    in_top = {"dirichlet": 0, "scale_shift": 0}
+    overlap = {"dirichlet": [], "scale_shift": []}
+    for _ in range(R):
+        for key in in_top:
+            if key == "dirichlet":
+                pr = geo(S0, rng.dirichlet(np.ones(len(wv0))))
+            else:
+                S = np.clip(S0 + rng.integers(-1, 2, size=S0.shape) + rng.integers(-1, 2, size=S0.shape[1]), 1, 5)
+                pr = geo(S, wv0 * rng.uniform(1 - sp, 1 + sp, size=len(wv0)))
+            pl = _places(dict(zip(oids, pr)))
+            in_top[key] += pl[lead][0] <= topn
+            overlap[key].append(len(set(top_ids) & {x for x in oids if pl[x][0] <= topn}))
+    for key, label in (("dirichlet", "weights drawn at random (flat Dirichlet)"), ("scale_shift", "one-anchor moves plus a shift of a whole scale")):
+        stats[f"top_share_{key}_top_opportunity"] = _r(100 * in_top[key] / R, 0)
+        stats[f"mean_top_kept_{key}"] = _r(float(np.mean(overlap[key])), 1)
+        rows.append({"variant": f"{label}, {R} draws", "stored_top_kept": f"{_r(float(np.mean(overlap[key])), 1)} of {topn} on average",
+                     "top_opportunity_places": f"top {topn} in {_r(100 * in_top[key] / R, 0):g}% of draws", "first": ""})
+    tables["opportunity-priority-variants"] = {
+        "description": (f"How the top {topn} depends on how priority is built. Stored top kept: how many of the stored top {topn} are in the top {topn} under the variant, "
+                        f"counting an opportunity tied into it. Top opportunity's places: where {by_id[lead].data['name']} lands, ties shown as the places they share. "
+                        "First: the opportunities in first place. No record changes; the stored ranking stays the original rater's."),
+        "columns": ["variant", "stored_top_kept", "top_opportunity_places", "first"], "rows": rows}
 
 
 PREDICTION_FIELDS = {"reference_class", "generic_diffusion", "thesis", "base_rate", "amended"}
@@ -3804,6 +3946,13 @@ def _panel_agreement(ents, vocabs, cfg, raters, stats, tables, p: str, t: str, w
         cats = list(labels[d])
         conf_rows += [{"decision": d, "first": labels[d][cats[a]], "second": labels[d][cats[b]], "n": int(Ps[a, b])}
                       for a in range(len(cats)) for b in range(len(cats)) if Ps[a, b]]
+        if d == "admission":   # whether the tests can reject (fifth review C2): the proposed negatives apart, agreement adjusted for
+            ia, ir = cats.index("admit"), cats.index("reject")   # prevalence (PABAK), and how often each test failed in the second reading
+            stats[f"{p}n_admission_admitted"], stats[f"{p}n_admission_admitted_kept"] = int(Ps[ia].sum()), int(Ps[ia, ia])
+            stats[f"{p}n_admission_negatives"], stats[f"{p}n_admission_negatives_rejected"] = int(Ps[ir].sum()), int(Ps[ir, ir])
+            stats[f"{p}pabak_admission"] = _r(2 * row["agree"] - 1, 2)
+            for x in ("nameable", "atomic", "tunable", "removable"):
+                stats[f"{p}n_admission_fail_{x}"] = sum(1 for r in raters for v in (r["codes"].get(d) or {}).values() if v.get(x) == "fail")
     if code_rows:
         tables[f"{t}-codes"] = {
             "description": f"Agreement between the dataset's code and {who}, per decision. Agree is the share of pairs that match; kappa is "
@@ -4039,7 +4188,15 @@ def _panel_agreement(ents, vocabs, cfg, raters, stats, tables, p: str, t: str, w
         for k, pl in (("second", p2), ("lower_median", pl_)):
             stats[f"{p}rank_{k}_top_opportunity"], stats[f"{p}rank_{k}_top_opportunity_last"] = pl[top1]
             stats[f"{p}n_tied_with_{k}_top_opportunity"] = pl[top1][1] - pl[top1][0]   # the others it shares those places with
-        cols = ["opportunity", "first_priority", "first_rank", "second_priority", "second_rank", "lower_median_priority", "lower_median_rank"]
+        # how far apart the two readings put each opportunity: the places between the two spans, zero where they meet; one
+        # further apart than the configured gap is flagged, since its place reflects the rater as much as the opportunity
+        # (fifth review D9). The opportunities in both readings' top n are the ones §9.4 can lean on.
+        gap_max = int((cfg.get("opportunities") or {}).get("cross_model_rank_gap", 10))
+        apart = {o: max(0, p2[o][0] - p1[o][1], p1[o][0] - p2[o][1]) for o in opps}
+        stats[f"{p}rank_gap_max"] = gap_max
+        stats[f"{p}n_rank_gap_over"] = sum(1 for o in opps if apart[o] > gap_max)
+        stats[f"{p}top_both"] = ", ".join(sorted(top(r1) & top(r2)))
+        cols = ["opportunity", "first_priority", "first_rank", "second_priority", "second_rank", "places_apart", "lower_median_priority", "lower_median_rank"]
         if ps != p1:
             cols.insert(1, "stored_rank")
         tables[f"{t}-opportunity-ranking"] = {
@@ -4048,12 +4205,14 @@ def _panel_agreement(ents, vocabs, cfg, raters, stats, tables, p: str, t: str, w
                            "every second reading combined as a field with ratings stores them)" +
                            ("; stored rank is the place §9.1 shows. " if ps != p1 else ", in the order of §9.1. ") +
                            "Priority is the weighted geometric mean of vocab/rubrics.yaml, and a rank shared by tied opportunities shows the places they "
-                           "share. " +
+                           f"share. Places apart: how many places separate the first and second readings' spans, marked with an asterisk above {gap_max}, "
+                           "where the place reflects the rater as much as the opportunity and waits for an independent rating. " +
                            ("The lower-median ranking is a sensitivity reading from a cross-model check by the records' own operator, never the stored "
                             "ranking: no record changes." if p == "xm_" else "Once these ratings are in the records, the lower-median ranking is the stored one."),
             "columns": cols,
             "rows": [{c: v for c, v in {"opportunity": o, "stored_rank": span(ps[o]), "first_priority": _r(orig[o], 2), "first_rank": span(p1[o]),
-                                        "second_priority": _r(sec[o], 2), "second_rank": span(p2[o]), "lower_median_priority": _r(low[o], 2),
+                                        "second_priority": _r(sec[o], 2), "second_rank": span(p2[o]),
+                                        "places_apart": f"{apart[o]}*" if apart[o] > gap_max else str(apart[o]), "lower_median_priority": _r(low[o], 2),
                                         "lower_median_rank": span(pl_[o])}.items() if c in cols} for o in sorted(opps, key=lambda o: (rs[o], o))],
             "link_columns": ["opportunity"]}
 
@@ -4463,6 +4622,9 @@ def _prior_art(opps, by_id, order, cfg, derived, stats, tables):
         if o["novelty"] > int(e.get("novelty_before", 0)):
             raise ValueError(f"{where}: novelty {o['novelty']} is above novelty_before {e.get('novelty_before')}; the search never raises a score")
         derived[oid].update({"prior_art_ceiling": cap, "novelty_before": e["novelty_before"], "prior_art_coverage": e["coverage"]})
+        # what a confirmation of its prediction would show (fifth review D4): where a game, official release, or mod already does
+        # the feature or a narrower form (a ceiling of 3 or less), a confirmation shows the feature spreading, not first arriving
+        derived[oid]["prediction_kind"] = "diffusion" if cap <= 3 else "new capability"
         rows.append({"opportunity": oid, "closest_prior_art": cl.get("name"), "kind": cl["kind"], "year": cl.get("year") or "",
                      "closeness": cl["closeness"], "ceiling": cap, "novelty_before": e["novelty_before"], "novelty": o["novelty"],
                      "coverage": e["coverage"]})
@@ -4499,6 +4661,14 @@ def _prior_art(opps, by_id, order, cfg, derived, stats, tables):
     stats["n_novelty_high_lowered"] = sum(1 for r in low if r["novelty_before"] >= 4)
     stats["n_novelty_lowered_partial_coverage"] = sum(1 for r in low if r["coverage"] == "partial")
     stats["n_novelty_kept_partial_coverage"] = sum(1 for r in rows if r["coverage"] == "partial" and r["novelty"] == r["novelty_before"])
+    # predictions whose confirmation would show diffusion, overall and among those due in the first year any resolves (D4)
+    due = {r["opportunity"]: str(live[r["opportunity"]].data["falsifiable_signal"]["resolve_by"])[:4] for r in rows}
+    first_year = min(due.values()) if due else None
+    stats["n_predictions_diffusion"] = len(shipped)
+    stats["n_predictions_new_capability"] = len(rows) - len(shipped)
+    stats["first_prediction_year"] = first_year
+    stats["n_predictions_first_year"] = sum(1 for v in due.values() if v == first_year)
+    stats["n_predictions_first_year_diffusion"] = sum(1 for r in shipped if due[r["opportunity"]] == first_year)
 
 
 # ======================================================================= SVG

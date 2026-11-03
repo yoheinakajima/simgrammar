@@ -1,0 +1,13 @@
+id: 2026-11-02-es-v5-revision
+type: run
+kind: maintenance
+date: '2026-11-02'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Answer Explore Science's review of v0.5.1 (47 minor issues) in the analysis and the prose, and bump to v0.6.
+method: 'Work in progress: this method is rewritten when the run is done, with every finding it answers and what changed.'
+contract_version: '1.2'
+proposals: []

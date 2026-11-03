@@ -1,0 +1,17 @@
+id: src-phipson-2010-permutation-p-values
+type: source
+name: 'Permutation P-values Should Never Be Zero: Calculating Exact P-values When Permutations Are Randomly Drawn'
+kind: paper
+authors:
+- Belinda Phipson
+- Gordon K. Smyth
+venue: Statistical Applications in Genetics and Molecular Biology 9(1)
+date: '2010-10-31'
+url: https://www.degruyterbrill.com/document/doi/10.2202/1544-6115.1585/html
+doi: 10.2202/1544-6115.1585
+accessed: '2026-11-02'
+notes: 'On p-values from randomly drawn permutations: counting the observed statistic among the draws gives (b + 1) /
+  (m + 1), which cannot be zero, so with m draws the smallest attainable p-value is 1 / (m + 1). The paper prints a
+  Monte Carlo p-value at that floor as an inequality.'
+provenance:
+  created: 2026-11-02-es-v5-revision
