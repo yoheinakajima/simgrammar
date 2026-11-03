@@ -34,9 +34,14 @@
 # - amended: the date a size threshold was added to the criteria and the text added. An amendment only adds a
 #   condition, so any title that meets the amended criteria also met the original ones: it can make a prediction harder
 #   to confirm, never easier.
+# - audience_bar: the date a console clause gained an audience size and the text added (run
+#   2026-11-03-console-audience-bar). A console release could stand in for a Steam review count with no size of its own;
+#   it now needs a public figure of copies sold or players of 20 times the review bar, the low end of the 20 to 50 sales
+#   per review that src-gwinnell-2023-steam-benchmarks reports, so the console bar is no harder to meet than the review
+#   bar it stands in for. Like an amendment, it only adds a condition.
 
 agent-ambassadors-async:
-  reference_class: Titles with at least 1,000 Steam user reviews, or console releases, tagged Massively Multiplayer,
+  reference_class: Titles with at least 1,000 Steam user reviews, or console releases with at least 20,000 copies sold or players, tagged Massively Multiplayer,
     MMORPG, Asynchronous Multiplayer, or Trading, that let players trade with each other and first ship the feature in
     the window.
   generic_diffusion: A language-model chat companion or AI-written dialogue in a multiplayer game, or standing market
@@ -48,10 +53,13 @@ agent-ambassadors-async:
     precursor: {mechanics: [delegation-to-ai, negotiation]}
     of: Catalog games with shared regions, persistent worlds, or player markets that already hand decisions to AI
       managers or run AI negotiation.
+  audience_bar:
+    date: '2026-11-03'
+    added: with at least 20,000 copies sold or players reported by a public source
 
 ai-liquidity-in-player-markets:
   reference_class: Persistent online games with a player-driven market, at least 1,000 Steam user reviews or a console
-    release, tagged Massively Multiplayer, MMORPG, Trading, or Economy, that announce or ship AI traders in the window.
+    release with at least 20,000 copies sold or players, tagged Massively Multiplayer, MMORPG, Trading, or Economy, that announce or ship AI traders in the window.
   generic_diffusion: Fixed-price NPC vendors, scripted market makers, or language-model shopkeepers that talk, none fitted
     to trades players made.
   thesis: Developer material says the AI traders' behavior was trained or calibrated on logged player trades, the
@@ -65,6 +73,9 @@ ai-liquidity-in-player-markets:
   amended:
     date: '2026-11-01'
     added: and at least 1,000 Steam user reviews or a console release
+  audience_bar:
+    date: '2026-11-03'
+    added: with at least 20,000 copies sold or players reported by a public source
 
 bottleneck-explainer:
   reference_class: Titles tagged Automation or City Builder with at least 1,000 Steam user reviews, or official mod tools
@@ -160,7 +171,7 @@ drama-aware-storyteller:
         more, as counted in November 2025; runtime systems are under 5 percent.
 
 dream-replay-layer:
-  reference_class: Titles with at least 1,000 Steam user reviews, or console releases, tagged Simulation, Colony Sim, or
+  reference_class: Titles with at least 1,000 Steam user reviews, or console releases with at least 20,000 copies sold or players, tagged Simulation, Colony Sim, or
     Life Sim, that first ship the feature in the window.
   generic_diffusion: Key art, trailers, or cutscenes generated before release, which the criteria exclude, or replays of
     recorded gameplay footage.
@@ -171,6 +182,9 @@ dream-replay-layer:
     precursor: {mechanics: [history-chronicle, history-generation]}
     of: Catalog games that already keep a structured history of simulated events, the log the visuals would be drawn
       from.
+  audience_bar:
+    date: '2026-11-03'
+    added: with at least 20,000 copies sold or players reported by a public source
 
 event-sourced-sim-runtime:
   reference_class: Engines, middleware, and open-source libraries released in the window, counted only when a shipped
@@ -225,7 +239,7 @@ generated-recipe-graphs:
 
 generative-decoration-catalogs:
   reference_class: Life or management sims other than inZOI, tagged Life Sim or Management, with at least 5,000 Steam user
-    reviews or a console release, that first ship the feature in the window.
+    reviews or a console release with at least 100,000 copies sold or players, that first ship the feature in the window.
   generic_diffusion: Catalog objects or textures the developer generated before release, or generated 2D images and
     patterns applied to existing objects.
   thesis: Players generate new placeable 3D objects inside the game from text or images. It shows a learned model landed
@@ -235,6 +249,9 @@ generative-decoration-catalogs:
     precursor: {mechanics: [content-sharing]}
     techniques: [text-to-3d-assets, gaussian-splatting]
     of: Catalog life and management sims that already let players share objects and builds they made by hand.
+  audience_bar:
+    date: '2026-11-03'
+    added: with at least 100,000 copies sold or players reported by a public source
 
 human-calibrated-customers:
   reference_class: Titles tagged Management, City Builder, Shop Keeper, or Capitalism with at least 1,000 Steam user
@@ -299,7 +316,7 @@ learned-build-assist:
     of: Catalog city builders that already turn coarse player input into detail by procedural rules.
 
 learned-material-surrogates:
-  reference_class: Titles with at least 1,000 Steam user reviews, or console releases, tagged Physics, Destruction,
+  reference_class: Titles with at least 1,000 Steam user reviews, or console releases with at least 20,000 copies sold or players, tagged Physics, Destruction,
     Sandbox, or Simulation, released in the window.
   generic_diffusion: Neural upscaling, frame generation, or learned visual effects on a classical solver, which change what
     is drawn and not the material state.
@@ -310,10 +327,13 @@ learned-material-surrogates:
     techniques: [graph-network-simulators, subspace-neural-physics, neural-cellular-automata]
     of: Catalog physics, construction, and sandbox games that already simulate fluids, destruction, or deformable
       materials with classical solvers.
+  audience_bar:
+    date: '2026-11-03'
+    added: with at least 20,000 copies sold or players reported by a public source
 
 learned-weather-layer:
   reference_class: Titles tagged Farming Sim, Flight, or City Builder with at least 1,000 Steam user reviews, or console
-    releases, that first ship the feature in the window.
+    releases with at least 20,000 copies sold or players, that first ship the feature in the window.
   generic_diffusion: Live forecast feeds, scripted weather states, or neural rendering of clouds and sky.
   thesis: A machine-learned emulator generates the weather that runs in the shipped game, as the criteria require.
   base_rate:
@@ -322,6 +342,9 @@ learned-weather-layer:
     techniques: [ml-weather-models]
     of: Catalog farming, flight, and city-building games that already run weather states or real-world weather
       feeds.
+  audience_bar:
+    date: '2026-11-03'
+    added: with at least 20,000 copies sold or players reported by a public source
 
 living-workforce-factories:
   reference_class: Titles tagged Automation released in the window that reach 1,000 Steam user reviews by the resolve-by
@@ -382,7 +405,7 @@ mean-field-crowds:
     of: Catalog city builders that already route traffic over a capacitated network or path agents one by one.
 
 mechanic-discovery-search:
-  reference_class: Titles with at least 1,000 Steam user reviews, or console releases, released in the window.
+  reference_class: Titles with at least 1,000 Steam user reviews, or console releases with at least 20,000 copies sold or players, released in the window.
   generic_diffusion: A developer crediting generative AI for art, text, or brainstormed ideas, or a language model that
     suggests rules without a search over rule sets.
   thesis: A developer statement or paper says a shipped rule came out of automated search over rule sets, as the criteria
@@ -393,6 +416,9 @@ mechanic-discovery-search:
     techniques: [alphaevolve-algorithm-discovery, automated-rule-generation, quality-diversity-search]
     of: Catalog games in which a model already decides the outcome of rules at runtime, the nearest catalogued form of
       generated rules.
+  audience_bar:
+    date: '2026-11-03'
+    added: with at least 20,000 copies sold or players reported by a public source
 
 natural-language-legislation:
   reference_class: Titles tagged Political Sim, City Builder, or Grand Strategy with at least 1,000 Steam user reviews,
@@ -531,7 +557,7 @@ scientists-not-tech-trees:
 
 sim-instructor-coach:
   reference_class: Flight or racing simulators (Steam tags Flight, Racing, or Automobile Sim) with at least 5,000 Steam
-    user reviews, or console releases, that first ship an official instructor in the window.
+    user reviews, or console releases with at least 100,000 copies sold or players, that first ship an official instructor in the window.
   generic_diffusion: Scripted radio or crew lines read by a speech synthesizer that do not depend on the player's inputs,
     or third-party coaching apps, which the criteria exclude.
   thesis: The official instructor speaks feedback generated from the player's live inputs. It shows voice models landed
@@ -540,6 +566,9 @@ sim-instructor-coach:
     class: {subgenres: [flight-sim, vehicle-sim]}
     precursor: {mechanics: [procedural-checklists]}
     of: Catalog flight and vehicle sims that already teach procedures through modelled checklists.
+  audience_bar:
+    date: '2026-11-03'
+    added: with at least 100,000 copies sold or players reported by a public source
 
 sims-as-agent-benchmarks:
   reference_class: Developers or publishers of simulation titles with at least 1,000 Steam user reviews that release an
@@ -563,7 +592,7 @@ specification-programming-games:
     of: Catalog programming sims in which the player already writes the code.
 
 symbolic-sim-neural-render:
-  reference_class: Titles with at least 1,000 Steam user reviews, or console releases, released in the window.
+  reference_class: Titles with at least 1,000 Steam user reviews, or console releases with at least 20,000 copies sold or players, released in the window.
   generic_diffusion: Neural upscaling, frame generation, or restyling filters on a conventional renderer, or a video model
     with no symbolic state.
   thesis: Documentation shows symbolic gameplay state and a main viewport drawn frame by frame by a learned generative
@@ -574,6 +603,9 @@ symbolic-sim-neural-render:
     techniques: [diffusion-game-engines, genie-world-models, open-interactive-video-models]
     of: Catalog games that already deploy neural rendering or video restyling on a conventional renderer, the generic
       form.
+  audience_bar:
+    date: '2026-11-03'
+    added: with at least 20,000 copies sold or players reported by a public source
 
 teachable-sim-companion:
   reference_class: Titles tagged Automation or Sandbox with at least 1,000 Steam user reviews that first ship the feature
@@ -588,7 +620,7 @@ teachable-sim-companion:
 
 trainable-creatures-revival:
   reference_class: Titles tagged God Game, Creature Collector, or Animals with at least 1,000 Steam user reviews, or
-    console releases, released in the window.
+    console releases with at least 20,000 copies sold or players, released in the window.
   generic_diffusion: Pets that talk through a language model while their behavior does not learn, or single-layer
     learners, which the criteria exclude.
   thesis: Documentation says a deep network, language model, or deep reinforcement-learning policy controls the creature
@@ -599,3 +631,7 @@ trainable-creatures-revival:
     techniques: [model-based-planning-muzero, deep-rl-npc-policies, generalist-game-agents]
     of: Catalog pet, god, and artificial-life games whose creatures already learn from reward, punishment, or neural
       adaptation.
+  audience_bar:
+    date: '2026-11-03'
+    added: with at least 20,000 copies sold or players reported by a public source
+

@@ -1,6 +1,6 @@
 # SimGrammar Contract
 
-**Version 1.2** · Applies to everything under `data/`, `vocab/`, `schema/`, `log/`, `report/`, and to the visual vocabulary in `media/visual/` with the Frame lines that use it.
+**Version 1.3** · Applies to everything under `data/`, `vocab/`, `schema/`, `log/`, `report/`, and to the visual vocabulary in `media/visual/` with the Frame lines that use it.
 
 This file defines what the repository guarantees. Code in `scripts/` enforces it; the rule table below is generated from `scripts/rules.py`, so the documented rules and the enforced rules are the same list. If this file and the code disagree, the code is the bug.
 

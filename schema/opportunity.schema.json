@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://simgrammar.dev/schema/1.2/opportunity.schema.json",
+  "$id": "https://simgrammar.dev/schema/1.3/opportunity.schema.json",
   "title": "Opportunity",
   "description": "A synthesized design opportunity combining mechanics and techniques. Scores follow rubrics; the composite priority is computed in build and never stored.",
   "type": "object",
@@ -31,7 +31,7 @@
       "properties": {
         "prediction": { "type": "string", "minLength": 20, "maxLength": 500 },
         "resolve_by": { "$ref": "common.schema.json#/$defs/date" },
-        "criteria": { "type": "string", "minLength": 20, "maxLength": 500 },
+        "criteria": { "type": "string", "minLength": 20, "maxLength": 600 },
         "resolution": {
           "type": "object",
           "additionalProperties": false,

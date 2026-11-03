@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://simgrammar.dev/schema/1.2/game.schema.json",
+  "$id": "https://simgrammar.dev/schema/1.3/game.schema.json",
   "title": "Game",
   "description": "A simulation game (or boundary case included for its mechanics). Owns `uses` edges to mechanics and `influenced_by` edges to earlier games.",
   "type": "object",

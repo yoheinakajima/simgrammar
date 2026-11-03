@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://simgrammar.dev/schema/1.2/common.schema.json",
+  "$id": "https://simgrammar.dev/schema/1.3/common.schema.json",
   "title": "Common definitions",
   "description": "Shared field definitions. Annotations: x-vocab names a vocab/*.yaml file; x-edge names an edge type in vocab/edge_types.yaml and marks the string as a reference; x-rubric names a scale in vocab/rubrics.yaml.",
   "$defs": {

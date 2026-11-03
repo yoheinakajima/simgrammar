@@ -1,11 +1,12 @@
 # Single registry of entity types. Code reads this; nothing else hardcodes directories.
-contract_version: "1.2"
+contract_version: "1.3"
 # Every contract version and the date it took effect. A run records the version it was written under;
 # E028 accepts any version listed here that is not newer than contract_version, so run files never need rewriting.
 contract_history:
   "1.0": "2026-10-23"
   "1.1": "2026-10-25"
   "1.2": "2026-10-26"
+  "1.3": "2026-11-03"
 # Limits checked on pull requests by scripts/pr_scope.py (E039) and calibration gates (E036).
 contribution:
   max_records_per_pr: 10        # games, mechanics, techniques, opportunities added, changed, or deleted in one PR

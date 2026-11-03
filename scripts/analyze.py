@@ -3335,7 +3335,7 @@ def _priority_variants(opps, by_id, rated, wv0, capped, topn, top_ids, oids, R, 
         "columns": ["variant", "stored_top_kept", "top_opportunity_places", "first"], "rows": rows}
 
 
-PREDICTION_FIELDS = {"reference_class", "generic_diffusion", "thesis", "base_rate", "amended"}
+PREDICTION_FIELDS = {"reference_class", "generic_diffusion", "thesis", "base_rate", "amended", "audience_bar"}
 PREDICTION_RATE_FIELDS = {"class", "precursor", "techniques", "of", "outside"}
 
 
@@ -3420,13 +3420,15 @@ def _prediction_baselines(ents, opps, games, techs, by_id, vocabs, cfg, derived,
                 if not str(out.get(k) or "").strip():
                     errs.append(f"{w}: outside.{k} is empty")
         am = e.get("amended")
-        if am:
-            if not str(am.get("added") or "").strip() or str(am["added"]) not in crit:
-                errs.append(f"{w}: amended.added is not in the criteria")
-            try:
-                date.fromisoformat(str(am.get("date")))
-            except ValueError:
-                errs.append(f"{w}: amended.date is not a date")
+        for key in ("amended", "audience_bar"):   # a size bar added where none was, and an audience size given to a console clause
+            a = e.get(key)
+            if a:
+                if not str(a.get("added") or "").strip() or str(a["added"]) not in crit:
+                    errs.append(f"{w}: {key}.added is not in the criteria")
+                try:
+                    date.fromisoformat(str(a.get("date")))
+                except ValueError:
+                    errs.append(f"{w}: {key}.date is not a date")
         if errs:
             continue
         cls = sorted(g for g in uses if cl.get("all") or subs[g] & set(cl.get("subgenres") or []) or uses[g] & set(cl.get("mechanics") or []))
@@ -3487,6 +3489,17 @@ def _prediction_baselines(ents, opps, games, techs, by_id, vocabs, cfg, derived,
         stats["prediction_amendment_date_long"] = written_dates(am_dates[-1])[0]
         stats["n_predictions_resolved_by_amendment"] = sum(
             1 for o in opps if (o.data["falsifiable_signal"].get("resolution") or {}).get("date") and str(o.data["falsifiable_signal"]["resolution"]["date"]) <= am_dates[-1])
+    # the audience bars: console clauses that gained a sales or player count, on what date, and how many predictions had resolved by then
+    ab = {x: (spec.get(x) or {}).get("audience_bar") for x in live_ids if (spec.get(x) or {}).get("audience_bar")}
+    stats["n_predictions_audience_bar"] = len(ab)
+    if ab:
+        ab_last = max(str(a["date"]) for a in ab.values())
+        stats["audience_bar_date_long"] = written_dates(ab_last)[0]
+        stats["n_predictions_resolved_by_audience_bar"] = sum(
+            1 for o in opps if (o.data["falsifiable_signal"].get("resolution") or {}).get("date") and str(o.data["falsifiable_signal"]["resolution"]["date"]) <= ab_last)
+    # a console clause with no audience size: "console release" not followed by "with at least"
+    stats["n_predictions_console_without_bar"] = sum(
+        1 for o in opps if re.search(r"console release(?! with at least)", str(o.data["falsifiable_signal"].get("criteria", ""))))
     for r in rows:
         r.pop("_share"), r.pop("_amended"), r.pop("_learned_comm"), r.pop("_whole")
     tables["prediction-base-rates"] = {
