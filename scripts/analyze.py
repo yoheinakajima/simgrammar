@@ -1074,17 +1074,16 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
                 scored.append((share_in * math.log((share_in + 1e-9) / (share_all + 1e-9) + 1), mid))
             scored.sort(key=lambda x: (-x[0], x[1]))
             topm = [mid for _, mid in scored[: cl["top_mechanics_per_cluster"]]]
-            top_subs = Counter(g.data.get("subgenre") for g in members).most_common(2)
             label = " + ".join(by_id[m].data["name"] for m in topm[:2])
             for g in members:
                 derived[g.id]["cluster"] = f"C{ci:02d}"
             crow.append({"cluster": f"C{ci:02d}", "label": label, "size": len(members),
                          "stability": _r(clust_jac.get(lab, 0.0), 2),
-                         "dominant_subgenres": ", ".join(f"{sub_terms.get(s, {}).get('label', s)} ({n})" for s, n in top_subs),
+                         "dominant_subgenres": _dominant_subgenres([g.data.get("subgenre") for g in members], sub_terms),
                          "signature_mechanics": topm,
                          "members": [g.id for g in sorted(members, key=lambda g: (float(np.mean([D[gidx[g.id], gidx[o.id]] for o in members])), g.id))]})
         min_size = int(st_cfg.get("min_family_size", 1))
-        tables["game-clusters"] = {"description": f"Games clustered by weighted Jaccard similarity of mechanic sets (average linkage, k={k_chosen} chosen by subsample stability, core weight {cl['core_weight']}{', inverse-prevalence weighting so ubiquitous mechanics do not dominate' if cl.get('idf') else ''}). Stability is the cluster's mean best-match Jaccard overlap across {B} subsamples of about {int(st_cfg['fraction'] * 100)}% of games: in each subsample the cluster is restricted to the games the subsample keeps and compared with every cluster of the subsample's own clustering by Jaccard index (the games in both, divided by the games in either), the best match counts, and subsamples keeping none of the cluster's games are skipped. A cluster with stability of at least {st_cfg['stable_cluster']} and at least {min_size} games counts as stable. Signature mechanics maximize within-cluster share x log-lift. Members are ordered by centrality (mean distance to the rest of the cluster), so the first members are the most typical.",
+        tables["game-clusters"] = {"description": f"Games clustered by weighted Jaccard similarity of mechanic sets (average linkage, k={k_chosen} chosen by subsample stability, core weight {cl['core_weight']}{', inverse-prevalence weighting so ubiquitous mechanics do not dominate' if cl.get('idf') else ''}). Stability is the cluster's mean best-match Jaccard overlap across {B} subsamples of about {int(st_cfg['fraction'] * 100)}% of games: in each subsample the cluster is restricted to the games the subsample keeps and compared with every cluster of the subsample's own clustering by Jaccard index (the games in both, divided by the games in either), the best match counts, and subsamples keeping none of the cluster's games are skipped. A cluster with stability of at least {st_cfg['stable_cluster']} and at least {min_size} games counts as stable. Dominant subgenres: the subgenre with the most member games and the runner-up, with their game counts; a tie is never broken, so subgenres tied for the most are all named, a tie for second place is counted, and a cluster whose subgenres all hold the same number of games reads none dominant. Signature mechanics maximize within-cluster share x log-lift. Members are ordered by centrality (mean distance to the rest of the cluster), so the first members are the most typical.",
                                    "columns": ["cluster", "label", "size", "stability", "dominant_subgenres", "signature_mechanics", "members"], "rows": crow,
                                    "link_columns": ["signature_mechanics", "members"], "max_links": 8}
         # how often clusters cut across subgenres: any second subgenre (the original count), and stricter shares (E8)
@@ -2367,7 +2366,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             stats[key + "_shown"] = f"≤ {stats[key]:g}" if stats[key] <= floor else f"= {stats[key]:g}"
 
     # ---------------- figures
-    figures.update(_figures(mechs, derived, fam_terms, famrows, by_id, games, year))
+    figures.update(_figures(mechs, derived, fam_terms, famrows, by_id, games, year, stats))
     # the byline names the first contributors by first run; everyone after them is credited as "SimGrammar contributors"
     contrib = [r["contributor"] for r in (tables.get("contributors") or {}).get("rows") or []]
     k = int((read_yaml(ROOT / "report" / "meta.yaml") or {}).get("byline_names", 3))
@@ -4696,33 +4695,88 @@ def _esc(s):
     return str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("'", "&#39;")
 
 
-def _figures(mechs, derived, fam_terms, famrows, by_id, games, year):
+def _figures(mechs, derived, fam_terms, famrows, by_id, games, year, stats=None):
     figs = {}
     if not mechs:
         return figs
-    # 1. legibility vs emergence, bubble = prevalence (deterministic jitter from id hash)
-    W, H, L, B = 560, 460, 60, 50
+    stats = stats or {}
+    # 1. legibility vs emergence, bubble = prevalence. Mechanics with the same two scores share one cell; they are packed
+    # around the cell's centre, largest first, so that every bubble shows (review F2), and the packing is deterministic.
+    # The interface families are the ones the excl_interface correlation leaves out (§5.6): they sit at the floor of
+    # emergence potential by construction, so they are drawn apart.
+    iface = {"information-legibility", "time-pacing"}
+    ink, accent = "var(--ink,#171717)", "var(--accent,#0550ae)"
+    W, H, L, B, TOP = 640, 580, 60, 50, 64
+    cw, ch = (W - L - 20) / 5, (H - B - TOP) / 5
+    sx = lambda v: L + (v - 0.5) * cw  # noqa: E731
+    sy = lambda v: H - B - (v - 0.5) * ch  # noqa: E731
+    maxp = max(derived[m.id]["prevalence"] for m in mechs) or 1
+    rad = lambda p: 2.5 + 9 * math.sqrt(p / maxp)  # noqa: E731
     body = []
     for v in range(1, 6):
-        x = L + (v - 0.5) * (W - L - 20) / 5
-        y = H - B - (v - 0.5) * (H - B - 20) / 5
-        body.append(f"<line x1='{x:.1f}' y1='20' x2='{x:.1f}' y2='{H-B}' style='stroke:var(--rule,#dcdcd4)'/>")
-        body.append(f"<line x1='{L}' y1='{y:.1f}' x2='{W-20}' y2='{y:.1f}' style='stroke:var(--rule,#dcdcd4)'/>")
-        body.append(f"<text x='{x:.1f}' y='{H-B+16}' text-anchor='middle'>{v}</text>")
-        body.append(f"<text x='{L-10}' y='{y+4:.1f}' text-anchor='end'>{v}</text>")
-    maxp = max(derived[m.id]["prevalence"] for m in mechs) or 1
-    for m in sorted(mechs, key=lambda m: -derived[m.id]["prevalence"]):
-        h = int(__import__("hashlib").md5(m.id.encode()).hexdigest(), 16)
-        jx = ((h % 1000) / 1000 - 0.5) * 0.7
-        jy = (((h // 1000) % 1000) / 1000 - 0.5) * 0.7
-        x = L + (m.data["legibility"] - 0.5 + jx) * (W - L - 20) / 5
-        y = H - B - (m.data["emergence_potential"] - 0.5 + jy) * (H - B - 20) / 5
-        r = 2.5 + 9 * math.sqrt(derived[m.id]["prevalence"] / maxp)
-        body.append(f"<circle cx='{x:.1f}' cy='{y:.1f}' r='{r:.1f}' fill-opacity='0.3' style='fill:var(--ink,#171717);stroke:var(--ink,#171717);stroke-width:0.6'><title>{_esc(m.data['name'])}</title></circle>")
+        body.append(f"<line x1='{sx(v):.1f}' y1='{TOP}' x2='{sx(v):.1f}' y2='{H-B}' style='stroke:var(--rule,#dcdcd4)'/>")
+        body.append(f"<line x1='{L}' y1='{sy(v):.1f}' x2='{W-20}' y2='{sy(v):.1f}' style='stroke:var(--rule,#dcdcd4)'/>")
+        body.append(f"<text x='{sx(v):.1f}' y='{H-B+16}' text-anchor='middle'>{v}</text>")
+        body.append(f"<text x='{L-10}' y='{sy(v)+4:.1f}' text-anchor='end'>{v}</text>")
+    cells = defaultdict(list)
+    for m in mechs:
+        cells[(m.data["legibility"], m.data["emergence_potential"])].append(m)
+    pos = {}
+    for (lx, ey), ms in sorted(cells.items()):
+        cx, cy, pad = sx(lx), sy(ey), 4.0
+        x0, x1, y0, y1 = cx - cw / 2 + pad, cx + cw / 2 - pad, cy - ch / 2 + pad, cy + ch / 2 - pad
+        gx, gy = np.meshgrid(np.arange(x0, x1 + 0.01, 1.5), np.arange(y0, y1 + 0.01, 1.5))
+        gx, gy = gx.ravel(), gy.ravel()
+        order = np.lexsort((gx, gy, np.round(((gx - cx) / cw) ** 2 + ((gy - cy) / ch) ** 2, 9)))
+        gx, gy = gx[order], gy[order]
+        placed = []
+        for m in sorted(ms, key=lambda m: (-derived[m.id]["prevalence"], m.id)):
+            r = rad(derived[m.id]["prevalence"])
+            inside = (gx - r >= x0) & (gx + r <= x1) & (gy - r >= y0) & (gy + r <= y1)
+            if placed:
+                P = np.array(placed)
+                gap = np.min(np.hypot(gx[:, None] - P[:, 0], gy[:, None] - P[:, 1]) - (r + P[:, 2] + 0.8), axis=1)
+            else:
+                gap = np.zeros(len(gx))
+            fit = np.flatnonzero(inside & (gap >= 0))
+            i = int(fit[0]) if len(fit) else (int(np.argmax(np.where(inside, gap, -np.inf))) if inside.any() else None)
+            x, y = (float(gx[i]), float(gy[i])) if i is not None else (cx, cy)
+            placed.append((x, y, r))
+            pos[m.id] = (x, y, r)
+    for m in sorted(mechs, key=lambda m: (-derived[m.id]["prevalence"], m.id)):
+        x, y, r = pos[m.id]
+        col, op = (accent, 0.45) if m.data["family"] in iface else (ink, 0.3)
+        body.append(f"<circle cx='{x:.1f}' cy='{y:.1f}' r='{r:.1f}' fill-opacity='{op}' style='fill:{col};stroke:{col};stroke-width:0.6'>"
+                    f"<title>{_esc(m.data['name'])}: {derived[m.id]['prevalence']} game{'' if derived[m.id]['prevalence'] == 1 else 's'}</title></circle>")
+    # key, above the plot: reference bubbles drawn with the plot's own radius rule, and the interface families' colour
+    kx, ky = L, 30
+    body.append(f"<text x='{kx}' y='{ky + 4}' style='fill:var(--muted,#696961)'>games using it</text>")
+    kx += 100
+    for n in (v for v in (1, 10, 40) if v <= maxp):
+        r = rad(n)
+        body.append(f"<circle cx='{kx + r:.1f}' cy='{ky}' r='{r:.1f}' fill-opacity='0.3' style='fill:{ink};stroke:{ink};stroke-width:0.6'/>")
+        body.append(f"<text x='{kx + 2 * r + 5:.1f}' y='{ky + 4}' style='fill:var(--muted,#696961)'>{n}</text>")
+        kx += 2 * r + 5 + 6 * len(str(n)) + 18
+    if_lab = " and ".join(fam_terms.get(f, {}).get("label", f).lower() for f in sorted(iface, key=lambda f: (f != "information-legibility", f)))
+    body.append(f"<circle cx='{kx + 6:.1f}' cy='{ky}' r='5.5' fill-opacity='0.45' style='fill:{accent};stroke:{accent};stroke-width:0.6'/>")
+    body.append(f"<text x='{kx + 17:.1f}' y='{ky + 4}' style='fill:var(--muted,#696961)'>{_esc(if_lab)} families</text>")
     body.append(f"<text x='{(W+L)/2:.0f}' y='{H-12}' text-anchor='middle'>Legibility (1 opaque - 5 transparent)</text>")
-    body.append(f"<text transform='translate(16,{(H-B)/2:.0f}) rotate(-90)' text-anchor='middle'>Emergence potential</text>")
-    figs["legibility-vs-emergence"] = {"svg": _svg(W, H, "".join(body)),
-                                       "caption": "Each mechanic placed by rubric legibility (x) and emergence potential (y); area ~ number of games using it. Jitter is deterministic."}
+    body.append(f"<text transform='translate(16,{(TOP+H-B)/2:.0f}) rotate(-90)' text-anchor='middle'>Emergence potential</text>")
+    n_if = sum(1 for m in mechs if m.data["family"] in iface)
+    sf = lambda v: f"{v:.3f}".rstrip("0").rstrip(".")  # noqa: E731  # as report_render._fmt prints a stat
+    cap = ("Each mechanic placed by its legibility (x) and emergence potential (y) scores; a bubble's size grows with the number of catalog games "
+           "using the mechanic, as the reference bubbles above the plot show. Mechanics with the same two scores are packed around that point, "
+           "the most used at the centre, so a bubble's place inside its cell means nothing. "
+           f"Blue bubbles are the {n_if} mechanics of the {if_lab} families, which display or pace the simulation rather than generate anything, "
+           "so they sit at the floor of the emergence scale by construction")
+    if stats.get("pct_interface_emergence_1") is not None:
+        cap += f": {sf(stats['pct_interface_emergence_1'])} percent of them score 1"
+    cap += "."
+    rho = [stats.get(f"rho_legibility_emergence_potential{k}") for k in ("", "_within_family", "_excl_interface")]
+    if None not in rho:
+        cap += (f" Spearman's ρ is {sf(rho[0])} over all mechanics, {sf(rho[1])} within families (each score ranked against its family's mean rank, "
+                f"so differences between families drop out), and {sf(rho[2])} without the blue families.")
+    figs["legibility-vs-emergence"] = {"svg": _svg(W, H, "".join(body)), "caption": cap}
 
     # 2. technique exposure by family (horizontal bars)
     rows = [r for r in famrows if r["technique_exposure"] > 0]
@@ -4762,3 +4816,23 @@ def _figures(mechs, derived, fam_terms, famrows, by_id, games, year):
         figs["mechanic-accumulation"] = {"svg": _svg(W, H, "".join(body)),
                                          "caption": "Cumulative count of mechanics by first appearance in the dataset. Steps mark the years a design vocabulary expanded."}
     return figs
+
+
+def _dominant_subgenres(subgenres, sub_terms) -> str:
+    """The game-clusters table's dominant_subgenres cell: the subgenre with the most member games and the runner-up, with
+    their game counts. A tie is never broken by member order or id (review D28): subgenres tied for the most are all named,
+    in label order; a tie for second place is counted, not named; and a cluster whose subgenres all hold the same number of
+    games has none dominant."""
+    cnt = Counter(str(s) for s in subgenres)
+    if not cnt:
+        return ""
+    lab = lambda s: sub_terms.get(s, {}).get("label", s)  # noqa: E731
+    levels = sorted(set(cnt.values()), reverse=True)
+    first = sorted((s for s in cnt if cnt[s] == levels[0]), key=lambda s: (lab(s), s))
+    if len(first) > 1 and len(first) == len(cnt):
+        return f"none dominant ({len(cnt)} subgenres, {levels[0]} {'game' if levels[0] == 1 else 'games'} each)"
+    parts = [f"{lab(s)} ({levels[0]})" for s in first]
+    if len(first) == 1 and len(levels) > 1:
+        second = [s for s in cnt if cnt[s] == levels[1]]
+        parts.append(f"{lab(second[0])} ({levels[1]})" if len(second) == 1 else f"{len(second)} others tied at {levels[1]}")
+    return ", ".join(parts)

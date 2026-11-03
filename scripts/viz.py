@@ -159,7 +159,7 @@ def build(shared, live, by_id, derived, tables, stats, vocabs, cfg) -> dict:
     out["constraint-profile"] = constraint_profile(live, fam, shared.get("family_score_intervals") or {})
     out["technique-landscape"] = technique_landscape(live, vocabs)
     out["determinism-runtime"] = determinism_runtime(live, vocabs)
-    out["opportunity-priorities"] = opportunity_priorities(live, tables)
+    out["opportunity-priorities"] = opportunity_priorities(live, tables, derived, stats)
     out["prediction-timeline"] = prediction_timeline(live)
     out["pipeline"] = pipeline(live, stats)
     return out
@@ -314,8 +314,9 @@ def strata(shared, live, by_id, derived, fam):
     first = {m.id: derived[m.id]["earliest_year"] for m in mechs}
     fams = sorted({m.data["family"] for m in mechs}, key=lambda f: (float(np.mean([first[m.id] for m in mechs if m.data["family"] == f])), f))
     n = len(mechs)
-    W, H = 880, 470
+    W, H = 896, 470
     L, R, TOP, BOT = 40, 690, 40, 400
+    TONES = ("0.05", "0.12", "0.2")  # the layers cycle through three shades, so neighbouring families always differ (review F3)
     sx = lambda y: L + (y - y0) / (y1 - y0 + 1) * (R - L)
     sy = lambda c: BOT - c / n * (BOT - TOP)
     yrs = list(range(y0, y1 + 2))
@@ -341,44 +342,57 @@ def strata(shared, live, by_id, derived, fam):
             pts_bot += [(xa, sy(base[i])), (xb, sy(base[i]))]
         poly = pts_top + list(reversed(pts_bot))
         d = "M" + "L".join(f"{f1(x)},{f1(y)}" for x, y in poly) + "Z"
-        fill_op = "0.13" if k % 2 == 0 else "0.05"
+        fill_op = TONES[k % len(TONES)]
         cnt = cum[f][-1]
         fm = sorted((m for m in mechs if m.data["family"] == f), key=lambda m: (first[m.id], m.id))
         layers.append(f'<path d="{d}" data-family="{f}" data-label="{esc(fam[f]["label"])}" data-count="{cnt}" '
                       f'data-first="{first[fm[0].id]}" fill-opacity="{fill_op}" style="fill:{T["ink"]};stroke:{T["rule2"]};stroke-width:0.6"/>')
-        label_targets.append(((sy(top[-1]) + sy(base[-1])) / 2, f, cnt))
+        label_targets.append(((sy(top[-1]) + sy(base[-1])) / 2, f, cnt, fill_op))
         base = top
     body.append('<g data-layer="strata">' + "".join(layers) + "</g>")
-    # labels on the right with leaders
+    # labels on the right with leaders, each with a swatch of its layer's shade
     ys = spread([t[0] for t in label_targets], 10.5, TOP, BOT)
-    for (ty, f, cnt), ly in zip(label_targets, ys):
+    for (ty, f, cnt, op), ly in zip(label_targets, ys):
         body.append(f'<path d="M{R + 2},{f1(ty)} L{R + 14},{f1(ty)} L{R + 22},{f1(ly)} L{R + 26},{f1(ly)}" style="fill:none;stroke:{T["rule2"]};stroke-width:0.6"/>')
-        body.append(text(R + 30, ly + 3, f'{fam[f]["label"].lower()} · {cnt}', 9, "muted"))
-    # annotations: years with the most new mechanics, credited to the game that introduced most of them
+        body.append(f'<rect x="{R + 29}" y="{f1(ly - 4)}" width="8" height="8" fill-opacity="{op}" style="fill:{T["ink"]};stroke:{T["rule2"]};stroke-width:0.6"/>')
+        body.append(text(R + 41, ly + 3, f'{fam[f]["label"].lower()} · {cnt}', 9, "muted"))
+    # annotations: the years with the most new mechanics. +N counts the mechanics whose first catalog game came out that
+    # year; the label then says how many of them the year's leading game uses, naming every game tied for the lead, so
+    # that it neither credits one game with the whole year nor picks one of two tied games by order (review F3)
     intro = defaultdict(list)
     for m in mechs:
         intro[first[m.id]].append(m)
-    by_game = Counter(derived[m.id]["earliest_game"] for m in mechs)
     top_years = sorted(intro, key=lambda y: (-len(intro[y]), y))[:6]
     total = [sum(cum[f][i] for f in fams) for i in range(len(yrs))]
+    gm = shared["gm"]
     ann = []
     for y in sorted(top_years):
-        gid = Counter(derived[m.id]["earliest_game"] for m in intro[y]).most_common(1)[0][0]
-        ann.append((y, by_id[gid].data["name"], len(intro[y])))
-    rows_end = []  # greedy rows: each label goes in the lowest row where it does not overlap
-    for y, gname, cnt in ann:
+        new = {m.id for m in intro[y]}
+        uses = {g.id: len(new & set(gm[g.id])) for g in games if g.data.get("year") == y}
+        best = max(uses.values())
+        lead = sorted(by_id[g].data["name"].lower() for g, c in uses.items() if c == best)
+        who = lead[0] if len(lead) == 1 else (f"{lead[0]} and {lead[1]}" if len(lead) == 2 else counted(len(lead), "game"))
+        ann.append((y, f"{y}: +{len(new)} mechanics, {best}{'' if len(lead) == 1 else ' each'} in {who}"))
+    # Each label ends just left of its year's leader, in the empty space above the rising stack, so it crosses no layer; a
+    # label too long for that space starts at the left edge instead. It takes the lowest row that keeps it clear of the
+    # stack's top edge, the axis numbers, and the labels already placed.
+    def stack_top(xa, xb):
+        return min((sy(total[i]) for i, yy in enumerate(yrs) if sx(yy) <= xb and sx(yy + 1) >= xa), default=BOT)
+    taken = [(L - 6 - len(str(c)) * 9 * CW - 2, sy(c) - 6, L - 4, sy(c) + 4) for c in range(0, n + 1, 50)]
+    for y, lab in ann:
         x = sx(y) + 1
         ty = sy(total[yrs.index(y)])
-        lab = f"{y} {gname.lower()} +{cnt}"
         w = len(lab) * 9 * CW
-        x0 = min(x - 4, R - w)
-        row = next((r for r, end in enumerate(rows_end) if x0 > end + 8), len(rows_end))
-        if row == len(rows_end):
-            rows_end.append(0)
-        rows_end[row] = x0 + w
-        ly = ty - 14 - row * 12
+        fits = x - 3 - w >= 4
+        x0 = x - 3 - w if fits else 4
+        for row in range(int(BOT // 12)):
+            ly = ty - 14 - row * 12
+            box = (x0 - 2, ly - 9, x0 + w + 2, ly + 3)
+            if ly - 9 < 2 or (box[3] <= stack_top(box[0], box[2]) - 2 and not any(box[0] < b[2] and b[0] < box[2] and box[1] < b[3] and b[1] < box[3] for b in taken)):
+                break
+        taken.append(box)
         body.append(f'<line x1="{f1(x)}" y1="{f1(ty - 2)}" x2="{f1(x)}" y2="{f1(ly + 3)}" style="stroke:{T["rule2"]};stroke-width:0.6"/>')
-        body.append(text(x0, ly, lab, 9, "ink2"))
+        body.append(text(x - 3, ly, lab, 9, "ink2", "end") if fits else text(x0, ly, lab, 9, "ink2"))
     # rug of game releases
     body.append('<g data-layer="rug">')
     for g in sorted(games, key=lambda g: ((g.data.get("year") or 0), g.id)):
@@ -403,8 +417,11 @@ def strata(shared, live, by_id, derived, fam):
         "title": "The vocabulary, year by year",
         "head": f"{counted(n, 'mechanic')} · {y0} to {y1}",
         "svg": "".join(body),
-        "caption": "Cumulative mechanics by the year of their first catalog game, one layer per family, oldest families at the bottom. "
-                   "Labels mark the years that added the most mechanics and the game that introduced most of them. Drag the year control, or hover or tap the chart, to read what each year added.",
+        "caption": "Cumulative mechanics by the year of their first catalog game, one layer per family, oldest families at the bottom; "
+                   f"the layers cycle through {len(TONES)} shades, and the swatch beside each family's name shows its layer's shade. "
+                   f"Labels mark the {len(top_years)} years that added the most mechanics. In a label, +N is the number of mechanics whose first catalog game "
+                   "came out that year, and the count after it is how many of those the year's leading game uses; a mechanic can first appear in two games "
+                   "of the same year, and games tied for the lead are all named. Drag the year control, or hover or tap the chart, to read what each year added.",
         "source": "derived.earliest_year per mechanic · dist/entities/mechanics.json",
         "controls": controls,
         "legend": "",
@@ -1017,7 +1034,7 @@ def constraint_profile(live, fam, intervals):
     W = LBL + len(scores) * (PW + GAP) + 10
     H = TOP + RH * len(fams) + 24
     HK = H + 20  # the key sits under the axis numbers
-    body = [svg_open("constraint-profile", W, HK, "Ceiling scores by family",
+    body = [svg_open("constraint-profile", W, HK, "Four rubric scores by family",
                      "Mean rubric score of each family's mechanics on authoring cost, compute cost, tuning difficulty, and legibility, on a 1 to 5 scale, "
                      "with a 95 percent bootstrap interval over the family's mechanics.")]
     for k, (s, lab, note) in enumerate(scores):
@@ -1055,8 +1072,12 @@ def constraint_profile(live, fam, intervals):
     body.append("</svg>")
     trows = [{"family": fam[f]["label"], "mechanics": count[f],
               **{k: v for s, _, _ in scores for k, v in ((s, round(means[f][s], 2)), (f"{s}_interval", f"{iv(f, s)[0]:g} to {iv(f, s)[1]:g}"))}} for f in fams]
-    return _plain("Ceiling scores by family", f"{counted(len(fams), 'family')} · {counted(len(mechs), 'mechanic')}", "".join(body),
-                  "Mean rubric score of each family's mechanics on four of the five ceilings; determinism is a property of techniques and has its own figure. "
+    return _plain("Four rubric scores by family", f"{counted(len(fams), 'family')} · {counted(len(mechs), 'mechanic')}", "".join(body),
+                  "Mean score of each family's mechanics on four of the rubric scales every mechanic is scored on: "
+                  + ", ".join(lab for _, lab, _ in scores[:-1]) + f", and {scores[-1][1]}, each from 1 to 5. "
+                  "Authoring cost, compute cost, and legibility bear on three of the five ceilings; tuning difficulty is not one of them. "
+                  "The other two ceilings have no mechanic-level score: determinism is a property of techniques and has its own figure, "
+                  "and no rubric scores believability. "
                   "Whiskers are 95 percent intervals from resampling each family's mechanics. Blue marks a family at 3 or above on a cost, or below 3.3 on legibility "
                   "(the dashed lines), and is hollow where the interval crosses that line. Families are ordered by combined compute and authoring cost.",
                   "mechanic rubric scores · dist/entities/mechanics.json",
@@ -1143,10 +1164,25 @@ def determinism_runtime(live, vocabs):
                                                                         "note": "Runtime techniques by effect on reproducibility and maturity."}, min_width=860)
 
 
-def opportunity_priorities(live, tables):
+def _ordinal(n: int) -> str:
+    return f"{n}{'th' if 10 <= n % 100 <= 20 else {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')}"
+
+
+def opportunity_priorities(live, tables, derived, stats):
     rows = {r["opportunity"]: r for r in tables["opportunities-ranked"]["rows"]}
     order = {r["opportunity"]: i for i, r in enumerate(tables["opportunities-ranked"]["rows"])}  # ranked on the unrounded priority
     opps = [o for o in sorted(live["opportunity"], key=lambda o: o.id) if not o.data.get("deprecated") and o.id in rows]
+    # The highlight follows the priorities, not the sort order (review F4): the top n is cut at the n-th place's priority,
+    # and when that value is shared beyond place n, the opportunities above it and those tied at it get two styles rather
+    # than the tie being broken by id. Ties are on the unrounded priority that orders the table, as section 9 counts them.
+    topn = min(int(stats.get("opportunity_top_n") or 8), len(opps))
+    pr = {o.id: derived[o.id]["priority"] for o in opps}
+    ranked = sorted(opps, key=lambda o: order[o.id])
+    cut = pr[ranked[topn - 1].id] if opps else None
+    above = {o.id for o in opps if pr[o.id] > cut}
+    tied = {o.id for o in opps if pr[o.id] == cut}
+    split = len(above) + len(tied) > topn
+    near = [o.id for o in opps if pr[o.id] < cut and rows[o.id]["priority"] == rows[ranked[topn - 1].id]["priority"]] if split else []
     cells = defaultdict(list)
     for o in opps:
         cells[(o.data["impact"], o.data["feasibility"])].append(o)
@@ -1158,8 +1194,7 @@ def opportunity_priorities(live, tables):
     lines = {o.id: wrap(o.data["name"], 35) for o in opps}  # names in full; a long one wraps under itself
     hts = {i: max(sum(len(lines[o.id]) for o in cells.get((i, f), [])) for f in feas) for i in imps}
     W = LBL + CWID * len(feas) + 10
-    H = TOP + sum(hts[i] * RH + 22 for i in imps) + 30
-    top8 = sorted(opps, key=lambda o: order[o.id])[:8]
+    H = TOP + sum(hts[i] * RH + 22 for i in imps) + 30 + (12 if split else 0)
     body = [svg_open("opportunity-priorities", W, H, "Where the bets sit on impact and feasibility",
                      "Opportunities placed by their impact and feasibility scores; each cell lists its opportunities with their novelty score.")]
     for j, f in enumerate(feas):
@@ -1173,19 +1208,32 @@ def opportunity_priorities(live, tables):
             body.append(f'<rect x="{x + 2}" y="{y}" width="{CWID - 4}" height="{h - 4}" style="fill:{T["paper2"]};stroke:{T["rule"]};stroke-width:0.6"/>')
             k = 0
             for o in cells.get((i, f), []):
-                lead = o in top8
-                st = f'fill:{T["accent"] if lead else T["ink2"]};font-size:8.5px{";font-weight:600" if lead else ""}'
+                lead, bold = o.id in above | tied, o.id in above or (o.id in tied and not split)
+                st = f'fill:{T["accent"] if lead else T["ink2"]};font-size:8.5px{";font-weight:600" if bold else ""}'
                 for j, line in enumerate(lines[o.id]):
                     head = (f'<title>{esc(o.data["name"])}: priority {rows[o.id]["priority"]}, novelty {o.data["novelty"]}, horizon {o.data["horizon"]}</title>'
                             f'{o.data["novelty"]} ') if j == 0 else ""
                     body.append(f'<text x="{f1(x + 8 + (0 if j == 0 else 2 * 8.5 * CW))}" y="{f1(y + 14 + k * RH)}" style="{st}">{head}{esc(line)}</text>')
                     k += 1
         y += h
-    body.append(text(LBL, H - 10, "number before each name: novelty score · blue: the eight highest priorities", 9, "faint"))
+    places = f"places {len(above) + 1} to {len(above) + len(tied)}"
+    if split:
+        body.append(text(LBL, H - 22, "number before each name: novelty score", 9, "faint"))
+        body.append(text(LBL, H - 10, f"bold blue: the {len(above)} priorities above the {_ordinal(topn)}-place value · plain blue: the {len(tied)} tied at that value, {places}", 9, "faint"))
+        how = (f"Bold blue names are the {len(above)} opportunities whose priority, the weighted geometric mean of the three scores, is above the "
+               f"{_ordinal(topn)}-place value; plain blue names are the {len(tied)} that share that value, {places}, so no top {topn} can be drawn without "
+               "breaking a tie. Ties are counted on the unrounded priority that orders the ranked table")
+        if near:
+            how += (f"; {'one opportunity' if len(near) == 1 else counted(len(near), 'opportunity')} shown at the same {rows[ranked[topn - 1].id]['priority']} "
+                    f"to one decimal {'sits' if len(near) == 1 else 'sit'} just below it and {'is' if len(near) == 1 else 'are'} not marked")
+        how += ". "
+    else:
+        body.append(text(LBL, H - 10, f"number before each name: novelty score · blue: the {topn} highest priorities", 9, "faint"))
+        how = f"Blue names are the {topn} highest priorities, the weighted geometric mean of the three scores. "
     body.append("</svg>")
     return _plain("Where the bets sit on impact and feasibility", f"{counted(len(opps), 'opportunity')}", "".join(body),
                   "Each opportunity placed by its impact and feasibility scores, with its novelty score before its name. "
-                  "Blue names are the eight highest priorities, the weighted geometric mean of the three scores. Scores come from one rater's reading of anchor text.",
+                  + how + "Scores come from one rater's reading of anchor text.",
                   "tables opportunities-ranked · dist/analysis/opportunities-ranked.csv",
                   {"table": "opportunities-ranked", "note": "Every opportunity with its scores and composite priority."}, min_width=860)
 
@@ -1279,15 +1327,17 @@ def cluster_k_curve(tables, cfg):
     st = cfg["clustering"]["stability"]
     thr, k_cfg = float(st["min_mean_ari"]), int(cfg["clustering"]["k"])
     ks = [r["k"] for r in rows]
-    L, R, TOP, BOT, W, H = 56, 16, 22, 44, 680, 300
-    lo = min(0.0, math.floor(min(r["p10_ari"] for r in rows) * 10) / 10)
+    L, R, TOP, BOT, W, H = 56, 16, 22, 44, 680, 320
+    # ARI is 0 at chance agreement and can go below it, while the share of games stays in [0, 1]: the axis always runs at
+    # least one gridline below zero, and further if a percentile does, so nothing is clipped (review F5)
+    lo = min(-0.25, math.floor(min(r["p10_ari"] for r in rows) * 4) / 4)
     sx = lambda k: L + (k - ks[0]) / max(ks[-1] - ks[0], 1) * (W - L - R)  # noqa: E731
     sy = lambda v: TOP + (1.0 - v) / (1.0 - lo) * (H - TOP - BOT)  # noqa: E731
     body = [svg_open("cluster-k-curve", W, H, "Agreement under resampling, by number of clusters",
                      "Mean adjusted Rand index between the full clustering and subsample re-clusterings for each k, with the 10th to 90th "
                      "percentile band, the share of games in the largest cluster, the selection threshold, and the configured k.")]
     for v in [x / 4 for x in range(int(math.ceil(lo * 4)), 5)]:
-        body.append(f'<line x1="{L}" y1="{f1(sy(v))}" x2="{W - R}" y2="{f1(sy(v))}" style="stroke:{T["rule"]};stroke-width:0.6"/>')
+        body.append(f'<line x1="{L}" y1="{f1(sy(v))}" x2="{W - R}" y2="{f1(sy(v))}" style="stroke:{T["rule2" if v == 0 else "rule"]};stroke-width:0.6"/>')
         body.append(text(L - 8, sy(v) + 3, f"{v:g}", 9, "faint", "end"))
     for k in ks:
         if k % 2 == 0:
@@ -1295,15 +1345,45 @@ def cluster_k_curve(tables, cfg):
     band = [(sx(r["k"]), sy(r["p90_ari"])) for r in rows] + [(sx(r["k"]), sy(r["p10_ari"])) for r in reversed(rows)]
     body.append(f'<polygon points="{" ".join(f"{f1(x)},{f1(y)}" for x, y in band)}" style="fill:{T["ink"]};fill-opacity:0.1;stroke:none"/>')
     body.append(f'<line x1="{L}" y1="{f1(sy(thr))}" x2="{W - R}" y2="{f1(sy(thr))}" style="stroke:{T["accent"]};stroke-width:1;stroke-dasharray:4 3"/>')
-    body.append(text(L + 4, sy(thr) - 5, f"selection threshold {thr:g}", 9, "accent"))
+    # the threshold's label goes where neither curve, the configured-k line, nor another label crosses it: the leftmost
+    # free place just above the dashed line, else just below it, else the line's left end
+    mean_pts = [(sx(r["k"]), sy(r["mean_ari"])) for r in rows]
+    share_pts = [(sx(r["k"]), sy(r["largest_cluster_share"])) for r in rows]
+    lab_r = min(rows, key=lambda r: (abs(r["k"] - (ks[0] + ks[-1]) / 3), r["k"]))
+    share_lab = (sx(lab_r["k"]), sy(lab_r["largest_cluster_share"]) - 6, "largest cluster's share of games")
+    k_lab = f"configured k = {k_cfg}"
+    blocked = [(share_lab[0], share_lab[1] - 9, share_lab[0] + len(share_lab[2]) * 9 * CW, share_lab[1] + 2)]
+    if k_cfg in ks:
+        blocked += [(sx(k_cfg) - 1, TOP, sx(k_cfg) + 1, H - BOT), (sx(k_cfg) + 4, TOP + 1, sx(k_cfg) + 4 + len(k_lab) * 9 * CW, TOP + 12)]
+
+    def span_y(pts, xa, xb):
+        ys = []
+        for (xa_, ya_), (xb_, yb_) in zip(pts, pts[1:]):
+            if xb_ < xa or xa_ > xb:
+                continue
+            for x in (max(xa_, xa), min(xb_, xb)):
+                ys.append(ya_ + (yb_ - ya_) * ((x - xa_) / (xb_ - xa_) if xb_ != xa_ else 0.0))
+        return (min(ys), max(ys)) if ys else None
+
+    def free(bx):
+        for pts in (mean_pts, share_pts):
+            s = span_y(pts, bx[0], bx[2])
+            if s and s[0] < bx[3] and s[1] > bx[1]:
+                return False
+        return not any(bx[0] < b[2] and b[0] < bx[2] and bx[1] < b[3] and b[1] < bx[3] for b in blocked)
+
+    thr_lab = f"selection threshold {thr:g}"
+    tw = len(thr_lab) * 9 * CW
+    spots = [(x0, base) for base in (sy(thr) - 5, sy(thr) + 12) for x0 in np.arange(L + 4, W - R - tw, 2.0)]
+    tx, ty = next(((float(x0), base) for x0, base in spots if free((x0 - 3, base - 11, x0 + tw + 3, base + 4))), (L + 4, sy(thr) - 5))
+    body.append(text(tx, ty, thr_lab, 9, "accent"))
     if k_cfg in ks:
         body.append(f'<line x1="{f1(sx(k_cfg))}" y1="{TOP}" x2="{f1(sx(k_cfg))}" y2="{H - BOT}" style="stroke:{T["ink2"]};stroke-width:0.8"/>')
-        body.append(text(sx(k_cfg) + 4, TOP + 10, f"configured k = {k_cfg}", 9, "ink2"))
-    share = " ".join(f"{f1(sx(r['k']))},{f1(sy(r['largest_cluster_share']))}" for r in rows)
+        body.append(text(sx(k_cfg) + 4, TOP + 10, k_lab, 9, "ink2"))
+    share = " ".join(f"{f1(x)},{f1(y)}" for x, y in share_pts)
     body.append(f'<polyline points="{share}" style="fill:none;stroke:{T["open"]};stroke-width:1.2;stroke-dasharray:2 2"/>')
     # label the dotted line in the plot itself, so the static figure reads without the site's legend
-    lab_r = min(rows, key=lambda r: (abs(r["k"] - (ks[0] + ks[-1]) / 3), r["k"]))
-    body.append(text(sx(lab_r["k"]), sy(lab_r["largest_cluster_share"]) - 6, "largest cluster's share of games", 9, "open"))
+    body.append(text(*share_lab, 9, "open"))
     mean = " ".join(f"{f1(sx(r['k']))},{f1(sy(r['mean_ari']))}" for r in rows)
     body.append(f'<polyline points="{mean}" style="fill:none;stroke:{T["ink"]};stroke-width:1.6"/>')
     for r in rows:
@@ -1321,7 +1401,9 @@ def cluster_k_curve(tables, cfg):
     return _plain("Agreement under resampling, by number of clusters", f"k = {ks[0]} to {ks[-1]} · {st['subsamples']} subsamples", "".join(body),
                   f"For each number of clusters k, the adjusted Rand index between the full clustering and the re-clustering of each of {st['subsamples']} subsamples "
                   f"of about {round(100 * float(st['fraction']))} percent of the games: the line is the mean, the band runs from the 10th to the 90th percentile. "
-                  f"The dotted line is the share of games in the largest cluster. The rule picks the smallest k whose mean reaches {thr:g} (dashed line); the vertical line marks the configured k.",
+                  f"The dotted line is the share of games in the largest cluster. The rule picks the smallest k whose mean reaches {thr:g} (dashed line); the vertical line marks the configured k. "
+                  "The two measures share one axis: the share runs from 0 to 1, while the adjusted Rand index is 0 for agreement no better than chance and "
+                  "negative for worse, so the axis extends below zero and no percentile is cut off.",
                   "tables cluster-stability · dist/analysis/cluster-stability.csv · report/analysis.yaml (clustering)",
                   {"table": "cluster-stability", "note": "Mean, 10th and 90th percentile ARI and the largest cluster's share of games, for every k."},
                   min_width=640, legend_html=key)
