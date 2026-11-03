@@ -84,6 +84,9 @@ phrases:
   - {id: what-matters, pattern: '\b(what matters (is|here|most)|the key (is|here)|the catch is|the trick is|the point is)\b', why: announces instead of saying}
   - {id: looks-like, pattern: '\b(that|this) is what [^.,;]{1,40} looks like\b', why: aphorism}
   - {id: keeps-returning, pattern: '\b(keeps? (coming back|returning) to|we will return to|more on that later)\b', why: signposting}
+  - {id: apology, pattern: '\b(unfortunately|regrettably|admittedly|to be fair)\b', why: apology; state the fact}
+  - {id: read-as, pattern: '\b(should|must|is best|are best) (be )?read (as|with)\b', why: tells the reader how to discount a claim; state the claim at its strength, severity: warn}
+  - {id: disclaimer, pattern: '\b(this|that|it|which) does not (show|mean|establish|prove)\b', why: disclaimer sentence; say what the evidence does show, severity: warn}
 
 structures:
   - {id: not-but, pattern: '\bnot (just |only |merely |simply )?[^,.;:!?]{1,50}, but\b', why: 'contrast frame "not X, but Y"; state the positive claim'}

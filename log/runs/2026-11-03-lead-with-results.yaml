@@ -1,0 +1,35 @@
+id: 2026-11-03-lead-with-results
+type: run
+kind: maintenance
+date: '2026-11-03'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Rewrite the paper and the book to lead with results, stating each finding once at the strength its evidence supports and gathering the general limits into one place, at the operator's request.
+method: >-
+  Prose, house style, and two site labels; no record, analysis parameter, or statistic changed. Measured
+  caveat density per chapter with a fixed lexicon of hedging phrases (cannot, untested, only, may, not yet,
+  should be read as, one rater, and similar): the paper ran 5 to 10 per thousand words and its abstract was
+  about 1,600 words. Rewrote the abstract to about 500 words of prose: each of the six findings is stated
+  once with its key number, and the cross-model agreement is one Reliability paragraph. Rewrote §1 to §11 so
+  each finding leads, each robustness check is reported as what was tested and what held, and a failed check
+  is stated once where the finding is made. Replaced the 1,300-word §2.6 with five short limits (sample,
+  raters, agreement, relations, coverage and recency) and moved its detail, unchanged in substance, to a new
+  Appendix F (ratings and calibration, the second rater, the rated mechanics with their table, the coding
+  sample, the cross-model check), together with the rating sample-size simulation and its table from §5.6.
+  Restructured §5.6 to lead with the correlation, then the checks it survives, then the second model's
+  weaker reading and the null coupling result. Corrected sentences the cross-model run had made out of date
+  (no second rater had scored the opportunities; maturity agreement unmeasured; edges never checked for
+  recall) and pointed detail references at Appendix F. Two helper agents in the same session applied the same
+  rule to the book under a revised book/STYLE.md rule 4 (say how sure the data is once, where the finding is
+  made) with chapter 13 as the single home for the book's limits; I reviewed their reports, aligned two
+  book sentences with the null coupling result (coupling does not track legibility, so the cost is a tax on
+  variety), and checked the book against the paper. book/tells.yaml gained an apology pattern (error) and two
+  hedge patterns (warn). The site's home strip now says the ten breaking techniques lose lockstep and
+  re-simulation, matching §6.4, and drops the rater clause. Every sentence kept its assertions or lost them
+  with it; the build evaluates 800 report assertions. The operator approved releasing the result as v0.7, so report/meta.yaml
+  moves to version 0.7 and CITATION.cff is regenerated. make check passed before and after each step.
+contract_version: '1.2'
+proposals: []
