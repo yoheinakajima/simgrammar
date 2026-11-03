@@ -28,7 +28,7 @@ The figure stacks the vocabulary year by year, one layer per family. The steepes
 
 A count like that suggests a golden age of invention followed by decades of reuse, and the suggestion can be tested against chance.
 
-Tested that way, the early games show a few fewer parts than random sets of later games with as many mechanic uses, a difference well within chance.{{assert:n_mechanics_seen_null_uses_mean > n_mechanics_seen_by_2000}}{{assert:p_mechanics_seen_uses > 0.05}} The test is coarse. It rules out a large early advantage and would miss one of a few mechanics. The "set early" figure reflects how widely the parts are shared: a few dozen games of any period already show most of the vocabulary. One narrower finding rests on a direct count that the test does not check: invention concentrates in a small number of games in every decade.
+Tested that way, the early games show a few fewer parts than random sets of later games with as many mechanic uses, a difference well within chance.{{assert:n_mechanics_seen_null_uses_mean > n_mechanics_seen_by_2000}}{{assert:p_mechanics_seen_uses > 0.05}} The test is coarse. It rules out a large early advantage and would miss one of a few mechanics. It cannot tell a small early advantage from chance, so on its own it neither shows early invention nor rules it out. A few dozen games of any period already show most of the vocabulary, and the year shuffle later in this chapter is what shows how widely the old parts are shared. One narrower finding rests on a direct count that the test does not check: invention concentrates in a small number of games in every decade.
 
 <details class="disclosure"><summary>how the test against chance works</summary>
 

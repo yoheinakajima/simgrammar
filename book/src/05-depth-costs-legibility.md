@@ -118,7 +118,7 @@ Dwarf Fortress was built on its designer's stated principles: break a system int
 
 Oxygen Not Included derives insulation, phase changes, and overheating machines from a single rule for heat moving between cells, so much of the depth is in one equation applied everywhere, and it gives the player overlays to read the results. Victoria 3 simulates prices, wages, and the politics that follow from them, and explains each of those numbers with causal tooltips.
 
-The cost of making depth readable is design work and screen space. Each coupled system needs a way to be read, and each legibility mechanic brings failure modes of its own.
+The cost of making depth readable is design work and screen space. On this reading each coupled system needs a way to be read, and each legibility mechanic brings failure modes of its own. The reading is a proposal. Counted from the links the dataset records between mechanics that need, reinforce, or work against each other, a mechanic's coupling does not go with a lower legibility score (ρ = {{stat:rho_legibility_coupling_degree}}), so the link between coupling and opacity rests on the scores alone.{{assert:rho_legibility_coupling_degree_family_low < 0}}{{assert:rho_legibility_coupling_degree_family_high > 0}}
 
 Explaining a simulation's state from its own logs needs retrieval, summarization, and constrained generation, all of which exist; chapter 8 counts how few techniques in the dataset do it.{{assert:rank_effect_explains <= 2}} Chapter 10 makes the case for a why-query, a box where a player asks why something happened and gets an answer drawn from the game's event log.
 

@@ -1,0 +1,21 @@
+id: src-strona-2014-curveball
+type: source
+name: A fast and unbiased procedure to randomize ecological binary matrices with fixed row and column totals
+kind: paper
+authors:
+- Giovanni Strona
+- Domenico Nappo
+- Francesco Boccacci
+- Simone Fattorini
+- Jesus San-Miguel-Ayanz
+venue: Nature Communications 5, 4114
+date: '2014-06-11'
+url: https://www.nature.com/articles/ncomms5114
+doi: 10.1038/ncomms5114
+accessed: '2026-11-02'
+notes: 'Introduces the Curveball algorithm for randomizing presence-absence matrices without altering row and column
+  totals, and reports that it samples the set of matrix configurations uniformly at far lower computational effort than
+  earlier swap methods. The fixed-margin null of §5.3 uses its trade: two rows exchange a random part of the entries
+  only one of them holds.'
+provenance:
+  created: 2026-11-02-es-v5-revision
