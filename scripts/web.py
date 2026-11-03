@@ -567,15 +567,13 @@ class Web:
         """The front door: what the atlas is and why it matters, then a way into every part of it. The paper has its own tab."""
         base, meta, st = "", self.meta, self.analysis["stats"]
         counts = self.counts()
-        # the rubric scores come from one model rater, and a second rater has re-scored a share of them (paper §5.6 and its caveats)
-        rater = "mostly from one model" if st.get("n_scores_independently_rated") else "from one model"
         findings = [
             (f'{st["pct_uses_since_2010_on_pre2001"]:.0f}%', "of the parts in games since 2010 were already in a game by 2000", "5.2"),
             # the paper's wording: legibility falls as emergence potential, the unscripted variety a mechanic generates, rises
-            (f'{st["rho_legibility_emergence_potential"]}', f"mechanics that generate more unscripted variety are rated harder to read (ρ, on scores {rater})", "5.6"),
+            (f'{st["rho_legibility_emergence_potential"]}', "mechanics that generate more unscripted variety are rated harder to read (ρ across the rubric scores)", "5.6"),
             # exposure is zero exactly when no technique record has an affects edge to the mechanic
             (f'{st["pct_uses_on_zero_exposure"]:.0f}%', "of mechanic uses fall on mechanics that no technique in this dataset is linked to", "8.2"),
-            (f'{st["n_technique_runtime_breaks"]} of {st["n_technique_runtime"]}', "AI techniques that run during play break exact replay", "6.4"),
+            (f'{st["n_technique_runtime_breaks"]} of {st["n_technique_runtime"]}', "AI techniques that run during play break lockstep multiplayer and re-simulation", "6.4"),
         ]
         # register.css pads every number but the first on its left, so when the strip wraps to two rows on a phone the second
         # row starts indented. A hidden empty number in front makes every finding a following number: all four pad alike.

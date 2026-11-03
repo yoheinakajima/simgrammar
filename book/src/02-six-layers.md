@@ -4,7 +4,7 @@ Zone a block of houses in [[simcity-1989|SimCity]], run a power line to it, and 
 
 The six rules in that paragraph do six different jobs. The maps, the zones, and the treasury hold the city's state. The crime formula and the spread of pollution change it. Pollution lowering land value connects one system to another. Painting zones and setting the tax rate take in what the player wants. The maps on screen show the player what the simulation is doing. Disasters and the year-end budget decide when the player has to pay attention and what a mistake costs.
 
-This book proposes six jobs that every simulation game does, and it files each mechanic under the job it mainly does. The dataset does not tag layers, so the six are a way of reading the catalog that its data does not test:
+This book files each mechanic under one of six jobs that every simulation game does, the one it mainly does. The filing is the book's; the dataset does not tag layers:
 
 1. **Substrate:** what exists, and how it is stored.
 2. **Dynamics:** the rules that change it.
@@ -47,7 +47,7 @@ Shared stocks are the simplest. Factorio's power grid connects every machine, an
 
 [[dwarf-fortress|Dwarf Fortress]] is the catalog's largest decomposition, at {{derived:dwarf-fortress.mechanic_count}} mechanics,{{assert:game_most_mechanics == dwarf-fortress}} and its parts are coupled tightly. A dwarf seized by a strange mood takes over a workshop to make a named artifact and goes insane if the materials are missing, which turns the production system into a source of stories.
 
-The records also link mechanics to one another by type. There are {{count:edge:synergy}} links where one mechanic makes another work better, and {{count:edge:requires}} links where one cannot run without another: loans and taxation need a treasury, hauling needs pathfinding, traffic needs roads, and romance needs relationship values to act on. A third type, tension, marks pairs that pull against each other (chapter 9). One run added both kinds of pairing, the links that make mechanics work better together and the tension links, in a single pass, judging each pair against a one-line definition. They record that run's judgment, and a pair with no tension link has not been checked and found compatible. The note on one such link names the partner of needs that decay in The Sims: objects that advertise which need they restore turn decaying needs into autonomous daily behavior, the design chapter 6 opens with.
+The records also link mechanics to one another by type. There are {{count:edge:synergy}} links where one mechanic makes another work better, and {{count:edge:requires}} links where one cannot run without another: loans and taxation need a treasury, hauling needs pathfinding, traffic needs roads, and romance needs relationship values to act on. A third type, tension, marks pairs that pull against each other (chapter 9). One run added the tension links and the links that make mechanics work better together in a single pass, judging each pair against a one-line definition. The note on one such link names the partner of needs that decay in The Sims: objects that advertise which need they restore turn decaying needs into autonomous daily behavior, the design chapter 6 opens with.
 
 [[democracy-4|Democracy 4]] makes coupling the whole game.{{assert:derived.policy-influence-network.prevalence == 1}} A country is one visible causal graph. Policies in seven areas, set as sliders, statistics such as crime and air quality, situations, and voter groups are its nodes; weighted links carry effects between them, and every node is recomputed each turn within a fixed range. Its designer describes the engine as a homebrew neural network in which voters, policies, ministers, and events are neurons, and Democracy 4 added income values allowed to exceed the usual bound, because percentage effects on a scale from 0 to 1 had given wealthy voters more than poor ones [@src-harris-2020-democracy4-fixed-income]. The record's failure modes are coupling problems: dense graphs with small weights make most policies feel inert while a few dominate, and long delays without visible pending effects make players blame the wrong policy.
 
@@ -71,7 +71,7 @@ Without the divinity, {{stat:n_games_agency_indirect_incentive}} games give the 
 
 A simulation the player cannot read plays as noise. Simulation games answer with a family of mechanics that own no simulation state at all: overlays, inspectors, tooltips, dashboards, alerts, advisors, forecasts. SimCity's maps are one. RimWorld's itemized thoughts, from chapter 1, are another. Paradox's grand strategy games break each number into nested tooltips of labeled causes, the form chapter 5 describes.
 
-The catalog undercounts this layer. Data overlays are tagged in only {{derived:data-overlays.prevalence}} catalog games, yet the mechanic's own definition names the info views of [[cities-skylines|Cities: Skylines]], and the Cities: Skylines record does not tag them. The dataset's records were written game by game, and interface mechanics were the easiest to leave out.
+The catalog undercounts this layer. Data overlays are tagged in only {{derived:data-overlays.prevalence}} catalog games, and the mechanic's own definition names the info views of [[cities-skylines|Cities: Skylines]], whose record does not tag them. The records were written game by game, and interface mechanics were the easiest to leave out.
 
 ## Pacing and stakes: when to look and what is lost
 
@@ -91,7 +91,7 @@ Each game record also says where its stories come from. In {{stat:n_games_narrat
 
 ## Where genres spend
 
-With no layer tags, the closest measure is which families of mechanics a subgenre's games use most, since the book files each family under the layer where most of its mechanics work. Agents, resources, economy, population, environment, and biology do most of their work in dynamics; logistics and social relations in coupling; space and construction, governance, control, and operation in control; physics and world generation in substrate; the information family in legibility; and time, progression, risk, narrative, multiplayer, and conflict in pacing and stakes. That filing is the book's proposal, and the dataset does not record it. The table lists, for each subgenre with enough games, the three families that take the largest share of its games' mechanic uses.
+With no layer tags, the closest measure is which families of mechanics a subgenre's games use most, since the book files each family under the layer where most of its mechanics work. Agents, resources, economy, population, environment, and biology do most of their work in dynamics; logistics and social relations in coupling; space and construction, governance, control, and operation in control; physics and world generation in substrate; the information family in legibility; and time, progression, risk, narrative, multiplayer, and conflict in pacing and stakes. The table lists, for each subgenre with enough games, the three families that take the largest share of its games' mechanic uses.
 
 {{viz:layer-profile}}
 
