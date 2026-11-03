@@ -3434,6 +3434,8 @@ def _prediction_baselines(ents, opps, games, techs, by_id, vocabs, cfg, derived,
         pre_t = set(pre.get("techniques") or []) | {t for t, x in tech_by_id.items() if pre.get("determinism_impact") and x.data.get("determinism_impact") == pre["determinism_impact"]}
         has_pre = [g for g in cls if uses[g] & set(pre.get("mechanics") or []) or by_game_tech[g] & pre_t]
         has_ai = [g for g in cls if g in learned_games]
+        # the same, leaving out AI-native titles and boundary cases (research demonstrations), which a review bar would mostly exclude (D5)
+        has_ai_comm = [g for g in has_ai if "ai-native" not in subs[g] and not by_id[g].data.get("boundary_case")]
         has_t = [g for g in cls if by_game_tech[g] & set(counting)]
         n = len(cls)
         share = round(100 * len(has_pre) / n) if n and pre else None
@@ -3449,7 +3451,7 @@ def _prediction_baselines(ents, opps, games, techs, by_id, vocabs, cfg, derived,
         rows.append({"opportunity": o.id, "resolve_by": (str(o.data["falsifiable_signal"]["resolve_by"]), o.data.get("name", o.id)), "test": d.get("prediction_test"),
                      "games": n, "precursor": f"{len(has_pre)} ({share}%)" if pre else "", "learned": len(has_ai),
                      "technique": len(has_t), "technique_in": sorted(has_t), "precursor_rate_of": " ".join(str(br["of"]).split()),
-                     "_share": share, "_amended": am})
+                     "_share": share, "_amended": am, "_learned_comm": len(has_ai_comm), "_whole": bool(cl.get("all"))})
         if out:
             outside_rows.append({"opportunity": o.id, "resolve_by": rows[-1]["resolve_by"], "outside_rate_of": " ".join(str(out["of"]).split()),
                                  "quote": " ".join(str(out["quote"]).split()), "source": out["source"]})
@@ -3466,6 +3468,8 @@ def _prediction_baselines(ents, opps, games, techs, by_id, vocabs, cfg, derived,
     stats["median_prediction_precursor_pct"] = int(round(float(np.median(shares)))) if shares else 0
     stats["n_predictions_learned_in_class"] = sum(1 for r in rows if r["learned"])
     stats["n_predictions_learned_absent"] = sum(1 for r in rows if not r["learned"])
+    stats["n_predictions_learned_in_class_commercial"] = sum(1 for r in rows if r["_learned_comm"])
+    stats["n_prediction_classes_whole_catalog"] = sum(1 for r in rows if r["_whole"])
     stats["n_predictions_technique_in_class"] = sum(1 for r in rows if r["technique"])
     stats["n_predictions_technique_absent"] = sum(1 for r in rows if not r["technique"])
     stats["n_predictions_technique_test_in_class"] = sum(1 for r in rows if r["technique"] and r["test"] == "technique")
@@ -3485,7 +3489,7 @@ def _prediction_baselines(ents, opps, games, techs, by_id, vocabs, cfg, derived,
         stats["n_predictions_resolved_by_amendment"] = sum(
             1 for o in opps if (o.data["falsifiable_signal"].get("resolution") or {}).get("date") and str(o.data["falsifiable_signal"]["resolution"]["date"]) <= am_dates[-1])
     for r in rows:
-        r.pop("_share"), r.pop("_amended")
+        r.pop("_share"), r.pop("_amended"), r.pop("_learned_comm"), r.pop("_whole")
     tables["prediction-base-rates"] = {
         "description": "Base rates for each prediction from the catalog (report/predictions.yaml). Games: catalog games in the prediction's "
                        "reference class, by subgenre or mechanic. Precursor: how many of them already have the precursor the last "
@@ -3750,7 +3754,7 @@ def _family_sensitivity(mechs, fam_terms, cfg, shared, tables, stats, mx):
     stats["n_families_small"] = sum(1 for f in fams if len(members[f]) <= small)
     stats["min_family_mechanics"] = min(len(v) for v in members.values())
     sc = {s: np.array([m.data[s] for m in mechs], float) for s in CEILING_SCORES}
-    score_iv, marks, firm = {}, Counter(), defaultdict(list)
+    score_iv, marks, firm, cells_ = {}, Counter(), defaultdict(list), []
     for f in fams:
         score_iv[f] = {}
         for s in CEILING_SCORES:
@@ -3760,6 +3764,7 @@ def _family_sensitivity(mechs, fam_terms, cfg, shared, tables, stats, mx):
             score_iv[f][s] = (lo, hi)
             v = float(sc[s][[col[x] for x in members[f]]].mean())
             mark, clear = _ceiling_mark(s, v), _ceiling_mark(s, lo) == _ceiling_mark(s, hi)
+            cells_.append((s, v, lo, hi))
             marks["cells"] += 1
             marks["marked"] += mark
             marks["marked_clear"] += mark and clear
@@ -3773,8 +3778,15 @@ def _family_sensitivity(mechs, fam_terms, cfg, shared, tables, stats, mx):
         stats[f"n_ceiling_{k}"] = marks[k]
     stats["n_ceiling_uncertain"] = marks["cells"] - marks["marked_clear"] - marks["unmarked_clear"]
     stats["n_ceiling_marked_crossing"] = marks["marked"] - marks["marked_clear"]
+    # the lines are asymmetric (a cost at 3 or above, legibility below 3.3; fifth review D20): the marks whose whole interval
+    # clears the line at the scale's middle anchor on both sides, and at a looser and a stricter pair of lines
+    for key, c_, l_ in (("mid", 3.0, 3.0), ("loose", 2.75, 3.5), ("strict", 3.25, 3.0)):
+        hot_ = lambda sc_, x: x < l_ if sc_ == "legibility" else x >= c_  # noqa: E731
+        stats[f"n_ceiling_marked_clear_{key}"] = sum(1 for sc_, v, lo, hi in cells_ if hot_(sc_, v) and hot_(sc_, lo) == hot_(sc_, hi))
+        stats[f"n_ceiling_marked_{key}"] = sum(1 for sc_, v, lo, hi in cells_ if hot_(sc_, v))
     # the marks whose interval clears the line, as prose: "tuning difficulty in a, b, and c; authoring cost in d"
     and_list = lambda xs: xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + ("," if len(xs) > 2 else "") + " and " + xs[-1]  # noqa: E731
+    stats["n_ceiling_marked_clear_tuning_difficulty"] = len(firm.get("tuning_difficulty", []))   # a scale that stands for no ceiling (F1)
     stats["ceiling_marks_clear_names"] = "; ".join(f"{s.replace('_', ' ')} in {and_list(firm[s])}" for s in sorted(firm, key=lambda s: (-len(firm[s]), s)))
 
     rows = []
