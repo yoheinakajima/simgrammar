@@ -29,6 +29,7 @@ method: >-
   variety), and checked the book against the paper. book/tells.yaml gained an apology pattern (error) and two
   hedge patterns (warn). The site's home strip now says the ten breaking techniques lose lockstep and
   re-simulation, matching §6.4, and drops the rater clause. Every sentence kept its assertions or lost them
-  with it; the build evaluates 800 report assertions. make check passed before and after each step.
+  with it; the build evaluates 800 report assertions. The operator approved releasing the result as v0.7, so report/meta.yaml
+  moves to version 0.7 and CITATION.cff is regenerated. make check passed before and after each step.
 contract_version: '1.2'
 proposals: []
