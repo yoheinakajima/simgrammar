@@ -573,7 +573,8 @@ class Web:
             (f'{st["rho_legibility_emergence_potential"]}', "mechanics that generate more unscripted variety are rated harder to read (ρ across the rubric scores)", "5.6"),
             # exposure is zero exactly when no technique record has an affects edge to the mechanic
             (f'{st["pct_uses_on_zero_exposure"]:.0f}%', "of mechanic uses fall on mechanics that no technique in this dataset is linked to", "8.2"),
-            (f'{st["n_technique_runtime_breaks"]} of {st["n_technique_runtime"]}', "AI techniques that run during play break lockstep multiplayer and re-simulation", "6.4"),
+            # §6.4's tests: lockstep without streaming needs output that never enters state or is identical across machines
+            (f'{st["n_det_no_lockstep_state"]} of {st["n_technique_runtime"]}', "AI techniques that run during play cannot run in lockstep multiplayer unless one machine streams their outputs", "6.4"),
         ]
         # register.css pads every number but the first on its left, so when the strip wraps to two rows on a phone the second
         # row starts indented. A hidden empty number in front makes every finding a following number: all four pad alike.
