@@ -1,0 +1,52 @@
+id: 2026-11-01-agent-readiness
+type: run
+kind: maintenance
+date: '2026-11-01'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Check simgrammar.com and the repository with Ora's agent-readiness scanner and publish the discovery
+  files and data documentation it found missing.
+method: 'Changed no records, sources, or report text. Asked to use ora.si: https://ora.si is the site
+  of a Slovenian regional development agency with no agent tools, so this run used Ora (ora.ai), the agent-readiness
+  scanner of that name, through its public REST API (POST /api/scan?format=audit, contract 1.38.0; no
+  account or key), which its docs give as equivalent to its ax CLI and MCP server; the CLI was not run
+  because it would fetch an npm package. Ora scans domains, MCP servers, and MCP Apps, not repositories:
+  it judges the repository through the domain scan, whose agent-rules-repo check found AGENTS.md. Baseline
+  for simgrammar.com (2026-11-02 UTC): 36/100, grade D. The failing checks a static site can meet are
+  met by scripts/discovery.py, a projection web.py calls: llms.txt gains markdown links, a when-to-use
+  section, and a link to every file; a developers page, in every page''s utility nav, explains each published
+  file, the schemas, examples, versions, limits, and the BibTeX; openapi.json describes the files as a
+  read-only API; the record schemas are published as committed under schema/, with every vocabulary in
+  schema/vocab.json; the home page carries JSON-LD (WebSite, Dataset with its downloads, ScholarlyArticle,
+  the byline); and .well-known/ holds an ARD catalog (also at ai-catalog.json), an RFC 9727 api-catalog,
+  and an Agent Skills index whose SKILL.md says when to use the atlas and how to query and cite it. One
+  endpoint list feeds them all. A copy assembled as the Pages workflow does passed 81 of 81 local probes
+  that mirror those checks (the live site passed 0 of 9), and every documented example was run and returns
+  rows. Not possible on GitHub Pages: Link headers, Markdown negotiation and Vary, a Markdown 404 body,
+  JSON error bodies, the api-catalog content type, a live API, an MCP server, and OAuth. Not attempted:
+  npm or PyPI packages, a CLI, WebMCP tools, Wikipedia or Wikidata, skills.sh and ChatGPT listings, and
+  contact and privacy pages (see proposals). Search-ranking checks move only as search engines index the
+  new page. design-slop-cop was not run (it would fetch an unpinned package); the page uses existing components
+  only and has no horizontal scroll at 390 px. Ora''s raw results are kept outside the repository.'
+contract_version: '1.2'
+proposals:
+- kind: schema
+  target: schema/*.schema.json $id
+  detail: Every schema's $id names https://simgrammar.dev/schema/1.2/<name>.schema.json, a host that does
+    not serve them, while the site now publishes the same files at https://simgrammar.com/schema/<name>.schema.json.
+    Moving $id to the site's domain, on a versioned path the site keeps, would let a validator resolve
+    each $id; it is a schema change, so it needs an ADR and a contract bump.
+- kind: other
+  target: contact and privacy pages
+  detail: Ora's trust-anchors check wants /contact and /privacy pages of at least 500 characters each.
+    The site sets no cookies and loads nothing from another host, but a privacy statement and a contact
+    channel are commitments the owner should word, so this run did not write them.
+- kind: other
+  target: WebMCP tools in web/simgrammar.js
+  detail: 'Ora''s largest remaining gaps need a server (a live API, an MCP server, OAuth), which GitHub
+    Pages cannot host. WebMCP needs none: simgrammar.js could register read-only tools (search records,
+    get a record, list a mechanic''s games) over the published JSON with document.modelContext.registerTool,
+    changing no page''s content. Whether that fits web/DESIGN.md is a design decision.'
