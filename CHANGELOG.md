@@ -2,6 +2,13 @@
 
 Contract, schema, vocabulary, and rubric changes. Data changes are tracked by run records in `log/runs/` and by git history.
 
+## 1.3 (2026-11-03)
+
+ADR-0009 (run `2026-11-03-console-audience-bar`).
+
+- **Schema:** `falsifiable_signal.criteria` may hold up to 600 characters (was 500). Non-breaking.
+- **Predictions:** the ten criteria whose console clause set no audience size now require a public figure of copies sold or players of 20 times the review bar; `report/predictions.yaml` records each as `audience_bar`, and the build checks the added text is in the criteria.
+
 ## 1.2 additions (2026-10-31, citable release)
 
 ADR-0008 (run `2026-10-31-citable-release`). No schema, vocabulary, or data rule changed.

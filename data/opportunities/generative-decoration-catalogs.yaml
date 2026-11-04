@@ -42,7 +42,7 @@ falsifiable_signal:
     from text or images.
   resolve_by: '2027-12-31'
   criteria: 'Feature first shipped after 2026-10-24 in a life or management sim other than inZOI with
-    at least 5,000 Steam user reviews or a console release; store page or patch notes describe player-facing
+    at least 5,000 Steam user reviews or a console release with at least 100,000 copies sold or players reported by a public source; store page or patch notes describe player-facing
     text-to-3D or image-to-3D object generation inside the game. Technique class: text-to-3D or image-to-3D
     generation by any method counts, classical photogrammetry from a player''s photos included, so this
     is a feature test; it shows a learned model landed only if the material says one makes the objects.'
@@ -64,3 +64,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-31-es-review-v2-fixes
   - 2026-11-01-es-v3-prior-art
+  - 2026-11-03-console-audience-bar

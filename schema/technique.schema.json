@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://simgrammar.dev/schema/1.2/technique.schema.json",
+  "$id": "https://simgrammar.dev/schema/1.3/technique.schema.json",
   "title": "Technique",
   "description": "A mathematical, AI, ML, or LLM technique or breakthrough relevant to simulation games. Must cite at least one source. Owns affects/builds_on/deployed_in edges.",
   "type": "object",

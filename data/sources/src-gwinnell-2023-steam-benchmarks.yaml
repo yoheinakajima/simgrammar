@@ -1,0 +1,14 @@
+id: src-gwinnell-2023-steam-benchmarks
+type: source
+name: 'Steam Benchmarks & Estimates: The Other Side Of Market Analysis'
+kind: tech-report
+authors:
+- Ashley Gwinnell
+venue: IMPRESS blog
+date: '2023-10-18'
+url: https://impress.games/blog/steam-benchmarks-and-estimates-analysis
+accessed: '2026-11-03'
+notes: Reviews of the Boxleiter method of estimating Steam sales from review counts; puts recent ratios at 20 to 50
+  sales for each review, down from a median just over 60 owners per review around 2014.
+provenance:
+  created: 2026-11-03-console-audience-bar

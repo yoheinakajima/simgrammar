@@ -47,7 +47,7 @@ falsifiable_signal:
     than scripted states or live forecast feeds.
   resolve_by: '2028-12-31'
   criteria: 'Feature first shipped after 2026-10-24 in a title with at least 1,000 Steam user reviews
-    or a console release; documentation or a developer statement describes a machine-learned weather emulator
+    or a console release with at least 20,000 copies sold or players reported by a public source; documentation or a developer statement describes a machine-learned weather emulator
     running in the shipped game. Technique class: machine-learned emulators only, so this is a technique
     test.'
 claims:
@@ -74,3 +74,4 @@ provenance:
   - 2026-10-31-es-review-techniques-opportunities
   - 2026-10-31-es-review-v2-fixes
   - 2026-11-01-es-v3-prior-art
+  - 2026-11-03-console-audience-bar

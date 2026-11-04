@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://simgrammar.dev/schema/1.2/run.schema.json",
+  "$id": "https://simgrammar.dev/schema/1.3/run.schema.json",
   "title": "Run",
   "description": "Provenance record for one research or editing pass. Append-only: once merged, a run file is never edited except to fix typos. Every entity's provenance points at runs.",
   "type": "object",
