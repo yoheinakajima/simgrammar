@@ -52,9 +52,10 @@ trl: 4
 runtime:
 - server-realtime
 - analytics
-determinism_impact: mitigable
+determinism_impact: breaks
 horizon: 3-5y
 risks:
+- determinism
 - compute-cost
 - latency
 - evaluation
@@ -101,3 +102,4 @@ provenance:
   created: 2026-10-24-techniques-llm-agents
   reviewed:
   - 2026-10-24-technique-links
+  - 2026-11-04-det-tests

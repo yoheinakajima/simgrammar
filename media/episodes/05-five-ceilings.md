@@ -100,7 +100,7 @@ Target runtime about 12 minutes: about 1,260 words of narration at 135 words a m
 
 **Voice.** Replays, bug reports from save files, leaderboards, and lockstep multiplayer all depend on the same inputs producing exactly the same world. In lockstep play, every player's machine runs the whole simulation and only inputs cross the network. Factorio is built around it. Its items move in exact, discrete steps, a belt carrying 15, 30, 45, or 60 items a second depending on its tier, so every machine in a multiplayer game computes the identical factory [@src-factoriowiki-2026-transport-belt-physics].
 
-**Voice.** That requirement has kept learned models out of the parts of games that decide what happens. The dataset sorts every AI technique that can run during play by what it does to reproducibility. Some break it outright. More can be made reproducible by fixing a seed, caching an answer, or logging what the model said. Episode 10 is about what happens when they meet a game that depends on it.{{assert:n_technique_runtime_breaks < n_technique_runtime_mitigable}}
+**Voice.** That requirement has kept learned models out of the parts of games that decide what happens. The dataset sorts every AI technique that can run during play by what it does to reproducibility. Some break it outright. More can be made reproducible by fixing a seed on weights the developer runs. Episode 10 is about what happens when they meet a game that depends on it.{{assert:n_technique_runtime_breaks < n_technique_runtime_mitigable}}
 
 ## 8. Minds made of formulas (8:04 to 10:07)
 

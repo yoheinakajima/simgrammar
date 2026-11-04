@@ -38,7 +38,7 @@ trl: 4
 runtime:
 - offline-authoring
 - client-realtime
-determinism_impact: mitigable
+determinism_impact: preserves
 horizon: 3-5y
 risks:
 - compute-cost
@@ -79,3 +79,4 @@ provenance:
   created: 2026-10-24-techniques-world-models
   reviewed:
   - 2026-11-01-es-v3-edge-audits
+  - 2026-11-04-det-tests

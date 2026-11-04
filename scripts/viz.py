@@ -968,7 +968,8 @@ DET_MARK = {
     "mitigable": lambda x, y: f'<circle cx="{f1(x)}" cy="{f1(y)}" r="3" style="fill:{T["paper"]};stroke:{T["accent"]};stroke-width:1.3"/>',
     "breaks": lambda x, y: f'<rect x="{f1(x - 3)}" y="{f1(y - 3)}" width="6" height="6" style="fill:{T["stop"]}"/>',
 }
-DET_LABEL = {"preserves": "preserves reproducibility", "mitigable": "reproducible if seeded, cached, or logged", "breaks": "breaks reproducibility"}
+# the tests of report/audits/determinism-tests.yaml: a log restores replay for every class, so it names none of them (review D1)
+DET_LABEL = {"preserves": "preserves reproducibility", "mitigable": "reproducible once seed and weights are fixed", "breaks": "breaks reproducibility"}
 
 
 def layer_profile(tables, fam, sub, cfg):

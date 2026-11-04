@@ -24,7 +24,7 @@ Target runtime about 11 minutes: about 1,120 words of narration at 135 words a m
 
 **Frame.** record technique=monte-carlo-tree-search fields=limitations,determinism_impact
 
-**Voice.** The opponent in that match plans with Monte Carlo tree search, and the dataset's record for the technique lists exactly this failure: a search that stops by the clock returns different moves on different hardware, which breaks replays and lockstep multiplayer. The fix is to count playouts instead of milliseconds and seed the random numbers. Then every machine computes the same move, which is why the record calls the technique mitigable.{{assert:field.monte-carlo-tree-search.determinism_impact == mitigable}}
+**Voice.** The opponent in that match plans with Monte Carlo tree search, and the dataset's record for the technique lists exactly this failure: a search that stops by the clock returns different moves on different hardware, which breaks replays and lockstep multiplayer. The fix is to count playouts instead of milliseconds and seed the random numbers. Then every machine computes the same move, which is why the record counts the technique as keeping the game reproducible.{{assert:field.monte-carlo-tree-search.determinism_impact == preserves}}{{assert:derived.monte-carlo-tree-search.determinism_lockstep == yes}}
 
 **Voice.** Simulation games need some things most software doesn't: the same inputs have to make the same world, everything a player sees is evidence about how the game works, and one purchase has to pay for hundreds of hours.
 
@@ -40,7 +40,7 @@ Target runtime about 11 minutes: about 1,120 words of narration at 135 words a m
 
 **On screen.** Techniques that can run during play: {{stat:n_technique_runtime}}. Break reproducibility outright: {{stat:n_technique_runtime_breaks}}. Can be made reproducible: {{stat:n_technique_runtime_mitigable}}. Leave it intact: {{stat:n_technique_runtime_preserves}}.
 
-**Voice.** Of the techniques in the dataset that can run while you play, {{stat:n_technique_runtime_breaks}} break that property outright.{{assert:n_technique_runtime_breaks < n_technique_runtime_mitigable}} Frame-generating world models, language-model game masters, societies of language agents, realtime voice: each samples its output, and its output decides what happens next.{{assert:field.genie-world-models.determinism_impact == breaks}}{{assert:field.llm-game-master.determinism_impact == breaks}}{{assert:field.realtime-voice-models.determinism_impact == breaks}}
+**Voice.** Of the techniques in the dataset that can run while you play, {{stat:n_technique_runtime_breaks}} break that property outright.{{assert:n_technique_runtime_breaks < n_technique_runtime_mitigable}} World models on someone else's servers, agents that play through a hosted model, societies of language agents, realtime voice: nothing the developer controls can make them repeat, and their output decides what happens next.{{assert:field.genie-world-models.determinism_impact == breaks}}{{assert:field.generalist-game-agents.determinism_impact == breaks}}{{assert:field.llm-agent-societies.determinism_impact == breaks}}{{assert:field.realtime-voice-models.determinism_impact == breaks}}
 
 **Picture.** A diagram: a model's answer drops into a cache, and two players' screens read the same entry.
 

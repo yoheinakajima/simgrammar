@@ -50,7 +50,7 @@ Target runtime about 11 minutes: about 1,190 words of narration at 135 words a m
 
 **Voice.** Most of the rules exist because something went wrong once. The first catalog was built by agents working in parallel, each taking a slice of games. An outside reviewer found that they'd recorded each game's distinctive parts and skipped the obvious ones: pause, building placement, tech trees. The finding that opened this series, that most of the commonest parts don't simulate anything, wasn't visible in that first data. The gaps were filled, and the analysis was redone.
 
-**Voice.** The same review caught the paper calling some techniques impossible to reproduce when their own records said they could be. Now a sentence about a technique is checked against that technique's record.{{assert:field.monte-carlo-tree-search.determinism_impact == mitigable}}
+**Voice.** The same review caught the paper calling some techniques impossible to reproduce when their own records said they could be. Now a sentence about a technique is checked against that technique's record.{{assert:field.monte-carlo-tree-search.determinism_impact == preserves}}
 
 **Picture.** The design map from episode 3, islands of games. One game at a time blinks out; some island borders shift.
 

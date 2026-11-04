@@ -30,7 +30,7 @@ Vertical, about 55 seconds, about 100 words of narration. One finding, from the 
 
 **On screen.** {{stat:n_technique_runtime_breaks}} of {{stat:n_technique_runtime}} techniques that run during play break reproducibility.
 
-**Voice.** Of the AI techniques in our dataset that can run during play, {{stat:n_technique_runtime_breaks}} break reproducibility outright.{{assert:n_technique_runtime_breaks < n_technique_runtime_mitigable}} For this opponent, the fix is one rule: count the playouts instead of the milliseconds, and seed the random numbers.{{assert:field.monte-carlo-tree-search.determinism_impact == mitigable}}
+**Voice.** Of the AI techniques in our dataset that can run during play, {{stat:n_technique_runtime_breaks}} break reproducibility outright.{{assert:n_technique_runtime_breaks < n_technique_runtime_mitigable}} For this opponent, the fix is one rule: count the playouts instead of the milliseconds, and seed the random numbers.{{assert:field.monte-carlo-tree-search.determinism_impact == preserves}}
 
 ## 0:50 to 0:55. End card
 

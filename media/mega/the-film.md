@@ -49,7 +49,7 @@ The film re-voices these episode scenes so their cross-references name the film'
 
 **Voice.** Replays, bug reports from save files, leaderboards, and lockstep multiplayer all depend on the same inputs producing exactly the same world. In lockstep play, every player's machine runs the whole simulation and only inputs cross the network. Factorio is built around it. Its items move in exact, discrete steps, a belt carrying 15, 30, 45, or 60 items a second depending on its tier, so every machine in a multiplayer game computes the identical factory [@src-factoriowiki-2026-transport-belt-physics].
 
-**Voice.** That requirement has kept learned models out of the parts of games that decide what happens. The dataset sorts every AI technique that can run during play by what it does to reproducibility. Some break it outright. More can be made reproducible by fixing a seed, caching an answer, or logging what the model said. Chapter 10 is about what happens when they meet a game that depends on it.{{assert:n_technique_runtime_breaks < n_technique_runtime_mitigable}}
+**Voice.** That requirement has kept learned models out of the parts of games that decide what happens. The dataset sorts every AI technique that can run during play by what it does to reproducibility. Some break it outright. More can be made reproducible by fixing a seed on weights the developer runs. Chapter 10 is about what happens when they meet a game that depends on it.{{assert:n_technique_runtime_breaks < n_technique_runtime_mitigable}}
 
 ### Episode 6, scene 10: What writes into the simulation
 
@@ -69,7 +69,7 @@ The film re-voices these episode scenes so their cross-references name the film'
 
 **Voice.** Factorio's record notes that items move in fixed, discrete steps, and that's what lets its multiplayer run identical worlds on every machine. The same property gives you replays, bug reports a developer can reproduce, leaderboards you can trust, and saves that load into the world you saved.
 
-**Voice.** Of the techniques in the dataset that can run while you play, {{stat:n_technique_runtime_breaks}} break that property outright.{{assert:n_technique_runtime_breaks < n_technique_runtime_mitigable}} Frame-generating world models, language-model game masters, societies of language agents, realtime voice: each samples its output, and its output decides what happens next.{{assert:field.genie-world-models.determinism_impact == breaks}}{{assert:field.llm-game-master.determinism_impact == breaks}}{{assert:field.realtime-voice-models.determinism_impact == breaks}}
+**Voice.** Of the techniques in the dataset that can run while you play, {{stat:n_technique_runtime_breaks}} break that property outright.{{assert:n_technique_runtime_breaks < n_technique_runtime_mitigable}} World models on someone else's servers, agents that play through a hosted model, societies of language agents, realtime voice: nothing the developer controls can make them repeat, and their output decides what happens next.{{assert:field.genie-world-models.determinism_impact == breaks}}{{assert:field.generalist-game-agents.determinism_impact == breaks}}{{assert:field.llm-agent-societies.determinism_impact == breaks}}{{assert:field.realtime-voice-models.determinism_impact == breaks}}
 
 **Voice.** Infinite Craft, from chapter 7, stores each answer the first time a model gives it, so every player after that gets the same one.{{assert:field.llm-rule-adjudication.determinism_impact == mitigable}}
 
@@ -101,7 +101,7 @@ The film re-voices these episode scenes so their cross-references name the film'
 
 **Voice.** Most of the rules exist because something went wrong once. The first catalog was built by agents working in parallel, each taking a slice of games. An outside reviewer found that they'd recorded each game's distinctive parts and skipped the obvious ones: pause, building placement, tech trees. The finding that opened this series, that most of the commonest parts don't simulate anything, wasn't visible in that first data. The gaps were filled, and the analysis was redone.
 
-**Voice.** The same review caught the paper calling some techniques impossible to reproduce when their own records said they could be. Now a sentence about a technique is checked against that technique's record.{{assert:field.monte-carlo-tree-search.determinism_impact == mitigable}}
+**Voice.** The same review caught the paper calling some techniques impossible to reproduce when their own records said they could be. Now a sentence about a technique is checked against that technique's record.{{assert:field.monte-carlo-tree-search.determinism_impact == preserves}}
 
 **Voice.** A later review removed one game at a time and re-ran everything. Several claims about which games belong together broke, because the samples used to test the clusters were reshuffled whenever the catalog changed. Each game's place in each of the {{stat:cluster_subsamples}} samples is now fixed by a hash of its name, and a claim that two games belong together has to hold in at least {{stat:cocluster_together_pct}} percent of them.
 

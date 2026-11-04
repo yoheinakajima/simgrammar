@@ -1,0 +1,406 @@
+# Determinism tests for every technique that runs during play (sixth review D1; §6.4).
+#
+# Made by run 2026-11-04-det-tests (operator yoheinakajima, model claude-opus-5-5, Claude Code) on 2026-11-04.
+# The class says what happens to simulation state when the technique runs during play: whether a replay, a peer, or a
+# branch can recompute what it did. Answer the tests in order; the class follows mechanically.
+#
+# Code the technique as its record describes it running during play. Where the record describes more than one form,
+# code the most reproducible one and say so in the note: the class records what the technique allows, and which form a
+# given title chose is a fact about that title. (The tests both coders were given said this only of a form the
+# developer can pin against one it cannot. The blind coder read it to cover a form that recomputes against one that
+# needs a setting, such as an iteration budget against a time budget; the run's own coding did not. Those were the only
+# class differences between the two, on four techniques, and they are coded the blind coder's way.)
+#
+# enters_state (yes/no). Does its runtime output enter simulation state: anything the game saves, re-simulates from
+#   inputs, or keeps in sync between peers, including anything that later changes what agents, rules, or the world do?
+#   Output only seen or heard by the player (pixels, audio, a text answer that nothing in the game reads back) is no.
+#   A generated frame that is the world, because the next frame is generated from it, is yes.
+#   If no: preserves (replay, lockstep and saves never read it), and the other three answers are na.
+# recompute (yes/no). On one machine, given the same game seed and the same inputs, does it give the same output with
+#   no further measure? Yes for symbolic algorithms, draws from the game's own seeded random generator, and fixed-weight
+#   networks evaluated without sampling (a forward pass, an argmax, a fixed search budget). No when it samples from its
+#   own unseeded noise or tokens, or depends on a wall-clock budget, call timing, or another party's service.
+#   If yes: preserves, and pinnable is na.
+# pinnable (yes/no). If recompute is no: can the developer make it recompute on one machine by fixing what it controls,
+#   namely the sampler seed, weights it can run itself (released weights, or its own), batch size and kernel settings,
+#   or a cache whose entries are all built before play? If yes: mitigable; if no: breaks, and `fails` names why.
+#   It fails for a model reachable only through a third party's service (fails: service; the developer cannot fix its
+#   weights, batching, or seed, and such services drift even at temperature zero), for output that depends on timing
+#   (fails: timing; concurrent calls racing, wall-clock budgets, live audio and voice-activity timing), and for a cache
+#   filled during play by a model that is not itself pinnable (that cache is a log). A cache filled during play by a
+#   pinnable model is recomputable, so it passes.
+# cross_machine (yes/no/na). With those settings fixed, would different hardware, drivers, or OS give bit-identical
+#   output? Floating-point GPU inference generally does not; integer, fixed-point, and CPU symbolic algorithms
+#   generally do; lookups into a cache built before play do. na when enters_state is no or the class is breaks.
+#
+# Derived, not answered: lockstep without streaming = enters_state no, or cross_machine yes. Counterfactual
+# re-simulation = the class is not breaks. Replay of a recorded session from a log of the technique's outputs works for
+# every technique, so it separates none of the classes. Offline-only techniques preserve by definition.
+#
+# class_before is the record's class before this run. first_recode is the class a blind agent of the same model gave
+# under the looser tests the previous version printed (same seed and inputs; else a fixed seed or a bounded cache), from
+# the records without their limitations; it agreed with class_before on 14 of 35 and showed three gaps these tests
+# close: output that never enters state, which form to code, and fixed-weight networks. run_coded is the class this
+# run's answers gave before it read the second blind coding, and blind holds that coding's answers: a second agent of
+# the same model, given these tests and the records (summary, mechanism, key results, limitations, deployments, edge
+# notes) with every sentence that states a determinism judgment removed. The answers above are the adjudicated ones.
+# scripts/analyze.py (_determinism_tests) derives each class from them, fails the build when a record's
+# determinism_impact differs or an offline-only technique does not preserve, and counts §6.4's figures and the
+# agreement of the codings.
+---
+techniques:
+- id: cicero-strategic-dialogue
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "yes"
+  cross_machine: "no"
+  note: "Sampled dialogue model; the released weights (non-commercial licence) let a developer run it and fix the sampler seed."
+  class_before: breaks
+  first_recode: mitigable
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "no", pinnable: "yes", cross_machine: "no"}
+- id: constrained-decoding
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "yes"
+  cross_machine: "no"
+  note: "Sampling under a token mask; llama.cpp GBNF on local weights can be seeded, the hosted-API form cannot."
+  class_before: mitigable
+  first_recode: breaks
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "no", pinnable: "yes", cross_machine: "no"}
+- id: continuous-alife-and-asal
+  enters_state: "yes"
+  recompute: "yes"
+  pinnable: "na"
+  cross_machine: "no"
+  note: "Fixed convolution, growth function and clip per step; GPU floating point."
+  class_before: preserves
+  first_recode: preserves
+  run_coded: preserves
+  blind: {enters_state: "yes", recompute: "yes", pinnable: "na", cross_machine: "yes"}
+- id: deep-rl-npc-policies
+  enters_state: "yes"
+  recompute: "yes"
+  pinnable: "na"
+  cross_machine: "no"
+  note: "Fixed-weight policy forward pass each frame, no sampling at play."
+  class_before: mitigable
+  first_recode: preserves
+  run_coded: preserves
+  blind: {enters_state: "yes", recompute: "yes", pinnable: "na", cross_machine: "no"}
+- id: diffusion-game-engines
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "yes"
+  cross_machine: "no"
+  note: "Frames are denoised from sampled noise; open weights (Oasis, MineWorld) let the developer fix seed and batch."
+  class_before: breaks
+  first_recode: mitigable
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "no", pinnable: "yes", cross_machine: "no"}
+- id: gaussian-splatting
+  enters_state: "no"
+  recompute: "na"
+  pinnable: "na"
+  cross_machine: "na"
+  note: "Rasterizes stored Gaussians into pixels; nothing in the simulation reads them."
+  class_before: preserves
+  first_recode: preserves
+  run_coded: preserves
+  blind: {enters_state: "no", recompute: "na", pinnable: "na", cross_machine: "na"}
+- id: generalist-game-agents
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "no"
+  cross_machine: "na"
+  fails: service
+  note: "A closed, Google-hosted Gemini agent acting on live frames; neither its weights nor its timing can be fixed."
+  class_before: mitigable
+  first_recode: breaks
+  run_coded: breaks
+  blind: {enters_state: "yes", recompute: "no", pinnable: "no", cross_machine: "na"}
+- id: generative-agents
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "yes"
+  cross_machine: "no"
+  note: "Sampled LLM calls; inZOI runs them on an on-device SLM the developer ships, Smallville's hosted model cannot be pinned."
+  class_before: breaks
+  first_recode: breaks
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "no", pinnable: "yes", cross_machine: "no"}
+- id: genie-world-models
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "no"
+  cross_machine: "na"
+  fails: service
+  note: "Frames sampled by a closed model on Google's servers; no weights or API to fix."
+  class_before: breaks
+  first_recode: breaks
+  run_coded: breaks
+  blind: {enters_state: "yes", recompute: "no", pinnable: "no", cross_machine: "na"}
+- id: graph-network-simulators
+  enters_state: "yes"
+  recompute: "yes"
+  pinnable: "na"
+  cross_machine: "no"
+  note: "Fixed-weight message passing plus an integrator, no sampling."
+  class_before: mitigable
+  first_recode: preserves
+  run_coded: preserves
+  blind: {enters_state: "yes", recompute: "yes", pinnable: "na", cross_machine: "no"}
+- id: imperfect-information-solvers
+  enters_state: "yes"
+  recompute: "yes"
+  pinnable: "na"
+  cross_machine: "yes"
+  note: "Blueprint lookup and iteration-bounded search on two CPUs (Pluribus), with draws from the game's seeded generator; DeepStack's and ReBeL's GPU value networks would differ across machines."
+  class_before: mitigable
+  first_recode: preserves
+  run_coded: preserves
+  blind: {enters_state: "yes", recompute: "yes", pinnable: "na", cross_machine: "yes"}
+- id: learned-level-generation
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "yes"
+  cross_machine: "no"
+  note: "MarioGPT samples tokens and PCGRL may sample actions; the weights are small and local, so the sampler seed can be fixed."
+  class_before: mitigable
+  first_recode: preserves
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "no", pinnable: "yes", cross_machine: "no"}
+- id: learned-motion-synthesis
+  enters_state: "no"
+  recompute: "na"
+  pinnable: "na"
+  cross_machine: "na"
+  note: "Kinematic poses for display: no physics is simulated and characters can clip or float; root motion that drove gameplay position would make it state."
+  class_before: preserves
+  first_recode: preserves
+  run_coded: preserves
+  blind: {enters_state: "no", recompute: "na", pinnable: "na", cross_machine: "na"}
+- id: llm-agent-societies
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "no"
+  cross_machine: "na"
+  fails: timing
+  note: "Concurrent modules and message buses race, and the LLMs are hosted services."
+  class_before: breaks
+  first_recode: breaks
+  run_coded: breaks
+  blind: {enters_state: "yes", recompute: "no", pinnable: "no", cross_machine: "na"}
+- id: llm-explanation-of-state
+  enters_state: "no"
+  recompute: "na"
+  pinnable: "na"
+  cross_machine: "na"
+  note: "Reads state and answers the player; the record says it never writes state."
+  class_before: preserves
+  first_recode: breaks
+  run_coded: preserves
+  blind: {enters_state: "no", recompute: "na", pinnable: "na", cross_machine: "na"}
+- id: llm-game-master
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "yes"
+  cross_machine: "no"
+  note: "Sampled each turn; Hidden Door's own small tuned models can be run and seeded by the developer, hosted APIs cannot."
+  class_before: breaks
+  first_recode: breaks
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "no", pinnable: "yes", cross_machine: "no"}
+- id: llm-rule-adjudication
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "yes"
+  cross_machine: "no"
+  note: "Llama weights the developer runs fill the rule table; pinned, a fresh table refills identically."
+  class_before: mitigable
+  first_recode: breaks
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "no", pinnable: "yes", cross_machine: "no"}
+- id: mean-field-games
+  enters_state: "yes"
+  recompute: "yes"
+  pinnable: "na"
+  cross_machine: "yes"
+  note: "Lookup of an equilibrium policy computed offline, plus draws from the game's seeded generator."
+  class_before: preserves
+  first_recode: preserves
+  run_coded: preserves
+  blind: {enters_state: "yes", recompute: "yes", pinnable: "na", cross_machine: "yes"}
+- id: ml-weather-models
+  enters_state: "yes"
+  recompute: "yes"
+  pinnable: "na"
+  cross_machine: "no"
+  note: "GraphCast-style fixed-weight steps recompute; GenCast's sampled diffusion ensembles, also described, would need a fixed seed."
+  class_before: mitigable
+  first_recode: preserves
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "yes", pinnable: "na", cross_machine: "no"}
+- id: model-based-planning-muzero
+  enters_state: "yes"
+  recompute: "yes"
+  pinnable: "na"
+  cross_machine: "no"
+  note: "Fixed-weight networks guide a search with a fixed simulation count; GPU floating point."
+  class_before: mitigable
+  first_recode: preserves
+  run_coded: preserves
+  blind: {enters_state: "yes", recompute: "yes", pinnable: "na", cross_machine: "no"}
+- id: monte-carlo-tree-search
+  enters_state: "yes"
+  recompute: "yes"
+  pinnable: "na"
+  cross_machine: "yes"
+  note: "Counted in iterations, with playouts from the game's seeded generator, the CPU search recomputes; a time budget, which the record names as the failure, would not."
+  class_before: mitigable
+  first_recode: preserves
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "yes", pinnable: "na", cross_machine: "yes"}
+- id: muse-wham
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "yes"
+  cross_machine: "no"
+  note: "Tokens are sampled; WHAM's released weights let the developer fix seed and batch."
+  class_before: breaks
+  first_recode: mitigable
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "no", pinnable: "yes", cross_machine: "no"}
+- id: neural-cellular-automata
+  enters_state: "yes"
+  recompute: "yes"
+  pinnable: "na"
+  cross_machine: "no"
+  note: "Fixed-weight update after fixed Sobel filters; the update mask is drawn from the game's seeded generator."
+  class_before: mitigable
+  first_recode: preserves
+  run_coded: preserves
+  blind: {enters_state: "yes", recompute: "yes", pinnable: "na", cross_machine: "no"}
+- id: neural-rendering-shaders
+  enters_state: "no"
+  recompute: "na"
+  pinnable: "na"
+  cross_machine: "na"
+  note: "Upscaling, frame generation and neural shading change pixels only."
+  class_before: preserves
+  first_recode: preserves
+  run_coded: preserves
+  blind: {enters_state: "no", recompute: "na", pinnable: "na", cross_machine: "na"}
+- id: on-device-language-models
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "yes"
+  cross_machine: "no"
+  note: "Sampled on the player's GPU from weights the game ships, so the sampler seed can be fixed."
+  class_before: mitigable
+  first_recode: mitigable
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "no", pinnable: "yes", cross_machine: "no"}
+- id: open-ended-environment-generation
+  enters_state: "yes"
+  recompute: "yes"
+  pinnable: "na"
+  cross_machine: "yes"
+  note: "POET's parameter mutation and seeded optimization, the form the record applies to play, recomputes; OMNI-EPIC's and SIMA 2's hosted foundation models would break."
+  class_before: mitigable
+  first_recode: breaks
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "yes", pinnable: "na", cross_machine: "yes"}
+- id: open-interactive-video-models
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "yes"
+  cross_machine: "no"
+  note: "Chunks denoised from sampled noise; released weights (Matrix-Game 2.0, GameCraft) let the developer fix seed and batch."
+  class_before: breaks
+  first_recode: mitigable
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "no", pinnable: "yes", cross_machine: "no"}
+- id: physical-world-foundation-models
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "yes"
+  cross_machine: "no"
+  note: "Sampled diffusion or sampled action search; Cosmos and V-JEPA 2 weights are open."
+  class_before: breaks
+  first_recode: mitigable
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "no", pinnable: "yes", cross_machine: "no"}
+- id: physics-based-character-control
+  enters_state: "yes"
+  recompute: "yes"
+  pinnable: "na"
+  cross_machine: "no"
+  note: "A fixed-weight tracking policy outputs PD targets each physics step; MaskedMimic's generative student, if it samples a latent, would need a seed."
+  class_before: mitigable
+  first_recode: preserves
+  run_coded: mitigable
+  blind: {enters_state: "yes", recompute: "yes", pinnable: "na", cross_machine: "no"}
+- id: real-time-video-restyling
+  enters_state: "no"
+  recompute: "na"
+  pinnable: "na"
+  cross_machine: "na"
+  note: "Repaints frames only; collision, inventory and world state stay in the host engine."
+  class_before: mitigable
+  first_recode: breaks
+  run_coded: preserves
+  blind: {enters_state: "no", recompute: "na", pinnable: "na", cross_machine: "na"}
+- id: realtime-voice-models
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "no"
+  cross_machine: "na"
+  fails: timing
+  note: "Replies depend on live audio and voice-activity timing, and the main APIs are hosted."
+  class_before: breaks
+  first_recode: breaks
+  run_coded: breaks
+  blind: {enters_state: "yes", recompute: "no", pinnable: "no", cross_machine: "na"}
+- id: story-sifting
+  enters_state: "yes"
+  recompute: "yes"
+  pinnable: "na"
+  cross_machine: "yes"
+  note: "Symbolic pattern matching over the recorded causal graph."
+  class_before: preserves
+  first_recode: preserves
+  run_coded: preserves
+  blind: {enters_state: "yes", recompute: "yes", pinnable: "na", cross_machine: "yes"}
+- id: subspace-neural-physics
+  enters_state: "no"
+  recompute: "na"
+  pinnable: "na"
+  cross_machine: "na"
+  note: "Deforms meshes for display; the record says it does not feed back into gameplay physics."
+  class_before: preserves
+  first_recode: preserves
+  run_coded: preserves
+  blind: {enters_state: "no", recompute: "na", pinnable: "na", cross_machine: "na"}
+- id: voyager-skill-libraries
+  enters_state: "yes"
+  recompute: "no"
+  pinnable: "no"
+  cross_machine: "na"
+  fails: service
+  note: "Tasks and code come from hosted GPT-4; the skill library grows from those calls, so it is a log."
+  class_before: mitigable
+  first_recode: breaks
+  run_coded: breaks
+  blind: {enters_state: "yes", recompute: "no", pinnable: "no", cross_machine: "na"}
+- id: wave-function-collapse
+  enters_state: "yes"
+  recompute: "yes"
+  pinnable: "na"
+  cross_machine: "yes"
+  note: "Constraint propagation with frequency-weighted choices from the game's seeded generator, on the CPU."
+  class_before: preserves
+  first_recode: preserves
+  run_coded: preserves
+  blind: {enters_state: "yes", recompute: "yes", pinnable: "na", cross_machine: "yes"}

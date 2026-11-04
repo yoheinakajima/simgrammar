@@ -56,7 +56,7 @@ trl: 7
 runtime:
 - offline-authoring
 - design-assist
-determinism_impact: mitigable
+determinism_impact: preserves
 horizon: now
 risks:
 - ip-provenance
@@ -101,3 +101,5 @@ sources:
 status: sourced
 provenance:
   created: 2026-10-24-techniques-world-models
+  reviewed:
+  - 2026-11-04-det-tests
