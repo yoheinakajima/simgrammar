@@ -848,6 +848,10 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     # schema binds two mechanics to exclusive values, so tension edges are the only recorded infeasibility; coverage is
     # also reported over the pairs that remain, observed and null alike
     feasible = np.array([tuple(sorted((mids[a_], mids[b_]))) not in tension_pairs for a_, b_ in zip(*iu)], dtype=bool)
+    # pairs across families only (sixth review D19): the alternatives a game picks one of, such as turn-based or real-time
+    # time, live inside a family, so this drops every pair that could be exclusive by design, as white space does (§5.5)
+    fam_of = np.array([by_id[m].data["family"] for m in mids])
+    across = (fam_of[iu[0]] != fam_of[iu[1]]) & feasible
     import random as _cb_random
     cb_rng = _cb_random.Random(cc["null_seed"])
 
@@ -862,7 +866,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             cb_rng.shuffle(pool_)
             cb_rows[i] = sorted((a_ & b_) | set(pool_[: len(only_a)]))
             cb_rows[j] = sorted((a_ & b_) | set(pool_[len(only_a):]))
-    null_cov, null_cov_r, null_cov_f, null_ws = [], [], [], []
+    null_cov, null_cov_r, null_cov_f, null_cov_x, null_ws = [], [], [], [], []
     if len(cb_rows) > 1 and mids:
         _trade(cc["null_burnin"])
         for _ in range(cc["null_samples"]):
@@ -875,6 +879,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
             null_cov.append(100 * float((up > 0).mean()))
             null_cov_r.append(100 * float((up[in_restricted] > 0).mean()) if in_restricted.any() else 0.0)
             null_cov_f.append(100 * float((up[feasible] > 0).mean()) if feasible.any() else 0.0)
+            null_cov_x.append(100 * float((up[across] > 0).mean()) if across.any() else 0.0)
             null_ws.append(Cn[np.ix_(ws_common, ws_common)].astype(np.int16))
     shared["cooccurrence_null"] = {"common": [mids[i] for i in ws_common], "counts": np.array(null_ws)}
     if null_cov:
@@ -905,6 +910,18 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         stats["pair_coverage_feasible_null_mean_pct"] = _r(float(ncf.mean()), 1)
         stats["pair_coverage_feasible_null_lo_pct"] = _r(float(np.percentile(ncf, 2.5)), 1)
         stats["pair_coverage_feasible_null_hi_pct"] = _r(float(np.percentile(ncf, 97.5)), 1)
+        ncx = np.array(null_cov_x)
+        n_x = int(across.sum())
+        obs_x = 100 * sum(1 for (a, b) in pair_count if a in m_pos and b in m_pos and (a, b) not in tension_pairs
+                          and by_id[a].data["family"] != by_id[b].data["family"]) / max(n_x, 1)
+        stats["n_possible_pairs_across_families"] = n_x
+        stats["pair_coverage_across_families_pct"] = _r(obs_x, 1)
+        stats["pair_coverage_across_families_null_mean_pct"] = _r(float(ncx.mean()), 1)
+        stats["pair_coverage_across_families_null_lo_pct"] = _r(float(np.percentile(ncx, 2.5)), 1)
+        stats["pair_coverage_across_families_null_hi_pct"] = _r(float(np.percentile(ncx, 97.5)), 1)
+        stats["pair_coverage_shortfall_pct"] = _r(float(nc.mean()) - obs_cov, 1)
+        stats["pair_coverage_across_families_shortfall_pct"] = _r(float(ncx.mean()) - obs_x, 1)
+        stats["p_pair_coverage_across_families"] = _r(min(1.0, 2 * min((1 + int((ncx <= obs_x).sum())) / (S_ + 1), (1 + int((ncx >= obs_x).sum())) / (S_ + 1))), 3)
     # the state classes of report/state-class.yaml (review D6): the file is checked against the live mechanics here, and
     # the §5.1 head and the pair coverage above are recomputed on the simulation-state subset (helpers _state_class*)
     state_cls = _state_class(mechs, ents.get("run", []))
@@ -1954,16 +1971,28 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         a_, b_ = opl[r["opportunity"]]
         r["place"] = str(a_) if a_ == b_ else f"{a_} to {b_}"
         derived[r["opportunity"]]["place_first"], derived[r["opportunity"]]["place_last"] = a_, b_
+    # the place under the maturity cap and the evidence flags, beside the stored ranking (sixth review D2)
+    opl_c = _places({x: round(v, 9) for x, v in cap_pr.items()})
+    short = {"no published edge": "no edge", "dated before every listed technique": "early"}
+    ev_flags = {e["opportunity"]: ", ".join(short.get(x, x) for x in e["flags"].split("; ") if x) for e in ev_rows}
+    for r in orows:
+        a_, b_ = opl_c[r["opportunity"]]
+        r["capped"] = str(a_) if a_ == b_ else f"{a_} to {b_}"
+        r["flags"] = ev_flags.get(r["opportunity"], "")
+        derived[r["opportunity"]]["capped_place_first"], derived[r["opportunity"]]["capped_place_last"] = a_, b_
     # displayed to one decimal: three ordinal ratings do not support more (review E22); rows keep their unrounded order
     for r in orows:
         r["priority"] = _r(r["priority"], 1)
         derived[r["opportunity"]]["priority_shown"] = r["priority"]
-    tables["opportunities-ranked"]["columns"] = ["opportunity", "type", "priority", "place", "impact", "feasibility", "novelty", "horizon", "rank_interval", "top_share"]
+    tables["opportunities-ranked"]["columns"] = ["opportunity", "priority", "place", "impact", "feasibility", "novelty", "horizon", "rank_interval", "top_share",
+                                                 "capped", "flags"]
     tables["opportunities-ranked"]["description"] = (
         "Opportunities by composite priority (weighted geometric mean of impact, feasibility, and novelty; weights in vocab/rubrics.yaml), shown to one decimal; rows are ordered by the unrounded value. "
         "Place: the places an opportunity shares with every other at its priority. "
         f"Rank interval: the {_r(100 * qlo, 0):g}th to {_r(100 * qhi, 0):g}th percentile of the opportunity's rank over {R} seeded draws that move each rating by up to one anchor and each weight by up to {_r(100 * sp, 0):g} percent. "
-        f"Top share: the percentage of those draws in which it ranks in the top {topn}.")
+        f"Top share: the percentage of those draws in which it ranks in the top {topn}. "
+        "Capped: its place when feasibility is capped by the maturity of the most mature technique it lists (§9.1). "
+        "Flags: no edge, none of its mechanics has an edge from its techniques; early, its horizon is earlier than every technique it lists.")
     stats["n_predictions"] = len(opps)
     res = sorted(o.data["falsifiable_signal"]["resolve_by"] for o in opps)
     stats["first_prediction_resolves"] = res[0] if res else None
@@ -1980,6 +2009,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     _prediction_baselines(ents, opps, games, techs, by_id, vocabs, cfg, derived, stats, tables)
     # the prior-art search behind each novelty score (review E31), checked against the records
     _prior_art(opps, by_id, [r["opportunity"] for r in orows], cfg, derived, stats, tables)
+    _prior_art_recall(opps, cfg, derived, stats)
 
     # ---------------- raters: agreement between independent ratings, and calibration results
     runs = {r.id: r for r in ents.get("run", [])}
@@ -2031,6 +2061,11 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
         for k in ("kappa", "alpha", "alpha_low", "alpha_high", "shift"):
             stats[f"{k}_rater_{f}"] = row[k]
         stats[f"rho_raters_{f}"] = row["rank_rho"]
+        # the same agreement with the mean shift taken out, rounded to whole anchors (sixth review D23)
+        sh = int(round(float(np.mean(second - first))))
+        Cc = np.array([_coincidence([int(x), min(K, max(1, int(y) - sh))], K) for x, y in v["ordered"]])
+        stats[f"alpha_centered_rater_{f}"] = _r(_alpha_ordinal(Cc.sum(0)), 2)
+        stats[f"shift_removed_rater_{f}"] = sh
         stats[f"n_rater_lower_{f}"] = int(np.sum(second < first))
         stats[f"n_rater_higher_{f}"] = int(np.sum(second > first))
         agree_rows.append(row)
@@ -2201,7 +2236,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     later_a = _re.compile(r"\b(?:update|expansion|dlc|patch|version \d[\d.]*)\b", _re.I)
     later_b = _re.compile(r"\b(?:add(?:s|ed)?|introduc\w*|split|let)\b", _re.I)
     later_c = _re.compile(r"\badded in\b|\bsince version\b", _re.I)
-    exposed = {}
+    exposed, later_uses = {}, set()
     for g in games:
         why = []
         if g.data.get("year_full_release") or _re.search(r"early access", str(g.data.get("design_notes") or ""), _re.I):
@@ -2212,6 +2247,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
                  or later_c.search(str(u.get("note") or ""))]
         if later:
             why.append("later feature: " + ", ".join(later))
+            later_uses.update((g.id, x) for x in later)
         if why:
             exposed[g.id] = why
 
@@ -2239,11 +2275,49 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
                           "pct_seen_by_2000": d_["pct_by_2000"], "first_since_2010": d_["since_2010"], "first_2020s": d_["first_2020s"],
                           "pct_uses_since_2010_on_pre2001": d_["pct_reuse"], "games_since_2010": d_["games_since_2010"],
                           "using_only_pre2001": d_["only_pre2001"]})
+    # A late bound that keeps every game: early-access uses move to the recorded 1.0 year, and a use whose note names a later
+    # year moves to the first such year. Each use counts in the year it is dated, so a use moved past 2009 counts as a use
+    # since 2010.
+    yr_re = _re.compile(r"\b(?:19|20)\d\d\b")
+    use_year, n_ea_moved, n_note_moved = {}, 0, 0
+    for g in games:
+        if not isinstance(year.get(g.id), int):
+            continue
+        fr = g.data.get("year_full_release")
+        for u in g.data.get("mechanics", []):
+            if u["id"] not in derived:
+                continue
+            y = year[g.id]
+            if isinstance(fr, int) and fr > y:
+                y, n_ea_moved = fr, n_ea_moved + 1
+            noted = [int(x) for x in yr_re.findall(str(u.get("note") or "")) if int(x) > y]
+            if (g.id, u["id"]) in later_uses and noted:
+                y, n_note_moved = min(noted), n_note_moved + 1
+            use_year[(g.id, u["id"])] = min(use_year.get((g.id, u["id"]), 9999), y)
+    first_l = {}
+    for (gid, mid), y in use_year.items():
+        first_l[mid] = min(first_l.get(mid, 9999), y)
+    old_l = {m for m, y in first_l.items() if y <= 2000}
+    uses_l = [mid for (gid, mid), y in use_year.items() if y >= 2010]
+    late_l = [g.id for g in games if isinstance(year.get(g.id), int) and year[g.id] >= 2010]
+    date_rows.insert(1, {"games": "every game, re-dated late", "count": len({g for g, _ in use_year}), "mechanics_dated": len(first_l),
+                         "first_year_moved": sum(1 for m in mechs if derived[m.id].get("earliest_year") and first_l.get(m.id) != derived[m.id]["earliest_year"]),
+                         "pct_seen_by_2000": _r(100 * len(old_l) / max(len(first_l), 1), 0), "first_since_2010": sum(1 for y in first_l.values() if y >= 2010),
+                         "first_2020s": sum(1 for y in first_l.values() if y >= 2020),
+                         "pct_uses_since_2010_on_pre2001": _r(100 * sum(1 for mid in uses_l if mid in old_l) / max(len(uses_l), 1), 0),
+                         "games_since_2010": len(late_l), "using_only_pre2001": sum(1 for gid in late_l if used_by_game[gid] and set(used_by_game[gid]) <= old_l)})
+    stats["n_uses_redated_full_release"] = n_ea_moved
+    stats["n_uses_redated_noted_year"] = n_note_moved
+    stats["n_games_redated_full_release"] = sum(1 for g in games if isinstance(g.data.get("year_full_release"), int) and isinstance(year.get(g.id), int) and g.data["year_full_release"] > year[g.id])
+    stats["n_mechanics_since_2010_redated"] = date_rows[1]["first_since_2010"]
+    stats["pct_mechanics_seen_by_2000_redated"] = date_rows[1]["pct_seen_by_2000"]
+    stats["pct_uses_since_2010_on_pre2001_redated"] = date_rows[1]["pct_uses_since_2010_on_pre2001"]
     tables["dating-sensitivity"] = {
-        "description": "The §5.2 counts with the games whose dating may predate their decomposed features left out: early-access titles, "
-                       "persistent online worlds, and games whose use notes date part of a mechanic to a later update, expansion, DLC, or "
-                       "version (dating-exposed-games.csv lists them). A mechanic used only by left-out games goes undated, and its "
-                       "first year moves when its earliest game is left out.",
+        "description": "The §5.2 counts with every game re-dated late (early-access uses at the recorded 1.0 year, a use whose note names "
+                       "a later year at that year), and with the games whose dating may predate their decomposed features left out: "
+                       "early-access titles, persistent online worlds, and games whose use notes date part of a mechanic to a later "
+                       "update, expansion, DLC, or version (dating-exposed-games.csv lists them). A mechanic used only by left-out games "
+                       "goes undated, and its first year moves when its earliest game is left out.",
         "columns": ["games", "count", "mechanics_dated", "first_year_moved", "pct_seen_by_2000", "first_since_2010", "first_2020s",
                     "pct_uses_since_2010_on_pre2001", "games_since_2010", "using_only_pre2001"],
         "rows": date_rows}
@@ -2261,6 +2335,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     stats["pct_uses_since_2010_on_pre2001_excl_exposed"] = all_out["pct_uses_since_2010_on_pre2001"]
     stats["n_mechanics_undated_excl_exposed"] = sum(1 for m in mechs if derived[m.id]["prevalence"] > 0) - all_out["mechanics_dated"]
     stats["n_mechanics_first_year_moved_excl_exposed"] = all_out["first_year_moved"]
+    stats["n_mechanics_dated_excl_exposed"] = all_out["mechanics_dated"]
 
     # ---------------- verification queue
     q = []
@@ -2359,6 +2434,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     # A Monte Carlo p-value cannot fall below 1/(B+1), or 2/(B+1) two-sided, for B null draws (fifth review D18): at that
     # floor the paper prints it as an inequality, elsewhere as an equality. `<key>_shown` holds the relation and the value.
     for key, draws, sides in (("p_pair_coverage", "cooccurrence_null_samples", 2), ("p_pair_coverage_state_class", "state_class_null_samples", 2),
+                              ("p_pair_coverage_across_families", "cooccurrence_null_samples", 2),
                               ("p_n_whitespace_pairs", "cooccurrence_null_samples", 1), ("p_cluster_subgenre_ari", "cluster_permutations", 1),
                               ("p_cluster_subgenre_nmi", "cluster_permutations", 1), ("p_cluster_mixed", "cluster_permutations", 1)):
         if isinstance(stats.get(key), (int, float)) and stats.get(draws):
@@ -2572,7 +2648,7 @@ def _rating_noise(mechs, by_id, alphas, score_pairs, rated, cal_ids, rub, cfg, n
             rhos[f, a] = _latent_rho(cum[f], a)
         return rhos[f, a]
 
-    need = {}
+    need, need_sh, share_at = {}, {}, {}
     for f in fields:
         start, T = 0, len(_anchor_pairs(K[f]))
         # from the highest level down, each scan starts at the n the level above needed: less agreement never needs fewer
@@ -2589,16 +2665,35 @@ def _rating_noise(mechs, by_id, alphas, score_pairs, rated, cal_ids, rub, cfg, n
                     low = np.nanpercentile(ba, q_lo, axis=1) if np.isnan(ba).any() else np.percentile(ba, q_lo, axis=1)
                     if np.mean(low > bound) >= share:
                         need[f, key], start = grid[i], i
+                        share_at[f, key] = float(np.mean(low > bound))
                         break
             if need[f, key] is None:
                 start = len(grid)
             stats[f"n_alpha_sample_{f}_{key}"] = need[f, key]
+        # the same at the best level with the second rater one anchor higher throughout (sixth review D16), the shift the
+        # doubly rated mechanics show on two scales: a constant offset the interval cannot shrink away
+        need_sh[f] = None
+        rho = rho_at(f, a_max)
+        for n_ in grid:
+            z, W = draw(n_)
+            r1 = np.minimum(np.searchsorted(cum[f], ndtr(z[..., 0]), side="right"), K[f] - 1)
+            r2 = np.minimum(np.searchsorted(cum[f], ndtr(rho * z[..., 0] + math.sqrt(1 - rho * rho) * z[..., 1]), side="right") + 1, K[f] - 1)
+            onehot = (pidx[f][r1, r2][..., None] == np.arange(T)).astype(float)
+            ba = _alpha_two(np.matmul(W, onehot), K[f])
+            low = np.nanpercentile(ba, q_lo, axis=1) if np.isnan(ba).any() else np.percentile(ba, q_lo, axis=1)
+            if np.mean(low > bound) >= share:
+                need_sh[f] = n_
+                break
     for key, val in levels:
         reached = [need[f, key] for f in fields if need[f, key] is not None]
         stats[f"alpha_sample_level_{key}"] = _r(val, 2)
         stats[f"n_alpha_sample_min_{key}"] = min(reached) if reached else None
         stats[f"n_alpha_sample_max_{key}"] = max(reached) if reached else None
         stats[f"n_scales_alpha_sample_unreached_{key}"] = len(fields) - len(reached)
+    stats["n_scales_alpha_sample_shift_unreached"] = sum(1 for f in fields if need_sh[f] is None)
+    stats["n_alpha_sample_shift_max"] = max((v for v in need_sh.values() if v is not None), default=None)
+    # Monte Carlo error of the share that cleared at each reported n: a binomial standard error over the simulated samples
+    stats["pct_alpha_sample_share_se_max"] = _r(100 * max((math.sqrt(p_ * (1 - p_) / S) for p_ in share_at.values()), default=0.0), 1)
     stats["alpha_sample_lower_bound"], stats["pct_alpha_sample_share"] = bound, round(100 * share)
     stats["n_alpha_sample_simulations"], stats["n_alpha_sample_grid_max"] = S, max(grid)
     stats["n_scales_alpha_below_bound"] = sum(1 for f in fields if alphas[f] <= bound)
@@ -3451,8 +3546,12 @@ def _prediction_baselines(ents, opps, games, techs, by_id, vocabs, cfg, derived,
         d["prediction_technique_games"] = len(has_t)
         rows.append({"opportunity": o.id, "resolve_by": (str(o.data["falsifiable_signal"]["resolve_by"]), o.data.get("name", o.id)), "test": d.get("prediction_test"),
                      "games": n, "precursor": f"{len(has_pre)} ({share}%)" if pre else "", "learned": len(has_ai),
-                     "technique": len(has_t), "technique_in": sorted(has_t), "precursor_rate_of": " ".join(str(br["of"]).split()),
+                     "learned_commercial": len(has_ai_comm), "technique": len(has_t), "technique_in": sorted(has_t), "precursor_rate_of": " ".join(str(br["of"]).split()),
                      "_share": share, "_amended": am, "_learned_comm": len(has_ai_comm), "_whole": bool(cl.get("all"))})
+        # the store-wide rate as its source states the number (the next table gives the quote and what it counts), kept short
+        # so the column does not take width from the descriptions
+        pct = re.search(r"(?:a little |just )?(?:under |over |about )?[<>≤≥]?\s*\d+(?:\.\d+)?\s*%", " ".join(str(out["quote"]).split())) if out else None
+        rows[-1]["store_wide"] = (pct.group(0).replace(" %", "%") if pct else "see below") if out else ""
         if out:
             outside_rows.append({"opportunity": o.id, "resolve_by": rows[-1]["resolve_by"], "outside_rate_of": " ".join(str(out["of"]).split()),
                                  "quote": " ".join(str(out["quote"]).split()), "source": out["source"]})
@@ -3502,15 +3601,18 @@ def _prediction_baselines(ents, opps, games, techs, by_id, vocabs, cfg, derived,
         1 for o in opps if re.search(r"console release(?! with at least)", str(o.data["falsifiable_signal"].get("criteria", ""))))
     for r in rows:
         r.pop("_share"), r.pop("_amended"), r.pop("_learned_comm"), r.pop("_whole")
+        r["learned"] = f'{r["learned"]} ({r.pop("learned_commercial")})'   # one column, so the descriptions keep their width
     tables["prediction-base-rates"] = {
         "description": "Base rates for each prediction from the catalog (report/predictions.yaml). Games: catalog games in the prediction's "
                        "reference class, by subgenre or mechanic. Precursor: how many of them already have the precursor the last "
                        "column describes, with the share. Learned: how many deploy any catalogued learned technique, the catalog's own "
-                       "generic diffusion. Technique: how many deploy a technique that would count (for a technique test, the class its criteria "
+                       "generic diffusion, and in parentheses how many remain without AI-native titles and research demonstrations, which a "
+                       "review bar would mostly exclude. Technique: how many deploy a technique that would count (for a technique test, the class its criteria "
                        "name; for a feature test, one the opportunity applies), and technique in names them. The catalog is chosen for lineage "
                        "and mechanic coverage, not sampled from a store, so a rate here describes the genre's reference titles, not the chance "
-                       "of the event.",
-        "columns": ["opportunity", "test", "games", "precursor", "learned", "technique", "technique_in", "precursor_rate_of"],
+                       "of the event. Store-wide: a rate from outside the catalog where one fits better, as its source states it (the next "
+                       "table gives what it counts, the quote, and the source).",
+        "columns": ["opportunity", "test", "games", "precursor", "learned", "technique", "technique_in", "store_wide", "precursor_rate_of"],
         "rows": rows, "link_columns": ["opportunity", "technique_in"]}
     tables["prediction-outside-rates"] = {
         "description": "Base rates from outside the catalog, for predictions where a store-wide count fits better: what the count is a rate "
@@ -4006,6 +4108,13 @@ def _panel_agreement(ents, vocabs, cfg, raters, stats, tables, p: str, t: str, w
         rate_rows.append({"field": f, "raters": sum(1 for r in raters if (r.get("ratings") or {}).get(f)), **row})
         for key in ("exact", "within_one", "kappa", "kappa_low", "kappa_high", "alpha", "alpha_low", "alpha_high", "rank_rho", "shift"):
             stats[_xm_key(p, key, f)] = row[key]
+        # agreement once a constant shift is taken out (sixth review D23): the second reader's scores move by the mean shift,
+        # rounded to whole anchors and kept on the scale, so alpha measures agreement on level after the offset
+        sh = int(round(float(row["shift"] or 0)))
+        cu = [(i, v, [min(K, max(1, int(x) - sh)) for x in vals]) for i, v, vals in units]
+        row_c, _ = _xm_ordinal(cu, K, rng(stream("rating-centered:" + f)), n_boot, q)
+        stats[_xm_key(p, "alpha_centered", f)] = row_c["alpha"]
+        stats[_xm_key(p, "shift_removed", f)] = sh
         stats[f"{p}n_rated_{f}"] = row["items"]
         rconf += [{"field": f, "first": a + 1, "second": b + 1, "n": int(Pc[a, b])} for a in range(K) for b in range(K) if Pc[a, b]]
     for kind, fields in (("maturity", ("trl",)), ("rubric", panel.MECH_SCALES), ("opportunity", panel.OPP_SCALES)):
@@ -4588,6 +4697,34 @@ PRIOR_ART_KINDS = ("game", "official", "mod", "prototype", "research", "outside"
 PRIOR_ART_CLOSENESS = ("design", "feature", "adjacent", "none")
 
 
+def _prior_art_recall(opps, cfg, derived, stats):
+    """Read report/audits/prior-art-recall.yaml, the known-item recall check of the prior-art searches (sixth review D13),
+    check its ids and ceilings against the records, and count what the logged searches retrieved. A known item that does
+    the design or the feature is one that would cap novelty at 3 or below; the others are adjacent."""
+    path = ROOT / str((cfg.get("prior_art") or {}).get("recall_file", "report/audits/prior-art-recall.yaml"))
+    if not path.exists():
+        return
+    rows = read_yaml(path) or []
+    live = {o.id for o in opps}
+    for r in rows:
+        if r["id"] not in live:
+            raise ValueError(f"{path.relative_to(ROOT)}: {r['id']} is not a live opportunity")
+        if int(r["entry_ceiling_now"]) != derived[r["id"]]["prior_art_ceiling"]:
+            raise ValueError(f"{path.relative_to(ROOT)}: {r['id']}: entry_ceiling_now {r['entry_ceiling_now']} is not the entry's ceiling {derived[r['id']]['prior_art_ceiling']}")
+    known = [k for r in rows for k in r.get("known_items") or []]
+    shipped = [k for k in known if k["closeness"] in ("design", "feature")]
+    finds = [n for r in rows for n in r.get("new_prior_art") or [] if n.get("counts")]
+    stats["n_recall_opportunities"] = len(rows)
+    stats["n_recall_known"] = len(known)
+    stats["n_recall_known_named"] = sum(1 for k in known if k["named_in_entry"])
+    stats["n_recall_known_retrieved"] = sum(1 for k in known if k["retrieved"])
+    stats["n_recall_known_feature"] = len(shipped)
+    stats["n_recall_known_feature_retrieved"] = sum(1 for k in shipped if k["retrieved"])
+    stats["n_recall_new_finds"] = len(finds)
+    stats["n_recall_ceilings_lowered"] = sum(1 for r in rows for n in r.get("new_prior_art") or []
+                                             if n.get("counts") and int(n["would_set_ceiling"]) < int(r["entry_ceiling_now"]))
+
+
 def _prior_art(opps, by_id, order, cfg, derived, stats, tables):
     """Read report/audits/prior-art.yaml (one entry per live opportunity: the queries, where they ran, the closest prior
     art found, and the verdict) and fail the build when it falls out of step with the records. The ceiling is the
@@ -4648,7 +4785,11 @@ def _prior_art(opps, by_id, order, cfg, derived, stats, tables):
         derived[oid].update({"prior_art_ceiling": cap, "novelty_before": e["novelty_before"], "prior_art_coverage": e["coverage"]})
         # what a confirmation of its prediction would show (fifth review D4): where a game, official release, or mod already does
         # the feature or a narrower form (a ceiling of 3 or less), a confirmation shows the feature spreading, not first arriving
-        derived[oid]["prediction_kind"] = "diffusion" if cap <= 3 else "new capability"
+        derived[oid]["prediction_kind"] = "spread" if cap <= 3 else "first arrival"
+        # the shipped titles and mods the entry names (sixth review D4): a confirmation from one of them, or from its update,
+        # expansion, DLC, or mod, is that title extending its own feature and counts as generic diffusion (§11)
+        prior = [x for x in [cl] + list(e.get("also") or []) if x.get("kind") in ("game", "official", "mod") and x.get("closeness") in ("design", "feature")]
+        derived[oid]["prediction_prior_titles"] = "; ".join(dict.fromkeys(str(x["name"]) for x in prior))
         rows.append({"opportunity": oid, "closest_prior_art": cl.get("name"), "kind": cl["kind"], "year": cl.get("year") or "",
                      "closeness": cl["closeness"], "ceiling": cap, "novelty_before": e["novelty_before"], "novelty": o["novelty"],
                      "coverage": e["coverage"]})
@@ -4693,6 +4834,18 @@ def _prior_art(opps, by_id, order, cfg, derived, stats, tables):
     stats["first_prediction_year"] = first_year
     stats["n_predictions_first_year"] = sum(1 for v in due.values() if v == first_year)
     stats["n_predictions_first_year_diffusion"] = sum(1 for r in shipped if due[r["opportunity"]] == first_year)
+    arrive = sorted((live[r["opportunity"]].data["name"] for r in rows if r["ceiling"] > 3), key=str.lower)
+    stats["predictions_first_arrival_names"] = (arrive[0] if len(arrive) == 1 else ", ".join(arrive[:-1]) + ("," if len(arrive) > 2 else "") + " and " + arrive[-1]) if arrive else ""
+    stats["n_predictions_prior_titles"] = sum(1 for r in rows if derived[r["opportunity"]]["prediction_prior_titles"])
+    tables["prediction-prior-titles"] = {
+        "description": "For each prediction, what a confirmation would show and the shipped titles and mods its prior-art entry (§9.1) "
+                       "names as already doing the design or the feature. A confirmation that comes from one of them, or from an update, "
+                       "expansion, DLC, or mod of one, is recorded as generic diffusion.",
+        "columns": ["opportunity", "shows", "prior_titles"],
+        "rows": [{"opportunity": r["opportunity"], "shows": derived[r["opportunity"]]["prediction_kind"],
+                  "prior_titles": derived[r["opportunity"]]["prediction_prior_titles"]}
+                 for r in sorted(rows, key=lambda r: (str(live[r["opportunity"]].data["falsifiable_signal"]["resolve_by"]), r["opportunity"]))],
+        "link_columns": ["opportunity"]}
 
 
 # ======================================================================= SVG

@@ -616,9 +616,12 @@ def latex(paper_md: str, meta: dict, manifest: dict, figures: dict) -> str:
         r"\usepackage[hyphens]{url}",
         r"\usepackage{hyperref}",
         r"\definecolor{sgaccent}{HTML}{0550AE}",
-        r"\hypersetup{colorlinks=true, linkcolor=sgaccent, urlcolor=sgaccent, citecolor=sgaccent, " + pdfmeta + "}",
+        r"\hypersetup{colorlinks=true, linkcolor=sgaccent, urlcolor=sgaccent, citecolor=sgaccent, bookmarksdepth=3, " + pdfmeta + "}",
         r"\setlist{itemsep=0.2em, topsep=0.3em}",
-        r"\setcounter{tocdepth}{2}",
+        # the printed contents lists sections only, so it fits beside the title on page 1 and no page holds only contents
+        # rows, which text extractors read as a table (sixth review A2); the PDF bookmarks keep every heading level, so
+        # the 21 family headings of §4.2 sit at one level in the outline (D25)
+        r"\setcounter{tocdepth}{1}",
         r"\setlength{\emergencystretch}{3em}",
         r"\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0pt}",
         rf"\fancyfoot[L]{{\footnotesize {esc(fm['title'])} v{esc(fm['version'])} \textperiodcentered{{}} dataset \texttt{{{short}}}}}",
@@ -630,7 +633,7 @@ def latex(paper_md: str, meta: dict, manifest: dict, figures: dict) -> str:
         + (rf"\\doi \href{{{esc_url('https://doi.org/' + meta['doi'])}}}{{\texttt{{{esc(meta['doi'])}}}}}" if meta.get("doi") else "") + "}",
         r"\begin{document}",
         r"\maketitle\thispagestyle{fancy}",
-        r"\tableofcontents",
+        r"{\small\tableofcontents}",
         r"\clearpage",
         tex_body.rstrip(),
         r"\end{document}",

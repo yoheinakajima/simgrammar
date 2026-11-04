@@ -1,0 +1,32 @@
+id: 2026-11-04-es-v6-revision
+type: run
+kind: maintenance
+date: '2026-11-04'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Answer Explore Science's sixth review (v0.7, 94, 23 open minor issues) in the analysis and the
+  prose of the paper and book.
+method: 'Read the 23 open findings of review EbzaOSwkc3u, version 2 (v0.7, 94). analyze.py adds: a late re-dating that moves early-access
+  uses to the recorded 1.0 year and noted later features to their year, and the denominator of mechanics still dated (D12,
+  D30); pair coverage over pairs across families, where no pair is exclusive by design, against the curveball null (D19, B5);
+  alpha with the mean shift taken out, for the two raters and the second model (D23); the capped place and evidence flags
+  in the ranking table (D2); what each confirmation shows and the prior-art titles whose updates or mods count as generic
+  diffusion, in a new table (D4); base rates with a commercial count and the store-wide rate in the main table (D5); a one-anchor
+  rater shift and Monte Carlo error in the sample-size simulation (D16); and the counts of a known-item recall check (D13).
+  The recall check (report/audits/prior-art-recall.yaml) was run by one agent of the same model on ten opportunities: known
+  items listed before reading the entries, logged queries re-run, synonym queries; five finds were added to three entries''
+  also lists and the bottleneck verdict was corrected, with no ceiling or score changed. Prose: the abstract''s findings and
+  reliability (B2, B5, D3, D15, D21); §2 on what family kappa shows and the late dating (C3, D12); §5 on dating bounds, the
+  across-family null, and shift-adjusted agreement (D12, D19, D23, D30); §6 and §9.3 on the ceilings as a frame and the causal
+  sentence (D20, D23); §8.1 on the first-coded effect (D21); §9.1 and §9.4 on recall and the capped ranking (D13, D2); §11
+  on first arrival, prior titles, the modding field, whole-catalog classes, and each review bar (D4, D5, D29, E1); §11.1 and
+  Appendix F on the sample size and what remains (D16, D13). Book chapters 1, 3, 5 and 8 say the same. The PDF lists sections
+  only in its contents, which now fit on page 1, and its bookmarks carry the family headings (A2, D25). The ranking table
+  drops its type column to make room. Not done here: the runtime techniques'' determinism recode (D1), which a blind recode
+  against the written tests showed needs sharper tests, and goes to its own run; Figure 4''s palette (F3); the Steam-tag snapshot
+  (E1). No record, score, or stored rank changes.'
+contract_version: '1.3'
+proposals: []
