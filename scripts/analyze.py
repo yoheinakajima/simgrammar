@@ -1505,6 +1505,7 @@ def compute(ents: dict, edges: list, vocabs: dict) -> dict:
     stats["n_technique_runtime"] = len(rt)
     for k in ("breaks", "mitigable", "preserves"):
         stats[f"n_technique_runtime_{k}"] = sum(1 for t in rt if t.data["determinism_impact"] == k)
+    _determinism_tests(techs, rt, cfg, derived, stats, tables)
 
     # ---------------- techniques: the 2019-2026 window, and whether TRL and maturity tell the same story (§7.1)
     tcfg = cfg.get("techniques") or {}
@@ -4695,6 +4696,106 @@ def _edge_audits(cfg, vocabs, mechs, techs, by_id, derived, stats, tables):
 
 PRIOR_ART_KINDS = ("game", "official", "mod", "prototype", "research", "outside")
 PRIOR_ART_CLOSENESS = ("design", "feature", "adjacent", "none")
+
+
+DET_ANSWERS = ("enters_state", "recompute", "pinnable", "cross_machine")
+DET_FAILS = {"service": "hosted service", "timing": "timing"}
+DET_BASIS = {"offline": "offline only", "no-state": "no state", "recomputes": "recomputes", "pinnable": "pinnable"}
+
+
+def _det_class(a) -> str:
+    """The class the written tests give (report/audits/determinism-tests.yaml): preserves when the output never enters
+    simulation state or recomputes on one machine with no further measure, mitigable when a seed, weights, settings, or
+    a cache built before play the developer controls make it recompute, breaks otherwise."""
+    return "preserves" if a["enters_state"] == "no" or a["recompute"] == "yes" else ("mitigable" if a["pinnable"] == "yes" else "breaks")
+
+
+def _determinism_tests(techs, rt, cfg, derived, stats, tables):
+    """Read report/audits/determinism-tests.yaml, the answers to the written determinism tests for every technique that
+    runs during play (sixth review D1; §6.4), and fail the build when a record's determinism_impact is not the class its
+    answers give, when an offline-only technique does not preserve, or when the answers contradict the tests' order.
+    Counts the classes before the recode, the deciding test, cross-machine identity, lockstep without streaming (no state,
+    or identical across machines), and the agreement of each blind recode with the final classes."""
+    path = ROOT / str((cfg.get("techniques") or {}).get("determinism_file", "report/audits/determinism-tests.yaml"))
+    where = path.relative_to(ROOT)
+    rows = (read_yaml(path) or {}).get("techniques") or []
+    by = {t.id: t for t in techs}
+    runtime = {t.id for t in rt}
+    seen = [r["id"] for r in rows]
+    if len(set(seen)) != len(seen) or set(seen) != runtime:
+        raise ValueError(f"{where}: must answer every live runtime technique once; missing {sorted(runtime - set(seen))}, "
+                         f"extra or repeated {sorted({x for x in seen if x not in runtime or seen.count(x) > 1})}")
+    for t in techs:
+        if t.id not in runtime:
+            derived[t.id]["determinism_basis"] = DET_BASIS["offline"]
+            if t.data["determinism_impact"] != "preserves":
+                raise ValueError(f"{where}: {t.id} runs only offline, so it preserves, not {t.data['determinism_impact']}")
+    yn = lambda x: {True: "yes", False: "no"}.get(x, str(x))  # noqa: E731  (YAML reads a bare yes as true)
+    out = []
+    for r in rows:
+        w = f"{where}: {r['id']}"
+        a = {k: yn(r.get(k)) for k in DET_ANSWERS}
+        if any(v not in ("yes", "no", "na") for v in a.values()):
+            raise ValueError(f"{w}: every answer is yes, no, or na")
+        need_na = (["recompute", "pinnable", "cross_machine"] if a["enters_state"] == "no" else
+                   ["pinnable"] if a["recompute"] == "yes" else [])
+        cls = _det_class(a)
+        if cls == "breaks":
+            need_na.append("cross_machine")
+        if any(a[k] != "na" for k in need_na) or any(a[k] == "na" for k in DET_ANSWERS if k not in need_na):
+            raise ValueError(f"{w}: answers out of order; na exactly for {need_na}")
+        if cls != by[r["id"]].data["determinism_impact"]:
+            raise ValueError(f"{w}: the tests give {cls}, the record says {by[r['id']].data['determinism_impact']}")
+        if (cls == "breaks") != bool(r.get("fails")) or (r.get("fails") and r["fails"] not in DET_FAILS):
+            raise ValueError(f"{w}: fails is one of {sorted(DET_FAILS)} exactly when the class is breaks")
+        basis = (DET_BASIS["no-state"] if a["enters_state"] == "no" else DET_BASIS["recomputes"] if a["recompute"] == "yes"
+                 else DET_BASIS["pinnable"] if cls == "mitigable" else DET_FAILS[r["fails"]])
+        lock = a["enters_state"] == "no" or a["cross_machine"] == "yes"
+        derived[r["id"]]["determinism_basis"] = basis
+        derived[r["id"]]["determinism_lockstep"] = "yes" if lock else "no"
+        out.append({**r, **a, "class": cls, "basis": basis, "lockstep": lock,
+                    "blind_class": _det_class({k: yn(v) for k, v in (r.get("blind") or {}).items()}) if r.get("blind") else None})
+    n = len(out)
+    for k in ("preserves", "mitigable", "breaks"):
+        stats[f"n_det_before_{k}"] = sum(1 for r in out if r["class_before"] == k)
+    stats["n_det_tested"] = n
+    stats["n_det_changed"] = sum(1 for r in out if r["class_before"] != r["class"])
+    stats["n_det_no_state"] = sum(1 for r in out if r["enters_state"] == "no")
+    stats["n_det_recomputes"] = sum(1 for r in out if r["enters_state"] == "yes" and r["recompute"] == "yes")
+    for k in DET_FAILS:
+        stats[f"n_det_breaks_{k}"] = sum(1 for r in out if r.get("fails") == k)
+    stats["n_det_cross_machine"] = sum(1 for r in out if r["cross_machine"] == "yes")
+    stats["n_det_lockstep"] = sum(1 for r in out if r["lockstep"])
+    stats["n_det_no_lockstep_state"] = sum(1 for r in out if not r["lockstep"])
+    stats["n_det_counterfactual"] = sum(1 for r in out if r["class"] != "breaks")
+    xm = sorted((by[r["id"]].data["name"] for r in out if r["cross_machine"] == "yes"), key=str.lower)
+    stats["det_cross_machine_names"] = (xm[0] if len(xm) == 1 else ", ".join(xm[:-1]) + ("," if len(xm) > 2 else "") + " and " + xm[-1]) if xm else ""
+    classes = ["preserves", "mitigable", "breaks"]
+    # agreement between independent codings: the run's own (before it read the blind one) against the blind agent's
+    # under the same tests, and the first blind recode under the looser tests against the classes it was meant to check
+    for key, a_col, b_col in (("blind", "run_coded", "blind_class"), ("first", "class_before", "first_recode")):
+        pairs = [(r[a_col], r[b_col]) for r in out if r.get(a_col) and r.get(b_col)]
+        O = np.zeros((3, 3))
+        for x, y in pairs:
+            O[classes.index(x), classes.index(y)] += 1
+        stats[f"n_det_{key}_coded"] = len(pairs)
+        stats[f"n_det_{key}_agree"] = int(np.trace(O))
+        stats[f"kappa_det_{key}"] = _r(_kappa_nominal(O), 2) if pairs else None
+    stats["n_det_blind_agree_final"] = sum(1 for r in out if r.get("blind_class") == r["class"])
+    stats["n_det_adjudicated"] = sum(1 for r in out if r.get("run_coded") and r["run_coded"] != r["class"])
+    yesno = lambda b: "yes" if b else "no"  # noqa: E731
+    tables["determinism-tests"] = {
+        "description": "Every technique that can run during play, by the written tests of §6.4 (report/audits/determinism-tests.yaml): "
+                       "the class, the test that decides it, whether the same settings give identical output on different hardware, and "
+                       "whether peers in lockstep could each run it without streaming its outputs. Decided by: no state (its output "
+                       "never enters simulation state), recomputes (same seed and inputs, same output), pinnable (a seed, weights, "
+                       "or settings the developer controls make it recompute), hosted service or timing (nothing the developer "
+                       "controls does). A dash means the test does not apply.",
+        "columns": ["technique", "class", "decided_by", "across_machines", "lockstep"],
+        "rows": [{"technique": r["id"], "class": r["class"], "decided_by": r["basis"],
+                  "across_machines": "–" if r["cross_machine"] == "na" else r["cross_machine"], "lockstep": yesno(r["lockstep"])}
+                 for r in sorted(out, key=lambda r: (classes.index(r["class"]), r["basis"], r["id"]))],
+        "link_columns": ["technique"]}
 
 
 def _prior_art_recall(opps, cfg, derived, stats):

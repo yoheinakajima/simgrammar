@@ -44,7 +44,7 @@ trl: 3
 runtime:
 - client-realtime
 - offline-authoring
-determinism_impact: mitigable
+determinism_impact: preserves
 horizon: 3-5y
 risks:
 - consistency
@@ -95,3 +95,4 @@ provenance:
   created: 2026-10-24-techniques-sim-math
   reviewed:
   - 2026-11-01-es-v3-edge-audits
+  - 2026-11-04-det-tests

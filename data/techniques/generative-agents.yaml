@@ -57,7 +57,7 @@ trl: 7
 runtime:
 - server-realtime
 - client-realtime
-determinism_impact: breaks
+determinism_impact: mitigable
 horizon: now
 risks:
 - determinism
@@ -138,3 +138,4 @@ provenance:
   - 2026-10-24-technique-links
   - 2026-10-24-review-fixes
   - 2026-11-01-es-v3-edge-audits
+  - 2026-11-04-det-tests

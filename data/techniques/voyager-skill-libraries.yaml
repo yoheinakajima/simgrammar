@@ -45,9 +45,10 @@ trl: 4
 runtime:
 - server-realtime
 - analytics
-determinism_impact: mitigable
+determinism_impact: breaks
 horizon: 1-2y
 risks:
+- determinism
 - compute-cost
 - consistency
 - evaluation
@@ -99,3 +100,4 @@ provenance:
   reviewed:
   - 2026-10-24-technique-links
   - 2026-10-31-tag-audit
+  - 2026-11-04-det-tests

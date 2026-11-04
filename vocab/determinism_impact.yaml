@@ -1,12 +1,12 @@
 id: determinism_impact
-description: Effect on reproducibility, replays, lockstep multiplayer, and save integrity when used at runtime.
+description: Effect on reproducibility, replays, lockstep multiplayer, and save integrity when used at runtime, by the written tests in report/audits/determinism-tests.yaml.
 terms:
   - id: preserves
     label: Preserves
-    definition: Deterministic given seed and inputs, or used only offline.
+    definition: Used only offline, its output never enters simulation state, or the same seed and inputs give the same output on one machine with no further measure.
   - id: mitigable
     label: Mitigable
-    definition: Non-deterministic but can be made reproducible via caching, logging outputs, or fixed seeds.
+    definition: Does not recompute as it stands, but a sampler seed, weights the developer runs, fixed batch and kernel settings, or a cache built before play make it recompute on one machine.
   - id: breaks
     label: Breaks
-    definition: Outputs cannot be reproduced reliably; replays and lockstep sync require recording the outputs themselves.
+    definition: Nothing the developer controls makes it recompute (a third party's hosted model, or output that depends on timing); only a log of its outputs restores a replay.

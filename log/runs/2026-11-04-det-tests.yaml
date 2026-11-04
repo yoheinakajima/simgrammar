@@ -1,0 +1,35 @@
+id: 2026-11-04-det-tests
+type: run
+kind: maintenance
+date: '2026-11-04'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Classify the runtime techniques' determinism by written tests, recode all of them, and report
+  the change (review D1).
+method: 'Read finding D1 of review EbzaOSwkc3u, version 2 (operational criteria for the determinism classes). A blind agent of the same
+  model first recoded the 35 runtime techniques from their records, without limitations, against the tests v0.7 printed; it agreed with
+  the stored classes on 14 of 35 and showed three gaps: output that never enters state, which of a record''s forms to code (hosted or
+  self-hosted, a time or an iteration budget), and fixed-weight networks. Wrote sharper tests (the header of report/audits/determinism-tests.yaml):
+  enters_state; recompute on one machine with no further measure; pinnable by a sampler seed, weights the developer runs, batch and
+  kernel settings, or a cache built before play; and cross_machine. Lockstep and counterfactual re-simulation are derived. Built a blind
+  input from each record''s summary, mechanism, key results, limitations, deployments, and edge notes, with every sentence matching
+  determinis, reproduc, replay, lockstep, re-simulat, or desync removed. The run coded the 35 and froze its answers (sha1 aebd652c)
+  before a second blind agent of the same model coded them from that input and the tests. The two agreed on class for 31 of 35 (kappa
+  0.81). All four differences (ml-weather-models, monte-carlo-tree-search, open-ended-environment-generation, physics-based-character-control)
+  came from which form to code: the blind agent coded the most reproducible form a record describes, following the tests'' stated reason,
+  and the run had not. The header now says so, and the four are coded that way, with the blind agent''s cross-machine answers for two
+  CPU searches and its no-state answer for learned motion synthesis. Changed determinism_impact on 20 records: 7 breaks to mitigable,
+  2 mitigable to breaks (each now lists the determinism risk), and 11 mitigable to preserves, one of them offline-only (text-to-3d-assets).
+  Runtime counts go from 9, 16, and 10 to 19, 11, and 5, and 12 of 35 could run in lockstep. analyze.py (_determinism_tests) derives
+  each class from the answers, fails the build on a mismatch or on an offline-only technique that does not preserve, and adds the §6.4
+  table and a decided-by column to the appendix catalog. Rewrote the vocab/determinism_impact.yaml definitions without logging (CHANGELOG),
+  the middle label of Figures 11 and 12, §6.4, the abstract''s finding 5, §7.3, §8.5 (on-device language characters now mitigable throughout),
+  §9.2, §10, and §11, book chapters 6, 7, 8, 10, 11, and 13, and media scripts (episodes 5, 6, 10, and 12, the film, short 10). Narration
+  changed in three scenes (episode 5 ''Same inputs, same world'', episode 6 ''Characters that talk'', episode 10 ''The fix was one line''),
+  which stay marked until re-rendered. Not done: coding by a model other than claude-opus-5-5, and checking the cross-machine answers
+  on real hardware.'
+contract_version: '1.3'
+proposals: []

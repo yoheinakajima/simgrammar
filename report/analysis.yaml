@@ -323,6 +323,10 @@ techniques:
   # only when an in-window technique builds on it, a catalog game released in the window deploys it, or it cites a
   # non-encyclopedia source dated in the window (later work that extends or applies it); analyze.py names the reason.
   window_start: 2019
+  # §6.4 (sixth review D1): every technique that runs during play is coded against written determinism tests in this
+  # file (its header gives them); analyze.py (_determinism_tests) fails the build when a record's determinism_impact is
+  # not the class its answers give.
+  determinism_file: report/audits/determinism-tests.yaml
   # The TRL anchors (vocab/rubrics.yaml) and the maturity definitions (vocab/technique_maturity.yaml) describe the same
   # evidence: TRL 6 is a public playable demo or tech preview, which is the prototype definition; TRL 7 and 8 are a
   # commercial game, which is shipped (niche); TRL 9 is standard practice across titles, which is shipped (mainstream).

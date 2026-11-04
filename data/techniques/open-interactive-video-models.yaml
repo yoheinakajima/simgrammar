@@ -60,7 +60,7 @@ maturity: prototype
 trl: 6
 runtime:
 - server-realtime
-determinism_impact: breaks
+determinism_impact: mitigable
 horizon: 3-5y
 risks:
 - determinism
@@ -122,3 +122,4 @@ provenance:
   created: 2026-10-24-techniques-world-models
   reviewed:
   - 2026-10-24-review-fixes
+  - 2026-11-04-det-tests

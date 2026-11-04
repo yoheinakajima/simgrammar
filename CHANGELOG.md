@@ -2,6 +2,13 @@
 
 Contract, schema, vocabulary, and rubric changes. Data changes are tracked by run records in `log/runs/` and by git history.
 
+## 1.3 additions (2026-11-04, determinism tests)
+
+Run `2026-11-04-det-tests` (sixth review D1). No term, field, or schema changed.
+
+- **Vocabulary:** the three `determinism_impact` definitions now state written tests, asked in order. Preserves: used only offline, output that never enters simulation state, or the same output from the same seed and inputs on one machine. Mitigable: a sampler seed, weights the developer runs, batch and kernel settings, or a cache built before play make it recompute. Breaks: nothing the developer controls does (a third party's hosted model, or output that depends on timing). Logging outputs, which restores a recorded replay for every class, no longer appears in any definition.
+- **Audit:** `report/audits/determinism-tests.yaml` answers the tests for every technique that runs during play, and adds cross-machine identity, from which lockstep without streaming is derived. `analyze.py` derives each class from the answers and fails the build when a record's `determinism_impact` differs, or when an offline-only technique does not preserve.
+
 ## 1.3 (2026-11-03)
 
 ADR-0009 (run `2026-11-03-console-audience-bar`).

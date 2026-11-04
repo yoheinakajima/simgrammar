@@ -61,7 +61,7 @@ maturity: shipped-niche
 trl: 8
 runtime:
 - server-realtime
-determinism_impact: breaks
+determinism_impact: mitigable
 horizon: now
 risks:
 - determinism
@@ -160,3 +160,4 @@ provenance:
   reviewed:
   - 2026-10-24-review-fixes
   - 2026-11-01-es-v3-edge-audits
+  - 2026-11-04-det-tests

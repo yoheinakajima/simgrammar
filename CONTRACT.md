@@ -159,7 +159,7 @@ Run `make check`. Every finding names a rule code; `--json` gives machine-readab
 | [`agency_model`](vocab/agency_model.yaml) | 11 | How player intent reaches the simulation. A game may use several. |
 | [`agent_count_order`](vocab/agent_count_order.yaml) | 7 | Order of magnitude of individually simulated agents in typical play. Aggregate populations shown as a number but simulated as stocks count as `aggregate`. |
 | [`confidence`](vocab/confidence.yaml) | 3 | Confidence in a specific claim. |
-| [`determinism_impact`](vocab/determinism_impact.yaml) | 3 | Effect on reproducibility, replays, lockstep multiplayer, and save integrity when used at runtime. |
+| [`determinism_impact`](vocab/determinism_impact.yaml) | 3 | Effect on reproducibility, replays, lockstep multiplayer, and save integrity when used at runtime, by the written tests in report/audits/determinism-tests.yaml. |
 | [`edge_types`](vocab/edge_types.yaml) | 13 | Every typed relation in the graph. Each edge is stored exactly once, on the `owner` side named here. Inverses are computed by the build and never stored. Symmetric edges are stored on the entity whose id sorts first. |
 | [`effect`](vocab/effect.yaml) | 7 | How a technique changes a mechanic (attribute of the technique→mechanic `affects` edge). |
 | [`failure_model`](vocab/failure_model.yaml) | 5 | What happens when the system goes wrong. |

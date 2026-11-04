@@ -138,6 +138,8 @@ tables:
   - trl
   - horizon
   - determinism_impact
+  - path: _derived.determinism_basis
+    label: decided by
   - path: _derived.window
     label: window
   sort:
@@ -146,7 +148,7 @@ tables:
   - name
   caption: The set covers techniques whose key result falls in 2019 or later. An older technique is kept as a historical
     exception only when an in-window technique builds on it, a catalog game released in the window deploys it, or it
-    cites later work from the window; the window column names which (report/analysis.yaml, techniques.window_start).
+    cites later work from the window; the window column names which (report/analysis.yaml, techniques.window_start). Decided by names the determinism test that sets the class (§6.4), one of offline only, no state, recomputes, pinnable, hosted service, or timing.
 - name: opportunity-catalog
   kind: rows
   entity: opportunity

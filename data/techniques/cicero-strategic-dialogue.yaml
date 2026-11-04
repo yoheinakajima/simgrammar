@@ -58,7 +58,7 @@ maturity: research
 trl: 5
 runtime:
 - server-realtime
-determinism_impact: breaks
+determinism_impact: mitigable
 horizon: 1-2y
 risks:
 - determinism
@@ -114,3 +114,4 @@ provenance:
   - 2026-10-24-review-fixes
   - 2026-10-25-source-claims-pilot
   - 2026-11-01-es-v3-edge-audits
+  - 2026-11-04-det-tests

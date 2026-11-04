@@ -52,7 +52,7 @@ trl: 4
 runtime:
 - offline-authoring
 - server-realtime
-determinism_impact: mitigable
+determinism_impact: preserves
 horizon: 3-5y
 risks:
 - controllability
@@ -103,3 +103,4 @@ provenance:
   created: 2026-10-24-techniques-rl-design
   reviewed:
   - 2026-11-01-es-v3-edge-audits
+  - 2026-11-04-det-tests

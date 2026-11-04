@@ -68,7 +68,7 @@ trl: 7
 runtime:
 - offline-authoring
 - client-realtime
-determinism_impact: mitigable
+determinism_impact: preserves
 horizon: now
 risks:
 - compute-cost
@@ -119,3 +119,4 @@ provenance:
   created: 2026-10-24-techniques-rl-design
   reviewed:
   - 2026-10-25-source-claims-pilot
+  - 2026-11-04-det-tests
