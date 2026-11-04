@@ -265,11 +265,28 @@ entries:
     year: 2002
     closeness: adjacent
     url: https://www.allaboutlean.com/publications/2002_wsc-throughput-sensitivityanalysis-preprint/
+  - name: Factory Insight (Factorio mod)
+    kind: mod
+    year: 2026
+    closeness: design
+    url: https://mods.factorio.com/mod/factory-insight
+  - name: BottleneckUI (Dyson Sphere Program mod)
+    kind: mod
+    year: null
+    closeness: feature
+    url: https://thunderstore.io/c/dyson-sphere-program/p/Valoneu/BottleneckUI/
+  - name: FLOWORKS
+    kind: game
+    year: 2026
+    closeness: feature
+    url: https://store.steampowered.com/app/4858700/
   novelty_before: 3
   novelty: 3
-  verdict: Factorio mods name the starved ingredients from the running factory, but by sampling, not by
-    perturbing or re-running the network, and they write no explanation; sensitivity analysis of throughput
-    is established in manufacturing research. The stored 3 stands.
+  verdict: Factorio mods name the starved ingredients from the running factory, most by sampling; one, Factory
+    Insight (2026, found by the recall check of run 2026-11-04-es-v6-revision), writes a chain of reasons to the
+    root cause and re-runs a train route search with a proposed fix, the design as a mod. A small 2026 game
+    highlights the jammed line. Sensitivity analysis of throughput is established in manufacturing research. Mods
+    and a narrower game are partial precedents; the stored 3 stands.
 - opportunity: branch-preview-forecasts
   date: '2026-11-01'
   queries:
@@ -683,6 +700,11 @@ entries:
     year: 2025
     closeness: adjacent
     url: https://arxiv.org/abs/2501.09099
+  - name: Rimteller (RimWorld mod)
+    kind: mod
+    year: 2026
+    closeness: feature
+    url: https://openworkshop.miskler.ru/mod/8442
   novelty_before: 3
   novelty: 3
   verdict: A 2026 RimWorld mod already has a language model read colony and pawn state and choose among
@@ -3145,6 +3167,11 @@ entries:
     year: 2023
     closeness: adjacent
     url: https://arxiv.org/abs/2310.02172
+  - name: RimMind - Personality (RimWorld mod)
+    kind: mod
+    year: 2026
+    closeness: feature
+    url: https://openworkshop.miskler.ru/mod/89919
   novelty_before: 3
   novelty: 3
   verdict: inZOI's on-device model writes inner thoughts after actions and at life events over a conventional

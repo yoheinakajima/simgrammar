@@ -1,0 +1,670 @@
+# Known-item recall check of the prior-art searches behind the novelty scores (sixth review D13; §9.1).
+#
+# Made by run 2026-11-04-es-v6-revision (operator yoheinakajima, model claude-opus-5-5, Claude Code), through one agent
+# of the same model on 2026-11-04. The sample is the opportunities in places 1 to 7 of the stored ranking, the three
+# §9.4 starts with, and the drama-aware storyteller, whose genre calls the idea a storyteller: ten in all.
+#
+# Per opportunity, in this order:
+# 1. Known items, listed from the opportunity's text and the agent's knowledge before it opened the logged search: up to
+#    four shipped games, official releases, or mods that do the design, the prediction's defining feature, or a narrower
+#    form (closeness design or feature), and adjacent work that would cap the score at 4.
+# 2. Whether each known item is named in the entry (closest or also), and whether up to three of the entry's logged web
+#    queries, run again, return it in their top ten results. Retrieved: named, or returned by a logged query.
+# 3. Two or three queries with the words other genres use for the idea (advisor, storyteller, director, dynamic events),
+#    and any game, official release, or mod they surface that the entry does not name, with its page and a quote from it.
+# A find counts only if its own page shows it doing the feature. Finds that do the design or the feature were added to
+# the entry's `also` list in report/audits/prior-art.yaml; none sets a ceiling below the entry's, so no score changed.
+# scripts/analyze.py (_prior_art_recall) checks the ids and ceilings against the records and computes the §9.1 counts.
+---
+- id: causal-why-query
+  entry_ceiling_now: 3
+  known_items:
+  - title: EchoColony (RimWorld mod)
+    kind: mod
+    closeness: feature
+    why: LLM chat with colonists; replies draw on the colonist's needs, memories and relationships in the save (narrower form).
+    named_in_entry: true
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: true
+    which_query: 'mod lets you ask an AI questions about your save game why colony LLM RimWorld OR Stellaris OR Cities: Skylines'
+    retrieved: true
+  - title: RimGPT (RimWorld mod)
+    kind: mod
+    closeness: adjacent
+    why: LLM commentator fed the game log; takes no player questions.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: true
+    which_query: 'mod lets you ask an AI questions about your save game why colony LLM RimWorld OR Stellaris OR Cities: Skylines'
+    retrieved: true
+  - title: Crusader Kings III / Victoria 3 nested causal tooltips
+    kind: game
+    closeness: adjacent
+    why: Breakdowns explain current values; no free text, no histories.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: Dwarf Fortress thoughts and Legends mode
+    kind: game
+    closeness: adjacent
+    why: Mood causes cite remembered events; Legends is a browsable world history; no free-text query.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: true
+    which_query: Dwarf Fortress OR Crusader Kings tool ask why something happened in your world legends LLM chat
+    retrieved: true
+  logged_queries_rerun:
+  - 'mod lets you ask an AI questions about your save game why colony LLM RimWorld OR Stellaris OR Cities: Skylines'
+  - Dwarf Fortress OR Crusader Kings tool ask why something happened in your world legends LLM chat
+  - RimWorld mod LLM ask storyteller explain what happened colony history
+  synonym_queries:
+  - >-
+    in-game AI advisor answers player questions about their campaign game state language model official update strategy game
+    2026
+  - Stellaris OR "Victoria 3" OR "Europa Universalis" mod AI advisor chat LLM ask questions about your empire save
+  - simulation game "ask" why citizens unhappy AI explains causes chat feature city builder language model Steam
+  followup_queries:
+  - Total War PHARAOH AI advisor NVIDIA ACE playtest now live update released players
+  - Noble Legacy Studio 369 agentic AI villagers LLM how it works memories events
+  new_prior_art: []
+  notes: >-
+    No new find counts. The Total War: PHARAOH ACE advisor came up again: the synonym query surfaced it at once, and coverage
+    says it explains things like why a settlement revolted. It is already in the entry as a prototype, and as of this search
+    every source still describes the playtest as upcoming, so the classification holds. If it ships as an official update,
+    the entry should be re-scored (an official release doing the design would cap at 2). Noble Legacy (Steam Early Access,
+    Aug 2025, 773 reviews) is reported by press to have OpenAI-powered villager conversation, but its store page (app 3372710)
+    describes no AI dialogue, so under the strict rule it does not count. RimTalk Lucid Chronicle (AI chronicles from colonist
+    memories) and RimMind are adjacent: they summarise or narrate, they do not answer questions. Xbox Gaming Copilot and EVE
+    Online's Aura Guidance answer help questions, not save-state causal questions.
+- id: branch-preview-forecasts
+  entry_ceiling_now: 3
+  known_items:
+  - title: Hearthstone Battlegrounds combat simulators (Bob's Buddy in HDT; Firestone)
+    kind: mod
+    closeness: feature
+    why: >-
+      Third-party overlay simulates the pending combat many times from the live boards and shows win/tie/loss odds; one combat,
+      not policy.
+    named_in_entry: true
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: true
+  - title: 'Command: Modern Operations / Command PE Monte Carlo analysis'
+    kind: game
+    closeness: feature
+    why: >-
+      Repeated scenario runs give outcome statistics. The rerun result places it in Command: Professional Edition, not the
+      consumer Steam game.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: true
+    which_query: '"Command: Modern Operations" Monte Carlo analysis run scenario multiple times statistics'
+    retrieved: true
+  - title: Into the Breach
+    kind: game
+    closeness: adjacent
+    why: Exact preview of the next enemy turn; a single deterministic projection, which the criteria exclude.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: Frozen Synapse
+    kind: game
+    closeness: adjacent
+    why: Plan-and-preview of a turn; deterministic projection, excluded.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  logged_queries_rerun:
+  - '"Command: Modern Operations" Monte Carlo analysis run scenario multiple times statistics'
+  - strategy game feature simulate outcome "1000 times" before decision preview spread of outcomes
+  - >-
+    game runs the simulation multiple times shows player probability outcomes before committing decision city builder OR grand
+    strategy
+  synonym_queries:
+  - >-
+    game feature "simulates" thousands of possible outcomes from current save shows odds before you commit forecast fan chart
+    policy
+  - sports management game "simulate" match or season many times from your save "win probability" preview feature Steam
+  - >-
+    auto battler OR wargame "battle simulator" runs fight many times from current board shows win rate in-game feature official
+  new_prior_art: []
+  notes: >-
+    Synonym queries surfaced only third-party combat simulators (Bob's Buddy, hsbg-sim, a CryptoBlade browser extension) and
+    non-game business wargaming (LucidWargames). None is a game, official release or mod doing the design beyond what the
+    entry already holds (Wesnoth attack prediction, Bob's Buddy). Command's Monte Carlo analysis appears in the rerun results
+    only through a 2021 MODSIM paper on Command: Professional Edition. That is a professional tool, which would cap at 4 at
+    most, so it does not change the ceiling of 3.
+- id: event-sourced-sim-runtime
+  entry_ceiling_now: 4
+  known_items:
+  - title: Factorio deterministic lockstep and replays
+    kind: game
+    closeness: adjacent
+    why: Input log replays a deterministic simulation; records no model outputs.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: SpacetimeDB commit log (BitCraft backend)
+    kind: official
+    closeness: adjacent
+    why: Never-compacted commit log can rebuild any past state; says nothing of model outputs.
+    named_in_entry: true
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: true
+    which_query: SpacetimeDB OR "game backend" commit log replay LLM agents AI NPC record outputs reproducible game server
+      2026
+    retrieved: true
+  - title: Temporal durable execution
+    kind: outside-games
+    closeness: adjacent
+    why: Event history records activity results, LLM calls included, and replays from it.
+    named_in_entry: true
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: true
+  known_none_note: Before the search I knew no game, mod or engine release that records model outputs in a replayable log.
+  logged_queries_rerun:
+  - game engine replay determinism LLM outputs recorded event log middleware
+  - AI NPC middleware replay cached model outputs multiplayer determinism Inworld OR Convai
+  - SpacetimeDB OR "game backend" commit log replay LLM agents AI NPC record outputs reproducible game server 2026
+  synonym_queries:
+  - >-
+    game stores LLM responses in save file so replays and multiplayer clients reuse them deterministic AI NPC dialogue cache
+    shipped
+  - Unity OR Godot OR Unreal plugin record and replay LLM calls deterministic playback game testing open source
+  followup_queries:
+  - Infinite Craft caches AI results first discovery same result every player how it works
+  new_prior_art:
+  - title: Infinite Craft (shared result cache)
+    kind: game
+    closeness: adjacent (borderline feature)
+    year: 2024
+    url: https://en.wikipedia.org/wiki/Infinite_Craft
+    quote: checks from its database if these two elements have already been combined before
+    would_set_ceiling: 4
+    counts: false
+    why_not_lower: >-
+      It records each model output once and serves the stored output to every later player, the 'read cached outputs' half
+      of the thesis. But it is a lookup table inside one game, not a replayable event log or a released runtime, and it has
+      no replay or fork. A looser reading (a game doing a narrower form of the feature) would cap at 3.
+  notes: >-
+    The reruns and synonym queries found only LLM-agent replay libraries (timewarp-llm, replayt), engine replay docs and tutorial
+    blogs, all outside games, plus the SpacetimeDB commit log the entry already has. No engine or middleware release documents
+    recording model outputs for replay. Infinite Craft is the one game-side precedent for storing model outputs once and reusing
+    them; it is recorded above as borderline and does not lower the ceiling under the strict reading.
+- id: language-modding
+  entry_ceiling_now: 3
+  known_items:
+  - title: Roblox Assistant (Roblox Studio)
+    kind: official
+    closeness: feature
+    why: Writes Luau scripts from text prompts against the platform API; a creation platform, not a moddable sim.
+    named_in_entry: true
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: true
+    which_query: Roblox Assistant agentic playtest automatically tests generated code Studio 2025
+    retrieved: true
+  - title: Epic Developer Assistant (UEFN / Verse)
+    kind: official
+    closeness: feature
+    why: Assistant that writes Verse code for Fortnite islands from prompts; a platform, not a sim.
+    named_in_entry: false
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: Scribblenauts
+    kind: game
+    closeness: adjacent
+    why: Typed nouns and adjectives become objects with properties; not mod code.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: Inform 7
+    kind: outside-games
+    closeness: adjacent
+    why: Compiler for a controlled subset of English, for interactive fiction authoring.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  logged_queries_rerun:
+  - official AI mod creator natural language mod generator game developer announces tool players describe mod
+  - 'Minecraft OR RimWorld OR "Cities: Skylines" OR Factorio OR inZOI official tool generate mod from text description AI'
+  - Roblox Assistant agentic playtest automatically tests generated code Studio 2025
+  synonym_queries:
+  - >-
+    developer adds in-game AI tool create mods by describing them text prompt official modding support sandbox game 2026 announcement
+  - >-
+    Hytale OR "s&box" OR "Space Engineers" OR Minecraft official AI assistant writes scripts mods from natural language creators
+  - >-
+    Steam game "describe" a rule or behavior in plain English AI generates game logic scripting sandbox early access "natural
+    language" creation
+  new_prior_art: []
+  notes: >-
+    Epic Developer Assistant is in the entry's checked pages but not in closest or also; the reruns did not surface it. The
+    synonym queries found only third-party mod generators (CreativeMode for Minecraft, Player.games for Minecraft and Hytale,
+    ModCraft for PEAK), standalone text-to-game engines (Summer Engine, Feika AI Game Engine, Bitmagic), Roblox's text-to-3D
+    and agentic tools, and HySkript, a hand-written English-like scripting mod for Hytale. None is a developer of a moddable
+    sim shipping the design, so nothing goes below 3. The third-party generators are the same class as the entry's Player
+    Games item.
+- id: salience-gated-llm-agents
+  entry_ceiling_now: 3
+  known_items:
+  - title: RimTalk (RimWorld mod)
+    kind: mod
+    closeness: feature
+    why: LLM dialogue built from colonists' current thoughts and activity; vanilla utility AI runs routine behaviour.
+    named_in_entry: true
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: true
+    which_query: RimTalk RimWorld mod LLM colonists conversations triggered events local model
+    retrieved: true
+  - title: RimGPT (RimWorld mod)
+    kind: mod
+    closeness: feature
+    why: LLM is called on logged game events to produce spoken commentary; routine behaviour untouched.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: true
+    which_query: RimGPT mod RimWorld AI commentator reacts to game events ChatGPT brrainz
+    retrieved: true
+  - title: inZOI Smart Zoi
+    kind: official
+    closeness: feature
+    why: On-device small LM writes Zoi thoughts after actions and at life events over a needs simulation.
+    named_in_entry: true
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: true
+  - title: Mantella (Skyrim mod)
+    kind: mod
+    closeness: feature
+    why: LLM is called only when the player speaks to an NPC; vanilla AI runs everything else.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  logged_queries_rerun:
+  - RimTalk RimWorld mod LLM colonists conversations triggered events local model
+  - RimGPT mod RimWorld AI commentator reacts to game events ChatGPT brrainz
+  - RimWorld mod LLM generates mood thoughts memories when event happens death raid "thought" local model
+  synonym_queries:
+  - >-
+    colony sim Steam game colonists powered by language model memories thoughts only at important events utility AI routine
+    behavior
+  - >-
+    life simulation game generative AI NPCs reflect on life events memory diary language model Steam early access 2026 "AI
+    NPC"
+  new_prior_art:
+  - title: RimMind - Personality (RimWorld mod, RimMind suite)
+    kind: mod
+    closeness: feature (near design)
+    year: 2026
+    url: https://openworkshop.miskler.ru/mod/89919
+    quote: Pawn status is sent to LLM daily or upon event triggers
+    would_set_ceiling: 3
+    counts: true
+    why: >-
+      Event-triggered model calls (plus a daily call) return one to three typed mood thoughts with intensity (mapped to -10..+10
+      mood) and duration, shown in the mood panel, while vanilla AI runs routine behaviour. That is the design's write-back
+      without a salience score or a call cap. Retrieved by the third rerun logged query but not named in the entry. The page
+      is a Workshop mirror; the suite page is dated 2026-04-25.
+  notes: >-
+    Synonym queries surfaced Ememe (Steam Early Access, generative-AI NPC life sim) and Life of an NPC (AI-directed town sim).
+    From the snippets, both run their NPCs on the model throughout rather than gating calls on events, so they do not show
+    the feature, and I did not fetch them. Mantella was not retrieved: the logged queries are RimWorld- and inZOI-specific.
+- id: bottleneck-explainer
+  entry_ceiling_now: 3
+  known_items:
+  - title: Bottleneck / Bottleneck Lite (Factorio mods)
+    kind: mod
+    closeness: adjacent
+    why: >-
+      Status light per machine (working, input-starved, output full); a lens, but no perturbation or re-run. The entry rates
+      it feature.
+    named_in_entry: true
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: true
+    which_query: >-
+      factory game feature shows bottleneck in production line simulation bottleneck indicator Satisfactory OR Captain of
+      Industry OR Production Line OR shapez
+    retrieved: true
+  - title: BottleneckUI (Dyson Sphere Program mod)
+    kind: mod
+    closeness: adjacent
+    why: Panel listing machines that lack inputs or power; no perturbation.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: Rate Calculator / Helmod / Factory Planner (Factorio mods)
+    kind: mod
+    closeness: adjacent
+    why: Compute required or current rates; no perturbation of the live network.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: true
+    which_query: Factorio calculator linear programming limiting resource shadow price YAFC Factory Planner bottleneck
+    retrieved: true
+  logged_queries_rerun:
+  - Factorio mod bottleneck detection identifies limiting machine production chain analysis
+  - >-
+    factory game feature shows bottleneck in production line simulation bottleneck indicator Satisfactory OR Captain of Industry
+    OR Production Line OR shapez
+  - Factorio calculator linear programming limiting resource shadow price YAFC Factory Planner bottleneck
+  synonym_queries:
+  - >-
+    factory automation game overlay highlights which machine limits output "limited by" throughput constraint built-in feature
+    patch notes
+  - >-
+    Satisfactory OR "Dyson Sphere Program" OR "Captain of Industry" mod bottleneck finder starved machines production analysis
+  followup_queries:
+  - Flowline Steam idle factory bottleneck release date constraint station game
+  new_prior_art:
+  - title: Factory Insight (Factorio mod)
+    kind: mod
+    closeness: design
+    year: 2026
+    url: https://mods.factorio.com/mod/factory-insight
+    quote: One chain of reasons, ending at the root cause
+    would_set_ceiling: 3
+    counts: true
+    why: >-
+      Measures live machines, traces belts, inserters and suppliers upstream, and writes a one-line verdict with a causal
+      chain to the root cause. For train routing it re-runs the route search with the proposed fix applied before recommending
+      it. This contradicts the entry's verdict that the Factorio mods write no explanation and never re-run. Created about
+      two months before 2026-11-04, so before the 2026-10-24 window.
+  - title: FLOWORKS (Steam, Early Access)
+    kind: game
+    closeness: feature (narrower, lens only)
+    year: 2026
+    url: https://store.steampowered.com/app/4858700/
+    quote: When a line jams, the bottleneck literally glows.
+    would_set_ceiling: 3
+    counts: true
+    why: >-
+      A shipped game (2026-07-10, 8 reviews) with a built-in bottleneck highlight. It does not perturb or explain, so under
+      the entry's own reading of the Bottleneck mod it is a narrower form (3); strictly, it is only adjacent (4).
+  - title: BottleneckUI (Dyson Sphere Program mod)
+    kind: mod
+    closeness: feature (narrower, status sampling)
+    year: 
+    url: https://thunderstore.io/c/dyson-sphere-program/p/Valoneu/BottleneckUI/
+    quote: currently lacking input items or suffering from power shortages
+    would_set_ceiling: 3
+    counts: true
+    why: >-
+      The same class as the Bottleneck mod the entry rates feature: it lists starved machines and does not perturb. The page
+      shows no first-upload date.
+  notes: >-
+    Flowline (in the entry's checked pages) is still unreleased (store date 2027-03-08). Factory Insight is the strongest
+    precedent found; it is a mod, so the ceiling stays 3, but the entry's verdict text is out of date.
+- id: local-first-ai-sims
+  entry_ceiling_now: 2
+  known_items:
+  - title: inZOI (Smart Zoi via NVIDIA ACE on-device SLM)
+    kind: game
+    closeness: design
+    why: A large life sim that ships an on-device small LM for runtime character features (2025).
+    named_in_entry: true
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: true
+    which_query: NARAKA BLADEPOINT AI teammate NVIDIA ACE available now local inference PC launch 2025
+    retrieved: true
+  - title: AI Roguelite
+    kind: game
+    closeness: feature
+    why: Steam game whose text generation can run on local LLM backends.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: Mantella (Skyrim mod)
+    kind: mod
+    closeness: feature
+    why: Supports local LLM and TTS backends for NPC dialogue.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: Dead Meat (Meaning Machine)
+    kind: game
+    closeness: feature
+    why: Interrogation game announced with an on-device LLM; release status unsure.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  logged_queries_rerun:
+  - '"AI People" GoodAI early access Steam LLM NPCs sandbox'
+  - NARAKA BLADEPOINT AI teammate NVIDIA ACE available now local inference PC launch 2025
+  synonym_queries:
+  - Steam game "runs locally" built-in language model offline no internet AI NPC dialogue "no API key" simulation
+  - >-
+    on-device small language model shipped in PC game 2026 NVIDIA ACE OR "In-Game Inferencing" local inference life sim strategy
+    launch
+  new_prior_art: []
+  notes: >-
+    The ceiling is already 2, the lowest the rules allow, so no find can lower it. The synonym queries surfaced Unreal plugins
+    for offline LLMs (LocalMind AI, Universal Offline LLM Plugin: middleware, not titles), NVIDIA's statement that Nemotron-4
+    4B shipped on-device in MechaBREAK, and AI People's December 2024 local-LLM update (its own platform, not Steam). None
+    was fetched, since none could change the ceiling. The entry has only two logged web queries; both were rerun.
+- id: content-elastic-events
+  entry_ceiling_now: 3
+  known_items:
+  - title: RimWorld quest generator (QuestScriptDefs, 1.1+)
+    kind: game
+    closeness: feature
+    why: Generates quests at runtime from templates with slots, accept/decline options and typed rewards, gated by conditions.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: Skyrim Radiant quests
+    kind: game
+    closeness: feature
+    why: Template quests whose targets, locations and givers are filled from game state at runtime.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: Wildermyth
+    kind: game
+    closeness: feature
+    why: Authored events cast specific heroes into roles by traits, relationships and history, with choices and typed effects.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: Caves of Qud dynamic quests and histories
+    kind: game
+    closeness: feature
+    why: Procedurally generated quests and histories from grammars and templates during play.
+    named_in_entry: true
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: true
+  logged_queries_rerun:
+  - >-
+    game LLM generates events at runtime JSON schema options effects validated against game state Steam AI disclosure "events
+    are generated"
+  - Reigns-like card game LLM generated dilemmas runtime swipe AI generated cards Steam itch.io
+  - Bannerlord "AI Influence" mod LLM dynamic events generated diplomacy
+  synonym_queries:
+  - >-
+    strategy game AI-generated events during play LLM writes event choices effects constrained to game rules Steam "AI Generated
+    Content Disclosure" events
+  - >-
+    game procedurally generates storylets dilemmas from templates referencing your characters and history "procedural events"
+    choices consequences colony OR kingdom sim
+  followup_queries:
+  - EQUILIBRIUM Steam 4661850 AI generated events schema
+  new_prior_art: []
+  notes: >-
+    Three of my four known items (RimWorld's quest generator, Skyrim's Radiant quests, Wildermyth) are classical runtime template
+    generators: the criteria count them as the feature, and the logged queries, all LLM-flavoured, miss them. Each would cap
+    at 3 (a game doing the feature), the same as now, so the ceiling holds; but they are older and larger precedents than
+    EQUILIBRIUM. A reviewer reading the design sketch without the language model might call RimWorld's quest templates, with
+    slot filling and run conditions, the design (2); I score them feature, consistent with the entry's treatment of Caves
+    of Qud. Synonym queries found Module Watcher (itch.io prototype whose page both claims AI-generated scenarios and tags
+    'No generative AI was used'; not counted), GenRealms (itch.io LLM Reigns-like; not fetched), and research or engine projects
+    (Waidrin, Ghost Engine). The EQUILIBRIUM follow-up returned nothing about the game.
+- id: placement-that-tells-stories
+  entry_ceiling_now: 3
+  known_items:
+  - title: RimWorld room thoughts
+    kind: game
+    closeness: adjacent
+    why: Room impressiveness and placement give named colonists mood thoughts; no story events with choices.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: Project Highrise tenant adjacency
+    kind: game
+    closeness: adjacent
+    why: Named tenants react to noisy or smelly neighbours and leave; complaints, not events.
+    named_in_entry: false
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: 'Cities: Skylines Chirper'
+    kind: game
+    closeness: adjacent
+    why: Named citizens post about local conditions and services; no events or choices.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: SimCity 4 My Sim
+    kind: game
+    closeness: adjacent
+    why: A named sim placed in a house reports neighbourhood problems; no placement-triggered vignettes.
+    named_in_entry: false
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: true
+    which_query: SimCity 4 "My Sim" mode move sim into house comments about neighborhood
+    retrieved: true
+  logged_queries_rerun:
+  - city builder where placing buildings triggers story events about named villagers neighbors
+  - city builder adjacency events villagers react to neighboring buildings tavern next to temple event chain indie 2024 2025
+  - SimCity 4 "My Sim" mode move sim into house comments about neighborhood
+  synonym_queries:
+  - >-
+    cozy town builder villagers react when you build next to their house neighbor building triggers villager quest or event
+    choice named residents
+  - >-
+    city builder "named citizens" event fires when you place a building near their home story vignette decision Steam 2025
+    2026
+  followup_queries:
+  - Town to City Galaxy Grove villagers requests buildings story events named residents placement
+  new_prior_art: []
+  notes: >-
+    All my known items are adjacent (they would cap at 4), so none challenges the ceiling of 3. The synonym queries surfaced
+    Animal Crossing placement rules, a Stardew Valley forum wish for NPC reactions to placed items (a wish, so it does not
+    count), Fabledom (building Hero Quarters unlocks a named protector; one-off unlock, not adjacency events), Founders Fortune
+    (general mood reactions), Lakeburg Legacies and Croakwood. None shows events fired by placement or adjacency for named
+    inhabitants.
+- id: drama-aware-storyteller
+  entry_ceiling_now: 3
+  known_items:
+  - title: Facade drama manager
+    kind: game
+    closeness: adjacent
+    why: Picks authored beats by tension arc and character state; rule-based, no language model.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: true
+    which_query: LLM drama manager selects authored events narrative relevance game research paper experience management language
+      model
+    retrieved: true
+  - title: Crusader Kings III weighted events and story cycles
+    kind: game
+    closeness: adjacent
+    why: Authored events weighted by relationships and traits, with story cycles tracking open threads; rule-based.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  - title: RimWorld storytellers
+    kind: game
+    closeness: adjacent
+    why: Pick authored incidents by threat budget and timing; the baseline the thesis improves on.
+    named_in_entry: false
+    in_entry_checked_pages: true
+    retrieved_by_logged_queries: true
+    which_query: colony sim Steam "AI storyteller" powered by large language model chooses events colonists relationships
+      2025 2026 game
+    retrieved: true
+  - title: Left 4 Dead AI Director
+    kind: game
+    closeness: adjacent
+    why: Paces authored encounters by player stress; no relationship or arc model.
+    named_in_entry: false
+    in_entry_checked_pages: false
+    retrieved_by_logged_queries: false
+    which_query: 
+    retrieved: false
+  known_none_note: >-
+    Before the search I knew no shipped title where a language model ranks authored events; all four known items are rule-based
+    analogues.
+  logged_queries_rerun:
+  - RimWorld mod LLM generated incidents events AI storyteller mod GPT
+  - colony sim Steam "AI storyteller" powered by large language model chooses events colonists relationships 2025 2026 game
+  - LLM drama manager selects authored events narrative relevance game research paper experience management language model
+  synonym_queries:
+  - >-
+    "AI director" powered by language model chooses which handcrafted events or encounters happen based on characters relationships
+    game Steam
+  - >-
+    LLM game master selects from authored quests storylets deck based on player history shipped game early access narrative
+    director language model
+  followup_queries:
+  - RimWorld "Residuals" OR "RimMind Storyteller" LLM storyteller picks incidents colony state workshop
+  new_prior_art:
+  - title: "[Og] Rimteller: AI Powered Storyteller (Experimental) (RimWorld mod)"
+    kind: mod
+    closeness: feature
+    year: 2026
+    url: https://openworkshop.miskler.ru/mod/8442
+    quote: purposefully generates events based on the current state of the colony
+    would_set_ceiling: 3
+    counts: true
+    why: >-
+      An LLM chooses which triggerable vanilla event fires, from colony state, trends and history, while the game keeps event
+      points and frequency. That is the defining feature in a mod. Published 2026-02-14 per the Workshop mirror. First surfaced
+      by the third rerun logged query on causal-why-query; not named in this entry.
+  notes: >-
+    RimMind - Storyteller (2026-04-25) is described on its mirror page only as AI-driven event selection, with no explicit
+    statement that a language model picks the events, so it is not counted. Exo's CYOA (Steam Early Access) has a runtime
+    LLM game master handling world consequences, but no authored deck is shown, so it is not counted. Solo Roleplayer (itch.io)
+    has an LLM director that stages scenes, not authored-event selection. Rule-based drama managers (Facade, Shepherd) and
+    research (Drama Llama, Dramamancer) appear, as the entry already notes.

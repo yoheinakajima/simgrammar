@@ -2,7 +2,7 @@
 
 ### 8.1 How techniques change mechanics
 
-Each `affects` edge records one of seven effects. Across {{stat:n_affects_edges}} edges the most common effect is *replaces substrate* ({{stat:n_effect_replaces_substrate}} edges): the technique computes the mechanic in place of its existing rule while the mechanic keeps its role in play, and often makes it richer as it does.{{assert:top_effect == Replaces substrate}} Acceleration is the rarest effect ({{stat:n_effect_accelerates}} edges) and explanation the next rarest ({{stat:n_effect_explains}}).{{assert:rarest_effect == Accelerates}}{{assert:rank_effect_explains == 2}}
+Each `affects` edge records one of seven effects. Across {{stat:n_affects_edges}} edges the most common effect is *replaces substrate* ({{stat:n_effect_replaces_substrate}} edges): the technique computes the mechanic in place of its existing rule while the mechanic keeps its role in play, and often makes it richer as it does.{{assert:top_effect == Replaces substrate}} It leads under the written precedence order of the audit below; as first coded, *deepens* led ({{stat:n_effect_deepens_before_audit}} edges, against {{stat:n_effect_replaces_substrate_before_audit}}), because most of the relabelled edges sat on the boundary between the two.{{assert:top_effect_before_audit == Deepens}} Acceleration is the rarest effect ({{stat:n_effect_accelerates}} edges) and explanation the next rarest ({{stat:n_effect_explains}}).{{assert:rarest_effect == Accelerates}}{{assert:rank_effect_explains == 2}}
 
 {{table:effect-distribution}}
 
