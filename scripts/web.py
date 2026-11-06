@@ -499,10 +499,13 @@ class Web:
                                  for a in self.analysis["byline"])
         bib = (f"@misc{{nakajima{meta['date'][:4]}grammar,\n  title = {{{meta['title']}: {meta['subtitle']}}},\n  author = {{{bib_names}}},\n"
                f"  year = {{{meta['date'][:4]}}},\n  version = {{{meta['version']}}},\n" + (f"  doi = {{{meta['doi']}}},\n" if meta.get("doi") else "") +
+               (f"  eprint = {{{meta['arxiv']}}},\n  archivePrefix = {{arXiv}},\n" if meta.get("arxiv") else "") +
                f"  url = {{{self.site['url']}paper/}},\n  note = {{Dataset {self.short}; full sha256 in manifest.json}}\n}}")
         nruns = len(self.ents.get("run", []))
         doi_url = f"https://doi.org/{meta['doi']}" if meta.get("doi") else ""
         doi_span = f' <span>doi <a href="{esc(doi_url)}">{esc(meta["doi"])}</a></span>' if doi_url else ""
+        arxiv_url = f"https://arxiv.org/abs/{meta['arxiv']}" if meta.get("arxiv") else ""
+        doi_span += f' <span>arXiv <a href="{esc(arxiv_url)}">{esc(meta["arxiv"])}</a></span>' if arxiv_url else ""
         # the receipt counts what the site publishes, as the home page and the indexes do; manifest.json counts files,
         # which include deprecated records, so the receipt says how many of those there are
         dep = [counted(man["counts"][t] - counts[t], f"deprecated {t}") for t in man["counts"] if t in counts and man["counts"][t] > counts[t]]
@@ -525,12 +528,12 @@ class Web:
 <section class="section" id="references"><div class="section-line"><h2>references <span>· {len(refs)} cited in the text</span></h2><a href="../source/" data-internal>all {counted(counts['source'], "source")}</a></div>
 <div class="register" data-kind="refs">{''.join(refs)}</div></section>
 <section class="section cite" id="cite"><div class="section-line"><h2>cite</h2><span>bibtex</span></div>
-<div class="cite-line"><span class="chip">{esc(authors)}</span><span class="chip">{esc(meta['date'][:4])}</span><span class="chip">v{esc(meta['version'])}</span><span class="chip">dataset {self.short}</span>{f'<span class="chip">doi {esc(meta["doi"])}</span>' if doi_url else ""}</div>
+<div class="cite-line"><span class="chip">{esc(authors)}</span><span class="chip">{esc(meta['date'][:4])}</span><span class="chip">v{esc(meta['version'])}</span><span class="chip">dataset {self.short}</span>{f'<span class="chip">doi {esc(meta["doi"])}</span>' if doi_url else ""}{f'<span class="chip">arXiv {esc(meta["arxiv"])}</span>' if arxiv_url else ""}</div>
 <div class="prompt"><div class="copy-row"><span>bibtex</span><span>{esc(meta['title'].lower())} · v{esc(meta['version'])}</span></div><pre data-style="citation">{esc(bib)}</pre></div></section>
 <section class="section" id="receipt"><div class="section-line"><h2>build receipt <span>· reproduce this page</span></h2><span>python scripts/build.py</span></div>
 <dl class="receipt" data-size="wide"><dt>dataset</dt><dd><span class="hash" data-prefix="sha256:">{man['dataset_sha256']}</span></dd>
 <dt>contract</dt><dd>{esc(man['contract_version'])} · <a href="{esc(self.gh('CONTRACT.md'))}">CONTRACT.md</a></dd>
-{f'<dt>doi</dt><dd><a href="{esc(doi_url)}">{esc(meta["doi"])}</a> · Zenodo, newest version</dd>' if doi_url else ""}
+{f'<dt>doi</dt><dd><a href="{esc(doi_url)}">{esc(meta["doi"])}</a> · Zenodo, newest version</dd>' if doi_url else ""}{f'<dt>arXiv</dt><dd><a href="{esc(arxiv_url)}">{esc(meta["arxiv"])}</a> · preprint</dd>' if arxiv_url else ""}
 <dt>published</dt><dd>{esc(published)}</dd>
 <dt>edges</dt><dd>{man['edges']}</dd>
 <dt>generator</dt><dd>{esc(man['generator'])} · scripts/web.py · scripts/viz.py</dd>

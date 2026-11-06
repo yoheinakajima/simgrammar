@@ -1,0 +1,14 @@
+id: 2026-11-06-arxiv-ready
+type: run
+kind: maintenance
+date: '2026-11-06'
+actor: agent
+operator: yoheinakajima
+agent:
+  model: claude-opus-5-5
+  harness: Claude Code (desktop app)
+purpose: Let report/meta.yaml carry the paper's arXiv id, so that recording it once arXiv announces the
+  paper is a one-line change.
+method: 'The paper went to arXiv on 2026-11-05 as submit/8336100 (cs.AI, cross-listed to cs.HC); arXiv assigns its id only when it announces the paper. report/meta.yaml may now carry `arxiv`, and scripts/build.py writes it to CITATION.cff as a url identifier beside the concept DOI. scripts/web.py shows it on the paper page''s header line, citation chips, BibTeX (eprint and archivePrefix), and build receipt, and scripts/paper_pdf.py puts it on the PDF title page after the DOI. The field is not set yet. Built origin/main and this branch to separate directories: the 5,225 files are byte-identical and CITATION.cff is unchanged. With a placeholder id set, CITATION.cff, the paper page, its BibTeX, and the LaTeX title page each carried it, and make check passed; the placeholder was then removed. The PDF itself was not recompiled. No record, score, statistic, or report text changed.'
+contract_version: '1.3'
+proposals: []
