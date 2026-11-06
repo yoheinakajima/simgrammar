@@ -324,6 +324,9 @@ def citation_cff(meta: dict, analysis: dict) -> str:
     lines += ["license: CC-BY-4.0", f"url: {q(meta['site']['url'])}", f"repository-code: {q(meta['site']['repo'])}"]
     if meta.get("doi"):
         lines.append(f"doi: {q(meta['doi'])}")
+    if meta.get("arxiv"):
+        lines += ["identifiers:", "  - type: url", f"    value: {q('https://arxiv.org/abs/' + meta['arxiv'])}",
+                  f"    description: {q('arXiv preprint arXiv:' + meta['arxiv'])}"]
     return "\n".join(lines) + "\n"
 
 
